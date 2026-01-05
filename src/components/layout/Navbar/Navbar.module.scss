@@ -2,7 +2,7 @@
     display: flex; //deixar alinhado horizontal
     justify-content: space-between; //alinhar horizontalmente
     align-items: center; //alinhar verticalmente
-    width: 100%; //largura
+    //width: 100%; //largura
     height: 100%; //altura do container
     max-height: 10vh; //altura máxima que ele pode ter
     background: #DDDDDD20; // cor em hexadecimal e a opacidade;
@@ -21,7 +21,14 @@
        // padding: 20px; //espaçamento para dentro
         //height: 100%;
 
-
+        .button {
+            background: none;
+            border: none;
+            display: flex;
+            gap: 5px;
+            color: lightgray;
+            font-weight: bold;
+        }
     }
 
 
