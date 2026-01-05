@@ -28,6 +28,12 @@
             gap: 5px;
             color: lightgray;
             font-weight: bold;
+            cursor: pointer;
+        }
+        .activeButton{
+          background-color: blue;
+          padding: 10px;
+
         }
     }
 

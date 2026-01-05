@@ -1,7 +1,7 @@
 import styles from "./Navbar.module.scss";
 import reactLogo from '../../../assets/react.svg'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChartLine, faPeopleGroup, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faChartLine, faPeopleGroup, faUser,faHouse} from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
 
@@ -9,8 +9,13 @@ const Navbar = () => {
         <nav className={styles.navbar}>
           <img src={reactLogo}  alt={""}/>
 
-
           <div className={styles.buttons}>
+            <button className={...{...styles.button, ...styles.activeButton} }>
+              <FontAwesomeIcon icon={faHouse}/>
+              <span>Home</span>
+            </button>
+
+
             <button className={styles.button}>
               <FontAwesomeIcon icon={faChartLine}/>
               <span>Tela do treinador</span>
