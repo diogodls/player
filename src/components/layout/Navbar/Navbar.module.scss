@@ -29,12 +29,24 @@
             color: lightgray;
             font-weight: bold;
             cursor: pointer;
+            height:30px;
+            align-items: center;
         }
-        .activeButton{
-          background-color: blue;
-          padding: 10px;
+        .button:hover{
+           background: #262626;
+        }
+        .active{
+          //background: none;
+          border: none;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          color: lightgray;
+          font-weight: bold;
+          cursor: pointer;
+          background: black;
+        }
 
-        }
     }
 
 
