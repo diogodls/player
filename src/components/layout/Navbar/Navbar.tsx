@@ -10,7 +10,7 @@ const Navbar = () => {
           <img src={reactLogo}  alt={""}/>
 
           <div className={styles.buttons}>
-            <button className={...{...styles.button, ...styles.activeButton} }>
+            <button className={styles.button}>
               <FontAwesomeIcon icon={faHouse}/>
               <span>Home</span>
             </button>
