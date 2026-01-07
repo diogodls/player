@@ -3,23 +3,28 @@ import reactLogo from '../../../assets/logoo.png'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChartColumn, faPeopleGroup, faUser,faHouse} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
+import {classNames} from "../../../utils/classNames.ts";
 
 const buttons = [
   {
     label: "Home",
     icon: faHouse,
+    x: 'lobler'
   },
   {
     label: "Tela do treinador",
     icon: faChartColumn,
+    x: 'lobler'
   },
   {
     label: "Análise individual",
     icon: faUser,
+    x: 'lobler'
   },
   {
     label: "Análise de equipe",
     icon: faPeopleGroup,
+    x: 'lobler'
   },
 ];
 
@@ -37,9 +42,12 @@ const Navbar = () => {
                     <button
                       key={btn.label}
                       className={
-                        index === activeIndex
-                          ? styles.active
-                          : styles.button
+                        classNames([styles.button,
+                          index === activeIndex
+                            ? styles.active
+                            : ''
+                          ]
+                        )
                       }
                       onClick={() => setActiveIndex(index)}
                     >
