@@ -1,7 +1,7 @@
 import styles from "./Navbar.module.scss";
-import reactLogo from '../../../assets/react.svg'
+import reactLogo from '../../../assets/logoo.png'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChartLine, faPeopleGroup, faUser,faHouse} from "@fortawesome/free-solid-svg-icons";
+import {faChartColumn, faPeopleGroup, faUser,faHouse} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 const buttons = [
@@ -11,7 +11,7 @@ const buttons = [
   },
   {
     label: "Tela do treinador",
-    icon: faChartLine,
+    icon: faChartColumn,
   },
   {
     label: "Análise individual",

@@ -5,14 +5,17 @@
     //width: 100%; //largura
     height: 100%; //altura do container
     max-height: 10vh; //altura máxima que ele pode ter
-    background: #DDDDDD20; // cor em hexadecimal e a opacidade;
+    background: #1f2937; // cor em hexadecimal e a opacidade;
     border: 1px solid #DDDDDD70; //borda no container, tamanho - tipo - cor
     padding: 20px; //espaçamento para dentro
     // margin: 20px; //espaçamento para fora
     // gap : 10px; // espaçamento entre items
+    border: none;
 
     .buttons {
         display: flex;
+        //border:30px solid blue;
+        //border-radius:100px;
         //justify-content: space-between;
        // align-items: center;
         gap: 20px;
@@ -22,29 +25,32 @@
         //height: 100%;
 
         .button {
-            background: none;
-            border: none;
+            padding: 5px 10px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 10px;
             display: flex;
             gap: 5px;
-            color: lightgray;
+            color: #cbd5e1;
             font-weight: bold;
             cursor: pointer;
-            height:30px;
+            height:40px;
             align-items: center;
         }
         .button:hover{
-           background: #262626;
+           background: #2a3441;
         }
         .active{
           //background: none;
-          border: none;
+          border: 1px solid #3b82f6;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           gap: 5px;
-          color: lightgray;
+          color: white;
           font-weight: bold;
           cursor: pointer;
-          background: black;
+          background: #1E90FF;
         }
 
     }
