@@ -4,40 +4,51 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChartLine, faPeopleGroup, faUser,faHouse} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
+const buttons = [
+  {
+    label: "Home",
+    icon: faHouse,
+  },
+  {
+    label: "Tela do treinador",
+    icon: faChartLine,
+  },
+  {
+    label: "Análise individual",
+    icon: faUser,
+  },
+  {
+    label: "Análise de equipe",
+    icon: faPeopleGroup,
+  },
+];
+
+
 
 const Navbar = () => {
-  const [active, setActive] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(4);
 
     return (
         <nav className={styles.navbar}>
           <img src={reactLogo}  alt={""}/>
 
           <div className={styles.buttons}>
-            <button
-              className={active ? styles.active : styles.button}
-              onClick={() => setActive(!active)}
-            >
-              <FontAwesomeIcon icon={faHouse}/>
-              <span>Home</span>
-            </button>
-
-
-            <button className={styles.button}>
-              <FontAwesomeIcon icon={faChartLine}/>
-              <span>Tela do treinador</span>
-            </button>
-
-            <button className={styles.button}>
-              <FontAwesomeIcon icon={faUser}/>
-              <span>Analise individual</span>
-            </button>
-
-            <button className={styles.button}>
-              <FontAwesomeIcon icon={faPeopleGroup}/>
-              <span>Análise de equipe</span>
-            </button>
-          </div>
-        </nav>
+                  {buttons.map((btn, index) => (
+                    <button
+                      key={btn.label}
+                      className={
+                        index === activeIndex
+                          ? styles.active
+                          : styles.button
+                      }
+                      onClick={() => setActiveIndex(index)}
+                    >
+                      <FontAwesomeIcon icon={btn.icon} />
+                      <span>{btn.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </nav>
     );
 };
 
