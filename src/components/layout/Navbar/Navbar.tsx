@@ -9,26 +9,20 @@ const buttons = [
   {
     label: "Home",
     icon: faHouse,
-    x: 'lobler'
   },
   {
     label: "Tela do treinador",
     icon: faChartColumn,
-    x: 'lobler'
   },
   {
     label: "Análise individual",
     icon: faUser,
-    x: 'lobler'
   },
   {
     label: "Análise de equipe",
     icon: faPeopleGroup,
-    x: 'lobler'
   },
 ];
-
-
 
 const Navbar = () => {
   const [activeIndex, setActiveIndex] = useState(4);
@@ -38,25 +32,25 @@ const Navbar = () => {
           <img src={reactLogo}  alt={""}/>
 
           <div className={styles.buttons}>
-                  {buttons.map((btn, index) => (
-                    <button
-                      key={btn.label}
-                      className={
-                        classNames([styles.button,
-                          index === activeIndex
-                            ? styles.active
-                            : ''
-                          ]
-                        )
-                      }
-                      onClick={() => setActiveIndex(index)}
-                    >
-                      <FontAwesomeIcon icon={btn.icon} />
-                      <span>{btn.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </nav>
+            {buttons.map((btn, index) => (
+              <button
+                key={btn.label}
+                className={
+                  classNames([styles.button,
+                    index === activeIndex
+                      ? styles.active
+                      : ''
+                    ]
+                  )
+                }
+                onClick={() => setActiveIndex(index)}
+               >
+                <FontAwesomeIcon icon={btn.icon} />
+                <span>{btn.label}</span>
+             </button>
+            ))}
+          </div>
+        </nav>
     );
 };
 

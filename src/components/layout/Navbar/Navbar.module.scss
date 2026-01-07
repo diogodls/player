@@ -14,40 +14,30 @@
 
     .buttons {
         display: flex;
-        //border:30px solid blue;
-        //border-radius:100px;
-        //justify-content: space-between;
-       // align-items: center;
         gap: 20px;
-        //width: 30%;
-
-       // padding: 20px; //espaçamento para dentro
-        //height: 100%;
 
         .button {
-            padding: 5px 10px;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 10px;
-            display: flex;
-            gap: 5px;
-            color: #cbd5e1;
-            font-weight: bold;
-            cursor: pointer;
-            height:40px;
-            align-items: center;
+          padding: 5px 10px;
+          background: transparent;
+          border: 1px solid transparent;
+          border-radius: 10px;
+          display: flex;
+          gap: 5px;
+          color: #cbd5e1;
+          font-weight: bold;
+          cursor: pointer;
+          height:40px;
+          align-items: center;
         }
+
         .button:hover{
            background: #2a3441;
         }
+
         .active{
           border: 1px solid #3b82f6;
           color: white;
           background: #1E90FF;
         }
-
     }
-
-
 }
-
