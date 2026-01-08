@@ -6,15 +6,19 @@
     height: 100%; //altura do container
     max-height: 10vh; //altura máxima que ele pode ter
     background: #1f2937; // cor em hexadecimal e a opacidade;
-    border: 1px solid #DDDDDD70; //borda no container, tamanho - tipo - cor
-    padding: 20px; //espaçamento para dentro
+    //border: ; //borda no container, tamanho - tipo - cor
+    padding: 10px 20px; //espaçamento para dentro
     // margin: 20px; //espaçamento para fora
     // gap : 10px; // espaçamento entre items
-    border: none;
+    border-bottom: 1px solid #DDDDDD20;
+
+    .img {
+      height:100%;
+    }
 
     .buttons {
         display: flex;
-        gap: 20px;
+        gap:1px;
 
         .button {
           padding: 5px 10px;
@@ -37,7 +41,7 @@
         .active{
           border: 1px solid #3b82f6;
           color: white;
-          background: #1E90FF;
+          background: var(--primary-color);
         }
     }
 }

@@ -25,11 +25,11 @@ const buttons = [
 ];
 
 const Navbar = () => {
-  const [activeIndex, setActiveIndex] = useState(4);
+  const [activeIndex, setActiveIndex] = useState(0);
 
     return (
         <nav className={styles.navbar}>
-          <img src={reactLogo}  alt={""}/>
+          <img className={styles.img} src={reactLogo}  alt={""}/>
 
           <div className={styles.buttons}>
             {buttons.map((btn, index) => (
