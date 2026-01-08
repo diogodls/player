@@ -18,10 +18,10 @@
 
     .buttons {
         display: flex;
-        gap:1px;
+        gap: 5px;
 
         .button {
-          padding: 5px 10px;
+          padding: 10px 15px;
           background: transparent;
           border: 1px solid transparent;
           border-radius: 10px;
@@ -30,7 +30,6 @@
           color: #cbd5e1;
           font-weight: bold;
           cursor: pointer;
-          height:40px;
           align-items: center;
         }
 
