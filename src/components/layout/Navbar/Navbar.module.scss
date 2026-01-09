@@ -5,38 +5,42 @@
     //width: 100%; //largura
     height: 100%; //altura do container
     max-height: 10vh; //altura máxima que ele pode ter
-    background: #DDDDDD20; // cor em hexadecimal e a opacidade;
-    border: 1px solid #DDDDDD70; //borda no container, tamanho - tipo - cor
-    padding: 20px; //espaçamento para dentro
+    background: #1f2937; // cor em hexadecimal e a opacidade;
+    //border: ; //borda no container, tamanho - tipo - cor
+    padding: 10px 20px; //espaçamento para dentro
     // margin: 20px; //espaçamento para fora
     // gap : 10px; // espaçamento entre items
+    border-bottom: 1px solid #DDDDDD20;
+
+    .img {
+      height:100%;
+    }
 
     .buttons {
         display: flex;
-        //justify-content: space-between;
-       // align-items: center;
-        gap: 20px;
-        //width: 30%;
-
-       // padding: 20px; //espaçamento para dentro
-        //height: 100%;
+        gap: 5px;
 
         .button {
-            background: none;
-            border: none;
-            display: flex;
-            gap: 5px;
-            color: lightgray;
-            font-weight: bold;
-            cursor: pointer;
+          padding: 10px 15px;
+          background: transparent;
+          border: 1px solid transparent;
+          border-radius: 10px;
+          display: flex;
+          gap: 5px;
+          color: #cbd5e1;
+          font-weight: bold;
+          cursor: pointer;
+          align-items: center;
         }
-        .activeButton{
-          background-color: blue;
-          padding: 10px;
 
+        .button:hover{
+           background: #2a3441;
+        }
+
+        .active{
+          border: 1px solid #3b82f6;
+          color: white;
+          background: var(--primary-color);
         }
     }
-
-
 }
-
