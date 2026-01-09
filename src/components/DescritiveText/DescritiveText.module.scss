@@ -1,0 +1,55 @@
+.content {
+  padding-block: 3rem;
+  background-color: #111828;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  gap: 35px;
+
+  .texts {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+
+    .icon {
+      font-size: 3em;
+      color: #60A4F9;
+    }
+
+    .title {
+      margin: 0;
+      color: white;
+    };
+
+    .secondaryTitle {
+      margin: 0;
+      color: #60A4F9;
+    };
+
+    .informativeText {
+      color: #B3BBB9;
+      text-align: center;
+      width: 80%;
+    };
+  }
+
+  .linkButtons {
+    display: flex;
+    gap: 10px;
+
+    .button {
+      padding: 15px;
+      font-weight: bold;
+      border-radius: 4px;
+      border: none;
+      background-color: #384152;
+      cursor: pointer;
+    }
+
+    .actionButton {
+      background-color: #2563EA;
+    }
+  }
+};

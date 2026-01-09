@@ -1,0 +1,46 @@
+.navbar {
+    display: flex; //deixar alinhado horizontal
+    justify-content: space-between; //alinhar horizontalmente
+    align-items: center; //alinhar verticalmente
+    //width: 100%; //largura
+    height: 100%; //altura do container
+    max-height: 10vh; //altura máxima que ele pode ter
+    background: #1f2937; // cor em hexadecimal e a opacidade;
+    //border: ; //borda no container, tamanho - tipo - cor
+    padding: 10px 20px; //espaçamento para dentro
+    // margin: 20px; //espaçamento para fora
+    // gap : 10px; // espaçamento entre items
+    border-bottom: 1px solid #DDDDDD20;
+
+    .img {
+      height:100%;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 5px;
+
+        .button {
+          padding: 10px 15px;
+          background: transparent;
+          border: 1px solid transparent;
+          border-radius: 10px;
+          display: flex;
+          gap: 5px;
+          color: #cbd5e1;
+          font-weight: bold;
+          cursor: pointer;
+          align-items: center;
+        }
+
+        .button:hover{
+           background: #2a3441;
+        }
+
+        .active{
+          border: 1px solid #3b82f6;
+          color: white;
+          background: var(--primary-color);
+        }
+    }
+}
