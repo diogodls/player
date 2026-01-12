@@ -1,4 +1,5 @@
 import './App.css'
+import Footer from './components/Footer/Footer.tsx';
 import Navbar from './components/layout/Navbar/Navbar.tsx'
 import {Outlet} from "react-router";
 
@@ -8,6 +9,7 @@ function App() {
     <>
       <Navbar />
       <Outlet />
+      <Footer />
     </>
   )
 }
