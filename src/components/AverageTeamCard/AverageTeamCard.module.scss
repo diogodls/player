@@ -1,25 +1,36 @@
-.divCard{
+.divCard {
   display: flex;
-  justify-content: center;
-  //justify-content: space-between;
+  justify-content: space-between;
   gap: 20px;
   height: fit-content;
-  .card{
+
+  .card {
     width: 100%;
     height: 95px;
-    padding: 5px 5px;
+    padding: 5px 22px;
+    border-radius: 15px;
+    font-size: 25px;
+    color: white;
     display: flex;
     align-items: center;
-    gap:10px;
-    border-radius: 15px;
-    font-size: 30px;
-    color: white;
-//    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    justify-content: space-between;
   }
-  .card-content{
+
+  .left {
     display: flex;
+    flex-direction: column;
   }
 
+  .cardName {
+    font-size: 15px;
+  }
 
+  .cardValue {
+    font-size: 30px;
+    font-weight: Bold;
+  }
 
+  .right {
+    font-size: 26px;
+  }
 }
