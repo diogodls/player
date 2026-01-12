@@ -1,8 +1,6 @@
 import {faChartColumn} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./AverageTeamCard.module.scss"
-import type {Icon} from "@fortawesome/fontawesome-svg-core";
-
 
 const cards = [
   {
@@ -24,13 +22,6 @@ const cards = [
     icon:faChartColumn
   }
 ]
-
-type AverageTeamCard ={
-  name: string
-  color: string
-  value: string
-  icon: Icon
-}
 
 const AverageTeamCard =  () => {
   return (

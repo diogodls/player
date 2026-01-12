@@ -1,0 +1,24 @@
+{
+  "coach-dashboard": {
+    "averageCards": [
+      {
+        "name":"Média ofensiva geral",
+        "color":"#2563eb",
+        "value":"10",
+        "icon":" faChartColumn"
+      },
+      {
+        "name":"Média defensiva geral",
+        "color": "#f97316",
+        "value": "20",
+        "icon":" faChartColumn"
+      },
+      {
+        "name":"Média defensiva geral",
+        "color":"#22c55e",
+        "value": "10",
+        "icon":"faChartColumn"
+      }
+    ]
+  }
+}
