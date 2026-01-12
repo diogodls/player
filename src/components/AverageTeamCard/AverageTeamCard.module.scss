@@ -1,0 +1,25 @@
+.divCard{
+  display: flex;
+  justify-content: center;
+  //justify-content: space-between;
+  gap: 20px;
+  height: fit-content;
+  .card{
+    width: 100%;
+    height: 95px;
+    padding: 5px 5px;
+    display: flex;
+    align-items: center;
+    gap:10px;
+    border-radius: 15px;
+    font-size: 30px;
+    color: white;
+//    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  }
+  .card-content{
+    display: flex;
+  }
+
+
+
+}

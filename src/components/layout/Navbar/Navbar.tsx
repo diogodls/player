@@ -27,7 +27,7 @@ const buttons = [
     icon: faPeopleGroup,
     link:'analise-equipe',
   },
-];
+]
 
 const Navbar = () => {
   const [activeIndex, setActiveIndex] = useState(0);
