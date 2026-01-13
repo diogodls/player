@@ -6,7 +6,6 @@ type AverageTeamCard ={
   cards: TeamCard[]
 }
 
-
 const AverageTeamCard =  ({cards}: AverageTeamCard) => {
   return (
     <div className={styles.divCard}>
