@@ -1,6 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./AverageTeamCard.module.scss"
 import type {TeamCard} from "../../pages/coachdashboard";
+import {iconMap} from "../../constants/iconMap.ts";
 
 type AverageTeamCard ={
   cards: TeamCard[]
@@ -19,7 +20,7 @@ const AverageTeamCard =  ({cards}: AverageTeamCard) => {
              <span className={styles.cardValue}>{card.value}</span>
           </div>
           <div className={styles.right}>
-            <FontAwesomeIcon icon={card.icon}/>
+            <FontAwesomeIcon icon={iconMap[card.icon]}/>
           </div>
         </div>
       ))}
