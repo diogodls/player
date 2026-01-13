@@ -1,10 +1,10 @@
 import type {Icon} from "@fortawesome/fontawesome-svg-core";
 
 export type CoachDashboard = {
-  averageTeamCard: AverageTeamCard[];
+  averageTeamCards: TeamCard[];
 }
 
-export type AverageTeamCard = {
+export type TeamCard = {
   name: string;
   color: string;
   value: string;

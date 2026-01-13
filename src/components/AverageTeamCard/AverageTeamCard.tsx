@@ -1,29 +1,13 @@
-import {faChartColumn} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./AverageTeamCard.module.scss"
+import type {TeamCard} from "../../pages/CoachDashboard";
 
-const cards = [
-  {
-    name:"Média Ofensiva Geral",
-    color:"linear-gradient(135deg, #2563eb, #1e40af)",
-    value:"10.2",
-    icon: faChartColumn
-  },
-  {
-    name:"Média Defensiva Geral",
-    color: "linear-gradient(135deg, #f97316, #c2410c)",
-    value: "20.5",
-    icon: faChartColumn
-  },
-  {
-    name:"Média Geral da Equipe",
-    color:"linear-gradient(135deg, #22c55e, #15803d)",
-    value: "10.3",
-    icon:faChartColumn
-  }
-]
+type AverageTeamCard ={
+  cards: TeamCard[]
+}
 
-const AverageTeamCard =  () => {
+
+const AverageTeamCard =  ({cards}: AverageTeamCard) => {
   return (
     <div className={styles.divCard}>
       {cards.map((card, index) => (

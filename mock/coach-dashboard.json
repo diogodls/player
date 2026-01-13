@@ -1,22 +1,22 @@
 {
   "coach-dashboard": {
-    "averageCards": [
+    "averageTeamCards": [
       {
-        "name":"Média ofensiva geral",
-        "color":"#2563eb",
+        "name":"Média Ofensiva Geral",
+        "color":"linear-gradient(135deg, #2563eb, #1e40af)",
         "value":"10",
-        "icon":" faChartColumn"
+        "icon":"faChartColumn"
       },
       {
-        "name":"Média defensiva geral",
-        "color": "#f97316",
-        "value": "20",
-        "icon":" faChartColumn"
+        "name":"Média Defensiva Geral",
+        "color":"linear-gradient(135deg, #f97316, #c2410c)",
+        "value":"20",
+        "icon":"faChartColumn"
       },
       {
-        "name":"Média defensiva geral",
-        "color":"#22c55e",
-        "value": "10",
+        "name":"Média Geral da Equipe",
+        "color":"linear-gradient(135deg, #22c55e, #15803d)",
+        "value":"10",
         "icon":"faChartColumn"
       }
     ]
