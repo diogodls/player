@@ -1,10 +1,10 @@
 import styles from "./CoachDashboard.module.scss";
 import {useApi} from "../../hooks/useApi.ts";
-import type {CoachDashboard} from "./index";
+import type {CoachDashboardData} from "./index";
 import AverageTeamCard from "../../components/AverageTeamCard/AverageTeamCard.tsx";
 
 const CoachDashboard = () => {
-  const { data } = useApi<CoachDashboard>("coach-dashboard");
+  const { data } = useApi<CoachDashboardData>("coach-dashboard");
 
   return (
     <div className={styles.container}>

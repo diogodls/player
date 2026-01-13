@@ -1,4 +1,4 @@
-export type CoachDashboard = {
+export type CoachDashboardData = {
   averageTeamCards: TeamCard[];
 }
 
