@@ -1,0 +1,24 @@
+{
+  "coach-dashboard": {
+    "averageTeamCards": [
+      {
+        "name":"Média Ofensiva Geral",
+        "color":"linear-gradient(135deg, #2563eb, #1e40af)",
+        "value":"10",
+        "icon":"faChartColumn"
+      },
+      {
+        "name":"Média Defensiva Geral",
+        "color":"linear-gradient(135deg, #f97316, #c2410c)",
+        "value":"20",
+        "icon":"faChartColumn"
+      },
+      {
+        "name":"Média Geral da Equipe",
+        "color":"linear-gradient(135deg, #22c55e, #15803d)",
+        "value":"10",
+        "icon":"faTrophy"
+      }
+    ]
+  }
+}

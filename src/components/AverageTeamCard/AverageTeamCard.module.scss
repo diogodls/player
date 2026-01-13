@@ -1,0 +1,56 @@
+.divCard {
+  display: flex;
+  gap: 20px;
+
+  .card {
+    width: 100%;
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 25px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cardName {
+    font-size: 15px;
+  }
+
+  .cardValue {
+    font-size: 30px;
+    font-weight: Bold;
+  }
+
+  .right {
+    font-size: 26px;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 12px;
+
+    .card {
+      height: auto;
+      padding: 12px 16px;
+      font-size: 18px;
+    }
+
+    .cardName {
+      font-size: 13px;
+    }
+
+    .cardValue {
+      font-size: 22px;
+    }
+
+    .right {
+      font-size: 20px;
+    }
+  }
+}
