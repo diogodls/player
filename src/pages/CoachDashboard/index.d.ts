@@ -3,7 +3,7 @@ export type CoachDashboardData = {
   players: Player[];
 }
 
-export type TeamCard = {
+export type AverageCard = {
   name: string;
   color: string;
   value: string;

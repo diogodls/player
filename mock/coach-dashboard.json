@@ -55,6 +55,38 @@
         "goalsTaken": 28,
         "goals": 10
       }
+    ],
+    "players": [
+      {
+        "id": 1,
+        "name": "joao",
+        "overall": 98,
+        "position": "goleiro"
+      },
+      {
+        "id": 2,
+        "name": "guga",
+        "overall": 97,
+        "position": "pivo"
+      },
+      {
+        "id": 3,
+        "name": "guedes",
+        "overall": 96,
+        "position": "ala"
+      },
+      {
+        "id": 4,
+        "name": "senna",
+        "overall": 99,
+        "position": "ala"
+      },
+      {
+        "id": 5,
+        "name": "balk",
+        "overall": 95,
+        "position": "fixo"
+      }
     ]
   }
 }
