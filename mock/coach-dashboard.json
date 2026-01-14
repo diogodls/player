@@ -56,36 +56,62 @@
         "goals": 10
       }
     ],
+    "metrics": ["ATK", "TWK", "DEF", "TEC", "SPD"],
     "players": [
       {
         "id": 1,
         "name": "joao",
         "overall": 98,
-        "position": "goleiro"
+        "position": "goleiro",
+        "atk": 85,
+        "speed": 68,
+        "passe":72,
+        "twk": 52,
+        "def": 58
       },
       {
         "id": 2,
         "name": "guga",
         "overall": 97,
-        "position": "pivo"
+        "position": "pivo",
+        "atk": 85,
+        "speed": 68,
+        "passe": 72,
+        "twk": 52,
+        "def": 58
       },
       {
         "id": 3,
         "name": "guedes",
         "overall": 96,
-        "position": "ala"
+        "position": "ala",
+        "atk": 85,
+        "speed": 68,
+        "passe": 72,
+        "twk": 52,
+        "def": 58
       },
       {
         "id": 4,
         "name": "senna",
         "overall": 99,
-        "position": "ala"
+        "position": "ala",
+        "atk": 85,
+        "speed": 68,
+        "passe": 72,
+        "twk": 52,
+        "def": 58
       },
       {
         "id": 5,
         "name": "balk",
         "overall": 95,
-        "position": "fixo"
+        "position": "fixo",
+        "atk": 85,
+        "speed": 68,
+        "passe": 72,
+        "twk": 52,
+        "def": 58
       }
     ]
   }

@@ -1,6 +1,7 @@
 export type CoachDashboardData = {
-  averageTeamCards: TeamCard[];
+  averageTeamCards: AverageCard[];
   players: Player[];
+  metrics: string[];
 }
 
 export type AverageCard = {

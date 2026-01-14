@@ -3,10 +3,10 @@ import {useApi} from "../../hooks/useApi.ts";
 import type {CoachDashboardData} from "./index";
 import AverageTeamCard from "../../components/AverageTeamCard/AverageTeamCard.tsx";
 import HeaderDashboard from  "../../components/HeaderDashboard/HeaderDashboard.tsx";
-import IndividualAnalisis from "../../components/IndividualAnalisis/IndividualAnalisis.tsx";
 import {useState} from "react";
 import PlayersSection from "../../components/PlayersSection/PlayersSection.tsx";
 import Filters from "../../components/Filters/Filters.tsx";
+import IndividualAnalisis from "../../components/PlayerComparison/PlayerComparison.tsx";
 
 type ViewMode = 'team' | 'individual' | 'compare';
 type FilterMode = 'all phases' | 'offensive' | 'defensive';

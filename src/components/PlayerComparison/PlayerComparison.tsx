@@ -1,22 +1,27 @@
-import styles from './IndividualAnalisis.module.scss';
 import Select, { Option } from 'rc-select';
-import {useEffect, useState, type SetStateAction} from "react";
+import {useState, type SetStateAction, useMemo} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPeopleGroup, faPerson} from "@fortawesome/free-solid-svg-icons";
 import type {IndividualPlayer} from "../../pages/CoachDashboard";
 import {RadarChart} from "@mui/x-charts";
+import styles from './PlayerComparison.module.scss';
 
-type IndividualAnalisisProps = {
+type PlayerComparisonProps = {
   players?: IndividualPlayer[];
+  metrics?: string[];
 }
 
-const IndividualAnalisis = ({players}: IndividualAnalisisProps) => {
+const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const [firstPlayer, setFirstPlayer] = useState<IndividualPlayer | null>(null);
   const [secondPlayer, setSecondPlayer] = useState<IndividualPlayer | null>(null);
 
-  useEffect(() => {
-    //TODO:filter da lista de players
-  }, [firstPlayer, secondPlayer]);
+  const playersList = useMemo(() => {
+    return players?.filter(
+      (player) =>
+        player.id !== firstPlayer?.id &&
+        player.id !== secondPlayer?.id
+    ) ?? [];
+  }, [players, firstPlayer, secondPlayer]);
 
   return (
     <div>
@@ -29,7 +34,7 @@ const IndividualAnalisis = ({players}: IndividualAnalisisProps) => {
         <div className={styles.player}>
           <span>Jogador 1</span>
           <Select>
-            {players?.map((player: IndividualPlayer, index: number) => (
+            {playersList?.map((player: IndividualPlayer, index: number) => (
               <Option
                 key={index}
                 value={player.id}
@@ -40,7 +45,7 @@ const IndividualAnalisis = ({players}: IndividualAnalisisProps) => {
             ))}
           </Select>
 
-          {firstPlayer?.id ??
+          {firstPlayer?.id &&
             <div className={styles.selectedPlayer}>
               <span><FontAwesomeIcon icon={faPerson}/> {firstPlayer?.name}</span>
               <span>{firstPlayer?.position}</span>
@@ -52,7 +57,7 @@ const IndividualAnalisis = ({players}: IndividualAnalisisProps) => {
         <div className={styles.player}>
           <span>Jogador 2</span>
           <Select>
-            {players?.map((player: IndividualPlayer, index: number) => (
+            {playersList?.map((player: IndividualPlayer, index: number) => (
               <Option
                 key={index}
                 value={player.id}
@@ -63,7 +68,7 @@ const IndividualAnalisis = ({players}: IndividualAnalisisProps) => {
             ))}
           </Select>
           <div className={styles.selectedPlayer}>
-            {secondPlayer?.id ??
+            {secondPlayer?.id &&
               <div className={styles.selectedPlayer}>
                 <span><FontAwesomeIcon icon={faPerson}/> {secondPlayer?.name}</span>
                 <span>{secondPlayer?.position}</span>
@@ -74,16 +79,23 @@ const IndividualAnalisis = ({players}: IndividualAnalisisProps) => {
         </div>
       </div>
 
-      <RadarChart
-        height={300}
-        series={[{ label: 'Lisa', data: [120, 98, 86, 99, 85, 65] }]}
-        radar={{
-          max: 120,
-          metrics: ['Math', 'Chinese', 'English', 'Geography', 'Physics', 'History'],
-        }}
-      />
+      {(firstPlayer?.atk && secondPlayer?.id) &&
+        <RadarChart
+          height={300}
+          series={
+            [
+              { label: firstPlayer?.name, data: [firstPlayer.atk, firstPlayer.twk, firstPlayer.def, firstPlayer?.passe, firstPlayer?.speed] },
+              { label: secondPlayer?.name, data: [secondPlayer.atk, secondPlayer.twk, secondPlayer.def, secondPlayer?.passe, secondPlayer?.speed] }
+            ]
+          }
+          radar={{
+            max: 100,
+            metrics: metrics ?? [],
+          }}
+        />
+      }
     </div>
   );
 }
 
-export default IndividualAnalisis;
+export default PlayerComparison;
