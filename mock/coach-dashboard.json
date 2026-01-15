@@ -56,62 +56,62 @@
         "goals": 10
       }
     ],
-    "metrics": ["ATK", "TWK", "DEF", "TEC", "SPD"],
+    "metrics": ["Minutagem", "Gols em quadra", "Gols tomados em quadra", "Ações defensivas", "Ações ofensivas"],
     "players": [
       {
         "id": 1,
         "name": "joao",
         "overall": 98,
         "position": "goleiro",
-        "atk": 85,
-        "speed": 68,
-        "passe":72,
-        "twk": 52,
-        "def": 58
+        "minutes": 31,
+        "defensiveActions": 68,
+        "offensiveActions": 2,
+        "goalsTaken": 7,
+        "goals": 1
       },
       {
         "id": 2,
         "name": "guga",
         "overall": 97,
         "position": "pivo",
-        "atk": 85,
-        "speed": 68,
-        "passe": 72,
-        "twk": 52,
-        "def": 58
+        "minutes": 40,
+        "defensiveActions": 9,
+        "offensiveActions": 52,
+        "goalsTaken": 31,
+        "goals": 14
       },
       {
         "id": 3,
         "name": "guedes",
         "overall": 96,
         "position": "ala",
-        "atk": 85,
-        "speed": 68,
-        "passe": 72,
-        "twk": 52,
-        "def": 58
+        "minutes": 36,
+        "defensiveActions": 42,
+        "offensiveActions": 46,
+        "goalsTaken": 28,
+        "goals": 10
       },
       {
         "id": 4,
         "name": "senna",
         "overall": 99,
         "position": "ala",
-        "atk": 85,
-        "speed": 68,
-        "passe": 72,
-        "twk": 52,
-        "def": 58
+        "minutes": 85,
+        "defensiveActions": 18,
+        "offensiveActions": 42,
+        "goalsTaken": 22,
+        "goals": 18
       },
       {
         "id": 5,
         "name": "balk",
         "overall": 95,
         "position": "fixo",
-        "atk": 85,
-        "speed": 68,
-        "passe": 72,
-        "twk": 52,
-        "def": 58
+        "minutes": 25,
+        "defensiveActions": 39,
+        "offensiveActions": 30,
+        "goalsTaken": 23,
+        "goals": 2
       }
     ]
   }

@@ -1,10 +1,11 @@
-import Select, { Option } from 'rc-select';
-import {useState, type SetStateAction, useMemo} from "react";
+import Select, {Option} from 'rc-select';
+import React, {useState, useMemo, type SetStateAction} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPeopleGroup, faPerson} from "@fortawesome/free-solid-svg-icons";
+import {faCircle, faUserGroup, faX} from "@fortawesome/free-solid-svg-icons";
 import type {IndividualPlayer} from "../../pages/CoachDashboard";
 import {RadarChart} from "@mui/x-charts";
 import styles from './PlayerComparison.module.scss';
+import 'rc-select/assets/index.css';
 
 type PlayerComparisonProps = {
   players?: IndividualPlayer[];
@@ -15,6 +16,9 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const [firstPlayer, setFirstPlayer] = useState<IndividualPlayer | null>(null);
   const [secondPlayer, setSecondPlayer] = useState<IndividualPlayer | null>(null);
 
+  const firstPlayerColor = "#60A5FA";
+  const secondPlayerColor = "#fb923c";
+
   const playersList = useMemo(() => {
     return players?.filter(
       (player) =>
@@ -23,22 +27,31 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
     ) ?? [];
   }, [players, firstPlayer, secondPlayer]);
 
+  const setPlayer = (setSelectedPlayer: React.Dispatch<SetStateAction<IndividualPlayer | null>>, playerId: number | null) => {
+    playersList.find((player) => {
+      console.log(player, playerId, player.id === playerId);
+      return player.id === playerId
+    });
+    setSelectedPlayer(playersList.find((player) => player.id === playerId) ?? null);
+  };
+
   return (
-    <div>
-      <h1 className={styles.title}>
-        <FontAwesomeIcon icon={faPeopleGroup}/>
+    <div className={styles.content}>
+      <h3 className={styles.title}>
+        <FontAwesomeIcon className={styles.icon} icon={faUserGroup}/>
         Comparação de atletas
-      </h1>
+      </h3>
 
       <div className={styles.players}>
         <div className={styles.player}>
           <span>Jogador 1</span>
-          <Select>
-            {playersList?.map((player: IndividualPlayer, index: number) => (
+          <Select
+            onSelect={(playerId: number | null) => setPlayer(setFirstPlayer, playerId)}
+          >
+            {playersList?.map((player: IndividualPlayer) => (
               <Option
-                key={index}
+                key={player.id}
                 value={player.id}
-                onChange={(player: SetStateAction<IndividualPlayer | null>) => setFirstPlayer(player)}
               >
                 {player.name} - {player.position}
               </Option>
@@ -47,45 +60,77 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
 
           {firstPlayer?.id &&
             <div className={styles.selectedPlayer}>
-              <span><FontAwesomeIcon icon={faPerson}/> {firstPlayer?.name}</span>
-              <span>{firstPlayer?.position}</span>
-              <span>Média: {firstPlayer?.overall}</span>
+              <div className={styles.infos}>
+                <span className={styles.name}>
+                  <FontAwesomeIcon icon={faCircle} style={{color: firstPlayerColor}}/>
+                  {firstPlayer?.name}
+                </span>
+
+                <span className={styles.position}>{firstPlayer?.position}</span>
+                <span className={styles.overall}>Média: {firstPlayer?.overall}</span>
+              </div>
+
+              <FontAwesomeIcon
+                className={styles.exitIcon}
+                icon={faX}
+                onClick={() => setFirstPlayer(null)}
+              />
             </div>
           }
         </div>
 
         <div className={styles.player}>
           <span>Jogador 2</span>
-          <Select>
-            {playersList?.map((player: IndividualPlayer, index: number) => (
+          <Select
+            onSelect={(playerId: number | null) => setPlayer(setSecondPlayer, playerId)}
+          >
+            {playersList?.map((player: IndividualPlayer) => (
               <Option
-                key={index}
+                key={player.id}
                 value={player.id}
-                onChange={(player: IndividualPlayer | null) => setSecondPlayer(player)}
               >
                 {player.name} - {player.position}
               </Option>
             ))}
           </Select>
-          <div className={styles.selectedPlayer}>
-            {secondPlayer?.id &&
-              <div className={styles.selectedPlayer}>
-                <span><FontAwesomeIcon icon={faPerson}/> {secondPlayer?.name}</span>
-                <span>{secondPlayer?.position}</span>
-                <span>Média: {secondPlayer?.overall}</span>
+
+          {secondPlayer?.id &&
+            <div className={styles.selectedPlayer}>
+              <div className={styles.infos}>
+                <span className={styles.name}>
+                  <FontAwesomeIcon icon={faCircle} style={{color: secondPlayerColor}}/>
+                  {secondPlayer?.name}
+                </span>
+
+                <span className={styles.position}>{secondPlayer?.position}</span>
+                <span className={styles.overall}>Média: {secondPlayer?.overall}</span>
               </div>
-            }
-          </div>
+
+              <FontAwesomeIcon
+                className={styles.exitIcon}
+                icon={faX}
+                onClick={() => setSecondPlayer(null)}
+              />
+            </div>
+          }
         </div>
       </div>
 
-      {(firstPlayer?.atk && secondPlayer?.id) &&
+      {(!firstPlayer?.id && !secondPlayer?.id) &&
+        <div className={styles.emptyList}>
+        <FontAwesomeIcon className={styles.icon} icon={faUserGroup}/>
+          <span className={styles.title}>Selecione dois jogadores para comparar</span>
+          <span>Escolha jogadores dos dropdowns para ver a sua comparação de performance</span>
+        </div>
+      }
+
+      {(firstPlayer?.id && secondPlayer?.id) &&
         <RadarChart
           height={300}
           series={
             [
-              { label: firstPlayer?.name, data: [firstPlayer.atk, firstPlayer.twk, firstPlayer.def, firstPlayer?.passe, firstPlayer?.speed] },
-              { label: secondPlayer?.name, data: [secondPlayer.atk, secondPlayer.twk, secondPlayer.def, secondPlayer?.passe, secondPlayer?.speed] }
+              { label: firstPlayer?.name, data: [firstPlayer.minutes, firstPlayer.goals, firstPlayer.goalsTaken, firstPlayer?.defensiveActions, firstPlayer?.offensiveActions] },
+              { label: secondPlayer?.name, data: [secondPlayer.minutes, secondPlayer.goals, secondPlayer.goalsTaken, secondPlayer?.defensiveActions, secondPlayer?.offensiveActions] }
             ]
           }
           radar={{
