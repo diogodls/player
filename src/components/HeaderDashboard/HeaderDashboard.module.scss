@@ -1,4 +1,4 @@
-.div{
+.div {
   height: 80px;
   display: flex;
   align-items: center;
@@ -6,20 +6,21 @@
   border-radius: 10px;
   padding: 8px;
 
-  .buttonsFlex{
+  .buttonsFlex {
     display: flex;
     align-items: center;
     gap: 15px;
   }
 
-  .button{
+  .button {
     display: flex;
     gap: 6px;
     background: #1f2937;
     padding: 4px;
     border-radius: 10px;
   }
-  .buttons{
+
+  .buttons {
     display: flex;
     align-items: center;
     padding: 8px 14px;
@@ -32,13 +33,16 @@
 
     cursor: pointer;
   }
-  .buttons:hover{
+
+  .buttons:hover {
     background: #2a3441;
   }
+
   .active {
     color: white;
     background: var(--primary-color);
   }
+
   .activePurple {
     background: #7c3aed;
     color: white;
@@ -58,11 +62,12 @@
     cursor: pointer;
   }
 
-  .text{
+  .text {
     font-weight: bold;
     font-size: 25px;
     display: block;
   }
+
   @media (max-width: 768px) {
     height: auto;
     flex-direction: column;
