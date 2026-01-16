@@ -1,0 +1,36 @@
+.detailedInfos {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .table {
+    .tableHead {
+      border-bottom: 1px solid #dddddd50;
+    }
+
+    .tableRow {
+      display: flex;
+      border-bottom: 1px solid #dddddd20;
+
+      .playerData {
+        display: flex;
+        flex-direction: column;
+
+        .progress {
+          width: 100%;
+          height: 2px;
+          border-radius: 10px;
+          position: relative;
+          background: #1F2937;
+
+          .color {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 2px;
+          }
+        }
+      }
+    }
+  }
+}

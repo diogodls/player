@@ -1,0 +1,41 @@
+.select {
+  width: 100%;
+  background-color: #374151;
+  border: 1px solid #DDDDDD20;
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  overflow: hidden;
+
+  .rc-select-selector {
+    border: none;
+    color: white;
+  }
+
+  :global(.rc-select-selector) {
+    border: none;
+    color: white;
+  }
+}
+
+.dropdown {
+  border: none;
+  background-color: #374151;
+}
+
+.placeholder {
+  font-size: 1rem;
+  color: white;
+}
+
+:global {
+  .rc-select-selector {
+    border: none;
+    color: white;
+  }
+
+  .rc-select-selection-placeholder {
+    top: -3px;
+    left: 0;
+  }
+}

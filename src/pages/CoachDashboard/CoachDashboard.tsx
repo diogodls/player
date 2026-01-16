@@ -4,6 +4,7 @@ import type {CoachDashboardData} from "./index";
 import AverageTeamCard from "../../components/AverageTeamCard/AverageTeamCard.tsx";
 import HeaderDashboard from  "../../components/HeaderDashboard/HeaderDashboard.tsx";
 import {useState} from "react";
+import PlayerComparison from "../../components/PlayerComparison/PlayerComparison.tsx";
 import PlayersSection from "../../components/PlayersSection/PlayersSection.tsx";
 import Filters from "../../components/Filters/Filters.tsx";
 import IndividualAnalisis from "../../components/PlayerComparison/PlayerComparison.tsx";
@@ -34,7 +35,7 @@ const CoachDashboard = () => {
           </>
         }
       {/*{viewMode === 'compare' && <CompareAnalysis />}*/}
-      <IndividualAnalisis players={data?.players} metrics={data?.metrics} />
+      <PlayerComparison players={data?.players} metrics={data?.metrics} />
       {/*{filterMode === 'all phases' && <All Phases />}*/}
       {/*{filterMode === 'offensive' && <offensive />}*/}
       {/*{filterMode === 'defensive' && <defensive />}*/}
