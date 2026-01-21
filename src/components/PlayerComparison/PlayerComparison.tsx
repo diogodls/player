@@ -8,6 +8,7 @@ import styles from './PlayerComparison.module.scss';
 import 'rc-select/assets/index.css';
 import PlayerSelect from "../elements/PlayerSelect/PlayerSelect.tsx";
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
+import {PLAYER_COLORS} from "../../constants/metrics.ts";
 
 type PlayerComparisonProps = {
   players?: IndividualPlayer[];
@@ -19,9 +20,6 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const [secondPlayer, setSecondPlayer] = useState<IndividualPlayer | null>(null);
   const [highlightedItem, setHighlightedItem] = useState<HighlightItemData | null>(null);
   const [selectedPlayers, setSelectedPlayers] = useState<IndividualPlayer[]>([]);
-
-  const firstPlayerColor = "#60A5FA";
-  const secondPlayerColor = "#fb923c";
 
   const playersList = useMemo(() => {
     return players?.filter(
@@ -71,7 +69,7 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
             <div className={styles.selectedPlayer}>
               <div className={styles.infos}>
                 <span className={styles.name}>
-                  <FontAwesomeIcon icon={faCircle} style={{color: firstPlayerColor}}/>
+                  <FontAwesomeIcon icon={faCircle} style={{color: PLAYER_COLORS[0]}}/>
                   {firstPlayer?.name}
                 </span>
 
@@ -90,13 +88,30 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
 
         <div className={styles.player}>
           <span>Jogador 2</span>
-          <PlayerSelect playersList={playersList} setIndividualPlayer={setSecondPlayer}/>
+          <Select
+            dropdownClassName={styles.dropdown} //TODO: terminar dropdown
+            dropdownMatchSelectWidth
+            placeholder={
+              <span className={styles.placeholder}>Selecione um jogador</span>
+            }
+            className={styles.select}
+            onSelect={(playerId: number) => setPlayer(setSecondPlayer, playerId)}
+          >
+            {playersList?.map((player: IndividualPlayer) => (
+              <Option
+                key={player.id}
+                value={player.id}
+              >
+                {player.name} - {player.position}
+              </Option>
+            ))}
+          </Select>
 
           {secondPlayer?.id &&
             <div className={styles.selectedPlayer}>
               <div className={styles.infos}>
                 <span className={styles.name}>
-                  <FontAwesomeIcon icon={faCircle} style={{color: secondPlayerColor}}/>
+                  <FontAwesomeIcon icon={faCircle} style={{color: PLAYER_COLORS[1]}}/>
                   {secondPlayer?.name}
                 </span>
 
@@ -128,7 +143,7 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
 
           <div className={styles.graphButtons}>
             {selectedPlayers?.map((selectedPlayer) => (
-              <button className={styles.graphPlayer}>{selectedPlayer.name}</button>
+              <button className={styles.graphPlayer} key={selectedPlayer.id}>{selectedPlayer.name}</button>
             ))}
           </div>
 
