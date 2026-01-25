@@ -2,22 +2,49 @@
   "coach-dashboard": {
     "averageTeamCards": [
       {
-        "name":"Média Ofensiva Geral",
-        "color":"linear-gradient(135deg, #2563eb, #1e40af)",
-        "value":"10",
-        "icon":"faChartColumn"
+        "name": "Média Ofensiva Geral",
+        "color": "linear-gradient(135deg, #2563eb, #1e40af)",
+        "value": "10",
+        "icon": "faChartColumn"
       },
       {
-        "name":"Média Defensiva Geral",
-        "color":"linear-gradient(135deg, #f97316, #c2410c)",
-        "value":"20",
-        "icon":"faChartColumn"
+        "name": "Média Defensiva Geral",
+        "color": "linear-gradient(135deg, #f97316, #c2410c)",
+        "value": "20",
+        "icon": "faChartColumn"
       },
       {
-        "name":"Média Geral da Equipe",
-        "color":"linear-gradient(135deg, #22c55e, #15803d)",
-        "value":"10",
-        "icon":"faTrophy"
+        "name": "Média Geral da Equipe",
+        "color": "linear-gradient(135deg, #22c55e, #15803d)",
+        "value": "10",
+        "icon": "faTrophy"
+      }
+    ],
+
+    "players": [
+      {
+        "id": "1",
+        "name": "Silva",
+        "position": "Centre Back",
+        "overall": 50.9,
+        "off": 25.6,
+        "def": 25.3
+      },
+      {
+        "id": "2",
+        "name": "Santos",
+        "position": "Centre Back",
+        "overall": 47.4,
+        "off": 23.7,
+        "def": 23.7
+      },
+      {
+        "id": "3",
+        "name": "Oliveira",
+        "position": "Right Winger",
+        "overall": 47.7,
+        "off": 27.4,
+        "def": 20.3
       }
     ]
   }
