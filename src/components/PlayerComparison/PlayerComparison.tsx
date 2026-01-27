@@ -3,12 +3,12 @@ import React, {useState, useMemo, type SetStateAction} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle, faUserGroup, faX} from "@fortawesome/free-solid-svg-icons";
 import type {IndividualPlayer} from "../../pages/CoachDashboard";
-import {type HighlightItemData, RadarChart} from "@mui/x-charts";
 import styles from './PlayerComparison.module.scss';
-import 'rc-select/assets/index.css';
-import PlayerSelect from "../elements/PlayerSelect/PlayerSelect.tsx";
+// import Select from "../elements/Select/CustomSelect.tsx";
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
 import {PLAYER_COLORS} from "../../constants/metrics.ts";
+import PlayerRadarChart from "./PlayerRadarChart/PlayerRadarChart.tsx";
+import 'rc-select/assets/index.css';
 
 type PlayerComparisonProps = {
   players?: IndividualPlayer[];
@@ -18,7 +18,6 @@ type PlayerComparisonProps = {
 const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const [firstPlayer, setFirstPlayer] = useState<IndividualPlayer | null>(null);
   const [secondPlayer, setSecondPlayer] = useState<IndividualPlayer | null>(null);
-  const [highlightedItem, setHighlightedItem] = useState<HighlightItemData | null>(null);
   const [selectedPlayers, setSelectedPlayers] = useState<IndividualPlayer[]>([]);
 
   const playersList = useMemo(() => {
@@ -32,8 +31,9 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const setPlayer = (setSelectedPlayer: React.Dispatch<SetStateAction<IndividualPlayer | null>>, playerId: number) => {
     const player = playersList.find((player) => player.id === playerId) ?? null;
     if (!player) return;
+
     setSelectedPlayer(player);
-    setSelectedPlayers((players) => [...players, player]);
+    setSelectedPlayers((players) => [...players, player]); //TODO: corrigir lista de selected players depois
   };
 
   return (
@@ -138,46 +138,12 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
       }
 
       {(firstPlayer?.id && secondPlayer?.id) &&
-        <div className={styles.graph}>
-          <span className={styles.title}>Gráfico de análise dos jogadores</span>
-
-          <div className={styles.graphButtons}>
-            {selectedPlayers?.map((selectedPlayer) => (
-              <button className={styles.graphPlayer} key={selectedPlayer.id}>{selectedPlayer.name}</button>
-            ))}
-          </div>
-
-          <RadarChart
-            height={300}
-            highlight="series"
-            highlightedItem={highlightedItem}
-            onHighlightChange={setHighlightedItem}
-            series={
-              [
-                {
-                  label: firstPlayer?.name,
-                  data: [firstPlayer.minutes, firstPlayer.goals, firstPlayer.goalsTaken, firstPlayer?.defensiveActions, firstPlayer?.offensiveActions],
-                  fillArea: true
-                },
-                {
-                  label: secondPlayer?.name,
-                  data: [secondPlayer.minutes, secondPlayer.goals, secondPlayer.goalsTaken, secondPlayer?.defensiveActions, secondPlayer?.offensiveActions],
-                  fillArea: true
-                }
-              ]
-            }
-            radar={{
-              max: 100,
-              metrics: metrics ?? [],
-            }}
-          />
-        </div>
+        <PlayerRadarChart players={selectedPlayers} metrics={metrics ?? []} />
       }
 
       {(firstPlayer?.id && secondPlayer?.id) &&
         <ComparativePlayerInfos selectedPlayers={selectedPlayers} metrics={metrics}/>
       }
-
     </div>
   );
 }

@@ -1,0 +1,87 @@
+/* ===== TEXTOS DOS EIXOS ===== */
+:global(.MuiChartsAxis-tickLabel),
+:global(.MuiChartsAxis-label),
+:global(.MuiChartsAxis-line),
+:global(.MuiChartsAxis-root text) {
+  fill: #fff;
+}
+
+/* ===== GRID ===== */
+:global(.MuiChartsGrid-line) {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== TOOLTIP ===== */
+:global(.MuiChartsTooltip-root) {
+  color: #fff;
+}
+
+/* ===== LEGEND (se usar) ===== */
+:global(.MuiChartsLegend-root text) {
+  fill: #fff;
+}
+
+:global(.MuiChartsSeries-root) {
+  opacity: 0.25;
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+:global(.MuiChartsSeries-root.Mui-highlighted) {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+
+.graph {
+  width: 100%;
+  background: #111827;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+
+  .graphLegend {
+    color: white;
+  }
+
+  .title {
+    font-weight: bold;
+    color: white;
+  }
+
+  .graphContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+
+    .graphButtons {
+      display: flex;
+      justify-content: center;
+
+      .graphPlayer {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        background-color: #dddddd10;
+        border: 1px solid #DDDDDD20;
+        cursor: pointer;
+
+        &:first-child {
+          border-radius: 8px 0 0 8px;
+        }
+
+        &:last-child {
+          border-radius: 0 8px 8px 0;
+        }
+      }
+
+      .selected {
+        background-color: #dddddd50;
+      }
+    }
+  }
+}
