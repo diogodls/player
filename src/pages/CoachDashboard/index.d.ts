@@ -11,10 +11,13 @@ export type TeamCard = {
 }
 
 export type Player = {
-  id: string;
+  id: number;
   name: string;
-  position: string;
   overall: number;
-  off: number;
-  def: number;
-};
+  position: string;
+  minutes: number;
+  defensiveActions: number;
+  offensiveActions: number;
+  goalsTaken: number;
+  goals: number;
+}

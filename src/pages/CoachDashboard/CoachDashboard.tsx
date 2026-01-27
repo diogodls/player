@@ -5,6 +5,7 @@ import AverageTeamCard from "../../components/AverageTeamCard/AverageTeamCard.ts
 import PlayerCard from "../../components/PlayerCard/PlayerCard.tsx";  
 import HeaderDashboard from  "../../components/HeaderDashboard/HeaderDashboard.tsx";
 import {useState} from "react";
+import PlayersSection from "../../components/PlayersSection/PlayersSection.tsx";
 
 type ViewMode = 'team' | 'individual' | 'compare';
 
@@ -16,14 +17,11 @@ const CoachDashboard = () => {
     <div className={styles.container}>
       <AverageTeamCard cards={data?.averageTeamCards ?? []}/>
 
-    <div className={styles.playersSection}>
-        {data?.players?.map((player) => (
-          <PlayerCard
-            key={player.id}
-            player={player}
-          />
+    <PlayersSection>
+      {data?.players?.map(player => (
+        <PlayerCard key={player.id} player={player} />
       ))}
-    </div>
+    </PlayersSection>
       <HeaderDashboard
         viewMode={viewMode}
         onChangeView={setViewMode}

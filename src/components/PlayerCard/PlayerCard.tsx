@@ -1,14 +1,5 @@
-// components/PlayerCard/PlayerCard.tsx
-
 import styles from "./PlayerCard.module.scss";
-
-type Player = {
-  name: string;
-  position: string;
-  overall: number;
-  off: number;
-  def: number;
-};
+import type {Player} from "../../pages/CoachDashboard/index";
 
 type PlayerCardProps = {
   player: Player;
@@ -22,8 +13,9 @@ const PlayerCard = ({ player }: PlayerCardProps) => {
       <span>{player.position}</span>
     </div>
 
-    <div className={styles.overall}>{player.overall}</div>
-
+    <div className={styles.overall}>
+      {player.overall}
+    </div>
     <div className={styles.radar}>
       Click to view radar chart
     </div>
@@ -31,14 +23,13 @@ const PlayerCard = ({ player }: PlayerCardProps) => {
     <div className={styles.stats}>
       <div className={`${styles.stat} ${styles.off}`}>
         <span>OFF</span>
-        <span>{player.off}</span>
+        <span>{player.offensiveActions}</span>
       </div>
 
       <div className={`${styles.stat} ${styles.def}`}>
         <span>DEF</span>
-        <span>{player.def}</span>
+        <span>{player.defensiveActions}</span>
       </div> 
-
     </div>
   </div>
   );
