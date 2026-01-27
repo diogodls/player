@@ -54,6 +54,7 @@
     background: transparent;
     color: #9ca3af;
     font-size: 14px;
+    height: 40px;
     cursor: pointer;
   }
 
@@ -64,13 +65,6 @@
   .active {
     color: white;
     background: var(--primary-color);
-  }
-
-  :global(.rc-select-selector) {
-    background: #374151;
-    border: none;
-    color: white;
-    border-radius: 10px;
   }
 
   .select {
