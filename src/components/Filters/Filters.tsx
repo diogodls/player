@@ -36,24 +36,19 @@ type Props = {
   onChangeView: (mode: Props['viewMode']) => void;
 };
 
-
 const Filters = ({ viewMode, onChangeView }: Props) => {
   const [position, setPosition] = useState('all');
 
   return (
     <div className={styles.filter}>
-      {/* 🔴 HEADER (apenas o título) */}
       <div className={styles.header}>
         <FontAwesomeIcon icon={faFilter} />
         <span>Filtros</span>
       </div>
 
-      {/* 🟢 CONTENT (todo o resto) */}
       <div className={styles.content}>
-        {/* ESQUERDA */}
         <div className={styles.group}>
           <span className={styles.groupLabel}>Filtrar por posição</span>
-
           <Select
             value={position}
             onChange={(value) => setPosition(value as string)}
@@ -67,7 +62,6 @@ const Filters = ({ viewMode, onChangeView }: Props) => {
           </Select>
         </div>
 
-        {/* DIREITA */}
         <div className={styles.group}>
           <span className={styles.groupLabel}>Filtrar por fase</span>
 
