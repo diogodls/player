@@ -1,0 +1,79 @@
+.div {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  padding: 8px;
+
+  .buttonsFlex {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .button {
+    display: flex;
+    gap: 6px;
+    background: #1f2937;
+    padding: 4px;
+    border-radius: 10px;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    gap: 5px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 14px;
+
+    cursor: pointer;
+  }
+
+  .buttons:hover {
+    background: #2a3441;
+  }
+
+  .active {
+    color: white;
+    background: var(--primary-color);
+  }
+
+  .activePurple {
+    background: #7c3aed;
+    color: white;
+  }
+
+  .export {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    background: #16a34a;
+    color: white;
+    font-size: 14px;
+    height: 37px;
+    cursor: pointer;
+  }
+
+  .text {
+    font-weight: bold;
+    font-size: 25px;
+    display: block;
+  }
+
+  @media (max-width: 768px) {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
+  }
+
+}
