@@ -42,7 +42,7 @@ const Filters = ({ viewMode, onChangeView }: Props) => {
   return (
     <div className={styles.filter}>
       <div className={styles.header}>
-        <FontAwesomeIcon icon={faFilter} />
+        <FontAwesomeIcon className={styles.icon} icon={faFilter} />
         <span>Filtros</span>
       </div>
 
