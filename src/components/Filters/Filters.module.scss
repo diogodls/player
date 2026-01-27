@@ -1,18 +1,21 @@
 .filter {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 10px;
-  padding: 12px;
   background: #1f2937;
+  border-radius: 14px;
+  padding: 14px 18px;
 
   .header {
     display: flex;
+    align-items: center;
     gap: 8px;
     font-weight: 600;
     color: white;
-    flex-direction: column;
+    margin-bottom: 12px;
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 270px;
   }
 
   .group {
