@@ -10,7 +10,7 @@ type AverageTeamCard ={
 const AverageTeamCard =  ({cards}: AverageTeamCard) => {
   return (
     <div className={styles.divCard}>
-      {cards.map((card, index) => (
+      {cards.map((card, index) =>   (
         <div className={styles.card}
           key={index}
           style={{background: card.color}}
