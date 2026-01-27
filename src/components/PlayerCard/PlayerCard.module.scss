@@ -13,8 +13,6 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-/* ================= HEADER ================= */
-
 .header {
   display: flex;
   flex-direction: column;
@@ -36,7 +34,6 @@
   }
 }
 
-/* ================= OVERALL ================= */
 
 .overall {
   margin-top: 12px;
@@ -47,8 +44,6 @@
 
   text-align: center;
 }
-
-/* ================= RADAR PLACEHOLDER ================= */
 
 .radar {
   margin: 14px 0;
@@ -72,8 +67,6 @@
 .radar:hover {
   background: #111827;
 }
-
-/* ================= STATS ================= */
 
 .stats {
   display: flex;
