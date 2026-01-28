@@ -1,0 +1,93 @@
+.filter {
+  background: #1f2937;
+  border-radius: 14px;
+  padding: 14px 18px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 12px;
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .groupLabel {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  .text{
+    font-size: 18px;
+    font-weight: 600;
+    color: #e5e7eb;
+  }
+
+  .button {
+    display: flex;
+    gap: 6px;
+    border-radius: 10px;
+  }
+
+  .buttons {
+    display: flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 8px;
+    gap: 4px;
+    border: none;
+    background: #374151;
+    color: #9ca3af;
+    font-size: 14px;
+    flex: 1;
+    justify-content: center;
+    height: 42px;
+    cursor: pointer;
+  }
+
+  .buttons:hover {
+    background: #2a3441;
+  }
+
+  .active {
+    color: white;
+    background: var(--primary-color);
+  }
+
+  .select {
+    width: 600px;
+    background-color: #374151;
+    border: 1px solid #DDDDDD20;
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    overflow: hidden;
+
+    .rc-select-selector {
+      border: none;
+      color: white;
+    }
+
+    :global(.rc-select-selector) {
+      border: none;
+      color: white;
+    }
+  }
+
+  .icon{
+    color: var(--primary-color);
+  }
+
+}
