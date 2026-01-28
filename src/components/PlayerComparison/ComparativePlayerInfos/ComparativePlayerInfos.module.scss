@@ -1,7 +1,15 @@
 .detailedInfos {
   display: flex;
   flex-direction: column;
+  background: #111827;
+  padding: 20px;
+  border-radius: 8px;
   gap: 15px;
+
+  .title {
+    color: white;
+    margin: 0;
+  }
 
   .table {
     .tableHead {
@@ -10,22 +18,26 @@
       border-bottom: 1px solid #dddddd50;
       text-align: left;
 
+      > * {
+        padding: 12px;
+      }
+
       .metric {
+        font-weight: 500;
         width: 50%;
       }
 
       .players {
         display: flex;
         text-align: center;
-        width: 40%;
+        width: 50%;
+        font-weight: 500;
+        gap: 10px;
 
         > * {
           width: 100%;
+          max-width: 25%;
         }
-      }
-
-      .difference {
-        width: 10%;
       }
     }
 
@@ -35,25 +47,57 @@
       padding-block: 10px;
       border-bottom: 1px solid #dddddd20;
       width: 100%;
+      transition: all 0.2s ease-in-out;
+
+      > * {
+        padding-inline: 12px;
+      }
+
+      &:hover {
+        background: rgb(31 41 55 / 0.5);
+      }
+
+      &:last-child {
+        border: none;
+      }
 
       .metric {
         width: 50%;
+        display: flex;
+        flex-direction: column;
+
+        .title {
+          font-weight: 500;
+          font-size: 1em;
+        }
+
+        .description {
+          color: gray;
+        }
       }
 
       .players {
         display: flex;
-        width: 40%;
+        width: 50%;
         gap: 10px;
 
         .playerData {
           display: flex;
           flex-direction: column;
+          gap: 3px;
           align-items: center;
           width: 100%;
+          max-width: 25%;
+
+          .number {
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+          }
 
           .progress {
             width: 100%;
-            height: 5px;
+            height: 10px;
             border-radius: 10px;
             position: relative;
             background: #dddddd50;
@@ -63,14 +107,10 @@
               top: 0;
               left: 0;
               border-radius: 10px;
-              height: 5px;
+              height: 10px;
             }
           }
         }
-      }
-
-      .difference {
-        width: 10%;
       }
     }
   }
