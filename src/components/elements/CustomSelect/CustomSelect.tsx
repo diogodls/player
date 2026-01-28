@@ -1,16 +1,16 @@
 import React, {type SetStateAction} from "react";
 import styles from "./CustomSelect.module.scss";
-import type {IndividualPlayer} from "../../../pages/CoachDashboard";
+import type {Player} from "../../../pages/CoachDashboard";
 import Select, {Option} from "rc-select";
 import 'rc-select/assets/index.css';
 
 type CustomSelect = {
-  playersList: IndividualPlayer[];
-  setIndividualPlayer: React.Dispatch<SetStateAction<IndividualPlayer | null>>;
+  playersList: Player[];
+  setValue: React.Dispatch<SetStateAction<Player | null>>;
 }
-
-const CustomSelect = ({playersList, setIndividualPlayer}: CustomSelect) => {
-  const setPlayer = (setSelectedPlayer: React.Dispatch<SetStateAction<IndividualPlayer | null>>, playerId: number | null) => {
+// TODO: corrigir componente em outra task
+const CustomSelect = ({playersList, setValue}: CustomSelect) => {
+  const setPlayer = (setSelectedPlayer: React.Dispatch<SetStateAction<Player | null>>, playerId: number | null) => {
     playersList.find((player) => {
       console.log(player, playerId, player.id === playerId); // so pra ver se o lobler vai re
       return player.id === playerId
@@ -26,9 +26,9 @@ const CustomSelect = ({playersList, setIndividualPlayer}: CustomSelect) => {
         <span className={styles.placeholder}>Selecione um jogador</span>
       }
       className={styles.select}
-      onSelect={(playerId: number | null) => setPlayer(setIndividualPlayer, playerId)}
+      onSelect={(playerId: number | null) => setPlayer(setValue, playerId)}
      >
-      {playersList?.map((player: IndividualPlayer) => (
+      {playersList?.map((player: Player) => (
         <Option
           key={player.id}
           value={player.id}

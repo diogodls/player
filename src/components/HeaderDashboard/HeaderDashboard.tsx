@@ -8,7 +8,7 @@ type ButtonsType = {
   label: string,
   icon: IconDefinition,
   mode: 'team' | 'individual' | 'compare'
-}
+};
 
 const buttons: ButtonsType[] = [
   {
@@ -26,7 +26,7 @@ const buttons: ButtonsType[] = [
     icon: faCodeCompare,
     mode:'compare'
   }
-]
+];
 
 type Props = {
   viewMode: 'team' | 'individual' | 'compare';
@@ -34,13 +34,13 @@ type Props = {
 };
 
 const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
-
   return (
     <div className={styles.div}>
       <div>
         <span className={styles.text}>Dashboard de Performance da Equipe</span>
-        <span> Analise as métricas de performance dos atletas</span>
+        <span>Analise as métricas de performance dos atletas</span>
       </div>
+
       <div className={styles.buttonsFlex}>
         <div className={styles.button}>
           {buttons.map((button) => (
@@ -70,6 +70,6 @@ const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
       </div>
     </div>
   );
-}
+};
 
 export default HeaderDashboard;

@@ -9,12 +9,28 @@
   .title {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 5px;
     color: white;
     margin: 0;
 
     .icon {
       color: #a173d6;
+      margin-right: 3px;
+    }
+
+    .addPlayer {
+      padding: 10px;
+      color: white;
+      background: #16a34a;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .2s all ease-in-out;
+
+      &:hover{
+        background: #18de65;
+      }
     }
   }
 
@@ -94,6 +110,7 @@
       }
 
       .exitIcon {
+        cursor: pointer;
         font-size: 20px;
         color: #e5e7eb;
       }

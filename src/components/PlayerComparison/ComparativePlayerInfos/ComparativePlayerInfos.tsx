@@ -1,11 +1,13 @@
 import styles from './ComparativePlayerInfos.module.scss';
 import type {Player} from "../../../pages/CoachDashboard";
 import {PLAYER_COLORS, PLAYER_METRICS} from "../../../constants/metrics.ts";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faStar} from "@fortawesome/free-solid-svg-icons";
 
 type ComparativePlayerInfos = {
   selectedPlayers?: Player[];
   metrics?: string[];
-}
+};
 
 const ComparativePlayerInfos = ({selectedPlayers, metrics}: ComparativePlayerInfos) => {
   return (
@@ -37,22 +39,39 @@ const ComparativePlayerInfos = ({selectedPlayers, metrics}: ComparativePlayerInf
             <tr className={styles.tableRow} key={index}>
               <td className={styles.metric}>
                 <span className={styles.title}>{metric}</span>
-                <span className={styles.description}>descrição</span>
-                {/* TODO: descrição da métrica*/}
               </td>
               <td className={styles.players}>
-                {selectedPlayers?.map((player, index) => (
-                  <div className={styles.playerData} key={player.id}>
-                    <span className={styles.number}> {player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]}</span>
-                    {/* TODO: métricas bem definidas para jogadores*/}
-                    <div className={styles.progress}>
-                      <div className={styles.color} style={{
-                        background: `${PLAYER_COLORS[index]}`,
-                        width: `${player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]}%`
-                      }}/>
+                {selectedPlayers?.map((player, index) => {
+                  const maxMetric = Math.max(...selectedPlayers.map((selectedPlayer) => selectedPlayer[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]));
+                  const betterPlayer = player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]] >= maxMetric;
+
+                  return (
+                    <div className={styles.data} key={player.id}>
+                      <div className={styles.playerData}>
+                        <span
+                          className={styles.number}
+                          style={{color: betterPlayer ? `${PLAYER_COLORS[index]}` : '#fff'}}
+                        >
+                          {player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]}
+                          {betterPlayer &&
+                            <FontAwesomeIcon
+                              className={styles.icon}
+                              icon={faStar}
+                              style={{color: `${PLAYER_COLORS[index]}`}}
+                            />
+                          }
+                        </span>
+
+                        <div className={styles.progress}>
+                          <div className={styles.color} style={{
+                            background: `${PLAYER_COLORS[index]}`,
+                            width: `${player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]}%`
+                          }}/>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </td>
             </tr>
           ))}

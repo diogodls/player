@@ -60,6 +60,11 @@
     font-size: 14px;
     height: 37px;
     cursor: pointer;
+    transition: .2s all ease-in-out;
+
+    &:hover{
+      background: #18de65;
+    }
   }
 
   .text {

@@ -7,5 +7,5 @@ export const PLAYER_METRICS = Object.freeze({
 });
 
 export const PLAYER_COLORS = Object.freeze([
-   "#60A5FA", "#fb923c"
+   "#60A5FA", "#fb923c", "#FA4F58", "#22BF75"
 ]);

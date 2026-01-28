@@ -1,7 +1,7 @@
 import Select, {Option} from 'rc-select';
 import {useState, useMemo} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircle, faUserGroup, faX} from "@fortawesome/free-solid-svg-icons";
+import {faCircle, faPlus, faUserGroup, faX} from "@fortawesome/free-solid-svg-icons";
 import type {Player} from "../../pages/CoachDashboard";
 import styles from './PlayerComparison.module.scss';
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
@@ -29,20 +29,33 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
     const player = playersList.find((player) => player.id === playerId) ?? null;
     if (!player) return;
 
-    setSelectedPlayers((players) => [...players, player]);
+    setSelectedPlayers((players) => [...players, player]); //todo: corrigir
   };
 
   const removePlayer = (playerId: number) => {
     setSelectedPlayers(
       (players) => players.filter((selectedPlayer) => selectedPlayer.id !== playerId)
     );
+
+    setPlayersCount(playersCount <= 2 ? playersCount : playersCount - 1);
   };
 
   return (
     <div className={styles.content}>
       <h3 className={styles.title}>
-        <FontAwesomeIcon className={styles.icon} icon={faUserGroup}/>
-        Comparação de atletas
+        <span>
+          <FontAwesomeIcon className={styles.icon} icon={faUserGroup}/>
+          Comparação de atletas
+        </span>
+
+        {playersCount < 4 &&
+          <button
+            className={styles.addPlayer}
+            onClick={() => setPlayersCount(playersCount + 1)}
+          >
+            <FontAwesomeIcon icon={faPlus}/>
+          </button>
+        }
       </h3>
 
       <div className={styles.players}>
@@ -71,10 +84,10 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
             {selectedPlayers[index] &&
               <div className={styles.selectedPlayer}>
                 <div className={styles.infos}>
-                <span className={styles.name}>
-                  <FontAwesomeIcon icon={faCircle} style={{color: PLAYER_COLORS[index]}}/>
-                  {selectedPlayers[index]?.name}
-                </span>
+                  <span className={styles.name}>
+                    <FontAwesomeIcon icon={faCircle} style={{color: PLAYER_COLORS[index]}}/>
+                    {selectedPlayers[index]?.name}
+                  </span>
 
                   <span className={styles.position}>{selectedPlayers[index]?.position}</span>
                   <span className={styles.overall}>Média: {selectedPlayers[index]?.overall}</span>
@@ -92,16 +105,16 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
       </div>
 
       {
-        (!selectedPlayers.length) &&
+        selectedPlayers.length < 2 &&
           <div className={styles.emptyList}>
             <FontAwesomeIcon className={styles.icon} icon={faUserGroup}/>
-            <span className={styles.title}>Selecione dois jogadores para comparar</span>
+            <span className={styles.title}>Selecione dois ou mais jogadores para comparar</span>
             <span>Escolha jogadores dos dropdowns para ver a sua comparação de performance</span>
           </div>
       }
 
       {
-        (selectedPlayers.length > 1) &&
+        selectedPlayers.length > 1 &&
           <>
             <PlayerRadarChart players={selectedPlayers} metrics={metrics ?? []}/>
             <ComparativePlayerInfos selectedPlayers={selectedPlayers} metrics={metrics}/>
@@ -109,6 +122,6 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
       }
     </div>
   );
-}
+};
 
 export default PlayerComparison;
