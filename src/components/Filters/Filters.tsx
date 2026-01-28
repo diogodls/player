@@ -11,7 +11,7 @@ type ButtonsType = {
   label : string,
   icon :  IconDefinition,
   mode : 'all phases' | 'offensive' | 'defensive'
-}
+};
 
 const buttons: ButtonsType[] = [
   {
@@ -29,7 +29,7 @@ const buttons: ButtonsType[] = [
     icon: faShield,
     mode:'defensive'
   }
-]
+];
 
 type Props = {
   viewMode: 'all phases' | 'offensive' | 'defensive';
