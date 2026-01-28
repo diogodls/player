@@ -22,17 +22,21 @@ const CoachDashboard = () => {
     <div className={styles.container}>
       <AverageTeamCard cards={data?.averageTeamCards ?? []}/>
 
-      <PlayersSection players = {data?.players ?? []} />
+
 
       <HeaderDashboard
         viewMode={viewMode}
         onChangeView={setViewMode}
       />
       {/*{viewMode === 'team' && <TeamAnalysis />}*/}
-      {viewMode === 'individual' && (<Filters
-        viewMode={filterMode}
-        onChangeView={setFilterMode}
-      />)}
+        {viewMode === 'individual' && (
+          <>
+        <Filters
+          viewMode={filterMode}
+          onChangeView={setFilterMode}
+          />
+        <PlayersSection players={data?.players ?? []} />
+        </>)}
       {/*{viewMode === 'compare' && <CompareAnalysis />}*/}
 
       {/*{filterMode === 'all phases' && <All Phases />}*/}
