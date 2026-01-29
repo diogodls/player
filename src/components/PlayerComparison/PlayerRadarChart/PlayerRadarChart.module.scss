@@ -1,0 +1,53 @@
+.graph {
+  width: 100%;
+  background: #111827; //TODO: Second background
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+
+  .graphLegend {
+    color: white;
+  }
+
+  .title {
+    font-weight: bold;
+    color: white;
+  }
+
+  .graphContent {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+
+    .graphButtons {
+      display: flex;
+      justify-content: center;
+
+      .graphPlayer {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        background-color: #dddddd10;
+        border: 1px solid #DDDDDD20;
+        cursor: pointer;
+
+        &:first-child {
+          border-radius: 8px 0 0 8px;
+        }
+
+        &:last-child {
+          border-radius: 0 8px 8px 0;
+        }
+      }
+
+      .selected {
+        background-color: #dddddd50;
+      }
+    }
+  }
+}

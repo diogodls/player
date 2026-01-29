@@ -1,5 +1,5 @@
 import './App.css'
-import Footer from './components/Footer/Footer.tsx';
+import Footer from './components/layout/Footer/Footer.tsx';
 import Navbar from './components/layout/Navbar/Navbar.tsx'
 import {Outlet} from "react-router";
 

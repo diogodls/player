@@ -55,6 +55,64 @@
         "goalsTaken": 28,
         "goals": 10
       }
+    ],
+    "metrics": ["Minutagem", "Gols em quadra", "Gols tomados em quadra", "Ações defensivas", "Ações ofensivas"],
+    "players": [
+      {
+        "id": 1,
+        "name": "João",
+        "overall": 98,
+        "position": "Goleiro",
+        "minutes": 31,
+        "defensiveActions": 68,
+        "offensiveActions": 2,
+        "goalsTaken": 7,
+        "goals": 1
+      },
+      {
+        "id": 2,
+        "name": "Guga",
+        "overall": 97,
+        "position": "Pivo",
+        "minutes": 40,
+        "defensiveActions": 9,
+        "offensiveActions": 52,
+        "goalsTaken": 31,
+        "goals": 14
+      },
+      {
+        "id": 3,
+        "name": "Guedes",
+        "overall": 96,
+        "position": "Ala",
+        "minutes": 36,
+        "defensiveActions": 42,
+        "offensiveActions": 46,
+        "goalsTaken": 28,
+        "goals": 10
+      },
+      {
+        "id": 4,
+        "name": "Senna",
+        "overall": 99,
+        "position": "Ala",
+        "minutes": 85,
+        "defensiveActions": 18,
+        "offensiveActions": 42,
+        "goalsTaken": 22,
+        "goals": 18
+      },
+      {
+        "id": 5,
+        "name": "Balk",
+        "overall": 95,
+        "position": "Fixo",
+        "minutes": 25,
+        "defensiveActions": 39,
+        "offensiveActions": 30,
+        "goalsTaken": 23,
+        "goals": 2
+      }
     ]
   }
 }

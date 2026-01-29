@@ -1,0 +1,140 @@
+.content {
+  background-color: #1F2937;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    color: white;
+    margin: 0;
+
+    .icon {
+      color: #a173d6;
+      margin-right: 3px;
+    }
+
+    .addPlayer {
+      padding: 10px;
+      color: white;
+      background: #16a34a;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: .2s all ease-in-out;
+
+      &:hover{
+        background: #18de65;
+      }
+    }
+  }
+
+  .players {
+    display: flex;
+    gap: 10px;
+
+    .dropdown {
+      background-color: blue;
+    }
+
+    .player {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .dropdown {
+        background-color: blue;
+      }
+
+      .placeholder {
+        font-size: 1rem;
+        color: white;
+      }
+
+      .select {
+        width: 100%;
+        background-color: #374151;
+        border: 1px solid #DDDDDD20;
+        padding: 10px;
+        border-radius: 8px;
+        color: white;
+        overflow: hidden;
+
+        .dropdown {
+          background-color: blue;
+        }
+
+        :global {
+          .rc-select-selector {
+            border: none;
+            color: white;
+          }
+
+          .rc-select-selection-placeholder {
+            top: -3px;
+            left: 0;
+          }
+        }
+      }
+    }
+
+    .selectedPlayer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #374151;
+      border-radius: 8px;
+      padding: 8px;
+      border: 1px solid #DDDDDD20;
+
+      .infos {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+          display: flex;
+          gap: 5px;
+          align-items: center;
+          font-weight: bold;
+        }
+
+        .overall {
+          color: #dddddd90;
+        }
+      }
+
+      .exitIcon {
+        cursor: pointer;
+        font-size: 20px;
+        color: #e5e7eb;
+      }
+    }
+  }
+
+  .emptyList {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    color: #4B5563;
+    margin-block: 4em;
+
+    .icon {
+      font-size: 3rem;
+    }
+
+    .title {
+      font-weight: bold;
+      font-size: 18px;
+      color: #4B5563;
+    }
+  }
+}
