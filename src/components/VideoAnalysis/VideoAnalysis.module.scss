@@ -1,12 +1,14 @@
 .screen {
   background-color: #1f2937 ;
   width: 900px;
+  padding: 50px;
 
   .above{
     display: flex;
     justify-content: space-between;
-    padding: 8px 40px;
     align-items: center;
+    width: 756px;
+    padding-bottom: 15px;
   }
 
   .text{
@@ -15,13 +17,13 @@
     gap: 8px;
     height: 36px;
     color: #e5e7eb;
-    font-size: 14px;
+    font-size: 35px;
     font-weight: 500;
   }
 
   .icon{
-    font-size: 12px;
-    color: #9ca3af;
+    font-size: 35px;
+    color: green;
   }
 
   .button{
@@ -42,6 +44,7 @@
     border-radius: 12px;
   }
   .emptyState {
+    padding: 50px;
     height: 520px;
     background: black;
     border-radius: 8px;
@@ -51,6 +54,7 @@
     justify-content: center;
     gap: 6px;
     text-align: center;
+    width: 95%;
   }
 
   .emptyIcon {
@@ -72,10 +76,10 @@
 
   .removeButton {
     background: #7f1d1d;
-    color: #fecaca;
+    color: white;
     border: none;
-    padding: 10px 14px;
-    border-radius: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
   }

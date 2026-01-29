@@ -1,6 +1,6 @@
 import styles from "./VideoAnalysis.module.scss"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUpload, faPlay} from "@fortawesome/free-solid-svg-icons";
+import {faUpload, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 
@@ -43,6 +43,7 @@ const VideoAnalysis = () =>{
             className={styles.removeButton}
             onClick={handleRemoveVideo}
           >
+            <FontAwesomeIcon icon={faTrash}/>
             Excluir vídeo
           </button>
         )}
@@ -64,9 +65,6 @@ const VideoAnalysis = () =>{
             <span className={styles.subtitle}>Use o botão acima para fazer upload</span>
           </div>
       )}
-      <div>
-
-      </div>
     </div>
   )
 }
