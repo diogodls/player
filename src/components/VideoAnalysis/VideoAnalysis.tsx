@@ -1,6 +1,6 @@
 import styles from "./VideoAnalysis.module.scss"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUpload} from "@fortawesome/free-solid-svg-icons";
+import {faUpload, faPlay} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 
@@ -16,10 +16,17 @@ const VideoAnalysis = () =>{
     setVideoUrl(url);
   };
 
+  const handleRemoveVideo = () => {
+    setVideoUrl(null);
+  };
+
   return(
     <div className={styles.screen}>
       <div className={styles.above}>
-        <span> Análise de Vídeo </span>
+        <span className={styles.text}>
+          <FontAwesomeIcon className={styles.icon} icon={faPlay}/>
+          Análise de Vídeo
+        </span>
         <label className={styles.button}>
           <FontAwesomeIcon icon={faUpload}/>
           Upload Vídeo
@@ -31,12 +38,32 @@ const VideoAnalysis = () =>{
           />
         </label>
 
+        {videoUrl && (
+          <button
+            className={styles.removeButton}
+            onClick={handleRemoveVideo}
+          >
+            Excluir vídeo
+          </button>
+        )}
       </div>
-      <video
-        className={styles.video}
-        src={videoUrl ?? undefined}
-        controls
-      ></video>
+
+      {videoUrl ? (
+          <video
+            className={styles.video}
+            src={videoUrl}
+            controls
+          />
+        ) : (
+          <div className={styles.emptyState}>
+            <FontAwesomeIcon
+              icon={faUpload}
+              className={styles.emptyIcon}
+            />
+            <span className={styles.title}>Nenhum vídeo carregado</span>
+            <span className={styles.subtitle}>Use o botão acima para fazer upload</span>
+          </div>
+      )}
       <div>
 
       </div>
