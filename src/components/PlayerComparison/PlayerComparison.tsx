@@ -16,7 +16,7 @@ type PlayerComparisonProps = {
 
 const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
-  const [playersCount, setPlayersCount] = useState<number>(2); //TODO: opção de adicionar mais players fica pra depois
+  const [playersCount, setPlayersCount] = useState<number>(2);
 
   const playersList = useMemo(() => {
     return players?.filter(
