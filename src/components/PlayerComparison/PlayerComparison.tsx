@@ -24,7 +24,6 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
         !selectedPlayers.find((selectedPlayer) => player?.id === selectedPlayer?.id)
     ) ?? [];
   }, [players, selectedPlayers]);
-  // de todas as gambiarras que eu ja fiz, essa com certeza é uma das que eu mais não quero lembrar
 
   const setPlayer = (playerId: number, index: number) => {
     const player = playersList.find((player) => player.id === playerId) ?? null;
