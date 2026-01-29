@@ -33,8 +33,8 @@ const CoachDashboard = () => {
               <PlayersSection players={data?.players ?? []} />
           </>
         }
-      {/*{viewMode === 'compare' && <CompareAnalysis />}*/}
-      <PlayerComparison players={data?.players} metrics={data?.metrics} />
+      {viewMode === 'compare' && <PlayerComparison players={data?.players} metrics={data?.metrics} />}
+
       {/*{filterMode === 'all phases' && <All Phases />}*/}
       {/*{filterMode === 'offensive' && <offensive />}*/}
       {/*{filterMode === 'defensive' && <defensive />}*/}

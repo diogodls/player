@@ -12,7 +12,6 @@ type CustomSelect = {
 const CustomSelect = ({playersList, setValue}: CustomSelect) => {
   const setPlayer = (setSelectedPlayer: React.Dispatch<SetStateAction<Player | null>>, playerId: number | null) => {
     playersList.find((player) => {
-      console.log(player, playerId, player.id === playerId); // so pra ver se o lobler vai re
       return player.id === playerId
     });
     setSelectedPlayer(playersList.find((player) => player.id === playerId) ?? null);
