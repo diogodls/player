@@ -7,7 +7,6 @@ import {useState} from "react";
 import PlayerComparison from "../../components/PlayerComparison/PlayerComparison.tsx";
 import PlayersSection from "../../components/PlayersSection/PlayersSection.tsx";
 import Filters from "../../components/Filters/Filters.tsx";
-import IndividualAnalisis from "../../components/PlayerComparison/PlayerComparison.tsx";
 
 type ViewMode = 'team' | 'individual' | 'compare';
 type FilterMode = 'all phases' | 'offensive' | 'defensive';
