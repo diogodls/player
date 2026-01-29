@@ -21,15 +21,17 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
   const playersList = useMemo(() => {
     return players?.filter(
       (player) =>
-        !selectedPlayers.find((selectedPlayer) => player.id === selectedPlayer.id)
+        !selectedPlayers.find((selectedPlayer) => player?.id === selectedPlayer?.id)
     ) ?? [];
   }, [players, selectedPlayers]);
+  // de todas as gambiarras que eu ja fiz, essa com certeza é uma das que eu mais não quero lembrar
 
-  const setPlayer = (playerId: number) => {
+  const setPlayer = (playerId: number, index: number) => {
     const player = playersList.find((player) => player.id === playerId) ?? null;
     if (!player) return;
-
-    setSelectedPlayers((players) => [...players, player]); //todo: corrigir
+    let newSelectedPlayersList = [...selectedPlayers];
+    newSelectedPlayersList[index] = player;
+    setSelectedPlayers(newSelectedPlayersList);
   };
 
   const removePlayer = (playerId: number) => {
@@ -69,7 +71,7 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
                 <span className={styles.placeholder}>Selecione um jogador</span>
               }
               className={styles.select}
-              onSelect={(playerId: number) => setPlayer(playerId)}
+              onSelect={(playerId: number) => setPlayer(playerId, index)}
             >
               {playersList?.map((player: Player) => (
                 <Option
@@ -105,7 +107,7 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
       </div>
 
       {
-        selectedPlayers.length < 2 &&
+        selectedPlayers.filter(Boolean).length < 2 &&
           <div className={styles.emptyList}>
             <FontAwesomeIcon className={styles.icon} icon={faUserGroup}/>
             <span className={styles.title}>Selecione dois ou mais jogadores para comparar</span>
@@ -114,7 +116,7 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
       }
 
       {
-        selectedPlayers.length > 1 &&
+        selectedPlayers.filter(Boolean).length > 1 &&
           <>
             <PlayerRadarChart players={selectedPlayers} metrics={metrics ?? []}/>
             <ComparativePlayerInfos selectedPlayers={selectedPlayers} metrics={metrics}/>
