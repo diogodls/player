@@ -1,4 +1,4 @@
-          import {faCodeCompare, faPeopleGroup, faUser, faFileExport} from "@fortawesome/free-solid-svg-icons";
+import {faCodeCompare, faPeopleGroup, faUser, faFileExport} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./HeaderDashboard.module.scss"
 import {classNames} from "../../utils/classNames.ts";

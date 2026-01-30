@@ -3,8 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUpload, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
-const VideoAnalysis = () =>{
-
+const VideoAnalysis = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +17,7 @@ const VideoAnalysis = () =>{
     setVideoUrl(null);
   };
 
-  return(
+  return (
     <div className={styles.screen}>
       <div className={styles.above}>
         <span className={styles.text}>
