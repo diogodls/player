@@ -24,26 +24,28 @@ const VideoAnalysis = () => {
           <FontAwesomeIcon className={styles.icon} icon={faPlay}/>
           Análise de Vídeo
         </span>
-        <label className={styles.button}>
-          <FontAwesomeIcon icon={faUpload}/>
-          Upload Vídeo
-          <input
-            type="file"
-            accept="video/*"
-            hidden
-            onChange={handleUpload}
-          />
-        </label>
+        <div className={styles.actions}>
+          <label className={styles.button}>
+              <FontAwesomeIcon icon={faUpload}/>
+              Upload Vídeo
+              <input
+                type="file"
+                accept="video/*"
+                hidden
+                onChange={handleUpload}
+              />
+            </label>
 
-        {videoUrl && (
-          <button
-            className={styles.removeButton}
-            onClick={handleRemoveVideo}
-          >
-            <FontAwesomeIcon icon={faTrash}/>
-            Excluir vídeo
-          </button>
-        )}
+            {videoUrl && (
+              <button
+                className={styles.removeButton}
+                onClick={handleRemoveVideo}
+              >
+                <FontAwesomeIcon icon={faTrash}/>
+                Excluir vídeo
+              </button>
+            )}
+        </div>
       </div>
 
       {videoUrl ? (

@@ -2,6 +2,7 @@
   background-color: #1f2937 ;
   width: 900px;
   padding: 50px;
+  border-radius: 12px;
 
   .above{
     display: flex;
@@ -11,13 +12,19 @@
     padding-bottom: 15px;
   }
 
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
   .text{
     display: flex;
     align-items: center;
     gap: 8px;
     height: 36px;
     color: #e5e7eb;
-    font-size: 35px;
+    font-size: 28px;
     font-weight: 500;
   }
 
