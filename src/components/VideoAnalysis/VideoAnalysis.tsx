@@ -3,7 +3,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUpload, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
-
 const VideoAnalysis = () =>{
 
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -11,7 +10,6 @@ const VideoAnalysis = () =>{
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const url = URL.createObjectURL(file);
     setVideoUrl(url);
   };
