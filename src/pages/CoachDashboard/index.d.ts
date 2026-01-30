@@ -2,14 +2,14 @@ export type CoachDashboardData = {
   averageTeamCards: AverageCard[];
   players: Player[];
   metrics: string[];
-}
+};
 
 export type AverageCard = {
   name: string;
   color: string;
   value: string;
   icon: string;
-}
+};
 
 export type Player = {
   id: number;
@@ -21,4 +21,9 @@ export type Player = {
   offensiveActions: number;
   goalsTaken: number;
   goals: number;
+};
+
+export type Team = {
+  defensiveActions: number;
+  offensiveActions: number;
 }

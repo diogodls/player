@@ -1,0 +1,82 @@
+.playerView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    .playerName {
+      display: flex;
+
+      .icon {
+        background: #1F2937;
+        border-radius: 4px;
+        padding: 8px;
+        font-size: 1em;
+      }
+
+      .player {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+          color: white;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .overall {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      background: #CA8A04;
+      border-radius: 8px;
+      color: white;
+
+      .rating {
+        font-weight: bold;
+        font-size: 1.3em;
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    width: 100%;
+
+    > * {
+      width: 100%;
+      max-width: 50%;
+    }
+
+    .radarGraph {
+      display: flex;
+      flex-direction: column;
+      background: #1F2937;
+      border-radius: 8px;
+    }
+
+    .playerData {
+      display: flex;
+      flex-direction: column;
+
+      .performance {
+        display: flex;
+        flex-direction: column;
+        background: #1F2937;
+        border-radius: 8px;
+      }
+
+      .statistics {
+        display: flex;
+        flex-direction: column;
+        background: #1F2937;
+        border-radius: 8px;
+      }
+    }
+  }
+}
