@@ -20,7 +20,7 @@ const buttons = [
   {
     label: "Análise individual",
     icon: faUser,
-    link:'analise-individual',
+    link:'/individual-analysis',
   },
   {
     label: "Análise de equipe",
