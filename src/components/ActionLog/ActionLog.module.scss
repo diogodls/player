@@ -1,5 +1,66 @@
-.container{
-  background-color: gray;
+.container {
+  background-color: #1f2937 ;
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #e5e7eb;
+  width: 100%;
+}
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
 
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.badge {
+  background-color: #2563eb;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.clear {
+  background-color: #9ca3af;
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
 }
