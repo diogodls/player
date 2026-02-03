@@ -6,7 +6,7 @@ import type {Player} from "../../pages/CoachDashboard";
 import styles from './PlayerComparison.module.scss';
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
 import {PLAYER_COLORS} from "../../constants/metrics.ts";
-import PlayerRadarChart from "./PlayerRadarChart/PlayerRadarChart.tsx";
+import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
 import 'rc-select/assets/index.css';
 
 type PlayerComparisonProps = {
@@ -116,10 +116,10 @@ const PlayerComparison = ({players, metrics}: PlayerComparisonProps) => {
 
       {
         selectedPlayers.filter(Boolean).length > 1 &&
-          <>
-            <PlayerRadarChart players={selectedPlayers} metrics={metrics ?? []}/>
+          <div>
+            <PlayerRadarChart players={selectedPlayers} showButtons metrics={metrics ?? []}/>
             <ComparativePlayerInfos selectedPlayers={selectedPlayers} metrics={metrics}/>
-          </>
+          </div>
       }
     </div>
   );

@@ -1,16 +1,17 @@
 import {type HighlightItemData, RadarChart} from "@mui/x-charts";
-import {PLAYER_COLORS} from "../../../constants/metrics.ts";
+import {PLAYER_COLORS} from "../../constants/metrics.ts";
 import {useState} from "react";
-import type {Player} from "../../../pages/CoachDashboard";
+import type {Player} from "../../pages/CoachDashboard";
 import styles from "./PlayerRadarChart.module.scss";
-import {classNames} from "../../../utils/classNames.ts";
+import {classNames} from "../../utils/classNames.ts";
 
 type PlayerRadarChart = {
   players: Player[];
   metrics: string[];
+  showButtons: boolean;
 };
 
-const PlayerRadarChart = ({players, metrics}: PlayerRadarChart) => {
+const PlayerRadarChart = ({players, showButtons, metrics}: PlayerRadarChart) => {
   const [highlightedPlayer, setHighlightedPlayer] = useState<HighlightItemData | null>({seriesId: players[0]?.id});
 
   return (
@@ -18,22 +19,24 @@ const PlayerRadarChart = ({players, metrics}: PlayerRadarChart) => {
       <span className={styles.title}>Gráfico de análise dos jogadores</span>
 
       <div className={styles.graphContent}>
-        <div className={styles.graphButtons}>
-          {players?.map((selectedPlayer) => (
-            <button
-              key={selectedPlayer.id}
-              className={classNames([
-                styles.graphPlayer,
-                selectedPlayer.id === highlightedPlayer?.seriesId
-                  ? styles.selected
-                  : '',
-              ])}
-              onClick={() => setHighlightedPlayer({seriesId: selectedPlayer.id})}
-            >
-              {selectedPlayer.name}
-            </button>
-          ))}
-        </div>
+        {showButtons &&
+          <div className={styles.graphButtons}>
+            {players?.map((selectedPlayer) => (
+              <button
+                key={selectedPlayer.id}
+                className={classNames([
+                  styles.graphPlayer,
+                  selectedPlayer.id === highlightedPlayer?.seriesId
+                    ? styles.selected
+                    : '',
+                ])}
+                onClick={() => setHighlightedPlayer({seriesId: selectedPlayer.id})}
+              >
+                {selectedPlayer.name}
+              </button>
+            ))}
+          </div>
+        }
 
         <RadarChart
           height={300}
