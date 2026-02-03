@@ -58,6 +58,26 @@
       flex-direction: column;
       background: #1F2937;
       border-radius: 8px;
+
+      .metrics {
+        display: flex;
+        flex-direction: column;
+
+        .metric {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .name {
+            color: white;
+          }
+
+          .value {
+            color: #60A5FA;
+            font-weight: bold;
+          }
+        }
+      }
     }
 
     .playerData {

@@ -2,13 +2,16 @@ import styles from './PlayerView.module.scss';
 import type {Player, Team} from "../../pages/CoachDashboard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
+import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
+import {METRICS_TYPES, PLAYER_METRICS} from "../../constants/metrics.ts";
 
 type PlayerView = {
   player: Player;
   team: Team;
+  metrics: string[];
 };
 
-const PlayerView = ({player}: PlayerView) => {
+const PlayerView = ({player, team, metrics}: PlayerView) => {
   return (
     <div className={styles.playerView}>
       <div className={styles.header}>
@@ -28,10 +31,27 @@ const PlayerView = ({player}: PlayerView) => {
       </div>
 
       <div className={styles.content}>
-        <div className={styles.radarGraph}></div>
+        <div className={styles.radarGraph}>
+          <PlayerRadarChart players={[player]} showButtons={false} metrics={metrics ?? []} />
+
+          <div className={styles.metrics}>
+            {metrics.map(metric => (
+              <div className={styles.metric}>
+                <span className={styles.name}>{metric}</span>
+                <span className={styles.value}>{player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className={styles.playerData}>
-          <div className={styles.performance}></div>
+          <div className={styles.performance}>
+            {Object.entries(METRICS_TYPES).map(([label, key]) => (
+              <div>
+                {label}{key}
+              </div>
+            ))}
+          </div>
           <div className={styles.statistics}></div>
         </div>
       </div>
