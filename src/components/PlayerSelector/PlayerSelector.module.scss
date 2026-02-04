@@ -1,0 +1,40 @@
+.tagPlayer {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 15px;
+  border-radius: 8px;
+  background: #1F2937;
+
+  .title {
+    font-weight: bold;
+
+    .icon {
+      color: #45c777;
+    }
+  }
+
+  .selectedPlayer {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: #20355B;
+    border: 1px solid #284C8A;
+    color: #284C8A;
+  }
+
+  .positions {
+    display: flex;
+    flex-wrap: wrap;
+
+    .position {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      .title {
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
