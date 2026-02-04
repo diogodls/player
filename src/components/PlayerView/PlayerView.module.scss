@@ -89,6 +89,19 @@
         flex-direction: column;
         background: #1F2937;
         border-radius: 8px;
+        gap: 15px;
+
+        .metrics {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .metric {
+            display: flex;
+            flex-direction: column;
+            background: #111827; //secondary-background
+          }
+        }
       }
 
       .statistics {
