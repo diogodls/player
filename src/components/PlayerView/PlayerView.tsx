@@ -1,9 +1,9 @@
 import styles from './PlayerView.module.scss';
 import type {Player, Team} from "../../pages/CoachDashboard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faCircle} from "@fortawesome/free-solid-svg-icons";
 import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
-import {METRICS_TYPES, PLAYER_METRICS} from "../../constants/metrics.ts";
+import {METRICS_COLORS, METRICS_TYPES, PLAYER_METRICS} from "../../constants/metrics.ts";
 
 type PlayerView = {
   player: Player;
@@ -46,13 +46,27 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
 
         <div className={styles.playerData}>
           <div className={styles.performance}>
-            {Object.entries(METRICS_TYPES).map(([label, key]) => (
-              <div>
-                {label}{key}
-              </div>
-            ))}
+            <div>
+              <span>Performance vs Média da equipe</span>
+            </div>
+            <div>
+              {Object.entries(METRICS_TYPES).map(([label, key], index) => (
+                <div className={styles.metric} key={index}>
+                  <span>
+                    <FontAwesomeIcon icon={faCircle} color={METRICS_COLORS[index]} />
+                    {label}
+                  </span>
+                  <span>
+                    Player: {key} | Team: {key}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className={styles.statistics}></div>
+          <div className={styles.statistics}>
+            <span></span>
+            exibir índices
+          </div>
         </div>
       </div>
     </div>
