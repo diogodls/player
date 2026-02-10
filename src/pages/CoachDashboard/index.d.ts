@@ -16,14 +16,37 @@ export type Player = {
   name: string;
   overall: number;
   position: string;
+  //todo: separar metricas
   minutes: number;
   defensiveActions: number;
   offensiveActions: number;
   goalsTaken: number;
   goals: number;
+  indexes: Indexes;
 };
 
 export type Team = {
-  defensiveActions: number;
-  offensiveActions: number;
-}
+  indexes: Indexes;
+};
+
+export interface Indexes extends GeneralIndexes, OffensiveIndexes, DeffensiveIndexes {}
+
+export type GeneralIndexes = {
+  radj: string,
+  goalsRelations: string,
+  actionsRelations: string,
+  atd: string,
+  dto: string,
+};
+
+export type OffensiveIndexes = {
+  pgj: string;
+  ic: string;
+  tio: string;
+};
+
+export type DeffensiveIndexes = {
+  gtj: string;
+  rf: string;
+  tid: string;
+};

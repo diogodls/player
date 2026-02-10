@@ -104,11 +104,41 @@
         }
       }
 
-      .statistics {
+      .indexes {
         display: flex;
         flex-direction: column;
         background: #1F2937;
         border-radius: 8px;
+
+        .title {
+
+        }
+
+        .index {
+          display: flex;
+          flex-direction: column;
+
+          .indexName {
+            font-weight: bold;
+          }
+
+          .values {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+
+            .value {
+              width: 50%;
+              color: white;
+              display: flex;
+              justify-content: space-between;
+
+              .number {
+                font-weight: 600;
+              }
+            }
+          }
+        }
       }
     }
   }

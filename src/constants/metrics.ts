@@ -3,7 +3,7 @@ export const PLAYER_METRICS = Object.freeze({
    "Gols em quadra": "defensiveActions",
    "Gols tomados em quadra": "offensiveActions",
    "Ações ofensivas": "goals",
-   "Ações defensivas": "goalsTaken"
+   "Ações defensivas": "goalsTaken",
 });
 
 export const PLAYER_COLORS = Object.freeze([
@@ -17,6 +17,28 @@ export const METRICS_TYPES = Object.freeze({
    "Ações Defensivas": ['offensiveActions'],
 });
 
-export const METRICS_COLORS = Object.freeze([
-   '#60A5FA','#FB923C', '#F9CB15'
-]);
+export const METRICS_COLORS = Object.freeze({
+   offensive: '#60A5FA',
+   deffensive:'#FB923C',
+   general:'#F9CB15',
+});
+
+export const GENERAL_INDEXES = Object.freeze({
+   radj: 'Relação Ataque-Defesa por jogo',
+   goalsRelations: '+/- gols',
+   actionsRelations: '+/- ações',
+   atd: 'Relação ataque + transições defensivas',
+   dto: 'Relação defesa + transições ofensivas',
+});
+
+export const OFFENSIVE_INDEXES = {
+   pgj: 'Participações em gol por jogo',
+   ic: 'Indíce de criação',
+   tio: 'Taxa de influência ofensiva',
+};
+
+export const DEFFENSIVE_INDEXES = {
+   gtj: 'Gols tomados por jogo',
+   rf: 'Relação recuperação/falhas defensivas',
+   tid: 'Taxa de influência defensiva',
+};
