@@ -1,13 +1,18 @@
 import styles from "./ActionLog.module.scss"
-//fazer: definir tamanho limite da div, ações boas(verde), ruins(vermelha)
+import {useEffect, useState} from "react";
+import { useToast} from "../../contexts/ToastContext.tsx";
+import { useCookies } from "react-cookie";
+
+
 type TaggedAction = {
   id: string;
-  time: string; // "mm:ss"
+  time: string;
   title: string;
-  description?: string;
   type: "good" | "bad" | "neutral";
   player?: string;
 };
+
+const COOKIE_KEY = "ufsm_action_log";
 
 const actionsMock: TaggedAction[] = [
   {
@@ -55,35 +60,73 @@ const actionsMock: TaggedAction[] = [
 ];
 
 const ActionLog = () => {
+  const toast = useToast();
+  const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
+  const [actions, setActions] = useState<TaggedAction[]>(actionsMock);
+
+  const handleClear = () => {
+    setActions([]);
+    removeCookie(COOKIE_KEY, { path: "/" });
+  };
+
+  useEffect(() => {
+    const raw = cookies[COOKIE_KEY];
+    if (!raw) return;
+
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (Array.isArray(parsed)) setActions(parsed);
+    } catch {
+
+    }
+  }, [cookies]);
+
+  const handleSave = () => {
+    console.table(actions);
+    const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    setCookie(COOKIE_KEY, JSON.stringify(actions), {
+      path: "/",
+      expires,
+      sameSite: "lax",
+    });
+
+    setActions([]);
+    toast.success("Salvo com sucesso!");
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
           <span>Linha do tempo de ações</span>
-          <span className={styles.badge}>{actionsMock.length}</span>
+          <span className={styles.badge}>{actions.length}</span>
         </div>
 
         <div className={styles.actions}>
-          <button className={styles.save}>Salvar</button>
-          <button className={styles.clear}>Limpar</button>
+          <button className={styles.save} onClick={handleSave}>
+            Salvar
+          </button>
+          <button className={styles.clear} onClick={handleClear}>
+            Limpar
+          </button>
         </div>
       </div>
 
-      {actionsMock.length === 0 ? (
-      <div className={styles.emptyState}>
-        <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerão aqui.</span>
-      </div>
+      {actions.length === 0 ? (
+        <div className={styles.emptyState}>
+          <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerão aqui.</span>
+        </div>
       ) : (
         <div className={styles.list}>
-          {actionsMock.map((action) => (
+          {actions.map((action) => (
             <div
               key={action.id}
               className={`${styles.item} ${
-                action.type === "good"
-                  ? styles.good
-                  : action.type === "bad"
-                    ? styles.bad
-                    : styles.neutral
+                action.type === "good" 
+                  ? styles.good 
+                : action.type === "bad"
+                  ? styles.bad
+                : ""
               }`}
             >
               <div className={styles.itemLeft}>
@@ -97,7 +140,6 @@ const ActionLog = () => {
                     <span className={styles.playerTag}>{action.player}</span>
                   )}
                 </div>
-
               </div>
             </div>
           ))}
