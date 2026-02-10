@@ -1,9 +1,34 @@
 import styles from './PlayerView.module.scss';
-import type {Player, Team} from "../../pages/CoachDashboard";
+import type {Indexes, Player, Team} from "../../pages/CoachDashboard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowLeft, faCircle} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
 import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
-import {METRICS_COLORS, METRICS_TYPES, PLAYER_METRICS} from "../../constants/metrics.ts";
+import {
+  DEFFENSIVE_INDEXES,
+  GENERAL_INDEXES,
+  OFFENSIVE_INDEXES,
+  PLAYER_METRICS
+} from "../../constants/metrics.ts";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+
+const responsive = {
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 3,
+    slidesToSlide: 3
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 2,
+    slidesToSlide: 2
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1,
+    slidesToSlide: 1
+  }
+};
 
 type PlayerView = {
   player: Player;
@@ -49,23 +74,78 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
             <div>
               <span>Performance vs Média da equipe</span>
             </div>
-            <div>
-              {Object.entries(METRICS_TYPES).map(([label, key], index) => (
-                <div className={styles.metric} key={index}>
-                  <span>
-                    <FontAwesomeIcon icon={faCircle} color={METRICS_COLORS[index]} />
-                    {label}
-                  </span>
-                  <span>
-                    Player: {key} | Team: {key}
-                  </span>
-                </div>
-              ))}
+            <div className={styles.carousel}>
+              <Carousel
+                swipeable={false}
+                draggable={false}
+                showDots={true}
+                responsive={responsive}
+                ssr={true} // means to render carousel on server-side.
+                infinite={true}
+                autoPlay={false}
+                autoPlaySpeed={1000}
+                keyBoardControl={true}
+                customTransition="all .5"
+                transitionDuration={500}
+                containerClass="carousel-container"
+                removeArrowOnDeviceType={["tablet", "mobile"]}
+                deviceType={'desktop'}
+                dotListClass="custom-dot-list-style"
+                itemClass="carousel-item-padding-40-px"
+              >
+                <div>Item 1</div>
+                <div>Item 2</div>
+                <div>Item 3</div>
+                <div>Item 4</div>
+              </Carousel>
             </div>
           </div>
-          <div className={styles.statistics}>
-            <span></span>
-            exibir índices
+
+          <div className={styles.indexes}>
+            <span className={styles.title}>Índices detalhados</span>
+
+            <div className={styles.index}>
+              <span className={styles.indexName}>Indíces gerais</span>
+
+              <div className={styles.values}>
+                {Object.entries(GENERAL_INDEXES).map(([key, label]) => {
+                  return (
+                    <span className={styles.value} about={label} key={key}>
+                      {key}:
+                      <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            <div className={styles.index}>
+              <span className={styles.indexName}>Indíces Ofensivos</span>
+
+              <div className={styles.values}>
+                {Object.entries(OFFENSIVE_INDEXES).map(([key, label]) => {
+                  return (
+                    <span className={styles.value} about={label} key={key}>
+                      {key}:
+                      <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            <div className={styles.index}>
+              <span className={styles.indexName}>Indíces Defensivos</span>
+
+              <div className={styles.values}>
+                {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
+                  return (
+                    <span className={styles.value} about={label} key={key}>
+                      {key}:
+                      <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
