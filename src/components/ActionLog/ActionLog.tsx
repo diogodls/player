@@ -3,7 +3,6 @@ import {useEffect, useState, useRef} from "react";
 import { useToast} from "../../contexts/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 
-
 type TaggedAction = {
   id: string;
   time: string;
@@ -79,11 +78,9 @@ const ActionLog = () => {
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) setActions(parsed);
     } catch {
-      // cookie corrompido -> ignora e segue
     } finally {
       hasLoadedCookie.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -101,7 +98,7 @@ const ActionLog = () => {
   const handleClear = () => {
     setActions([]);
     removeCookie(COOKIE_KEY, { path: "/" });
-    toast.success("Limpo!");
+    toast.success("Log limpo com sucesso!");
   };
 
   const handleSave = async () => {
