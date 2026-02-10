@@ -1,5 +1,5 @@
 import styles from "./ActionLog.module.scss"
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import { useToast} from "../../contexts/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 
@@ -61,37 +61,58 @@ const actionsMock: TaggedAction[] = [
 
 const ActionLog = () => {
   const toast = useToast();
+
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
+
   const [actions, setActions] = useState<TaggedAction[]>(actionsMock);
 
-  const handleClear = () => {
-    setActions([]);
-    removeCookie(COOKIE_KEY, { path: "/" });
-  };
+  const hasLoadedCookie = useRef(false);
 
   useEffect(() => {
     const raw = cookies[COOKIE_KEY];
-    if (!raw) return;
+    if (!raw) {
+      hasLoadedCookie.current = true;
+      return;
+    }
 
     try {
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) setActions(parsed);
     } catch {
-
+      // cookie corrompido -> ignora e segue
+    } finally {
+      hasLoadedCookie.current = true;
     }
-  }, [cookies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleSave = () => {
-    console.table(actions);
-    const expires = new Date(Date.now() + 2 * 60 * 60 * 1000);
+  useEffect(() => {
+    if (!hasLoadedCookie.current) return;
+
+    const expires = new Date(Date.now() + 12 * 60 * 60 * 1000); // 12h
+
     setCookie(COOKIE_KEY, JSON.stringify(actions), {
       path: "/",
       expires,
       sameSite: "lax",
     });
+  }, [actions, setCookie]);
 
+  const handleClear = () => {
     setActions([]);
-    toast.success("Salvo com sucesso!");
+    removeCookie(COOKIE_KEY, { path: "/" });
+    toast.success("Limpo!");
+  };
+
+  const handleSave = async () => {
+    try{
+      console.table(actions);
+      setActions([]);
+      removeCookie(COOKIE_KEY, { path: "/" });
+      toast.success("Salvo com sucesso!");
+    }catch (e){
+      toast.error("Falha ao salvar no banco");
+    }
   };
 
   return (
