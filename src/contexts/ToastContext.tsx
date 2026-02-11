@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import styles from "./ToastContext.module.scss";
 
 type ToastType = "success" | "error" | "info";
 
@@ -24,8 +25,14 @@ function uid() {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timersRef = useRef<Map<string, number>>(new Map());
 
   const remove = useCallback((id: string) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      window.clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
@@ -34,8 +41,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       const id = uid();
       const toast: Toast = { id, type, message, durationMs };
       setToasts((prev) => [...prev, toast]);
-
-      window.setTimeout(() => remove(id), durationMs);
+      const timerId = window.setTimeout(() => remove(id), durationMs);
+      timersRef.current.set(id, timerId);
     },
     [remove]
   );
@@ -45,7 +52,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       success: (m, d) => push("success", m, d),
       error: (m, d) => push("error", m, d),
       info: (m, d) => push("info", m, d),
-      clearAll: () => setToasts([]),
+      clearAll: () => {
+        timersRef.current.forEach((timer) => window.clearTimeout(timer));
+        timersRef.current.clear();
+        setToasts([]);
+      },
     }),
     [push]
   );
@@ -54,44 +65,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
 
-      {/* Container dos toasts */}
-      <div
-        style={{
-          position: "fixed",
-          top: 16,
-          right: 16,
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
-          zIndex: 9999,
-        }}
-      >
+      <div className={styles.local}>
         {toasts.map((t) => (
           <div
             key={t.id}
             role="status"
             onClick={() => remove(t.id)}
-            style={{
-              minWidth: 260,
-              maxWidth: 360,
-              padding: "12px 14px",
-              borderRadius: 12,
-              cursor: "pointer",
-              color: "white",
-              boxShadow: "0 10px 25px rgba(0,0,0,.25)",
-              background:
-                t.type === "success"
-                  ? "#16a34a"
-                  : t.type === "error"
-                    ? "#dc2626"
-                    : "#2563eb",
-            }}
+            className={`${styles.toast} ${styles[t.type]}`}
           >
-            <strong style={{ textTransform: "capitalize" }}>{t.type}</strong>
-            <div style={{ marginTop: 4 }}>{t.message}</div>
-            <div style={{ fontSize: 12, opacity: 0.8, marginTop: 6 }}>
-              Clique para fechar
-            </div>
+            <strong className={styles.title}>{t.type}</strong>
+            <div className={styles.message}>{t.message}</div>
+            <div className={styles.hint}>Clique para fechar</div>
           </div>
         ))}
       </div>

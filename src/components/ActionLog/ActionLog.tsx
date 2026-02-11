@@ -56,15 +56,13 @@ const actionsMock: TaggedAction[] = [
     type: "neutral",
     player: "Fixo",
   },
-];
+]; //fazer: apagar aqui @diogoddls
 
 const ActionLog = () => {
+
   const toast = useToast();
-
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
-
   const [actions, setActions] = useState<TaggedAction[]>(actionsMock);
-
   const hasLoadedCookie = useRef(false);
 
   useEffect(() => {
