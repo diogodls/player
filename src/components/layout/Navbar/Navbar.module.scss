@@ -24,7 +24,7 @@
           padding: 10px 15px;
           background: transparent;
           border: 1px solid transparent;
-          border-radius: 10px;
+          border-radius: var(--border-radius);
           display: flex;
           gap: 5px;
           color: var(--text-muted);

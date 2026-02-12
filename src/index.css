@@ -32,6 +32,7 @@
   --bg-dark: #111827;
   --surface: #1f2937;
 
+  --border-radius: 8px;
   --border-50: rgba(221,221,221,0.31);
   --border-20: rgba(221,221,221,0.125);
 }

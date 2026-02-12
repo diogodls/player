@@ -42,7 +42,7 @@
     .button {
       padding: 15px;
       font-weight: bold;
-      border-radius: 4px;
+      border-radius: var(--border-radius);
       border: none;
       background-color: var(--surface);
       cursor: pointer;

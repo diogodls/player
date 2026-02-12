@@ -2,7 +2,7 @@
   width: 100%;
   background:var(--bg-dark); //TODO: Second background
   padding: 15px;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -28,7 +28,7 @@
       display: flex;
       justify-content: center;
 
-      .graphPlayer {
+        .graphPlayer {
         padding: 10px;
         display: flex;
         align-items: center;
@@ -37,11 +37,11 @@
         cursor: pointer;
 
         &:first-child {
-          border-radius: 8px 0 0 8px;
+          border-radius: var(--border-radius) 0 0 var(--border-radius);
         }
 
         &:last-child {
-          border-radius: 0 8px 8px 0;
+          border-radius: 0 var(--border-radius) var(--border-radius) 0;
         }
       }
 

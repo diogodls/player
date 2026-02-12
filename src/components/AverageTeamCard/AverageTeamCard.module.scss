@@ -5,7 +5,7 @@
   .card {
     width: 100%;
     padding: 20px;
-    border-radius: 15px;
+    border-radius: var(--border-radius);
     font-size: 25px;
     color: var(--text-primary);
     display: flex;

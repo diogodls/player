@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   padding: 8px;
 
 
@@ -18,14 +18,14 @@
     gap: 6px;
     background: var(--surface);
     padding: 4px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
   }
 
   .buttons {
     display: flex;
     align-items: center;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     gap: 5px;
     border: none;
     background: transparent;
@@ -54,7 +54,7 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     border: none;
     background: var(--green);
     color: var(--text-primary);

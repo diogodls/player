@@ -1,6 +1,6 @@
 .filter {
   background: var(--surface);
-  border-radius: 14px;
+  border-radius: var(--border-radius);
   padding: 14px 18px;
 
   .header {
@@ -38,14 +38,14 @@
   .button {
     display: flex;
     gap: 6px;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
   }
 
   .buttons {
     display: flex;
     align-items: center;
     padding: 8px 14px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     gap: 4px;
     border: none;
     background: var(--surface);
@@ -71,7 +71,7 @@
     background-color: var(--surface);
     border: 1px solid var(--border-20);
     padding: 10px;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     color: var(--text-primary);
     overflow: hidden;
 
