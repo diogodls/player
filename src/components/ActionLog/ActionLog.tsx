@@ -2,19 +2,14 @@ import styles from "./ActionLog.module.scss"
 import {useEffect, useState, useRef} from "react";
 import { useToast} from "../../contexts/ToastContext.tsx";
 import { useCookies } from "react-cookie";
-
-type Player = {
-  id: number;
-  name: string;
-  position: "Ala" | "Fixo" | "Pivô" | "Goleiro";
-};
+import type {Player} from "../../pages/CoachDashboard";
 
 type TaggedAction = {
   id: string;
   time: string;
   title: string;
   type: "good" | "bad" | "neutral";
-  player: string;
+  player: Player;
 };
 
 const COOKIE_KEY = "ufsm_action_log";
@@ -25,43 +20,35 @@ const actionsMock: TaggedAction[] = [
     time: "00:12",
     title: "Pressão alta bem executada",
     type: "good",
-    player: "Ala",
+    player: {
+      "id": 1,
+      "name": "Guedes",
+      "overall": 96,
+      "position": "Ala",
+      "minutes": 36,
+      "defensiveActions": 42,
+      "offensiveActions": 46,
+      "goalsTaken": 28,
+      "goals": 10
+    },
   },
   {
     id: "a2",
     time: "00:27",
     title: "Passe errado na saída",
     type: "bad",
-    player: "Fixo",
-  },
-  {
-    id: "a3",
-    time: "01:05",
-    title: "Finalização perigosa",
-    type: "good",
-    player: "Pivô",
-  },
-  {
-    id: "a4",
-    time: "01:34",
-    title: "Falha de cobertura",
-    type: "bad",
-    player: "Ala",
-  },
-  {
-    id: "a5",
-    time: "02:10",
-    title: "Reposição rápida",
-    type: "good",
-    player: "Goleiro",
-  },
-  {
-    id: "a6",
-    time: "03:02",
-    title: "Falta tática",
-    type: "neutral",
-    player: "Fixo",
-  },
+    player: {
+      "id": 2,
+      "name": "Guga",
+      "overall": 76,
+      "position": "Ala",
+      "minutes": 36,
+      "defensiveActions": 42,
+      "offensiveActions": 46,
+      "goalsTaken": 28,
+      "goals": 10
+    },
+  }
 ]; //TODO: apagar aqui @diogoddls
 
 const ActionLog = () => {
@@ -157,7 +144,9 @@ const ActionLog = () => {
                 <div className={styles.itemTop}>
                   <span>{action.title}</span>
                   {action.player && (
-                    <span className={styles.playerTag}>{action.player}</span>
+                    <span className={styles.playerTag}>
+                      {action.player.name} {action.player.position}
+                    </span>
                   )}
                 </div>
               </div>
