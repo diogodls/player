@@ -1,5 +1,5 @@
 .screen {
-  background-color: #1f2937 ;
+  background-color: var(--surface);
   max-width: 65%;
   width: 100%;
   padding: 50px;
@@ -31,14 +31,14 @@
 
   .icon{
     font-size: 28px;
-    color: green;
+    color: var(--green);
   }
 
   .button{
     padding: 10px 16px;
     border-radius: 10px;
-    background-color:  var(--primary-color);
-    color: white;
+    background-color:  var(--selected-blue);
+    color: var(text-primary);
     font-size: 14px;
     font-weight: 500;
     border: none;
@@ -67,24 +67,24 @@
 
   .emptyIcon {
     font-size: 32px;
-    color: #9ca3af;
+    color: var(--text-secondary);
     margin-bottom: 8px;
   }
 
   .title {
-    color: #e5e7eb;
+    color: var(--text-primary);
     font-size: 15px;
     font-weight: 500;
   }
 
   .subtitle {
-    color: #9ca3af;
+    color: var(--text-secondary);
     font-size: 13px;
   }
 
   .removeButton {
-    background: #7f1d1d;
-    color: white;
+    background: var(--deep-red);
+    color: var(--text-primary);
     border: none;
     padding: 10px 16px;
     border-radius: 10px;

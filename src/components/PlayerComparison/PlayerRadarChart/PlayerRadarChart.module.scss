@@ -1,6 +1,6 @@
 .graph {
   width: 100%;
-  background: #111827; //TODO: Second background
+  background:var(--bg-dark); //TODO: Second background
   padding: 15px;
   border-radius: 10px;
   display: flex;
@@ -10,12 +10,12 @@
   gap: 15px;
 
   .graphLegend {
-    color: white;
+    color: var(--text-primary);
   }
 
   .title {
     font-weight: bold;
-    color: white;
+    color: var(--text-primary);
   }
 
   .graphContent {
@@ -32,8 +32,8 @@
         padding: 10px;
         display: flex;
         align-items: center;
-        background-color: #dddddd10;
-        border: 1px solid #DDDDDD20;
+        background-color: var(--bg-secondary);
+        border: 1px solid var(--border-20);
         cursor: pointer;
 
         &:first-child {

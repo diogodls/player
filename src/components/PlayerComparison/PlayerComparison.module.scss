@@ -15,14 +15,14 @@
     margin: 0;
 
     .icon {
-      color: #a173d6;
+      color: var(--light-purple);
       margin-right: 3px;
     }
 
     .addPlayer {
       padding: 10px;
       color: white;
-      background: #16a34a;
+      background: var(--green);
       border: none;
       border-radius: 10px;
       cursor: pointer;
