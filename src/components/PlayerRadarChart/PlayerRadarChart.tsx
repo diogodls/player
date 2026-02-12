@@ -9,13 +9,14 @@ type PlayerRadarChart = {
   players: Player[];
   metrics: string[];
   showButtons: boolean;
+  primaryColor?: boolean;
 };
 
-const PlayerRadarChart = ({players, showButtons, metrics}: PlayerRadarChart) => {
+const PlayerRadarChart = ({players, showButtons, metrics, primaryColor}: PlayerRadarChart) => {
   const [highlightedPlayer, setHighlightedPlayer] = useState<HighlightItemData | null>({seriesId: players[0]?.id});
 
   return (
-    <div className={styles.graph}>
+    <div className={styles.graph} style={{background: primaryColor ? '#1F2937' : '#111827'}}>
       <span className={styles.title}>Gráfico de análise dos jogadores</span>
 
       <div className={styles.graphContent}>
