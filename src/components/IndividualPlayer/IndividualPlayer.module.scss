@@ -101,6 +101,27 @@
         padding: 10px;
         gap: 15px;
 
+        .carousel {
+
+          .carouselItem {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            .value {
+              background: #0D1117;
+              border-radius: 8px;
+              padding: 10px;
+
+              .name {
+                display: flex;
+                gap: 5px;
+                align-items: center;
+              }
+            }
+          }
+        }
+
         .metrics {
           display: flex;
           flex-direction: column;
@@ -119,7 +140,7 @@
         flex-direction: column;
         background: #1F2937;
         border-radius: 8px;
-        padding: 10px;
+        padding: 20px;
         gap: 5px;
 
         .title {

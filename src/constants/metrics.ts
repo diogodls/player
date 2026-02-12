@@ -18,8 +18,8 @@ export const METRICS_TYPES = Object.freeze({
 });
 
 export const INDEXES_COLORS = Object.freeze({
-   offensive: '#FB923C',
-   deffensive: '#60A5FA',
+   offensive: '#60A5FA',
+   deffensive: '#FB923C',
    general: '#F9CB15',
 });
 

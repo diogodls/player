@@ -1,7 +1,7 @@
 import styles from './IndividualPlayer.module.scss';
 import type {Indexes, Player, Team} from "../../pages/CoachDashboard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faArrowTrendDown, faArrowTrendUp, faCircle} from "@fortawesome/free-solid-svg-icons";
 import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
 import {
   DEFFENSIVE_INDEXES,
@@ -15,13 +15,13 @@ import "react-multi-carousel/lib/styles.css";
 const responsive = {
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 3,
-    slidesToSlide: 3
+    items: 1,
+    slidesToSlide: 1
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
-    items: 2,
-    slidesToSlide: 2
+    items: 1,
+    slidesToSlide: 1
   },
   mobile: {
     breakpoint: { max: 464, min: 0 },
@@ -77,11 +77,9 @@ const PlayerView = ({player, team, metrics}: IndividualPlayer) => {
             </div>
             <div className={styles.carousel}>
               <Carousel
-                swipeable={false}
                 showDots={true}
                 responsive={responsive}
                 infinite={true}
-                keyBoardControl={true}
                 customTransition="all .5"
                 transitionDuration={500}
                 containerClass="carousel-container"
@@ -90,10 +88,55 @@ const PlayerView = ({player, team, metrics}: IndividualPlayer) => {
                 dotListClass="custom-dot-list-style"
                 itemClass="carousel-item-padding-40-px"
               >
-                <div>Item 1</div>
-                <div>Item 2</div>
-                <div>Item 3</div>
-                <div>Item 4</div>
+                <div className={styles.carouselItem}>
+                  {Object.entries(GENERAL_INDEXES).map(([key, label]) => {
+                    const aboveScorePlayer = player.indexes[key as keyof Indexes] > team.indexes[key as keyof Indexes];
+
+                    return (
+                      <span className={styles.value} title={label} key={key}>
+                        <span>
+                          <span className={styles.name}>
+                            <FontAwesomeIcon icon={faCircle} style={{color: INDEXES_COLORS.offensive}}/>
+                            {label}
+                          </span>
+                          <span className={styles.number}>
+                            {player.name}: {player.indexes[key as keyof Indexes]} |
+                            <span> Média do time: {team.indexes[key as keyof Indexes]}</span>
+                          </span>
+                        </span>
+                        <span>
+                          <span>
+                            {aboveScorePlayer ?
+                              <FontAwesomeIcon icon={faArrowTrendUp}/> :
+                              <FontAwesomeIcon icon={faArrowTrendDown}/>
+                            }
+                          </span>
+                          <span>{player.indexes[key as keyof Indexes] - team.indexes[key as keyof Indexes]}</span>
+                        </span>
+                      </span>
+                    );
+                  })}
+                </div>
+                <div>
+                  {Object.entries(OFFENSIVE_INDEXES).map(([key, label]) => {
+                    return (
+                      <span className={styles.value} title={label} key={key}>
+                        {label}:
+                        <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+                <div>
+                  {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
+                    return (
+                      <span className={styles.value} title={label} key={key}>
+                        {label}:
+                        <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
+                      </span>
+                    );
+                  })}
+                </div>
               </Carousel>
             </div>
           </div>
@@ -107,7 +150,7 @@ const PlayerView = ({player, team, metrics}: IndividualPlayer) => {
                 {Object.entries(GENERAL_INDEXES).map(([key, label]) => {
                   return (
                     <span className={styles.value} title={label} key={key}>
-                      {key}:
+                      {label}:
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>
                   );
@@ -119,8 +162,8 @@ const PlayerView = ({player, team, metrics}: IndividualPlayer) => {
               <div className={styles.values}>
                 {Object.entries(OFFENSIVE_INDEXES).map(([key, label]) => {
                   return (
-                    <span className={styles.value} title={label} key={key}>
-                      {key}:
+                    <span className={styles.value} key={key}>
+                      {label}:
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>
                   );
@@ -133,7 +176,7 @@ const PlayerView = ({player, team, metrics}: IndividualPlayer) => {
                 {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
                   return (
                     <span className={styles.value} title={label} key={key}>
-                      {key}:
+                      {label}:
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>
                   );
