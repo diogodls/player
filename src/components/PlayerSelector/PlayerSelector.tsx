@@ -11,38 +11,50 @@ type PlayerSelectorProps = {
 
 const PlayerSelector = ({players}: PlayerSelectorProps) => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [openActionsModal, setOpenActionsModal] = useState<boolean>(false);
+
+  const handlePlayerClick = (player: Player) => {
+    setSelectedPlayer(player);
+    setOpenActionsModal(true);
+  };
 
   return (
     <div className={styles.tagPlayer}>
-      <div className={styles.title}>
-        <span>
-          <FontAwesomeIcon icon={faUser} className={styles.icon}/>
-          Selecione um jogador para taggear
-        </span>
+      <span className={styles.title}>
+        <FontAwesomeIcon icon={faUser} className={styles.icon}/>
+        Selecione um jogador para taggear
+      </span>
 
-        {selectedPlayer &&
-          <div className={styles.selectedPlayer}>
-            {selectedPlayer.name} - {selectedPlayer.position}
-          </div>
-        }
-        <div className={styles.positions}>
-          {PLAYERS_POSITIONS.map((position) => (
-            <div className={styles.position} key={position}>
-              <span className={styles.title}>{position}</span>
-
-              {players.map((player: Player) => {
-                if (player.position === position) return;
-
-                return (
-                  <div className={styles.player} key={player.id}>
-
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+      {selectedPlayer &&
+        <div className={styles.selectedPlayer}>
+          <span className={styles.playerData}><span className={styles.playerName}>{selectedPlayer.name}</span> - {selectedPlayer.position}</span>
+          <span className={styles.description}>Jogador selecionado - Clique para taggear ações</span>
         </div>
+      }
+      <div className={styles.positions}>
+        {PLAYERS_POSITIONS.map((position) => (
+          <div className={styles.position} key={position}>
+            <span className={styles.title}>{position}</span>
+
+            {players.map((player: Player) => {
+              if (player.position !== position) return;
+
+              return (
+                <button
+                  key={player.id}
+                  className={`${styles.player} ${selectedPlayer?.id === player.id ? styles.selected : ''}`}
+                  onClick={() => handlePlayerClick(player)}
+                >
+                  <span className={styles.name}>{player.name}</span>
+                  <span className={styles.description}>Clique para marcar uma ação</span>
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </div>
+
+      {openActionsModal && <div></div>}
     </div>
   );
 };
