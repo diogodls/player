@@ -1,11 +1,11 @@
-import styles from './PlayerView.module.scss';
+import styles from './IndividualPlayer.module.scss';
 import type {Indexes, Player, Team} from "../../pages/CoachDashboard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
 import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
 import {
   DEFFENSIVE_INDEXES,
-  GENERAL_INDEXES,
+  GENERAL_INDEXES, INDEXES_COLORS,
   OFFENSIVE_INDEXES,
   PLAYER_METRICS
 } from "../../constants/metrics.ts";
@@ -30,13 +30,14 @@ const responsive = {
   }
 };
 
-type PlayerView = {
+type IndividualPlayer = {
   player: Player;
   team: Team;
   metrics: string[];
 };
 
-const PlayerView = ({player, team, metrics}: PlayerView) => {
+const PlayerView = ({player, team, metrics}: IndividualPlayer) => {
+
   return (
     <div className={styles.playerView}>
       <div className={styles.header}>
@@ -45,7 +46,7 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
             <FontAwesomeIcon icon={faArrowLeft} />
           </span>
           <div className={styles.player}>
-            <span className={styles.player}>{player.name}</span>
+            <span className={styles.name}>{player.name}</span>
             <span>{player.position}</span>
           </div>
         </div>
@@ -57,7 +58,7 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
 
       <div className={styles.content}>
         <div className={styles.radarGraph}>
-          <PlayerRadarChart players={[player]} showButtons={false} metrics={metrics ?? []} />
+          <PlayerRadarChart players={[player]} showButtons={false} metrics={metrics ?? []} primaryColor/>
 
           <div className={styles.metrics}>
             {metrics.map(metric => (
@@ -77,13 +78,9 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
             <div className={styles.carousel}>
               <Carousel
                 swipeable={false}
-                draggable={false}
                 showDots={true}
                 responsive={responsive}
-                ssr={true} // means to render carousel on server-side.
                 infinite={true}
-                autoPlay={false}
-                autoPlaySpeed={1000}
                 keyBoardControl={true}
                 customTransition="all .5"
                 transitionDuration={500}
@@ -105,12 +102,11 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
             <span className={styles.title}>Índices detalhados</span>
 
             <div className={styles.index}>
-              <span className={styles.indexName}>Indíces gerais</span>
-
+              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.general}`}}>Indíces gerais</span>
               <div className={styles.values}>
                 {Object.entries(GENERAL_INDEXES).map(([key, label]) => {
                   return (
-                    <span className={styles.value} about={label} key={key}>
+                    <span className={styles.value} title={label} key={key}>
                       {key}:
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>
@@ -119,12 +115,11 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
               </div>
             </div>
             <div className={styles.index}>
-              <span className={styles.indexName}>Indíces Ofensivos</span>
-
+              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.offensive}`}}>Indíces Ofensivos</span>
               <div className={styles.values}>
                 {Object.entries(OFFENSIVE_INDEXES).map(([key, label]) => {
                   return (
-                    <span className={styles.value} about={label} key={key}>
+                    <span className={styles.value} title={label} key={key}>
                       {key}:
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>
@@ -133,12 +128,11 @@ const PlayerView = ({player, team, metrics}: PlayerView) => {
               </div>
             </div>
             <div className={styles.index}>
-              <span className={styles.indexName}>Indíces Defensivos</span>
-
+              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.deffensive}`}}>Indíces Defensivos</span>
               <div className={styles.values}>
                 {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
                   return (
-                    <span className={styles.value} about={label} key={key}>
+                    <span className={styles.value} title={label} key={key}>
                       {key}:
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>

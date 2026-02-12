@@ -32,21 +32,21 @@ export type Team = {
 export interface Indexes extends GeneralIndexes, OffensiveIndexes, DeffensiveIndexes {}
 
 export type GeneralIndexes = {
-  radj: string,
-  goalsRelations: string,
-  actionsRelations: string,
-  atd: string,
-  dto: string,
+  radj: number,
+  goalsRelations: number,
+  actionsRelations: number,
+  atd: number,
+  dto: number,
 };
 
 export type OffensiveIndexes = {
-  pgj: string;
-  ic: string;
-  tio: string;
+  pgj: number,
+  ic: number,
+  tio: number,
 };
 
 export type DeffensiveIndexes = {
-  gtj: string;
-  rf: string;
-  tid: string;
+  gtj: number,
+  rf: number,
+  tid: number,
 };

@@ -17,10 +17,10 @@ export const METRICS_TYPES = Object.freeze({
    "Ações Defensivas": ['offensiveActions'],
 });
 
-export const METRICS_COLORS = Object.freeze({
-   offensive: '#60A5FA',
-   deffensive:'#FB923C',
-   general:'#F9CB15',
+export const INDEXES_COLORS = Object.freeze({
+   offensive: '#FB923C',
+   deffensive: '#60A5FA',
+   general: '#F9CB15',
 });
 
 export const GENERAL_INDEXES = Object.freeze({
