@@ -43,16 +43,22 @@
   font-size: 12px;
   border-radius: 6px;
   cursor: pointer;
+  &:hover {
+    background-color: #2a3441;
+  }
 }
 
 .clear {
-  background-color: #9ca3af;
+  background-color: #1f2937;
   color: white;
   border: none;
   padding: 6px 8px;
   font-size: 12px;
   border-radius: 6px;
   cursor: pointer;
+  &:hover {
+    background-color: #ef4444;
+  }
 }
 
 .emptyState {
@@ -96,13 +102,13 @@
 
 .itemTop {
   display: flex;
-  align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
 .itemBody {
   display: flex;
+  padding-top: 2px;
   flex-direction: column;
   gap: 6px;
 }

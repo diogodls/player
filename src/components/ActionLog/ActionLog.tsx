@@ -3,12 +3,18 @@ import {useEffect, useState, useRef} from "react";
 import { useToast} from "../../contexts/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 
+type Player = {
+  id: number;
+  name: string;
+  position: "Ala" | "Fixo" | "Pivô" | "Goleiro";
+};
+
 type TaggedAction = {
   id: string;
   time: string;
   title: string;
   type: "good" | "bad" | "neutral";
-  player?: string;
+  player: string;
 };
 
 const COOKIE_KEY = "ufsm_action_log";
@@ -56,10 +62,9 @@ const actionsMock: TaggedAction[] = [
     type: "neutral",
     player: "Fixo",
   },
-]; //fazer: apagar aqui @diogoddls
+]; //TODO: apagar aqui @diogoddls
 
 const ActionLog = () => {
-
   const toast = useToast();
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
   const [actions, setActions] = useState<TaggedAction[]>(actionsMock);
@@ -75,7 +80,6 @@ const ActionLog = () => {
     try {
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) setActions(parsed);
-    } catch {
     } finally {
       hasLoadedCookie.current = true;
     }
@@ -105,7 +109,7 @@ const ActionLog = () => {
       setActions([]);
       removeCookie(COOKIE_KEY, { path: "/" });
       toast.success("Salvo com sucesso!");
-    }catch (e){
+    }catch {
       toast.error("Falha ao salvar no banco");
     }
   };
