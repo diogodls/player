@@ -72,7 +72,7 @@
 }
 
 .removeBtn {
-  display: grid;
+  align-items: center;
   width: 28px;
   height: 28px;
   border-radius: 8px;
@@ -150,52 +150,102 @@
   background: rgba(239, 68, 68, 0.10);
 }
 
- @media (max-width: 768px) {
-    .container {
-      padding: 14px;
-      border-radius: 10px;
-      max-height: none;
-    }
-
-    .header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .title {
-      font-size: 13px;
-      gap: 6px;
-    }
-
-    .badge {
-      font-size: 11px;
-      padding: 2px 6px;
-    }
-
-    .actions {
-      width: 100%;
-      gap: 10px;
-    }
-
-    .save{
-      flex: 1;
-      padding: 10px 0;
-      font-size: 13px;
-      border-radius: 8px;
-    }
-
-    .clear {
-      flex: 1;
-      padding: 10px 0;
-      font-size: 13px;
-      border-radius: 8px;
-    }
-
-    .emptyState {
-      height: auto;
-      padding: 24px 8px;
-      font-size: 12px;
-    }
+@media (max-width: 768px) {
+  .container {
+    padding: 14px;
+    border-radius: 10px;
   }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .title {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .save,
+  .clear {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .emptyState {
+    height: auto;
+    padding: 24px 8px;
+    font-size: 12px;
+  }
+
+  .list {
+    max-height: none;
+    padding-right: 0;
+    gap: 10px;
+  }
+
+  .item {
+    grid-template-columns: 56px 1fr;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    align-items: start;
+  }
+
+  .itemLeft {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .time {
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .itemBody {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    row-gap: 6px;
+    column-gap: 10px;
+    align-items: start;
+  }
+
+  .removeBtn {
+    grid-column: 2;
+    grid-row: 1; /* fica no topo */
+    width: 30px;
+    height: 30px;
+  }
+
+  .actionTitle {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 13px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.2;
+  }
+
+  .playerTag {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: 12px;
+    opacity: 0.9;
+  }
+}
