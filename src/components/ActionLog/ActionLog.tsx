@@ -1,10 +1,10 @@
-import styles from "./ActionLog.module.scss"
-import {useEffect, useState, useRef} from "react";
-import { useToast} from "../../contexts/ToastContext.tsx";
+import styles from "./ActionLog.module.scss";
+import { useEffect, useRef, useState } from "react";
+import { useToast } from "../../contexts/ToastContext.tsx";
 import { useCookies } from "react-cookie";
-import type {Player} from "../../pages/CoachDashboard";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBullseye, faXmark} from "@fortawesome/free-solid-svg-icons";
+import type { Player } from "../../pages/CoachDashboard";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 type TaggedAction = {
   id: string;
@@ -16,6 +16,7 @@ type TaggedAction = {
 
 const COOKIE_KEY = "ufsm_action_log";
 
+// TODO: apagar aqui @diogoddls
 const actionsMock: TaggedAction[] = [
   {
     id: "a1",
@@ -23,15 +24,15 @@ const actionsMock: TaggedAction[] = [
     title: "Pressão alta bem executada",
     type: "good",
     player: {
-      "id": 1,
-      "name": "Guedes",
-      "overall": 96,
-      "position": "Ala",
-      "minutes": 36,
-      "defensiveActions": 42,
-      "offensiveActions": 46,
-      "goalsTaken": 28,
-      "goals": 10
+      id: 1,
+      name: "Guedes",
+      overall: 96,
+      position: "Ala",
+      minutes: 36,
+      defensiveActions: 42,
+      offensiveActions: 46,
+      goalsTaken: 28,
+      goals: 10,
     },
   },
   {
@@ -40,18 +41,18 @@ const actionsMock: TaggedAction[] = [
     title: "Passe errado na saída",
     type: "bad",
     player: {
-      "id": 2,
-      "name": "Guga",
-      "overall": 76,
-      "position": "Ala",
-      "minutes": 36,
-      "defensiveActions": 42,
-      "offensiveActions": 46,
-      "goalsTaken": 28,
-      "goals": 10
+      id: 2,
+      name: "Guga",
+      overall: 76,
+      position: "Ala",
+      minutes: 36,
+      defensiveActions: 42,
+      offensiveActions: 46,
+      goalsTaken: 28,
+      goals: 10,
     },
-  }
-]; //TODO: apagar aqui @diogoddls
+  },
+];
 
 const ActionLog = () => {
   const toast = useToast();
@@ -61,21 +62,24 @@ const ActionLog = () => {
 
   useEffect(() => {
     const raw = cookies[COOKIE_KEY];
-    if (!raw) {
-      hasLoadedCookie.current = true;
-      return;
-    }
 
+    hasLoadedCookie.current = true;
+    if (!raw) return;
     try {
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) setActions(parsed);
-    } finally {
-      hasLoadedCookie.current = true;
+    } catch {
+      removeCookie(COOKIE_KEY, { path: "/" });
     }
   }, []);
 
   useEffect(() => {
     if (!hasLoadedCookie.current) return;
+
+    if (actions.length === 0) {
+      removeCookie(COOKIE_KEY, { path: "/" });
+      return;
+    }
 
     const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
@@ -84,11 +88,10 @@ const ActionLog = () => {
       expires,
       sameSite: "lax",
     });
-  }, [actions, setCookie]);
+  }, [actions, setCookie, removeCookie]);
 
   const handleClear = () => {
     setActions([]);
-    removeCookie(COOKIE_KEY, { path: "/" });
     toast.success("Log limpo com sucesso!");
   };
 
@@ -98,12 +101,12 @@ const ActionLog = () => {
   };
 
   const handleSave = async () => {
-    try{
+    try {
+      // futuro: mandar pro backend
       console.table(actions);
       setActions([]);
-      removeCookie(COOKIE_KEY, { path: "/" });
       toast.success("Salvo com sucesso!");
-    }catch {
+    } catch {
       toast.error("Falha ao salvar no banco");
     }
   };
@@ -136,11 +139,11 @@ const ActionLog = () => {
             <div
               key={action.id}
               className={`${styles.item} ${
-                action.type === "good" 
-                  ? styles.good 
-                : action.type === "bad"
-                  ? styles.bad
-                : ""
+                action.type === "good"
+                  ? styles.good
+                  : action.type === "bad"
+                    ? styles.bad
+                    : ""
               }`}
             >
               <div className={styles.itemLeft}>
@@ -148,27 +151,25 @@ const ActionLog = () => {
               </div>
 
               <div className={styles.itemBody}>
-                <div className={styles.itemTop}>
-                  <span>
-                    <FontAwesomeIcon icon={faBullseye}/>
-                    {action.title}
+                <span className={styles.actionTitle}>
+                  <FontAwesomeIcon icon={faBullseye} />
+                  {action.title}
+                </span>
+
+                {action.player && (
+                  <span className={styles.playerTag}>
+                    {action.player.name} - {action.player.position}
                   </span>
-                  <div className={styles.rightSide}>
-                  {action.player && (
-                    <span className={styles.playerTag} >
-                      {action.player.name} - {action.player.position}
-                    </span>
-                  )}
-                    <button
-                      className={styles.removeBtn}
-                      onClick={() => handleRemoveAction(action.id)}
-                      aria-label="Remover ação"
-                      title="Remover"
-                    >
-                      <FontAwesomeIcon icon={faXmark} />
-                    </button>
-                  </div>
-                </div>
+                )}
+
+                <button
+                  className={styles.removeBtn}
+                  onClick={() => handleRemoveAction(action.id)}
+                  aria-label="Remover ação"
+                  title="Remover"
+                >
+                  <FontAwesomeIcon icon={faXmark} />
+                </button>
               </div>
             </div>
           ))}
@@ -178,4 +179,4 @@ const ActionLog = () => {
   );
 };
 
-export default ActionLog
+export default ActionLog;
