@@ -3,6 +3,8 @@ import {useEffect, useState, useRef} from "react";
 import { useToast} from "../../contexts/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 import type {Player} from "../../pages/CoachDashboard";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBullseye, faXmark} from "@fortawesome/free-solid-svg-icons";
 
 type TaggedAction = {
   id: string;
@@ -75,7 +77,7 @@ const ActionLog = () => {
   useEffect(() => {
     if (!hasLoadedCookie.current) return;
 
-    const expires = new Date(Date.now() + 12 * 60 * 60 * 1000); // 12h
+    const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
     setCookie(COOKIE_KEY, JSON.stringify(actions), {
       path: "/",
@@ -88,6 +90,11 @@ const ActionLog = () => {
     setActions([]);
     removeCookie(COOKIE_KEY, { path: "/" });
     toast.success("Log limpo com sucesso!");
+  };
+
+  const handleRemoveAction = (id: string) => {
+    setActions((prev) => prev.filter((a) => a.id !== id));
+    toast.info("Ação removida");
   };
 
   const handleSave = async () => {
@@ -142,12 +149,25 @@ const ActionLog = () => {
 
               <div className={styles.itemBody}>
                 <div className={styles.itemTop}>
-                  <span>{action.title}</span>
+                  <span>
+                    <FontAwesomeIcon icon={faBullseye}/>
+                    {action.title}
+                  </span>
+                  <div className={styles.rightSide}>
                   {action.player && (
-                    <span className={styles.playerTag}>
-                      {action.player.name} {action.player.position}
+                    <span className={styles.playerTag} >
+                      {action.player.name} - {action.player.position}
                     </span>
                   )}
+                    <button
+                      className={styles.removeBtn}
+                      onClick={() => handleRemoveAction(action.id)}
+                      aria-label="Remover ação"
+                      title="Remover"
+                    >
+                      <FontAwesomeIcon icon={faXmark} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

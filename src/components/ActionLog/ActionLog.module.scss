@@ -71,6 +71,21 @@
   text-align: center;
 }
 
+.removeBtn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
 .item {
   display: grid;
   grid-template-columns: 64px 1fr;
@@ -106,10 +121,15 @@
   gap: 10px;
 }
 
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .itemBody {
   display: flex;
   padding-top: 2px;
-  flex-direction: column;
   gap: 6px;
 }
 
