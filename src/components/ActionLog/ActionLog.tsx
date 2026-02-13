@@ -76,7 +76,8 @@ const ActionLog = () => {
   useEffect(() => {
     if (!hasLoadedCookie.current) return;
 
-    if (actions.length === 0) {
+    // if (actions.length === 0) { pra quando n tiver acoes apagar os cookies, deixei -1 pra testar
+    if (actions.length === -1) {
       removeCookie(COOKIE_KEY, { path: "/" });
       return;
     }
@@ -92,7 +93,7 @@ const ActionLog = () => {
 
   const handleClear = () => {
     setActions([]);
-    toast.success("Log limpo com sucesso!");
+    toast.info("Log limpo com sucesso!");
   };
 
   const handleRemoveAction = (id: string) => {

@@ -72,7 +72,8 @@
 }
 
 .removeBtn {
-  align-items: center;
+  display: grid;
+  place-items: center;
   width: 28px;
   height: 28px;
   border-radius: 8px;
@@ -80,6 +81,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
+  padding: 0;
   &:hover {
     background: #ef4444;
   }
