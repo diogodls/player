@@ -1,0 +1,55 @@
+.local {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .toast {
+    min-width: 260px;
+    max-width: 360px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideIn 0.25s ease forwards;
+  }
+
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .title {
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+
+  .message {
+    margin-top: 4px;
+  }
+
+  .hint {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 6px;
+  }
+
+  .success {
+    background: #16a34a;
+  }
+
+  .error {
+    background: #dc2626;
+  }
+
+  .info {
+    background: #2563eb;
+  }
+}

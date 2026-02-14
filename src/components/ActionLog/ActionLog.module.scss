@@ -1,5 +1,253 @@
-.container{
-  background-color: gray;
+.container {
+  background-color: #1f2937;
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #e5e7eb;
+  width: 100%;
+}
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
 
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.badge {
+  background-color: #2563eb;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.save {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: #2a3441;
+  }
+}
+
+.clear {
+  background-color: #1f2937;
+  color: white;
+  border: none;
+  padding: 6px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  &:hover {
+    background-color: #ef4444;
+  }
+}
+
+.emptyState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.removeBtn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  padding: 0;
+  &:hover {
+    background: #ef4444;
+  }
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(148, 163, 184, 0.06);
+  align-items: center;
+}
+
+.list {
+  max-height: 320px;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.time {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(226, 232, 240, 0.85);
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(2, 6, 23, 0.35);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.itemBody {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  column-gap: 14px;
+  min-width: 0;
+}
+
+.itemLeft {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.actionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.playerTag {
+  color: white;
+}
+
+.good {
+  border-color: rgba(34, 197, 94, 0.28);
+  background: rgba(34, 197, 94, 0.10);
+}
+
+.bad {
+  border-color: rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.10);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .title {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .actions {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .save,
+  .clear {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  .emptyState {
+    height: auto;
+    padding: 24px 8px;
+    font-size: 12px;
+  }
+
+  .list {
+    max-height: none;
+    padding-right: 0;
+    gap: 10px;
+  }
+
+  .item {
+    grid-template-columns: 56px 1fr;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 12px;
+    align-items: start;
+  }
+
+  .itemLeft {
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .time {
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .itemBody {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    row-gap: 6px;
+    column-gap: 10px;
+    align-items: start;
+  }
+
+  .removeBtn {
+    grid-column: 2;
+    grid-row: 1; /* fica no topo */
+    width: 30px;
+    height: 30px;
+  }
+
+  .actionTitle {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 13px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.2;
+  }
+
+  .playerTag {
+    grid-column: 1;
+    grid-row: 3;
+    font-size: 12px;
+    opacity: 0.9;
+  }
 }
