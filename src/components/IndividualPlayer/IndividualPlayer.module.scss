@@ -70,6 +70,7 @@
       .metrics {
         display: flex;
         flex-direction: column;
+        gap: 5px;
 
         .metric {
           display: flex;
@@ -78,6 +79,7 @@
 
           .name {
             color: white;
+            font-weight: 500;
           }
 
           .value {
@@ -98,25 +100,45 @@
         flex-direction: column;
         background: #1F2937;
         border-radius: 8px;
-        padding: 10px;
+        padding: 15px;
         gap: 15px;
 
-        .carousel {
+        .performanceHeader {
+          color: white;
+          font-weight: 600;
+          font-size: 1.2em;
+        }
 
-          .carouselItem {
+        .carouselItem {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+
+          .teamIndex {
             display: flex;
-            flex-direction: column;
-            gap: 5px;
+            justify-content: space-between;
+            background: #0D1117;
+            border-radius: 8px;
+            padding: 15px;
+
+            .name {
+              display: flex;
+              gap: 5px;
+              align-items: center;
+            }
 
             .value {
-              background: #0D1117;
-              border-radius: 8px;
-              padding: 10px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
 
-              .name {
-                display: flex;
-                gap: 5px;
-                align-items: center;
+              .icon {
+                color: #354460;
+                font-size: 1.2em;
+              }
+
+              .number {
+                font-weight: bold;
               }
             }
           }
@@ -171,6 +193,12 @@
               display: flex;
               gap: 5px;
               margin-right: 10px;
+
+              .valueName {
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+              }
 
               .number {
                 font-weight: 500;
