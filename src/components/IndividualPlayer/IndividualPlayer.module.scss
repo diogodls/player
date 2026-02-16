@@ -52,7 +52,7 @@
 
   .content {
     display: flex;
-    gap: 10px;
+    gap: 20px;
     width: 100%;
 
     > * {
@@ -85,6 +85,7 @@
           .value {
             color: #60A5FA;
             font-weight: bold;
+            font-size: 1.3em;
           }
         }
       }
@@ -93,7 +94,7 @@
     .playerData {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 20px;
 
       .performance {
         display: flex;
@@ -112,33 +113,45 @@
         .carouselItem {
           display: flex;
           flex-direction: column;
-          gap: 5px;
+          gap: 10px;
 
           .teamIndex {
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
             background: #0D1117;
             border-radius: 8px;
             padding: 15px;
 
-            .name {
+            .topSide {
               display: flex;
-              gap: 5px;
-              align-items: center;
+              justify-content: space-between;
+
+              .name {
+                display: flex;
+                gap: 5px;
+                font-size: 1.1em;
+                align-items: center;
+              }
+
+              .icon {
+                color: #354460;
+                font-size: .9em;
+              }
             }
 
             .value {
               display: flex;
-              flex-direction: column;
+              justify-content: space-between;
               align-items: center;
 
-              .icon {
-                color: #354460;
-                font-size: 1.2em;
+              .number {
+                font-size: 1.5em;
+                font-weight: bold;
               }
 
-              .number {
-                font-weight: bold;
+              .infos {
+                color: gray;
               }
             }
           }
@@ -163,12 +176,11 @@
         background: #1F2937;
         border-radius: 8px;
         padding: 20px;
-        gap: 5px;
+        gap: 20px;
 
         .title {
           font-size: 1.2em;
           font-weight: bold;
-          margin-bottom: 5px;
           color: white;
         }
 
@@ -181,14 +193,13 @@
           }
 
           .values {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             justify-content: space-between;
-            width: 100%;
 
             .value {
-              width: 40%;
+              width: 100%;
               color: white;
               display: flex;
               gap: 5px;
