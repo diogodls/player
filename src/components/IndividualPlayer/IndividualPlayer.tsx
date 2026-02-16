@@ -168,8 +168,7 @@ const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
               </div>
             </div>
             <div className={styles.index}>
-              <span className={styles.indexName}
-                    style={{color: `${INDEXES_COLORS.deffensive}`}}>Indíces Defensivos</span>
+              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.deffensive}`}}>Indíces Defensivos</span>
               <div className={styles.values}>
                 {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
                   return (
@@ -201,29 +200,29 @@ const CarouselItem = ({label, player, indexKey, team, indexColor}: CarouselItem)
   const indexIcon = playerScore > 0 ? faArrowTrendUp
     : playerScore === 0 ? faArrowRightArrowLeft
       : faArrowTrendDown;
-  const numberColor = playerScore > 0 ? '#16a34a'
-    : playerScore === 0 ? faArrowRightArrowLeft
+  const numberColor = playerScore > 0 ? '#86efac'
+    : playerScore === 0 ? '#facc15'
       : '#dc2626';
 
   return (
     <span className={styles.teamIndex}>
-      <span>
+      <span className={styles.topSide}>
         <span className={styles.name}>
           <FontAwesomeIcon icon={faCircle} style={{color: INDEXES_COLORS[indexColor]}}/>
           {label}
         </span>
-        <span>
-          {player.name}: {player.indexes[indexKey]} |
-          <span> Média do time: {team.indexes[indexKey]}</span>
-        </span>
-      </span>
-      <span className={styles.value}>
         <span className={styles.icon}>
           <FontAwesomeIcon
             icon={indexIcon}
           />
         </span>
-        <span className={styles.number}>
+      </span>
+      <span className={styles.value}>
+        <span className={styles.infos}>
+          {player.name}: {player.indexes[indexKey]} |
+          <span> Média do time: {team.indexes[indexKey]}</span>
+        </span>
+        <span className={styles.number} style={{color: numberColor}}>
           {playerScore}
         </span>
       </span>
