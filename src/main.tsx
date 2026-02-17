@@ -9,7 +9,6 @@ import {ToastProvider} from "./contexts/ToastContext/ToastContext.tsx";
 import {CookiesProvider} from "react-cookie";
 import {ActionsProvider} from "./contexts/ActionsContext/ActionsContext.tsx";
 import SessionScreen from "./pages/SessionScreen/SessionScreen.tsx";
-
 import PlayerView from "./pages/PlayerView/PlayerView.tsx";
 
 createRoot(document.getElementById('root')!).render(
