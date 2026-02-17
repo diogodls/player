@@ -25,6 +25,14 @@ export type Player = {
   indexes: Indexes;
 };
 
+export type Metrics = { //todo: aplicar em jogador em nova task
+  minutes: number;
+  defensiveActions: number;
+  offensiveActions: number;
+  goalsTaken: number;
+  goals: number;
+};
+
 export type Team = {
   indexes: Indexes;
 };
@@ -50,3 +58,5 @@ export type DeffensiveIndexes = {
   rf: number,
   tid: number,
 };
+
+export type IndexType = 'general' | 'offensive' | 'deffensive'

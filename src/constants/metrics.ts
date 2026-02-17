@@ -23,22 +23,24 @@ export const INDEXES_COLORS = Object.freeze({
    general: '#F9CB15',
 });
 
-export const GENERAL_INDEXES = Object.freeze({
-   radj: 'Relação Ataque-Defesa por jogo',
-   goalsRelations: '+/- gols',
-   actionsRelations: '+/- ações',
-   atd: 'Relação ataque + transições defensivas',
-   dto: 'Relação defesa + transições ofensivas',
-});
+export const INDEXES_META = {
+   radj: { label: 'Relação Ataque-Defesa por jogo', category: 'general' },
+   goalsRelations: { label: '+/- gols', category: 'general' },
+   actionsRelations: { label: '+/- ações', category: 'general' },
+   atd: { label: 'Relação ataque + transições defensivas', category: 'general' },
+   dto: { label: 'Relação defesa + transições ofensivas', category: 'general' },
 
-export const OFFENSIVE_INDEXES = {
-   pgj: 'Participações em gol por jogo',
-   ic: 'Indíce de criação',
-   tio: 'Taxa de influência ofensiva',
+   pgj: { label: 'Participações em gol por jogo', category: 'offensive' },
+   ic: { label: 'Índice de criação', category: 'offensive' },
+   tio: { label: 'Taxa de influência ofensiva', category: 'offensive' },
+
+   gtj: { label: 'Gols tomados por jogo', category: 'deffensive' },
+   rf: { label: 'Relação recuperação/falhas defensivas', category: 'deffensive' },
+   tid: { label: 'Taxa de influência defensiva', category: 'deffensive' },
 };
 
-export const DEFFENSIVE_INDEXES = {
-   gtj: 'Gols tomados por jogo',
-   rf: 'Relação recuperação/falhas defensivas',
-   tid: 'Taxa de influência defensiva',
+export const INDEXES_LABELS = {
+   general: 'Índices gerais',
+   offensive: 'Índices ofensivos',
+   deffensive: 'Índices defensivos',
 };
