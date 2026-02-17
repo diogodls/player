@@ -28,13 +28,14 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-export default function SaveSessionModal({
+const SaveSessionModal = ({
  isOpen,
  initialType = "Treino",
  initialDate,
  onClose,
  onSubmit,
- title = "Salvar Treino/Jogo",}: Props) {
+ title = "Salvar Treino/Jogo",
+}: Props) => {
   const [type, setType] = useState<SessionType>(initialType);
   const [date, setDate] = useState<string>(initialDate ?? todayISO());
   const [local, setLocal] = useState("");
@@ -156,3 +157,5 @@ export default function SaveSessionModal({
     </div>
   );
 }
+
+export default SaveSessionModal;
