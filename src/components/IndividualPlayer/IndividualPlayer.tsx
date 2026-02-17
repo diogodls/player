@@ -1,5 +1,5 @@
 import styles from './IndividualPlayer.module.scss';
-import type {Indexes, Player, Team} from "../../pages/CoachDashboard";
+import type {Indexes, IndexType, Player, Team} from "../../pages/CoachDashboard";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -10,13 +10,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
 import {
-  DEFFENSIVE_INDEXES,
-  GENERAL_INDEXES, INDEXES_COLORS,
-  OFFENSIVE_INDEXES,
+  INDEXES_COLORS, INDEXES_LABELS, INDEXES_META,
   PLAYER_METRICS
 } from "../../constants/metrics.ts";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
+import {useNavigate} from "react-router";
 
 const responsive = {
   desktop: {
@@ -43,13 +42,20 @@ type IndividualPlayer = {
 };
 
 const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
-  //mais pra frente da pra fazer um refactor nessa parte de map dos índices, mas por enquanto vou deixar assim pra nós conseguir estruturar o resto do projeto
+  const navigate = useNavigate();
+
+  const groupedIndexes = Object.entries(INDEXES_META).reduce((acc, [key, meta]) => {
+    if (!acc[meta.category]) acc[meta.category] = [];
+    acc[meta.category].push({ key, label: meta.label });
+    return acc;
+  }, {} as Record<string, { key: string; label: string }[]>);
+
   return (
     <div className={styles.playerView}>
       <div className={styles.header}>
         <div className={styles.playerName}>
-          <span className={styles.icon} onClick={() => console.log('volta')}>
-            <FontAwesomeIcon icon={faArrowLeft}/>
+          <span className={styles.icon} onClick={() => navigate('/coach-dashboard')}>
+            <FontAwesomeIcon icon={faArrowLeft} />
           </span>
           <div className={styles.player}>
             <span className={styles.name}>{player.name}</span>
@@ -93,93 +99,41 @@ const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
               dotListClass="custom-dot-list-style"
               itemClass="carousel-item-padding-40-px"
             >
-              <div className={styles.carouselItem}>
-                {Object.entries(GENERAL_INDEXES).map(([key, label]) => {
-                  return (
-                    <CarouselItem
-                      indexColor={'general'}
-                      label={label}
-                      indexKey={key as keyof Indexes}
-                      key={key}
-                      player={player}
-                      team={team}
-                    />
-                  );
-                })}
-              </div>
-              <div className={styles.carouselItem}>
-                {Object.entries(OFFENSIVE_INDEXES).map(([key, label]) => {
-                  return (
-                    <CarouselItem
-                      indexColor={'offensive'}
-                      label={label}
-                      indexKey={key as keyof Indexes}
-                      key={key}
-                      player={player}
-                      team={team}
-                    />
-                  );
-                })}
-              </div>
-              <div className={styles.carouselItem}>
-                {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
-                  return (
-                    <CarouselItem
-                      indexColor={'deffensive'}
-                      label={label}
-                      indexKey={key as keyof Indexes}
-                      key={key}
-                      player={player}
-                      team={team}
-                    />
-                  );
-                })}
-              </div>
+              {Object.entries(groupedIndexes).map(([indexType, indexes]) => {
+                return (
+                  <div className={styles.carouselItem}>
+                    {indexes.map(({key, label}) => (
+                      <CarouselItem
+                        indexColor={indexType as IndexType}
+                        label={label}
+                        indexKey={key as keyof Indexes}
+                        key={key}
+                        player={player}
+                        team={team}
+                      />
+                    ))}
+                  </div>
+                );
+              })}
             </Carousel>
           </div>
 
           <div className={styles.indexes}>
             <span className={styles.title}>Índices detalhados</span>
 
-            <div className={styles.index}>
-              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.general}`}}>Indíces gerais</span>
-              <div className={styles.values}>
-                {Object.entries(GENERAL_INDEXES).map(([key, label]) => {
-                  return (
+            {Object.entries(groupedIndexes).map(([indexType, indexes]) => (
+              <div className={styles.index}>
+                <span className={styles.indexName} style={{color: `${INDEXES_COLORS[indexType as IndexType]}`}}>{INDEXES_LABELS[indexType as IndexType]}</span>
+                <div className={styles.values}>
+                  {indexes.map(({key, label}) => (
                     <span className={styles.value} title={label} key={key}>
                       <span className={styles.valueName}>{label}:</span>
                       <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
                     </span>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className={styles.index}>
-              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.offensive}`}}>Indíces Ofensivos</span>
-              <div className={styles.values}>
-                {Object.entries(OFFENSIVE_INDEXES).map(([key, label]) => {
-                  return (
-                    <span className={styles.value} key={key}>
-                      <span className={styles.valueName}>{label}:</span>
-                      <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-            <div className={styles.index}>
-              <span className={styles.indexName} style={{color: `${INDEXES_COLORS.deffensive}`}}>Indíces Defensivos</span>
-              <div className={styles.values}>
-                {Object.entries(DEFFENSIVE_INDEXES).map(([key, label]) => {
-                  return (
-                    <span className={styles.value} title={label} key={key}>
-                      <span className={styles.valueName}>{label}:</span>
-                      <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
@@ -212,9 +166,7 @@ const CarouselItem = ({label, player, indexKey, team, indexColor}: CarouselItem)
           {label}
         </span>
         <span className={styles.icon}>
-          <FontAwesomeIcon
-            icon={indexIcon}
-          />
+          <FontAwesomeIcon icon={indexIcon}/>
         </span>
       </span>
       <span className={styles.value}>
