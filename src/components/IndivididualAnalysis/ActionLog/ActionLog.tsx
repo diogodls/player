@@ -5,6 +5,7 @@ import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
+import SaveSessionModal, { type SessionMeta } from "../SaveSessionModal/SaveSessionModal";
 
 const COOKIE_KEY = "ufsm_action_log";
 
@@ -13,6 +14,7 @@ const ActionLog = () => {
   const {success, info, error} = useContext(ToastContext);
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
   const hasLoadedCookie = useRef(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   useEffect(() => {
     const raw = cookies[COOKIE_KEY];
@@ -59,6 +61,26 @@ const ActionLog = () => {
     try {
       // futuro: mandar pro backend
       console.table(actions);
+      setActions([]);
+      toast.success("Salvo com sucesso!");
+      setIsSaveModalOpen(true);
+    } catch {
+      toast.error("Falha ao salvar no banco");
+    }
+  };
+
+  const handleSubmitSession = async (meta: SessionMeta) => {
+    try {
+      const payload = {
+        session: meta,
+        actions,
+        savedAt: new Date().toISOString(),
+      };
+
+      // futuro: mandar pro backend
+      console.log("PAYLOAD SALVO:", payload);
+      console.table(actions);
+
       setActions([]);
       success("Salvo com sucesso!");
     } catch {
@@ -124,6 +146,12 @@ const ActionLog = () => {
           ))}
         </div>
       )}
+      <SaveSessionModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        onSubmit={handleSubmitSession}
+        title="Novo Treino/Jogo"
+      />
     </div>
   );
 };
