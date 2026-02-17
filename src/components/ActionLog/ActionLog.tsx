@@ -33,6 +33,19 @@ const actionsMock: TaggedAction[] = [
       offensiveActions: 46,
       goalsTaken: 28,
       goals: 10,
+      indexes: {
+        radj: 2,
+        goalsRelations: 2,
+        actionsRelations: 2,
+        atd: 2,
+        dto: 2,
+        pgj: 2,
+        ic: 2,
+        tio: 2,
+        gtj: 2,
+        rf: 2,
+        tid: 2
+      }
     },
   },
   {
@@ -50,6 +63,19 @@ const actionsMock: TaggedAction[] = [
       offensiveActions: 46,
       goalsTaken: 28,
       goals: 10,
+      indexes: {
+        radj: 2,
+        goalsRelations: 2,
+        actionsRelations: 2,
+        atd: 2,
+        dto: 2,
+        pgj: 2,
+        ic: 2,
+        tio: 2,
+        gtj: 2,
+        rf: 2,
+        tid: 2
+      }
     },
   },
 ];
