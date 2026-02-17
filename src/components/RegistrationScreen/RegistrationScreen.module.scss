@@ -1,0 +1,70 @@
+.card {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+  border-radius: 14px;
+  background: #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px 18px;
+
+  .cardHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .headerIcon {
+    font-size: 16px;
+    color: #60a5fa;
+    margin-top: 2px;
+  }
+
+  .headerText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .headerTitle {
+    color: #e5e7eb;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.1;
+  }
+
+  .headerSub {
+    color: rgba(229, 231, 235, 0.6);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .emptyState {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .emptyIcon {
+    font-size: 44px;
+    color: rgba(148, 163, 184, 0.35);
+    margin-bottom: 6px;
+  }
+
+  .emptyTitle {
+    color: rgba(229, 231, 235, 0.75);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .emptySub {
+    color: rgba(229, 231, 235, 0.45);
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
