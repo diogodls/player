@@ -17,7 +17,7 @@
 
       .icon {
         cursor: pointer;
-        background: #1F2937;
+        background: var(--surface);
         border-radius: 4px;
         padding: 8px;
         font-size: 1em;
@@ -29,7 +29,7 @@
         flex-direction: column;
 
         .name {
-          color: white;
+          color: var(--text-primary);
           font-size: 1.2em;
           font-weight: 600;
         }
@@ -40,9 +40,9 @@
       display: flex;
       flex-direction: column;
       padding: 8px;
-      background: #CA8A04;
-      border-radius: 8px;
-      color: white;
+      background: var(--accent-orange);
+      border-radius: var(--border-radius);
+      color: var(--text-primary);
 
       .rating {
         font-weight: bold;
@@ -64,8 +64,8 @@
     .radarGraph {
       display: flex;
       flex-direction: column;
-      background: #1F2937;
-      border-radius: 8px;
+      background: var(--surface);
+      border-radius: var(--border-radius);
       padding: 10px;
       width: 100%;
 
@@ -80,12 +80,12 @@
           align-items: center;
 
           .name {
-            color: white;
+            color: var(--text-primary);
             font-weight: 500;
           }
 
           .value {
-            color: #60A5FA;
+            color: var(--light-blue);
             font-weight: bold;
             font-size: 1.3em;
           }
@@ -107,14 +107,14 @@
       .performance {
         display: flex;
         flex-direction: column;
-        background: #1F2937;
-        border-radius: 8px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 15px;
         text-align: center;
         gap: 15px;
 
         .performanceHeader {
-          color: white;
+          color: var(--text-primary);
           font-weight: 600;
           font-size: 1.2em;
         }
@@ -132,8 +132,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background: #0D1117;
-            border-radius: 8px;
+            background: var(--secondary-bg-dark);
+            border-radius: var(--border-radius);
             padding: 15px;
 
             .topSide {
@@ -148,7 +148,7 @@
               }
 
               .icon {
-                color: #354460;
+                color: var(--surface);
                 font-size: .9em;
               }
             }
@@ -164,21 +164,9 @@
               }
 
               .infos {
-                color: gray;
+                color: var(--text-muted);
               }
             }
-          }
-        }
-
-        .metrics {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-
-          .metric {
-            display: flex;
-            flex-direction: column;
-            background: #111827; //secondary-background
           }
         }
       }
@@ -186,8 +174,8 @@
       .indexes {
         display: flex;
         flex-direction: column;
-        background: #1F2937;
-        border-radius: 8px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 20px;
         gap: 20px;
         overflow: auto;
@@ -195,7 +183,7 @@
         .title {
           font-size: 1.2em;
           font-weight: bold;
-          color: white;
+          color: var(--text-primary);
         }
 
         .index {
@@ -219,7 +207,7 @@
 
             .value {
               width: 100%;
-              color: white;
+              color: var(--text-primary);
               display: flex;
               gap: 5px;
               margin-right: 10px;
