@@ -6,7 +6,6 @@
   border-radius: var(--border-radius);
   padding: 8px;
 
-
   .buttonsFlex {
     display: flex;
     align-items: center;
@@ -64,7 +63,7 @@
     transition: .2s all ease-in-out;
 
     &:hover{
-      background: var(--green);
+      background: #18de65;
     }
   }
 
