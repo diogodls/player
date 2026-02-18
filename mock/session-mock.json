@@ -1,0 +1,24 @@
+[
+  {
+    "id": "r1",
+    "type": "Jogo",
+    "date": "13/02/2026",
+    "rival": "Carlos Barbosa",
+    "location": "Farrezão"
+  },
+  {
+    "id": "r2",
+    "type": "Treino",
+    "date": "15/02/2026",
+    "rival": "Carlos Barbosa",
+    "location": "Ginásio UFSM",
+    "trainingDescription": "Finalização + posse + transição"
+  },
+  {
+    "id": "r3",
+    "type": "Treino",
+    "date": "18/02/2026",
+    "location": "CEFD UFSM",
+    "trainingDescription": "Bolas paradas defensivas e pressão"
+  }
+]
