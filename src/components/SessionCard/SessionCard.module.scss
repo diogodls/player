@@ -1,0 +1,81 @@
+.card {
+  width: 100%;
+  background: #111827;
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  .topRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .badgeGame {
+    background: #2563eb;
+    color: #ffffff;
+  }
+
+  .badgeTraining {
+    background: rgba(34, 197, 94, 0.18);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+
+  .iconBtn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #e5e7eb;
+    }
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #cbd5e1;
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+    color: #9ca3af;
+  }
+
+  .primary {
+    font-weight: 700;
+    color: #e5e7eb;
+  }
+
+  .text {
+    font-weight: 500;
+  }
+}

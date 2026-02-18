@@ -20,5 +20,19 @@
     "date": "18/02/2026",
     "location": "CEFD UFSM",
     "trainingDescription": "Bolas paradas defensivas e pressão"
+  },
+  {
+    "id": "r3",
+    "type": "Treino",
+    "date": "19/02/2026",
+    "location": "CEFD UFSM",
+    "trainingDescription": "Bolas paradas ofensivas e pressão"
+  },
+  {
+    "id": "r1",
+    "type": "Jogo",
+    "date": "21/02/2026",
+    "rival": "Atlantico",
+    "location": "Farrezão"
   }
 ]
