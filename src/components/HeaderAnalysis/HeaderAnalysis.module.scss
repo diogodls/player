@@ -1,17 +1,18 @@
 .container {
   width: 100%;
-  background: #0f172a; // dark navy
   padding: 10px 20px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  border-radius: var(--border-radius);
 }
 
 .title {
-  font-size: 25px;
+  font-size: 28px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .actions {
@@ -25,7 +26,7 @@
   gap: 8px;
 
   padding: 8px 14px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   font-size: 13px;
   font-weight: 500;
   border: none;
@@ -33,25 +34,25 @@
   transition: 0.2s ease;
 
   svg {
-    font-size: 13px;
+    font-size: 20px;
   }
 }
 
 .save {
   background: var(--selected-blue);
-  color: white;
+  color: var(--text-primary);
 
   &:hover {
-    background: #1d4ed8;
+    background: var(--green);
   }
 }
 
 .clear {
-  background: #1e293b;
-  color: #cbd5e1;
-  border: 1px solid #334155;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-20);
 
   &:hover {
-    background: #334155;
+    background: var(--deep-red);
   }
 }

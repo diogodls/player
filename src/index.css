@@ -21,7 +21,6 @@
   --action-green: #16A34A;
   --action-red: #DC2626;
   --yellow: #facc15;
-  --surface-dark: #0f172a;
   --light-purple: #a173d6;
   --purple: #7c3aed;
 
@@ -34,6 +33,7 @@
   --secondary-bg-dark: #0D1117;
   --surface: #1f2937;
   --light-background: #374151;
+  --surface-dark: #0f172a;
 
   --border-radius: 8px;
   --border-50: rgba(221,221,221,0.31);
