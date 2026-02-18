@@ -6,6 +6,7 @@ import {useApi} from "../../hooks/useApi.ts";
 import {useState} from "react";
 import ActionsModal from "../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
+import HeaderAnalysis from "../../components/HeaderAnalysis/HeaderAnalysis.tsx";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
@@ -13,7 +14,12 @@ const IndividualAnalysis = () => {
 
   return (
     <div className={styles.container}>
+      <HeaderAnalysis
+        onSave={() => console.log("Salvar")}
+        onClear={() => console.log("Limpar")}
+      />
       <div className={styles.content}>
+
         <div className={styles.leftContent}>
           <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
         </div>
