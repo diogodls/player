@@ -1,4 +1,4 @@
-import {type Dispatch, type SetStateAction, useContext, useEffect} from "react";
+import {type Dispatch, type SetStateAction, useContext} from "react";
 import type {Player} from "../../pages/CoachDashboard";
 import styles from './PlayerSelector.module.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -18,10 +18,6 @@ const PlayerSelector = ({players, setActionsModalOpen}: PlayerSelectorProps) => 
     setSelectedPlayer(player);
     setActionsModalOpen(true);
   };
-
-  useEffect(() => {
-    console.log(selectedPlayer, players);
-  }, [setSelectedPlayer, selectedPlayer]);
 
   return (
     <div className={styles.tagPlayer}>
