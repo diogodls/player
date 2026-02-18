@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
 
 export type SessionType = "Treino" | "Jogo";
@@ -28,14 +28,7 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-const SaveSessionModal = ({
- isOpen,
- initialType = "Treino",
- initialDate,
- onClose,
- onSubmit,
- title = "Salvar Treino/Jogo",
-}: Props) => {
+const SaveSessionModal = ({isOpen, initialType = "Treino", initialDate, onClose, onSubmit, title = "Salvar Treino/Jogo",}: Props) => {
   const [type, setType] = useState<SessionType>(initialType);
   const [date, setDate] = useState<string>(initialDate ?? todayISO());
   const [local, setLocal] = useState("");
@@ -67,8 +60,8 @@ const SaveSessionModal = ({
       date,
       local: local.trim(),
       ...(type === "Treino"
-        ? { description: description.trim() }
-        : { opponent: opponent.trim() }),
+        ? {description: description.trim()}
+        : {opponent: opponent.trim()}),
     };
 
     onSubmit(meta);
@@ -157,5 +150,5 @@ const SaveSessionModal = ({
     </div>
   );
 }
-
+//todo: enviar para um endpoint com axios
 export default SaveSessionModal;
