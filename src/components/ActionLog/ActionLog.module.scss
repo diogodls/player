@@ -1,8 +1,8 @@
 .container {
-  background-color: #1f2937;
+  background-color: var(--surface);
   border-radius: 12px;
   padding: 16px 20px;
-  color: #e5e7eb;
+  color: var(--text-primary);
   width: 100%;
 }
 
@@ -22,8 +22,8 @@
 }
 
 .badge {
-  background-color: #2563eb;
-  color: white;
+  background-color: var(--selected-blue);
+  color: var(--text-primary);
   font-size: 12px;
   padding: 2px 6px;
   border-radius: 999px;
@@ -36,21 +36,21 @@
 }
 
 .save {
-  background-color: #2563eb;
-  color: white;
+  background-color: var(--selected-blue);
+  color: var(--text-primary);
   border: none;
   padding: 6px 10px;
   font-size: 12px;
   border-radius: 6px;
   cursor: pointer;
   &:hover {
-    background-color: #2a3441;
+    background-color: var(--surface);
   }
 }
 
 .clear {
-  background-color: #1f2937;
-  color: white;
+  background-color: var(--surface);
+  color: var(--text-primary);
   border: none;
   padding: 6px 8px;
   font-size: 12px;
@@ -67,7 +67,7 @@
   align-items: center;
   height: 80px;
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -78,8 +78,8 @@
   height: 28px;
   border-radius: 8px;
   background: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-20);
+  color: var(--text-primary);
   cursor: pointer;
   padding: 0;
   &:hover {
@@ -110,10 +110,10 @@
 .time {
   font-size: 12px;
   font-weight: 800;
-  color: rgba(226, 232, 240, 0.85);
+  color: var(--text-muted);
   padding: 6px 8px;
   border-radius: 10px;
-  background: rgba(2, 6, 23, 0.35);
+  background: var(--bg-dark);
   border: 1px solid rgba(148, 163, 184, 0.14);
 }
 
@@ -139,7 +139,7 @@
 }
 
 .playerTag {
-  color: white;
+  color: var(--text-primary);
 }
 
 .good {

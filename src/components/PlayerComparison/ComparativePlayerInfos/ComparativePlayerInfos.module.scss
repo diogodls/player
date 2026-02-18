@@ -1,13 +1,13 @@
 .detailedInfos {
   display: flex;
   flex-direction: column;
-  background: #111827;
+  background: var(--surface-dark);
   padding: 20px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   gap: 15px;
 
   .title {
-    color: white;
+    color: var(--text-primary);
     margin: 0;
   }
 
@@ -15,7 +15,7 @@
     .tableHead {
       display: flex;
       width: 100%;
-      border-bottom: 1px solid #dddddd50;
+      border-bottom: 1px solid var(--border-20);
       text-align: left;
 
       > * {
@@ -45,7 +45,7 @@
       display: flex;
       align-items: center;
       padding-block: 10px;
-      border-bottom: 1px solid #dddddd20;
+      border-bottom: 1px solid var(--border-20);
       width: 100%;
       transition: all 0.2s ease-in-out;
 
@@ -96,7 +96,7 @@
               display: flex;
               gap: 5px;
               align-items: center;
-              color: white;
+              color: var(--text-primary);
               font-size: 1.2em;
               font-weight: bold;
               position: relative;
@@ -109,18 +109,18 @@
               }
             }
 
-            .progress {
+              .progress {
               width: 100%;
               height: 10px;
-              border-radius: 10px;
+              border-radius: var(--border-radius);
               position: relative;
-              background: #dddddd50;
+              background: var(--border-20);
 
               .color {
                 position: absolute;
                 top: 0;
                 left: 0;
-                border-radius: 10px;
+                border-radius: var(--border-radius);
                 height: 10px;
               }
             }
