@@ -89,52 +89,52 @@
   .icon{
     color: var(--selected-blue);
   }
-}
 
 @media (max-width: 768px) {
-  .header {
-    margin-bottom: 10px;
-    gap: 8px;
-    font-size: 14px;
-  }
-
-  .filter {
-    .content {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .header {
+      margin-bottom: 10px;
+      gap: 8px;
+      font-size: 14px;
     }
-  }
 
-  .group {
-    gap: 12px;
-  }
+    .filter {
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
 
-  .groupLabel {
-    font-size: 11px;
-  }
+    .group {
+      gap: 12px;
+    }
 
-  .text {
-    font-size: 16px;
-  }
+    .groupLabel {
+      font-size: 11px;
+    }
 
-  .button {
-    flex-direction: column;
-    gap: 10px;
-  }
+    .text {
+      font-size: 16px;
+    }
 
-  .buttons {
-    width: 100%;
-    height: 44px;
-    font-size: 13px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    justify-content: center;
-  }
+    .button {
+      flex-direction: column;
+      gap: 10px;
+    }
 
-  .select {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
+    .buttons {
+      width: 100%;
+      height: 44px;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      justify-content: center;
+    }
+
+    .select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+    }
   }
 }
