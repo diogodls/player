@@ -93,11 +93,8 @@ const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
               infinite={true}
               customTransition="all .5"
               transitionDuration={500}
-              containerClass="carousel-container"
               removeArrowOnDeviceType={["tablet", "mobile"]}
-              deviceType={'desktop'}
-              dotListClass="custom-dot-list-style"
-              itemClass="carousel-item-padding-40-px"
+              itemClass={styles.carouselItemClass}
             >
               {Object.entries(groupedIndexes).map(([indexType, indexes]) => {
                 return (
