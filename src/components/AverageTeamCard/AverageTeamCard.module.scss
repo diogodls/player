@@ -5,9 +5,9 @@
   .card {
     width: 100%;
     padding: 20px;
-    border-radius: 15px;
+    border-radius: var(--border-radius);
     font-size: 25px;
-    color: white;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: space-between;

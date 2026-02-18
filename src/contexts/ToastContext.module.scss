@@ -12,7 +12,7 @@
     padding: 12px 14px;
     border-radius: 12px;
     cursor: pointer;
-    color: #fff;
+    color: var(--text-primary);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
     opacity: 0;
     transform: translateX(20px);
@@ -42,14 +42,14 @@
   }
 
   .success {
-    background: #16a34a;
+    background: var(--green);
   }
 
   .error {
-    background: #dc2626;
+    background: var(--deep-red);
   }
 
   .info {
-    background: #2563eb;
+    background: var(--selected-blue);
   }
 }

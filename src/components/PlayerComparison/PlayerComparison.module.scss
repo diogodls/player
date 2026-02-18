@@ -1,6 +1,6 @@
 .content {
   background-color: #1F2937;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -15,16 +15,16 @@
     margin: 0;
 
     .icon {
-      color: #a173d6;
+      color: var(--light-purple);
       margin-right: 3px;
     }
 
-    .addPlayer {
+      .addPlayer {
       padding: 10px;
       color: white;
-      background: #16a34a;
+      background: var(--green);
       border: none;
-      border-radius: 10px;
+      border-radius: var(--border-radius);
       cursor: pointer;
       transition: .2s all ease-in-out;
 
@@ -62,7 +62,7 @@
         background-color: #374151;
         border: 1px solid #DDDDDD20;
         padding: 10px;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         color: white;
         overflow: hidden;
 
@@ -89,7 +89,7 @@
       align-items: center;
       justify-content: space-between;
       background-color: #374151;
-      border-radius: 8px;
+      border-radius: var(--border-radius);
       padding: 8px;
       border: 1px solid #DDDDDD20;
 
