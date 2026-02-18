@@ -1,23 +1,16 @@
 import styles from "./ActionLog.module.scss";
-import { useEffect, useRef, useState } from "react";
-import { useToast } from "../../contexts/ToastContext.tsx";
+import {useContext, useEffect, useRef, useState} from "react";
+import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
 import { useCookies } from "react-cookie";
-import type { Player } from "../../pages/CoachDashboard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
+import type {ActionTagged} from "../../pages/IndividualAnalysis";
 
-type TaggedAction = {
-  id: string;
-  time: string;
-  title: string;
-  type: "good" | "bad" | "neutral";
-  player: Player;
-};
 
 const COOKIE_KEY = "ufsm_action_log";
 
 // TODO: apagar aqui @diogoddls
-const actionsMock: TaggedAction[] = [
+const actionsMock: ActionTagged[] = [
   {
     id: "a1",
     time: "00:12",
@@ -81,9 +74,9 @@ const actionsMock: TaggedAction[] = [
 ];
 
 const ActionLog = () => {
-  const toast = useToast();
+  const {success, info, error} = useContext(ToastContext);
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
-  const [actions, setActions] = useState<TaggedAction[]>(actionsMock);
+  const [actions, setActions] = useState<ActionTagged[]>(actionsMock);
   const hasLoadedCookie = useRef(false);
 
   useEffect(() => {
@@ -119,12 +112,12 @@ const ActionLog = () => {
 
   const handleClear = () => {
     setActions([]);
-    toast.info("Log limpo com sucesso!");
+    info("Log limpo com sucesso!");
   };
 
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
-    toast.info("Ação removida");
+    info("Ação removida");
   };
 
   const handleSave = async () => {
@@ -132,9 +125,9 @@ const ActionLog = () => {
       // futuro: mandar pro backend
       console.table(actions);
       setActions([]);
-      toast.success("Salvo com sucesso!");
+      success("Salvo com sucesso!");
     } catch {
-      toast.error("Falha ao salvar no banco");
+      error("Falha ao salvar no banco");
     }
   };
 

@@ -4,21 +4,25 @@ import ActionLog from "../../components/ActionLog/ActionLog.tsx";
 import PlayerSelector from "../../components/PlayerSelector/PlayerSelector.tsx";
 import {useApi} from "../../hooks/useApi.ts";
 import type {CoachDashboardData} from "../CoachDashboard";
+import {useState} from "react";
+import ActionsModal from "../../components/ActionsModal/ActionsModal.tsx";
 
 const IndividualAnalysis = () => {
-  const { data } = useApi<CoachDashboardData>("coach-dashboard"); //todo: trocar para nova rota quando o componente de analise individual for para a main
+  const { data } = useApi<CoachDashboardData>("individual-analisis");
+  const [actionsModalOpen, setActionsModalOpen] = useState(false);
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <PlayerSelector players={data?.players ?? []}/>
+          <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
         </div>
         <div className={styles.rightContent}>
           <VideoAnalysis/>
           <ActionLog/>
         </div>
       </div>
+      {actionsModalOpen && <ActionsModal />}
     </div>
   );
 };

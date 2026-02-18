@@ -1,22 +1,27 @@
-import {useState} from "react";
+import {type Dispatch, type SetStateAction, useContext, useEffect} from "react";
 import type {Player} from "../../pages/CoachDashboard";
 import styles from './PlayerSelector.module.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {PLAYERS_POSITIONS} from "../../constants/players.ts";
+import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext.tsx";
 
 type PlayerSelectorProps = {
   players: Player[];
+  setActionsModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
-const PlayerSelector = ({players}: PlayerSelectorProps) => {
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [openActionsModal, setOpenActionsModal] = useState<boolean>(false);
+const PlayerSelector = ({players, setActionsModalOpen}: PlayerSelectorProps) => {
+  const {setSelectedPlayer, selectedPlayer} = useContext(ActionsContext);
 
   const handlePlayerClick = (player: Player) => {
     setSelectedPlayer(player);
-    setOpenActionsModal(true);
+    setActionsModalOpen(true);
   };
+
+  useEffect(() => {
+    console.log(selectedPlayer, players);
+  }, [setSelectedPlayer, selectedPlayer]);
 
   return (
     <div className={styles.tagPlayer}>
@@ -53,8 +58,6 @@ const PlayerSelector = ({players}: PlayerSelectorProps) => {
           </div>
         ))}
       </div>
-
-      {openActionsModal && <div></div>}
     </div>
   );
 };
