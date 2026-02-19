@@ -3,29 +3,43 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import SessionCard from "../../components/SessionCard/SessionCard";
-import sessionsMock from "../../../mock/session-mock.json";
+import type { SessionRecord } from "../../pages/SessionScreen";
 
-type SessionType = "Jogo" | "Treino";
+type Props = {
+  sessions: SessionRecord[];
+  onDelete?: (id: string) => void;
+  onEdit?: (id: string) => void;
+};
 
-type SessionItem = {
+type SessionItemForCard = {
   id: string;
-  type: SessionType;
+  type: "Jogo" | "Treino";
   date: string;
   location: string;
   rival?: string;
   trainingDescription?: string;
 };
 
-const RegistrationScreen = () => {
-  const sessions = sessionsMock as SessionItem[];
+function toCardItem(s: SessionRecord): SessionItemForCard {
+  return {
+    id: s.id,
+    type: s.type,
+    date: s.date,
+    location: s.local,
+    rival: s.opponent,
+    trainingDescription: s.description,
+  };
+}
+
+const RegistrationScreen = ({ sessions, onDelete, onEdit }: Props) => {
   const total = sessions.length;
 
   const handleEdit = (id: string) => {
-    console.log("edit", id);
+    onEdit?.(id);
   };
 
   const handleDelete = (id: string) => {
-    console.log("delete", id);
+    onDelete?.(id);
   };
 
   return (
@@ -49,14 +63,17 @@ const RegistrationScreen = () => {
           </div>
         ) : (
           <div className={styles.list}>
-            {sessions.map((item) => (
-              <SessionCard
-                key={item.id}
-                item={item}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
+            {sessions.map((s) => {
+              const item = toCardItem(s);
+              return (
+                <SessionCard
+                  key={item.id}
+                  item={item}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              );
+            })}
           </div>
         )}
       </div>
