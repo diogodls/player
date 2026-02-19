@@ -8,7 +8,7 @@ import type {Action, ActionTagged} from "../../pages/IndividualAnalysis";
 type ActionsModal = {
   actions: Action[];
   closeModal: () => void
-}
+};
 
 const ActionsModal = ({actions, closeModal}: ActionsModal) => {
   const {selectedPlayer, setActions} = useContext(ActionsContext);
@@ -31,13 +31,14 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
     [actions]
   );
 
-  const handleActionClick = () => {
+  const handleActionClick = (action: Action) => {
     const actionTagged = {
       player: selectedPlayer,
-      type: "good",
-      title: 'a',
-      time: 'a',
-    } as ActionTagged
+      goodAction: action.goodAction,
+      title: action.label,
+      time: '12:41', //todo: pegar tempo do vídeo
+    } as ActionTagged;
+
     setActions((actions) => [...actions, actionTagged])
     closeModal();
   }
@@ -70,17 +71,24 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
                 {title}
               </span>
               <div className={styles.tagActions}>
-                {actions.map(({goodAction, label, key}) => (
-                  <span
-                    className={`${styles.action} ${goodAction ? styles.goodAction : styles.badAction}`}
-                    title={key}
-                    key={key}
-                    onClick={() => handleActionClick()}
-                  >
-                    <FontAwesomeIcon icon={goodAction ? faBullseye : faMinus}/>
-                    <span>{label}</span>
+                {actions.map((action) => {
+                  const actionTag = {
+                    ...action,
+                    category: title
+                  };
+
+                  return (
+                    <span
+                      className={`${styles.action} ${action.goodAction ? styles.goodAction : styles.badAction}`}
+                      title={action.key}
+                      key={action.key}
+                      onClick={() => handleActionClick(actionTag)}
+                    >
+                    <FontAwesomeIcon icon={action.goodAction ? faBullseye : faMinus}/>
+                    <span>{action.label}</span>
                   </span>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ))}

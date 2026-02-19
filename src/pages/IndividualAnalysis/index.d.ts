@@ -4,7 +4,7 @@ export type ActionTagged = {
   id: string;
   time: string;
   title: string;
-  type: "good" | "bad" | "neutral";
+  goodAction: boolean;
   player: Player;
 };
 
