@@ -8,7 +8,7 @@ import ActionsModal from "../../components/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
 
 const IndividualAnalysis = () => {
-  const { data } = useApi<IndividualAnalysisData>("individual-analisis");
+  const {data} = useApi<IndividualAnalysisData>("individual-analysis");
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
 
   return (
@@ -17,8 +17,10 @@ const IndividualAnalysis = () => {
         <div className={styles.leftContent}>
           <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
         </div>
-        <div className={styles.rightContent}>
+        <div className={styles.videoAnalysis}>
           <VideoAnalysis/>
+        </div>
+        <div className={styles.actionLog}>
           <ActionLog/>
         </div>
       </div>

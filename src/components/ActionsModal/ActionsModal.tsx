@@ -31,8 +31,13 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
     [actions]
   );
 
+  function uid() {
+    return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  }
+
   const handleActionClick = (action: Action) => {
     const actionTagged = {
+      id: uid(),
       player: selectedPlayer,
       goodAction: action.goodAction,
       title: action.label,

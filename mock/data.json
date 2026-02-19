@@ -185,5 +185,245 @@
         "tid": 2
       }
     }
+  },
+  "individual-analysis": {
+    "players": [
+      {
+        "id": 1,
+        "name": "João",
+        "overall": 98,
+        "position": "Goleiro",
+        "minutes": 31,
+        "defensiveActions": 68,
+        "offensiveActions": 2,
+        "goalsTaken": 7,
+        "goals": 1,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 2,
+        "name": "Guga",
+        "overall": 97,
+        "position": "Pivo",
+        "minutes": 40,
+        "defensiveActions": 9,
+        "offensiveActions": 52,
+        "goalsTaken": 31,
+        "goals": 14,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 3,
+        "name": "Guedes",
+        "overall": 96,
+        "position": "Ala",
+        "minutes": 36,
+        "defensiveActions": 42,
+        "offensiveActions": 46,
+        "goalsTaken": 28,
+        "goals": 10,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 4,
+        "name": "Senna",
+        "overall": 99,
+        "position": "Ala",
+        "minutes": 85,
+        "defensiveActions": 18,
+        "offensiveActions": 42,
+        "goalsTaken": 22,
+        "goals": 18,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 5,
+        "name": "Balk",
+        "overall": 95,
+        "position": "Fixo",
+        "minutes": 25,
+        "defensiveActions": 39,
+        "offensiveActions": 30,
+        "goalsTaken": 23,
+        "goals": 2,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      }
+    ],
+    "actions": [
+      {
+        "key": "Gol TO",
+        "label": "Gol transição ofensiva",
+        "category": "Gols em quadra",
+        "goodAction": true
+      },
+      {
+        "key": "Gol OO",
+        "label": "Gol organização ofensiva",
+        "category": "Gols em quadra",
+        "goodAction": true
+      },
+      {
+        "key": "Gol BP",
+        "label": "Gol bola parada",
+        "category": "Gols em quadra",
+        "goodAction": true
+      },
+      {
+        "key": "Gol GL",
+        "label": "Gol goleiro linha",
+        "category": "Gols em quadra",
+        "goodAction": true
+      },
+      {
+        "key": "Gol MGL",
+        "label": "Gol marcação de goleiro linha",
+        "category": "Gols em quadra",
+        "goodAction": false
+      },
+      {
+        "key": "GS TO",
+        "label": "Gol sofrido transição defensiva",
+        "category": "Gols tomados em quadra",
+        "goodAction": false
+      },
+      {
+        "key": "GS OO",
+        "label": "Gol sofrido organização defensiva",
+        "category": "Gols tomados em quadra",
+        "goodAction": false
+      },
+      {
+        "key": "GS BP",
+        "label": "Gol sofrido bola parada",
+        "category": "Gols tomados em quadra",
+        "goodAction": true
+      },
+      {
+        "key": "GS GLA",
+        "label": "Gol sofrido goleiro linha adversário",
+        "category": "Gols tomados em quadra",
+        "goodAction": false
+      },
+      {
+        "key": "GS GLO",
+        "label": "Gol sofrido usando goleiro linha ofensivo",
+        "category": "Gols tomados em quadra",
+        "goodAction": false
+      },
+      {
+        "key": "GM",
+        "label": "Gol marcado",
+        "category": "Ações ofensivas",
+        "goodAction": true
+      },
+      {
+        "key": "ASS",
+        "label": "Assistência",
+        "category": "Ações ofensivas",
+        "goodAction": true
+      },
+      {
+        "key": "AD",
+        "label": "Ação decisiva",
+        "category": "AÇÕES OFENSIVAS",
+        "goodAction": true
+      },
+      {
+        "key": "CC",
+        "label": "Chance criada",
+        "category": "AÇÕES OFENSIVAS",
+        "goodAction": true
+      },
+      {
+        "key": "PP",
+        "label": "Perda de posse",
+        "category": "AÇÕES OFENSIVAS",
+        "goodAction": false
+      },
+      {
+        "key": "GP",
+        "label": "Gol pago",
+        "category": "AÇÕES DEFENSIVAS",
+        "goodAction": false
+      },
+      {
+        "key": "FD",
+        "label": "Falha defensiva",
+        "category": "AÇÕES DEFENSIVAS",
+        "goodAction": false
+      },
+      {
+        "key": "RB",
+        "label": "Roubada de bola",
+        "category": "AÇÕES DEFENSIVAS",
+        "goodAction": true
+      },
+      {
+        "key": "DIA",
+        "label": "Desarme, interceptação e antecipação",
+        "category": "AÇÕES DEFENSIVAS",
+        "goodAction": true
+      }
+    ]
   }
 }
