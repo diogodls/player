@@ -74,8 +74,62 @@
 
   .emptySub {
     color: var(--text-muted);
-    opacity: 0.6; // aproxima do rgba antigo
+    opacity: 0.6;
     font-size: 12px;
     font-weight: 500;
+  }
+}
+@media (max-width: 768px) {
+  .card {
+    min-height: 180px;
+    border-radius: 12px;
+    padding: 14px;
+
+    .cardHeader {
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .headerIcon {
+      font-size: 15px;
+      margin-top: 1px;
+    }
+
+    .headerText {
+      gap: 2px;
+    }
+
+    .headerTitle {
+      font-size: 13px;
+      line-height: 1.15;
+    }
+
+    .headerSub {
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .list {
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .emptyState {
+      padding: 16px;
+      gap: 6px;
+    }
+
+    .emptyIcon {
+      font-size: 36px;
+      margin-bottom: 4px;
+    }
+
+    .emptyTitle {
+      font-size: 13px;
+    }
+
+    .emptySub {
+      font-size: 11px;
+    }
   }
 }
