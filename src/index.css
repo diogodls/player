@@ -21,7 +21,7 @@
   --yellow: #facc15;
   --surface-dark: #0f172a;
   --light-purple: #a173d6;
-  --purple:#7c3aed;
+  --purple: #7c3aed;
 
   --text-primary: rgba(255, 255, 255, 0.87);
   --text-light: #e5e7eb;
@@ -29,6 +29,7 @@
 
   --bg-default: #242424;
   --bg-dark: #111827;
+  --secondary-bg-dark: #0D1117;
   --surface: #1f2937;
 
   --border-radius: 8px;

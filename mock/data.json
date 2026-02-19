@@ -1,0 +1,189 @@
+{
+  "coach-dashboard": {
+    "averageTeamCards": [
+      {
+        "name": "Média Ofensiva Geral",
+        "color": "linear-gradient(135deg, #2563eb, #1e40af)",
+        "value": "10",
+        "icon": "faChartColumn"
+      },
+      {
+        "name": "Média Defensiva Geral",
+        "color": "linear-gradient(135deg, #f97316, #c2410c)",
+        "value": "20",
+        "icon": "faChartColumn"
+      },
+      {
+        "name": "Média Geral da Equipe",
+        "color": "linear-gradient(135deg, #22c55e, #15803d)",
+        "value": "10",
+        "icon": "faTrophy"
+      }
+    ],
+    "metrics": ["Minutagem", "Gols em quadra", "Gols tomados em quadra", "Ações defensivas", "Ações ofensivas"],
+    "players": [
+      {
+        "id": 1,
+        "name": "João",
+        "overall": 98,
+        "position": "Goleiro",
+        "minutes": 31,
+        "defensiveActions": 68,
+        "offensiveActions": 2,
+        "goalsTaken": 7,
+        "goals": 1,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 2,
+        "name": "Guga",
+        "overall": 97,
+        "position": "Pivo",
+        "minutes": 40,
+        "defensiveActions": 9,
+        "offensiveActions": 52,
+        "goalsTaken": 31,
+        "goals": 14,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 3,
+        "name": "Guedes",
+        "overall": 96,
+        "position": "Ala",
+        "minutes": 36,
+        "defensiveActions": 42,
+        "offensiveActions": 46,
+        "goalsTaken": 28,
+        "goals": 10,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 4,
+        "name": "Senna",
+        "overall": 99,
+        "position": "Ala",
+        "minutes": 85,
+        "defensiveActions": 18,
+        "offensiveActions": 42,
+        "goalsTaken": 22,
+        "goals": 18,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      },
+      {
+        "id": 5,
+        "name": "Balk",
+        "overall": 95,
+        "position": "Fixo",
+        "minutes": 25,
+        "defensiveActions": 39,
+        "offensiveActions": 30,
+        "goalsTaken": 23,
+        "goals": 2,
+        "indexes": {
+          "radj": 2,
+          "goalsRelations": 2,
+          "actionsRelations": 2,
+          "atd": 2,
+          "dto": 2,
+          "pgj": 2,
+          "ic": 2,
+          "tio": 2,
+          "gtj": 2,
+          "rf": 2,
+          "tid": 2
+        }
+      }
+    ]
+  },
+  "player-view": {
+    "metrics": ["Minutagem", "Gols em quadra", "Gols tomados em quadra", "Ações defensivas", "Ações ofensivas"],
+    "player": {
+      "id": 5,
+      "name": "Balk",
+      "overall": 95,
+      "position": "Fixo",
+      "minutes": 25,
+      "defensiveActions": 39,
+      "offensiveActions": 30,
+      "goalsTaken": 23,
+      "goals": 2,
+      "indexes": {
+        "radj": 2,
+        "goalsRelations": 2,
+        "actionsRelations": 2,
+        "atd": 2,
+        "dto": 2,
+        "pgj": 2,
+        "ic": 2,
+        "tio": 2,
+        "gtj": 2,
+        "rf": 2,
+        "tid": 2
+      }
+    },
+    "team": {
+      "indexes": {
+        "radj": 2,
+        "goalsRelations": 2,
+        "actionsRelations": 2,
+        "atd": 66,
+        "dto": 8,
+        "pgj": 25,
+        "ic": 21,
+        "tio": 1,
+        "gtj": 0,
+        "rf": 2,
+        "tid": 2
+      }
+    }
+  }
+}

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "json-server --watch ./mock/*",
-    "mock": "json-server --watch mock/coach-dashboard.json --port 3001"
+    "mock": "json-server --watch mock/data.json --port 3001"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -26,6 +26,7 @@
     "react": "^19.2.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.2.0",
+    "react-multi-carousel": "^2.8.6",
     "react-router": "^7.11.0",
     "sass": "^1.97.1",
     "swr": "^2.3.8"
