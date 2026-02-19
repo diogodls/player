@@ -3,8 +3,8 @@
   width: 100%;
   min-height: 220px;
   border-radius: 14px;
-  background: #1f2937;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface);
+  border: 1px solid var(--border-20);
   padding: 16px 18px;
 
   .cardHeader {
@@ -15,7 +15,7 @@
 
   .headerIcon {
     font-size: 16px;
-    color: #60a5fa;
+    color: var(--light-blue);
     margin-top: 2px;
   }
 
@@ -26,16 +26,17 @@
   }
 
   .headerTitle {
-    color: #e5e7eb;
+    color: var(--text-light);
     font-weight: 700;
     font-size: 14px;
     line-height: 1.1;
   }
 
   .headerSub {
-    color: rgba(229, 231, 235, 0.6);
+    color: var(--text-muted);
     font-size: 12px;
     font-weight: 500;
+    opacity: 0.8;
   }
 
   .emptyState {
@@ -52,12 +53,14 @@
 
   .emptyIcon {
     font-size: 44px;
-    color: rgba(148, 163, 184, 0.35);
+    color: var(--text-muted);
+    opacity: 0.35;
     margin-bottom: 6px;
   }
 
   .emptyTitle {
-    color: rgba(229, 231, 235, 0.75);
+    color: var(--text-light);
+    opacity: 0.75;
     font-weight: 700;
     font-size: 14px;
   }
@@ -69,9 +72,9 @@
     margin-top: 12px;
   }
 
-
   .emptySub {
-    color: rgba(229, 231, 235, 0.45);
+    color: var(--text-muted);
+    opacity: 0.6; // aproxima do rgba antigo
     font-size: 12px;
     font-weight: 500;
   }
