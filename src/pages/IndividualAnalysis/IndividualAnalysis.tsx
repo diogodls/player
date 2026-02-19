@@ -22,7 +22,9 @@ const IndividualAnalysis = () => {
           <ActionLog/>
         </div>
       </div>
-      {actionsModalOpen && <ActionsModal actions={data?.actions ?? []}/>}
+      {actionsModalOpen && <ActionsModal
+        closeModal={() => setActionsModalOpen(false)}
+        actions={data?.actions ?? []}/>}
     </div>
   );
 };

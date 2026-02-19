@@ -57,6 +57,13 @@
           }
         }
       }
+
+      .exitIcon {
+        cursor: pointer;
+        padding: 12px 10px;
+        background: var(--light-background);
+        border-radius: var(--border-radius);
+      }
     }
 
     .actions {

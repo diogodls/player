@@ -2,15 +2,16 @@ import styles from './ActionsModal.module.scss';
 import {useContext, useMemo} from "react";
 import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBullseye, faMinus, faUser} from "@fortawesome/free-solid-svg-icons";
-import type {Action} from "../../pages/IndividualAnalysis";
+import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
+import type {Action, ActionTagged} from "../../pages/IndividualAnalysis";
 
 type ActionsModal = {
   actions: Action[];
+  closeModal: () => void
 }
 
-const ActionsModal = ({actions}: ActionsModal) => {
-  const {selectedPlayer} = useContext(ActionsContext);
+const ActionsModal = ({actions, closeModal}: ActionsModal) => {
+  const {selectedPlayer, setActions} = useContext(ActionsContext);
   const groupedActions = useMemo(
     () =>
       actions.reduce((acc, action) => {
@@ -26,13 +27,24 @@ const ActionsModal = ({actions}: ActionsModal) => {
           acc[action.category] = [...acc[action.category], formattedAction];
         }
         return acc;
-      }, {} as Record<string, { label: string, key: string, goodAction: boolean}[]>),
+      }, {} as Record<string, { label: string, key: string, goodAction: boolean }[]>),
     [actions]
-  )
+  );
+
+  const handleActionClick = () => {
+    const actionTagged = {
+      player: selectedPlayer,
+      type: "good",
+      title: 'a',
+      time: 'a',
+    } as ActionTagged
+    setActions((actions) => [...actions, actionTagged])
+    closeModal();
+  }
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.content}>
+    <div className={styles.modalOverlay} onClick={closeModal}>
+      <div className={styles.content} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.player}>
             <span>
@@ -47,6 +59,8 @@ const ActionsModal = ({actions}: ActionsModal) => {
               </span>
             </span>
           </div>
+
+          <FontAwesomeIcon icon={faX} className={styles.exitIcon} onClick={closeModal}/>
         </div>
 
         <div className={styles.actions}>
@@ -57,8 +71,13 @@ const ActionsModal = ({actions}: ActionsModal) => {
               </span>
               <div className={styles.tagActions}>
                 {actions.map(({goodAction, label, key}) => (
-                  <span className={`${styles.action} ${goodAction ? styles.goodAction : styles.badAction}`} title={key} key={key}>
-                    <FontAwesomeIcon icon={goodAction ? faBullseye : faMinus} />
+                  <span
+                    className={`${styles.action} ${goodAction ? styles.goodAction : styles.badAction}`}
+                    title={key}
+                    key={key}
+                    onClick={() => handleActionClick()}
+                  >
+                    <FontAwesomeIcon icon={goodAction ? faBullseye : faMinus}/>
                     <span>{label}</span>
                   </span>
                 ))}
