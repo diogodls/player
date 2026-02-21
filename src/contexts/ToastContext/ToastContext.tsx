@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import React, {createContext, useCallback, useMemo, useRef, useState} from "react";
 import styles from "./ToastContext.module.scss";
 
 type ToastType = "success" | "error" | "info";
@@ -17,13 +17,13 @@ type ToastContextValue = {
   clearAll: () => void;
 };
 
-const ToastContext = createContext<ToastContextValue | null>(null);
+const ToastContext = createContext<ToastContextValue>({} as ToastContextValue);
 
 function uid() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-export function ToastProvider({ children }: { children: React.ReactNode }) {
+const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timersRef = useRef<Map<string, number>>(new Map());
 
@@ -83,8 +83,4 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error("useToast deve ser usado dentro de <ToastProvider />");
-  return ctx;
-}
+export {ToastContext, ToastProvider};

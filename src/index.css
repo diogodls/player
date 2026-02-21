@@ -18,6 +18,8 @@
   --deep-orange: #FA4F58;
   --deep-red: #7f1d1d;
   --green: #22BF75;
+  --action-green: #16A34A;
+  --action-red: #DC2626;
   --yellow: #facc15;
   --surface-dark: #0f172a;
   --light-purple: #a173d6;
@@ -31,8 +33,13 @@
   --bg-dark: #111827;
   --secondary-bg-dark: #0D1117;
   --surface: #1f2937;
+  --light-background: #374151;
 
   --border-radius: 8px;
   --border-50: rgba(221,221,221,0.31);
   --border-20: rgba(221,221,221,0.125);
+
+  --phone-size: 468px;
+  --tablet-size: 1024px;
+  --desktop-size: 3000px;
 }

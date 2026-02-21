@@ -3,9 +3,10 @@ import {faBullseye, faPeopleGroup, faShield, faFilter} from "@fortawesome/free-s
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./Filters.module.scss"
 import {classNames} from "../../utils/classNames.ts";
-import Select from 'rc-select';
+import Select, { Option } from 'rc-select';
 import 'rc-select/assets/index.css';
 import { useState } from "react";
+import {PLAYERS_POSITIONS} from "../../constants/players.ts";
 
 type ButtonsType = {
   label : string,
@@ -55,10 +56,10 @@ const Filters = ({ viewMode, onChangeView }: Props) => {
             className={styles.select}
             dropdownMatchSelectWidth
           >
-            <Select.Option value="all">Todas as posições</Select.Option>
-            <Select.Option value="fixo">Fixo</Select.Option>
-            <Select.Option value="ala">Ala</Select.Option>
-            <Select.Option value="pivo">Pivô</Select.Option>
+            <Option value="all">Todas as posições</Option>
+            {PLAYERS_POSITIONS.map((position) => (
+              <Option value={position}>{position}</Option>
+            ))}
           </Select>
         </div>
 

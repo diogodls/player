@@ -1,89 +1,17 @@
 import styles from "./ActionLog.module.scss";
-import { useEffect, useRef, useState } from "react";
-import { useToast } from "../../contexts/ToastContext.tsx";
+import {useContext, useEffect, useRef} from "react";
+import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
 import { useCookies } from "react-cookie";
-import type { Player } from "../../pages/CoachDashboard";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
-
-type TaggedAction = {
-  id: string;
-  time: string;
-  title: string;
-  type: "good" | "bad" | "neutral";
-  player: Player;
-};
+import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext.tsx";
 
 const COOKIE_KEY = "ufsm_action_log";
 
-// TODO: apagar aqui @diogoddls
-const actionsMock: TaggedAction[] = [
-  {
-    id: "a1",
-    time: "00:12",
-    title: "Pressão alta bem executada",
-    type: "good",
-    player: {
-      id: 1,
-      name: "Guedes",
-      overall: 96,
-      position: "Ala",
-      minutes: 36,
-      defensiveActions: 42,
-      offensiveActions: 46,
-      goalsTaken: 28,
-      goals: 10,
-      indexes: {
-        radj: 2,
-        goalsRelations: 2,
-        actionsRelations: 2,
-        atd: 2,
-        dto: 2,
-        pgj: 2,
-        ic: 2,
-        tio: 2,
-        gtj: 2,
-        rf: 2,
-        tid: 2
-      }
-    },
-  },
-  {
-    id: "a2",
-    time: "00:27",
-    title: "Passe errado na saída",
-    type: "bad",
-    player: {
-      id: 2,
-      name: "Guga",
-      overall: 76,
-      position: "Ala",
-      minutes: 36,
-      defensiveActions: 42,
-      offensiveActions: 46,
-      goalsTaken: 28,
-      goals: 10,
-      indexes: {
-        radj: 2,
-        goalsRelations: 2,
-        actionsRelations: 2,
-        atd: 2,
-        dto: 2,
-        pgj: 2,
-        ic: 2,
-        tio: 2,
-        gtj: 2,
-        rf: 2,
-        tid: 2
-      }
-    },
-  },
-];
-
 const ActionLog = () => {
-  const toast = useToast();
+  const {actions, setActions} = useContext(ActionsContext);
+  const {success, info, error} = useContext(ToastContext);
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
-  const [actions, setActions] = useState<TaggedAction[]>(actionsMock);
   const hasLoadedCookie = useRef(false);
 
   useEffect(() => {
@@ -119,12 +47,12 @@ const ActionLog = () => {
 
   const handleClear = () => {
     setActions([]);
-    toast.info("Log limpo com sucesso!");
+    info("Log limpo com sucesso!");
   };
 
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
-    toast.info("Ação removida");
+    info("Ação removida");
   };
 
   const handleSave = async () => {
@@ -132,9 +60,9 @@ const ActionLog = () => {
       // futuro: mandar pro backend
       console.table(actions);
       setActions([]);
-      toast.success("Salvo com sucesso!");
+      success("Salvo com sucesso!");
     } catch {
-      toast.error("Falha ao salvar no banco");
+      error("Falha ao salvar no banco");
     }
   };
 
@@ -165,13 +93,7 @@ const ActionLog = () => {
           {actions.map((action) => (
             <div
               key={action.id}
-              className={`${styles.item} ${
-                action.type === "good"
-                  ? styles.good
-                  : action.type === "bad"
-                    ? styles.bad
-                    : ""
-              }`}
+              className={`${styles.item} ${action.goodAction ? styles.good : styles.bad}`}
             >
               <div className={styles.itemLeft}>
                 <span className={styles.time}>{action.time}</span>

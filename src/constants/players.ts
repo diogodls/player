@@ -1,0 +1,1 @@
+export const PLAYERS_POSITIONS = ['Fixo', 'Ala', 'Pivo'];
