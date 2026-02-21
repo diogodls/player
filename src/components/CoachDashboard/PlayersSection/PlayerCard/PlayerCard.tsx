@@ -1,5 +1,5 @@
 import styles from "./PlayerCard.module.scss";
-import type {Player} from "../../pages/CoachDashboard";
+import type {Player} from "../../../../pages/CoachDashboard";
 import {Link} from "react-router";
 
 type PlayerCardProps = {

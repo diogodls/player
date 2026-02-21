@@ -1,10 +1,10 @@
 import styles from "./ActionLog.module.scss";
 import {useContext, useEffect, useRef} from "react";
-import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
+import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
-import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext.tsx";
+import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 
 const COOKIE_KEY = "ufsm_action_log";
 

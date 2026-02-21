@@ -2,11 +2,11 @@ import Select, {Option} from 'rc-select';
 import {useState, useMemo} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircle, faPlus, faUserGroup, faX} from "@fortawesome/free-solid-svg-icons";
-import type {Player} from "../../pages/CoachDashboard";
+import type {Player} from "../../../pages/CoachDashboard";
 import styles from './PlayerComparison.module.scss';
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
-import {PLAYER_COLORS} from "../../constants/metrics.ts";
-import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
+import {PLAYER_COLORS} from "../../../constants/metrics.ts";
+import PlayerRadarChart from "../../elements/PlayerRadarChart/PlayerRadarChart.tsx";
 import 'rc-select/assets/index.css';
 
 type PlayerComparisonProps = {

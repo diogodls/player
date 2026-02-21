@@ -2,11 +2,11 @@ import type {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {faBullseye, faPeopleGroup, faShield, faFilter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./Filters.module.scss"
-import {classNames} from "../../utils/classNames.ts";
+import {classNames} from "../../../utils/classNames.ts";
 import Select, { Option } from 'rc-select';
 import 'rc-select/assets/index.css';
 import { useState } from "react";
-import {PLAYERS_POSITIONS} from "../../constants/players.ts";
+import {PLAYERS_POSITIONS} from "../../../constants/players.ts";
 
 type ButtonsType = {
   label : string,

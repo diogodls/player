@@ -1,4 +1,4 @@
-import DescritiveText from "../../components/DescritiveText/DescritiveText.tsx";
+import DescritiveText from "../../components/Home/DescritiveText/DescritiveText.tsx";
 import styles from './Home.module.scss';
 
 const Home = () => {

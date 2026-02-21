@@ -1,6 +1,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChartColumn} from "@fortawesome/free-solid-svg-icons";
-import {classNames} from "../../utils/classNames.ts";
+import {classNames} from "../../../utils/classNames.ts";
 import styles from './DescritiveText.module.scss';
 import {useNavigate} from "react-router";
 
