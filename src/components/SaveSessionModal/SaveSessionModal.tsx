@@ -1,15 +1,6 @@
 import {useEffect, useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
-
-export type SessionType = "Treino" | "Jogo";
-
-export type SessionMeta = {
-  type: SessionType;
-  date: string;
-  local: string;
-  description?: string;
-  opponent?: string;
-};
+import type { SessionMeta, SessionType } from "../../pages/SessionScreen";
 
 type Props = {
   isOpen: boolean;

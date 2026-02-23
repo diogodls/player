@@ -62,8 +62,6 @@ const ActionLog = () => {
     try {
       // futuro: mandar pro backend
       console.table(actions);
-      setActions([]);
-      toast.success("Salvo com sucesso!");
       setIsSaveModalOpen(true);
     } catch {
       toast.error("Falha ao salvar no banco");

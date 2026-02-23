@@ -112,5 +112,11 @@
     color: #fff;
     font-weight: 700;
     cursor: pointer;
+
+    &:disabled {
+      opacity: 0.1;
+      cursor: not-allowed;
+      transform: none;
+    }
   }
 }
