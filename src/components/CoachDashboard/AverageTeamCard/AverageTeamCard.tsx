@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./AverageTeamCard.module.scss"
-import type {AverageCard} from "../../pages/CoachDashboard";
-import {iconMap} from "../../constants/iconMap.ts";
+import type {AverageCard} from "../../../pages/CoachDashboard";
+import {iconMap} from "../../../constants/iconMap.ts";
 
 type AverageTeamCard ={
   cards: AverageCard[]

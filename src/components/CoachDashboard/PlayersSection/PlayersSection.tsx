@@ -1,6 +1,6 @@
-import PlayerCard from "../PlayerCard/PlayerCard";
+import PlayerCard from "./PlayerCard/PlayerCard.tsx";
 import styles from "./PlayersSection.module.scss";
-import type {Player} from "../../pages/CoachDashboard";
+import type {Player} from "../../../pages/CoachDashboard";
 
 type PlayersSectionProps = {
   players: Player[];

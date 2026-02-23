@@ -8,7 +8,7 @@ import {
   faArrowTrendUp,
   faCircle
 } from "@fortawesome/free-solid-svg-icons";
-import PlayerRadarChart from "../PlayerRadarChart/PlayerRadarChart.tsx";
+import PlayerRadarChart from "../elements/PlayerRadarChart/PlayerRadarChart.tsx";
 import {
   INDEXES_COLORS, INDEXES_LABELS, INDEXES_META,
   PLAYER_METRICS

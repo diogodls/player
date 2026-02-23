@@ -1,9 +1,9 @@
 import styles from './ActionsModal.module.scss';
 import {useContext, useMemo} from "react";
-import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext.tsx";
+import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
-import type {Action, ActionTagged} from "../../pages/IndividualAnalysis";
+import type {Action, ActionTagged} from "../../../pages/IndividualAnalysis";
 
 type ActionsModal = {
   actions: Action[];

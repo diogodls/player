@@ -1,10 +1,10 @@
 import {type Dispatch, type SetStateAction, useContext} from "react";
-import type {Player} from "../../pages/CoachDashboard";
+import type {Player} from "../../../pages/CoachDashboard";
 import styles from './PlayerSelector.module.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
-import {PLAYERS_POSITIONS} from "../../constants/players.ts";
-import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext.tsx";
+import {PLAYERS_POSITIONS} from "../../../constants/players.ts";
+import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 
 type PlayerSelectorProps = {
   players: Player[];

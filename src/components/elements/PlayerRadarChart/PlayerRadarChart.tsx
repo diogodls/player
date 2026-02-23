@@ -1,9 +1,9 @@
 import {type HighlightItemData, RadarChart} from "@mui/x-charts";
-import {PLAYER_COLORS} from "../../constants/metrics.ts";
+import {PLAYER_COLORS} from "../../../constants/metrics.ts";
 import {useState} from "react";
-import type {Player} from "../../pages/CoachDashboard";
+import type {Player} from "../../../pages/CoachDashboard";
 import styles from "./PlayerRadarChart.module.scss";
-import {classNames} from "../../utils/classNames.ts";
+import {classNames} from "../../../utils/classNames.ts";
 
 type PlayerRadarChart = {
   players: Player[];

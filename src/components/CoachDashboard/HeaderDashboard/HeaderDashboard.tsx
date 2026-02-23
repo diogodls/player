@@ -1,7 +1,7 @@
 import {faCodeCompare, faPeopleGroup, faUser, faFileExport} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./HeaderDashboard.module.scss"
-import {classNames} from "../../utils/classNames.ts";
+import {classNames} from "../../../utils/classNames.ts";
 import type {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 
 type ButtonsType = {

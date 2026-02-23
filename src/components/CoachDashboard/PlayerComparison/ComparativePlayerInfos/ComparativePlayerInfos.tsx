@@ -1,6 +1,6 @@
 import styles from './ComparativePlayerInfos.module.scss';
-import type {Player} from "../../../pages/CoachDashboard";
-import {PLAYER_COLORS, PLAYER_METRICS} from "../../../constants/metrics.ts";
+import type {Player} from "../../../../pages/CoachDashboard";
+import {PLAYER_COLORS, PLAYER_METRICS} from "../../../../constants/metrics.ts";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStar} from "@fortawesome/free-solid-svg-icons";
 
