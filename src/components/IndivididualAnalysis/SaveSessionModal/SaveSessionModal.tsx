@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
-import type { SessionMeta, SessionType } from "../../pages/SessionScreen";
+import type { SessionMeta, SessionType } from "../../../pages/SessionScreen";
 
 type Props = {
   isOpen: boolean;

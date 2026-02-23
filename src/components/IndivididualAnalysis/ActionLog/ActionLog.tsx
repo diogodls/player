@@ -1,12 +1,12 @@
 import styles from "./ActionLog.module.scss";
-import {useContext, useEffect, useRef} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import SaveSessionModal from "../SaveSessionModal/SaveSessionModal";
-import type { SessionMeta } from "../../pages/SessionScreen/index";
+import type { SessionMeta } from "../../../pages/SessionScreen/index";
 
 const COOKIE_KEY = "ufsm_action_log";
 
@@ -64,7 +64,7 @@ const ActionLog = () => {
       console.table(actions);
       setIsSaveModalOpen(true);
     } catch {
-      toast.error("Falha ao salvar no banco");
+      error("Falha ao salvar no banco");
     }
   };
 

@@ -2,11 +2,11 @@ import styles from "./RegistrationScreen.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
-import SessionCard from "../../components/SessionCard/SessionCard";
-import type { SessionRecord } from "../../pages/SessionScreen";
+import SessionCard from "./SessionCard/SessionCard.tsx";
+import type { SessionData } from "../../pages/SessionScreen/index";
 
 type Props = {
-  sessions: SessionRecord[];
+  sessions: SessionData[];
   onDelete?: (id: string) => void;
   onEdit?: (id: string) => void;
 };
@@ -20,7 +20,7 @@ type SessionItemForCard = {
   trainingDescription?: string;
 };
 
-function toCardItem(s: SessionRecord): SessionItemForCard {
+function toCardItem(s: SessionData): SessionItemForCard {
   return {
     id: s.id,
     type: s.type,
