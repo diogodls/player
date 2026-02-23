@@ -1,6 +1,6 @@
 import styles from "./HeaderSessionScreen.module.scss";
 
-const HeaderSessionScreen =() => {
+const HeaderSessionScreen = () => {
   return(
     <div className={styles.headerText}>
       <span className={styles.title}>

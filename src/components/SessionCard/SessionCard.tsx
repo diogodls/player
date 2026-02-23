@@ -19,7 +19,7 @@ type Props = {
   onDelete?: (id: string) => void;
 };
 
-export default function SessionCard({ item}: Props) {
+export default function SessionCard({item}: Props) {
   const badgeClass =
     item.type === "Jogo" ? styles.badgeGame : styles.badgeTraining;
 

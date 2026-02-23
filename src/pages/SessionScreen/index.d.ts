@@ -1,6 +1,6 @@
 export type SessionType = "Treino" | "Jogo";
 
-export type SessionRecord = {
+export type SessionData = {
   id: string;
   type: SessionType;
   date: string;
