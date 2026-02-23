@@ -5,7 +5,8 @@ import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
-import SaveSessionModal, { type SessionMeta } from "../SaveSessionModal/SaveSessionModal";
+import SaveSessionModal from "../SaveSessionModal/SaveSessionModal";
+import type { SessionMeta } from "../../pages/SessionScreen/index";
 
 const COOKIE_KEY = "ufsm_action_log";
 
