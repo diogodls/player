@@ -28,5 +28,4 @@ const AverageTeamCard =  ({cards}: AverageTeamCard) => {
   );
 };
 
-
 export default AverageTeamCard;

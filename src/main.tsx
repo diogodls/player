@@ -8,7 +8,7 @@ import IndividualAnalysis from "./pages/IndividualAnalysis/IndividualAnalysis.ts
 import {ToastProvider} from "./contexts/ToastContext/ToastContext.tsx";
 import {CookiesProvider} from "react-cookie";
 import {ActionsProvider} from "./contexts/ActionsContext/ActionsContext.tsx";
-
+import SessionView from "./pages/SessionView/SessionView.tsx";
 import PlayerView from "./pages/PlayerView/PlayerView.tsx";
 
 createRoot(document.getElementById('root')!).render(
@@ -22,6 +22,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
               <Route path={"/individual-analysis"} element={<IndividualAnalysis/>}/>
               <Route path={"/player/:id"} element={<PlayerView/>}/>
+              <Route path={"/session-screen"} element={<SessionView />}/>
             </Route>
           </Routes>
         </BrowserRouter>

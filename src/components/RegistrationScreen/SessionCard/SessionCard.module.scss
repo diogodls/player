@@ -1,0 +1,71 @@
+.card {
+  width: 100%;
+  background: var(--bg-dark);
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: var(--text-light);
+  border: 1px solid var(--border-20);
+  cursor: pointer;
+  transition: 0.2s all ease-in-out;
+
+  &:hover {
+    transform: scale(1.02);
+    background: var(--bg-dark);
+  }
+
+  .topRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 10px;
+      border-radius: 10%;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badgeGame {
+      background: var(--selected-blue);
+      color: #ffffff;
+    }
+
+    .badgeTraining {
+      background: color-mix(in srgb, var(--green) 18%, transparent);
+      color: color-mix(in srgb, var(--green) 55%, white);
+      border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
+    }
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: color-mix(in srgb, var(--text-light) 85%, var(--text-muted));
+
+      .icon {
+        width: 16px;
+        height: 16px;
+        color: var(--text-muted);
+      }
+
+      .primary {
+        font-weight: 700;
+        color: var(--text-light);
+      }
+
+      .text {
+        font-weight: 500;
+      }
+    }
+  }
+}
