@@ -4,6 +4,7 @@ import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.ts
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
 import type {Action, ActionTagged} from "../../../pages/IndividualAnalysis";
+import {agroupActions} from "../../../utils/agroupActions.ts";
 
 type ActionsModal = {
   actions: Action[];
@@ -12,24 +13,7 @@ type ActionsModal = {
 
 const ActionsModal = ({actions, closeModal}: ActionsModal) => {
   const {selectedPlayer, setActions} = useContext(ActionsContext);
-  const groupedActions = useMemo(
-    () =>
-      actions.reduce((acc, action) => {
-        const formattedAction = {
-          label: action.label,
-          key: action.key,
-          goodAction: action.goodAction,
-        };
-
-        if (!acc[action.category]) {
-          acc[action.category] = [formattedAction];
-        } else {
-          acc[action.category] = [...acc[action.category], formattedAction];
-        }
-        return acc;
-      }, {} as Record<string, { label: string, key: string, goodAction: boolean }[]>),
-    [actions]
-  );
+  const groupedActions = useMemo( () => agroupActions(actions), [actions]);
 
   function uid() {
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -46,9 +30,10 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
       key: action.key,
       category: action.category,
       time: '12:41', //todo: pegar tempo do vídeo
+      type: 'individual'
     } as ActionTagged;
 
-    setActions((actions) => [...actions, actionTagged])
+    setActions((actions) => [...actions, actionTagged]);
     closeModal();
   }
 
@@ -93,9 +78,9 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
                       key={action.key}
                       onClick={() => handleActionClick(actionTag)}
                     >
-                    <FontAwesomeIcon icon={action.goodAction ? faBullseye : faMinus}/>
-                    <span>{action.label}</span>
-                  </span>
+                      <FontAwesomeIcon icon={action.goodAction ? faBullseye : faMinus}/>
+                      <span>{action.label}</span>
+                    </span>
                   )
                 })}
               </div>

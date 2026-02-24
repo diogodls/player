@@ -16,6 +16,10 @@ type ActionLogProps = {
   session: Session;
 };
 
+type ActionLog = {
+  logType: 'team' | 'individual';
+};
+
 const ActionLog = ({ session }: ActionLogProps) => {
   const { actions, setActions } = useContext(ActionsContext);
   const { success, info, error } = useContext(ToastContext);
@@ -26,6 +30,12 @@ const ActionLog = ({ session }: ActionLogProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
+  const {actions, teamActions, setActions} = useContext(ActionsContext);
+  const selectedActions = logType === 'individual' ? actions : teamActions;
+  const {success, info, error} = useContext(ToastContext);
+  const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
+  const hasLoadedCookie = useRef(false);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   useEffect(() => {
     const cookieValue = new Cookies().get(cookieKey);
 
@@ -146,7 +156,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
         </div>
       ) : (
         <div className={styles.list}>
-          {actions.map((action) => (
+          {selectedActions.map((action) => (
             <div
               key={action.id}
               className={`${styles.item} ${action.goodAction ? styles.good : styles.bad}`}

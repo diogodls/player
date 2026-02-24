@@ -811,121 +811,121 @@
         "key": "BPSE",
         "label": "Bola parada sem execução",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key" : "BPME",
         "label": "Bola parada mal executada",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction" : "false"
+        "goodAction": false
       },
       {
         "key": "BPBE",
         "label": "Bola parada bem excutada",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "GBP",
         "label": "Gol de bola parada",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "GSP",
         "label": "Gol de saída de pressão",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "GAP",
         "label": "Gol de ataque posicional",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "GT",
         "label": "Gol de transição",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "GGL",
         "label": "Gol de goleiro linha",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "PPSP",
         "label": "Perda de Posse saída de pressão",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "PPAP",
         "label": "Perda de Posse ataque posicional",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "PPT",
         "label": "Perda de Posse em transição",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "PPGL",
         "label": "Perda de Posse em goleiro linha",
         "category": "AÇÕES OFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "MBRP",
         "label": "Marcação Baixa recupera bola",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "MBGT",
         "label": "Marcação Baixa gol tomado",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "VRP",
         "label": "Marcação Variando recupera bola",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "VGT",
         "label": "Marcação variando gol tomado",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "PRP",
         "label": "Marcação pressão recupera a bola",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "PRGT",
         "label": "Marcação pressão gol tomado",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       },
       {
         "key": "TRP",
         "label": "Marcação transição recupera a bola",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "true"
+        "goodAction": true
       },
       {
         "key": "TGT",
         "label": "Marcação transição gol tomado",
         "category": "AÇÕES DEFENSIVAS",
-        "goodAction": "false"
+        "goodAction": false
       }
     ]
   }

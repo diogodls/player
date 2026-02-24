@@ -1,6 +1,6 @@
 import styles from "./IndividualAnalysis.module.scss";
 import VideoAnalysis from "../../components/elements/VideoAnalysis/VideoAnalysis.tsx";
-import ActionLog from "../../components/IndivididualAnalysis/ActionLog/ActionLog.tsx";
+import ActionLog from "../../components/elements/ActionLog/ActionLog.tsx";
 import PlayerSelector from "../../components/IndivididualAnalysis/PlayerSelector/PlayerSelector.tsx";
 import {useApi} from "../../hooks/useApi.ts";
 import {useState} from "react";
