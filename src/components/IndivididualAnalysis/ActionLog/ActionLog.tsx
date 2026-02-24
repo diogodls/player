@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import SaveSessionModal from "../SaveSessionModal/SaveSessionModal";
-import type { SessionMeta } from "../../../pages/SessionScreen/index";
+import type { SessionMeta } from "../../../pages/SessionView";
 
 const COOKIE_KEY = "ufsm_action_log";
 
@@ -33,8 +33,7 @@ const ActionLog = () => {
   useEffect(() => {
     if (!hasLoadedCookie.current) return;
 
-    // if (actions.length === 0) { pra quando n tiver acoes apagar os cookies, deixei -1 pra testar
-    if (actions.length === -1) {
+    if (actions.length === 0) {
       removeCookie(COOKIE_KEY, { path: "/" });
       return;
     }
@@ -56,16 +55,6 @@ const ActionLog = () => {
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
     info("Ação removida");
-  };
-
-  const handleSave = async () => {
-    try {
-      // futuro: mandar pro backend
-      console.table(actions);
-      setIsSaveModalOpen(true);
-    } catch {
-      error("Falha ao salvar no banco");
-    }
   };
 
   const handleSubmitSession = async (meta: SessionMeta) => {
@@ -96,7 +85,7 @@ const ActionLog = () => {
         </div>
 
         <div className={styles.actions}>
-          <button className={styles.save} onClick={handleSave}>
+          <button className={styles.save} onClick={() => setIsSaveModalOpen(true)}>
             Salvar
           </button>
           <button className={styles.clear} onClick={handleClear}>
@@ -145,11 +134,11 @@ const ActionLog = () => {
           ))}
         </div>
       )}
+
       <SaveSessionModal
         isOpen={isSaveModalOpen}
         onClose={() => setIsSaveModalOpen(false)}
         onSubmit={handleSubmitSession}
-        title="Novo Treino/Jogo"
       />
     </div>
   );

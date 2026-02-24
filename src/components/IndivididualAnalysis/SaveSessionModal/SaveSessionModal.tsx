@@ -1,14 +1,13 @@
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
-import type { SessionMeta, SessionType } from "../../../pages/SessionScreen";
+import type { SessionMeta, SessionType } from "../../../pages/SessionView";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faX} from "@fortawesome/free-solid-svg-icons";
 
-type Props = {
+type SaveSessionModal = {
   isOpen: boolean;
-  initialType?: SessionType;
-  initialDate?: string;
   onClose: () => void;
   onSubmit: (meta: SessionMeta) => void;
-  title?: string;
 };
 
 function todayISO() {
@@ -19,21 +18,12 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-const SaveSessionModal = ({isOpen, initialType = "Treino", initialDate, onClose, onSubmit, title = "Salvar Treino/Jogo",}: Props) => {
-  const [type, setType] = useState<SessionType>(initialType);
-  const [date, setDate] = useState<string>(initialDate ?? todayISO());
+const SaveSessionModal = ({isOpen, onClose, onSubmit}: SaveSessionModal) => {
+  const [type, setType] = useState<SessionType>("Treino");
+  const [date, setDate] = useState<string>(todayISO());
   const [local, setLocal] = useState("");
   const [description, setDescription] = useState("");
   const [opponent, setOpponent] = useState("");
-
-  useEffect(() => {
-    if (!isOpen) return;
-    setType(initialType);
-    setDate(initialDate ?? todayISO());
-    setLocal("");
-    setDescription("");
-    setOpponent("");
-  }, [isOpen, initialType, initialDate]);
 
   const canSubmit = useMemo(() => {
     if (!date.trim() || !local.trim()) return false;
@@ -63,9 +53,9 @@ const SaveSessionModal = ({isOpen, initialType = "Treino", initialDate, onClose,
     <div className={styles.overlay} onMouseDown={onClose}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{title}</h2>
+          <h2 className={styles.title}>Novo Treino/Jogo</h2>
           <button className={styles.close} onClick={onClose} aria-label="Fechar">
-            ×
+            <FontAwesomeIcon icon={faX} />
           </button>
         </div>
 

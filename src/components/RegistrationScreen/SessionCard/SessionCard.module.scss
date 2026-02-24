@@ -18,43 +18,26 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-  }
 
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    height: 22px;
-    padding: 0 10px;
-    border-radius: 10%;
-    font-size: 12px;
-    font-weight: 600;
-  }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 10px;
+      border-radius: 10%;
+      font-size: 12px;
+      font-weight: 600;
+    }
 
-  .badgeGame {
-    background: var(--selected-blue);
-    color: #ffffff;
-  }
+    .badgeGame {
+      background: var(--selected-blue);
+      color: #ffffff;
+    }
 
-  .badgeTraining {
-    background: color-mix(in srgb, var(--green) 18%, transparent);
-    color: color-mix(in srgb, var(--green) 55%, white);
-    border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
-  }
-
-  .iconBtn {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--border-20);
-      color: var(--text-light);
+    .badgeTraining {
+      background: color-mix(in srgb, var(--green) 18%, transparent);
+      color: color-mix(in srgb, var(--green) 55%, white);
+      border: 1px solid color-mix(in srgb, var(--green) 25%, transparent);
     }
   }
 
@@ -62,27 +45,27 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-  }
 
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: color-mix(in srgb, var(--text-light) 85%, var(--text-muted));
-  }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: color-mix(in srgb, var(--text-light) 85%, var(--text-muted));
 
-  .icon {
-    width: 16px;
-    height: 16px;
-    color: var(--text-muted);
-  }
+      .icon {
+        width: 16px;
+        height: 16px;
+        color: var(--text-muted);
+      }
 
-  .primary {
-    font-weight: 700;
-    color: var(--text-light);
-  }
+      .primary {
+        font-weight: 700;
+        color: var(--text-light);
+      }
 
-  .text {
-    font-weight: 500;
+      .text {
+        font-weight: 500;
+      }
+    }
   }
 }

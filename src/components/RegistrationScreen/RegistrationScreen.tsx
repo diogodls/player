@@ -3,44 +3,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import SessionCard from "./SessionCard/SessionCard.tsx";
-import type { SessionData } from "../../pages/SessionScreen/index";
+import type { Session } from "../../pages/SessionView";
 
-type Props = {
-  sessions: SessionData[];
-  onDelete?: (id: string) => void;
-  onEdit?: (id: string) => void;
+type RegistrationScreen = {
+  sessions: Session[];
 };
 
-type SessionItemForCard = {
-  id: string;
-  type: "Jogo" | "Treino";
-  date: string;
-  location: string;
-  rival?: string;
-  trainingDescription?: string;
-};
-
-function toCardItem(s: SessionData): SessionItemForCard {
-  return {
-    id: s.id,
-    type: s.type,
-    date: s.date,
-    location: s.local,
-    rival: s.opponent,
-    trainingDescription: s.description,
-  };
-}
-
-const RegistrationScreen = ({ sessions, onDelete, onEdit }: Props) => {
+const RegistrationScreen = ({ sessions }: RegistrationScreen) => {
   const total = sessions.length;
-
-  const handleEdit = (id: string) => {
-    onEdit?.(id);
-  };
-
-  const handleDelete = (id: string) => {
-    onDelete?.(id);
-  };
 
   return (
     <div className={styles.wrapper}>
@@ -63,17 +33,12 @@ const RegistrationScreen = ({ sessions, onDelete, onEdit }: Props) => {
           </div>
         ) : (
           <div className={styles.list}>
-            {sessions.map((s) => {
-              const item = toCardItem(s);
-              return (
-                <SessionCard
-                  key={item.id}
-                  item={item}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              );
-            })}
+            {sessions.map((session) => (
+              <SessionCard
+                key={session.id}
+                item={session}
+              />
+            ))}
           </div>
         )}
       </div>

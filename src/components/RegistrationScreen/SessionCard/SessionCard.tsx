@@ -1,25 +1,13 @@
 import styles from "./SessionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCalendarDays, faLocationDot, faHandshake, faClipboardList} from "@fortawesome/free-solid-svg-icons";
+import type {Session} from "../../../pages/SessionView";
 
-type SessionType = "Jogo" | "Treino";
-
-type SessionItem = {
-  id: string;
-  type: SessionType;
-  date: string;
-  location: string;
-  rival?: string;
-  trainingDescription?: string;
+type SessionCard = {
+  item: Session;
 };
 
-type Props = {
-  item: SessionItem;
-  onEdit?: (id: string) => void;
-  onDelete?: (id: string) => void;
-};
-
-export default function SessionCard({item}: Props) {
+const SessionCard = ({item}: SessionCard) => {
   const badgeClass =
     item.type === "Jogo" ? styles.badgeGame : styles.badgeTraining;
 
@@ -37,23 +25,23 @@ export default function SessionCard({item}: Props) {
           <span className={styles.primary}>{item.date}</span>
         </div>
 
-        {item.type === "Jogo" && item.rival && (
+        {item.type === "Jogo" && item.opponent && (
           <div className={styles.row}>
             <FontAwesomeIcon icon={faHandshake} className={styles.icon} />
-            <span className={styles.text}>{item.rival}</span>
+            <span className={styles.text}>{item.opponent}</span>
           </div>
         )}
 
         <div className={styles.row}>
           <FontAwesomeIcon icon={faLocationDot} className={styles.icon} />
-          <span className={styles.text}>{item.location}</span>
+          <span className={styles.text}>{item.local}</span>
         </div>
 
-        {item.type === "Treino" && item.trainingDescription && (
+        {item.type === "Treino" && item.description && (
           <div className={styles.row}>
             <FontAwesomeIcon icon={faClipboardList} className={styles.icon} />
             <span className={styles.text}>
-              {item.trainingDescription}
+              {item.description}
             </span>
           </div>
         )}
@@ -61,3 +49,5 @@ export default function SessionCard({item}: Props) {
     </div>
   );
 }
+
+export default SessionCard;

@@ -426,27 +426,29 @@
       }
     ]
   },
-  "sessions": [
-    {
-      "id": "1",
-      "type": "Treino",
-      "date": "15/02/2026",
-      "local": "UFSM",
-      "description": "Finalização e 1x1"
-    },
-    {
-      "id": "2",
-      "type": "Jogo",
-      "date": "19/02/2026",
-      "local": "Farrezão",
-      "opponent": "Atlantico"
-    },
-    {
-      "id": "2",
-      "type": "Jogo",
-      "date": "13/02/2026",
-      "local": "Carlos Barbosa",
-      "opponent": "ACBF"
-    }
-  ]
+  "sessions": {
+    "sessions": [
+      {
+        "id": "1",
+        "type": "Treino",
+        "date": "15/02/2026",
+        "local": "UFSM",
+        "description": "Finalização e 1x1"
+      },
+      {
+        "id": "2",
+        "type": "Jogo",
+        "date": "19/02/2026",
+        "local": "Farrezão",
+        "opponent": "Atlantico"
+      },
+      {
+        "id": "2",
+        "type": "Jogo",
+        "date": "13/02/2026",
+        "local": "Carlos Barbosa",
+        "opponent": "ACBF"
+      }
+    ]
+  }
 }
