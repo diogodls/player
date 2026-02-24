@@ -39,11 +39,11 @@
 }
 
 .save {
-  background: var(--selected-blue);
+  background: var(--surface);
   color: var(--text-primary);
 
   &:hover {
-    background: var(--green);
+    background: var(--selected-blue);
   }
 }
 
