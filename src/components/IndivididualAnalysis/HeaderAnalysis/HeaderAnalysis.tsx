@@ -1,7 +1,7 @@
 import styles from "./HeaderAnalysis.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFloppyDisk, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { useToast } from "../../contexts/ToastContext";
+import { useToast } from "../../hooks/useToast.ts";
 
 type Props = {
   onSave?: () => void;
