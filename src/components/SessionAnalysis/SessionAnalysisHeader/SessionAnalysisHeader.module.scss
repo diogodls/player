@@ -1,0 +1,61 @@
+.header {
+  width: 100%;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    color: var(--text-light);
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .pill {
+    border:none;
+    cursor: pointer;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+
+    &:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    &:active {
+      opacity: 0.5;
+    }
+  }
+
+  .icon {
+    font-size: 14px;
+    opacity: 0.95;
+  }
+
+  .pillBlue {
+    background: var(--selected-blue);
+  }
+
+  .pillGreen {
+    background: var(--green);
+  }
+
+  .active {
+    border: white;
+  }
+}
