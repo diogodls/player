@@ -13,6 +13,10 @@ const IndividualAnalysis = () => {
 
   return (
     <div className={styles.container}>
+      <HeaderAnalysis
+        onSave={() => console.log("Salvar")}
+        onClear={() => console.log("Limpar")}
+      />
       <div className={styles.content}>
         <div className={styles.leftContent}>
           <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
