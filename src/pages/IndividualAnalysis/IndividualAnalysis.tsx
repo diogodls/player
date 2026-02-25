@@ -6,6 +6,7 @@ import {useApi} from "../../hooks/useApi.ts";
 import {useState} from "react";
 import ActionsModal from "../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
+import HeaderAnalysis from "../../components/IndivididualAnalysis/HeaderAnalysis/HeaderAnalysis.tsx";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
