@@ -6,7 +6,7 @@ import {useApi} from "../../hooks/useApi.ts";
 import {useState} from "react";
 import ActionsModal from "../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
-import HeaderAnalysis from "../../components/HeaderAnalysis/HeaderAnalysis.tsx";
+import HeaderAnalysis from "../../components/IndivididualAnalysis/HeaderAnalysis/HeaderAnalysis.tsx";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
@@ -19,7 +19,6 @@ const IndividualAnalysis = () => {
         onClear={() => console.log("Limpar")}
       />
       <div className={styles.content}>
-
         <div className={styles.leftContent}>
           <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
         </div>
