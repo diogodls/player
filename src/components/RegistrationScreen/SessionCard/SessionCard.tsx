@@ -2,17 +2,21 @@ import styles from "./SessionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCalendarDays, faLocationDot, faHandshake, faClipboardList} from "@fortawesome/free-solid-svg-icons";
 import type {Session} from "../../../pages/SessionView";
+import {useNavigate} from "react-router";
 
 type SessionCard = {
   item: Session;
 };
 
 const SessionCard = ({item}: SessionCard) => {
-  const badgeClass =
-    item.type === "Jogo" ? styles.badgeGame : styles.badgeTraining;
+  const badgeClass = item.type === "Jogo" ? styles.badgeGame : styles.badgeTraining;
+  const navigate = useNavigate();
+  const handleOpen = () => {
+    navigate(`/sessions/${item.id}/analysis`);
+  };
 
   return (
-    <div className={styles.card}>
+    <button className={styles.card} onClick={handleOpen}>
       <div className={styles.topRow}>
         <span className={`${styles.badge} ${badgeClass}`}>
           {item.type}
@@ -46,7 +50,7 @@ const SessionCard = ({item}: SessionCard) => {
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 }
 
