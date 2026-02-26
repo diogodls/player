@@ -1,6 +1,7 @@
 import styles from "./SessionAnalysisHeader.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faArrowLeft, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
+import {useNavigate} from "react-router";
 
 type Tab = "individual" | "team";
 
@@ -10,10 +11,12 @@ type Props = {
 };
 
 const SessionAnalysisHeader = ({ active = "individual", onChange }: Props) => {
+  const navigate = useNavigate();
+
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <button className={styles.back}>
+        <button className={styles.back} onClick={()=> navigate(-1)}>
           <FontAwesomeIcon icon={faArrowLeft}/>
         </button>
         <h2 className={styles.title}>Detalhes</h2>
