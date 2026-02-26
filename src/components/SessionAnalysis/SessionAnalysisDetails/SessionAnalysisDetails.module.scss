@@ -1,0 +1,96 @@
+.wrapper {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-20);
+
+  .empty {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .topRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .badgeGame {
+    background: var(--selected-blue);
+    color: #fff;
+  }
+
+  .badgeTraining {
+    background: rgba(34, 197, 94, 0.18);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+
+  .opponent {
+    color: var(--text-light);
+    font-weight: 800;
+    font-size: 16px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .infoCard {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-20);
+  }
+
+  .labelRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .icon {
+    font-size: 14px;
+    color: var(--text-muted);
+    opacity: 0.9;
+  }
+
+  .label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .value {
+    color: var(--text-light);
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  .valueMuted {
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

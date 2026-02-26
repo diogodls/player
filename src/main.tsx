@@ -24,7 +24,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path={"/individual-analysis"} element={<IndividualAnalysis/>}/>
               <Route path={"/player/:id"} element={<PlayerView/>}/>
               <Route path={"/session-screen"} element={<SessionView />}/>
-              <Route path="/sessions/:sessionId/analysis" element={<SessionAnalysis />} />
+              <Route path="/sessions/:id/analysis" element={<SessionAnalysis />} />
             </Route>
           </Routes>
         </BrowserRouter>
