@@ -1,6 +1,6 @@
 import styles from "./SessionAnalysisHeader.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faUsers } from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
 
 type Tab = "individual" | "team";
 
@@ -12,8 +12,12 @@ type Props = {
 const SessionAnalysisHeader = ({ active = "individual", onChange }: Props) => {
   return (
     <header className={styles.header}>
-      <h2 className={styles.title}>Detalhes</h2>
-
+      <div className={styles.left}>
+        <button className={styles.back}>
+          <FontAwesomeIcon icon={faArrowLeft}/>
+        </button>
+        <h2 className={styles.title}>Detalhes</h2>
+      </div>
       <div className={styles.actions}>
         <button
           type="button"
