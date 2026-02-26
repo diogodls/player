@@ -1,7 +1,8 @@
 import styles from "./HeaderAnalysis.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFloppyDisk, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { useToast } from "../../hooks/useToast.ts";
+import { useContext } from "react";
+import { ToastContext } from "../../../contexts/ToastContext/ToastContext";
 
 type Props = {
   onSave?: () => void;
@@ -9,7 +10,7 @@ type Props = {
 };
 
 const IndividualAnalysisHeader = ({ onSave, onClear }: Props) => {
-  const toast = useToast();
+  const toast = useContext(ToastContext);
 
   const handleSave = () => {
     try {
@@ -19,7 +20,7 @@ const IndividualAnalysisHeader = ({ onSave, onClear }: Props) => {
       } else {
         toast.error("Nenhuma ação de salvar foi definida.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Erro ao salvar o log do jogador.");
     }
   };
@@ -32,7 +33,7 @@ const IndividualAnalysisHeader = ({ onSave, onClear }: Props) => {
       } else {
         toast.error("Nenhuma ação de limpeza foi definida.");
       }
-    } catch (error) {
+    } catch {
       toast.error("Erro ao limpar o log.");
     }
   };
