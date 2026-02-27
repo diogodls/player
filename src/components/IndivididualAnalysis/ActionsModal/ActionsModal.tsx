@@ -1,36 +1,32 @@
 import styles from './ActionsModal.module.scss';
-import {useContext, useMemo} from "react";
+import {useContext} from "react";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
-import type {Action, ActionTagged} from "../../../pages/IndividualAnalysis";
-import {agroupActions} from "../../../utils/agroupActions.ts";
+import {faUser, faX} from "@fortawesome/free-solid-svg-icons";
+import type {Action, ActionTagged} from "../../../pages/Analysis";
+import {uid} from "uid";
+import ActionsList from "../../elements/ActionsList/ActionsList.tsx";
 
 type ActionsModal = {
   actions: Action[];
-  closeModal: () => void
+  closeModal: () => void;
 };
 
 const ActionsModal = ({actions, closeModal}: ActionsModal) => {
-  const {selectedPlayer, setActions} = useContext(ActionsContext);
-  const groupedActions = useMemo( () => agroupActions(actions), [actions]);
-
-  function uid() {
-    return Math.random().toString(36).slice(2) + Date.now().toString(36);
-  }
+  const {selectedPlayer, setActions, currentVideoTime} = useContext(ActionsContext);
 
   const handleActionClick = (action: Action) => {
     if (!selectedPlayer) return;
 
     const actionTagged = {
       id: uid(),
-      player: selectedPlayer,
       goodAction: action.goodAction,
       title: action.label,
       key: action.key,
       category: action.category,
-      time: '12:41', //todo: pegar tempo do vídeo
-      type: 'individual'
+      time: currentVideoTime,
+      type: 'individual',
+      player: selectedPlayer,
     } as ActionTagged;
 
     setActions((actions) => [...actions, actionTagged]);
@@ -58,35 +54,7 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
           <FontAwesomeIcon icon={faX} className={styles.exitIcon} onClick={closeModal}/>
         </div>
 
-        <div className={styles.actions}>
-          {Object.entries(groupedActions).map(([title, actions]) => (
-            <div className={styles.actionsType} key={title}>
-              <span className={styles.actionsTitle}>
-                {title}
-              </span>
-              <div className={styles.tagActions}>
-                {actions.map((action) => {
-                  const actionTag = {
-                    ...action,
-                    category: title
-                  };
-
-                  return (
-                    <span
-                      className={`${styles.action} ${action.goodAction ? styles.goodAction : styles.badAction}`}
-                      title={action.key}
-                      key={action.key}
-                      onClick={() => handleActionClick(actionTag)}
-                    >
-                      <FontAwesomeIcon icon={action.goodAction ? faBullseye : faMinus}/>
-                      <span>{action.label}</span>
-                    </span>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+        <ActionsList actions={actions} handleActionClick={handleActionClick}/>
       </div>
     </div>
   );

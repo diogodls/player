@@ -18,7 +18,7 @@ const TeamAnalysis = () => {
           <VideoAnalysis/>
         </div>
         <div className={styles.actionLog}>
-          <ActionLog/>
+          <ActionLog logType={'team'}/>
         </div>
       </div>
     </div>

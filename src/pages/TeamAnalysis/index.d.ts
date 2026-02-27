@@ -1,3 +1,5 @@
+import type {Player} from "../CoachDashboard";
+
 export type TeamAnalysisData = {
   actions: Action[];
 }
@@ -7,6 +9,7 @@ export type TeamActionTagged = {
   time: string;
   title: string;
   goodAction: boolean;
+  player?: Player;
 }
 
 export type Action = {

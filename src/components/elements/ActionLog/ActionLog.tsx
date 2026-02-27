@@ -150,7 +150,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
         </div>
       </div>
 
-      {actions.length === 0 ? (
+      {selectedActions.length === 0 ? (
         <div className={styles.emptyState}>
           <span>Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.</span>
         </div>
