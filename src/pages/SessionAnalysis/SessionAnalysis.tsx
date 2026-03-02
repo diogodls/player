@@ -4,6 +4,7 @@ import { useApi } from "../../hooks/useApi";
 import type { SessionData, Session } from "../SessionView";
 import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader";
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails";
+import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
 
 const SessionAnalysis = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,7 @@ const SessionAnalysis = () => {
     <div className={styles.container}>
       <SessionAnalysisHeader />
       <SessionAnalysisDetails session={session} />
+      <SessionAnalysisSummary/>
     </div>
   );
 };
