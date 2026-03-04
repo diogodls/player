@@ -1,29 +1,31 @@
+import { useMemo, useState } from "react";
 import styles from "./SessionAnalysisActionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
+  faChevronUp,
   faArrowTrendUp,
   faArrowTrendDown,
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
+import SessionAnalysisActionView, {
+  type AthleteAction,
+} from "../SessionAnalysisActionView.tsx";
 
 type Props = {
-  initials?: string;          // letra dentro do círculo (ex: "R")
-  title?: string;             // ex: "RW2 - Ferreira"
-  actionsCount?: number;      // ex: 1
+  initials?: string;
+  title?: string;
+  actions?: AthleteAction[];
 
-  positives?: number;         // ex: 1
-  negatives?: number;         // ex: 0
-  neutrals?: number;          // ex: 0
+  overall?: number;
+  overallLabel?: string;
 
-  overall?: number;           // ex: 50
-  overallLabel?: string;      // ex: "GER"
+  offensive?: number;
+  defensive?: number;
+  aproveitamento?: number;
 
-  offensive?: number;         // 0-100
-  defensive?: number;         // 0-100
-  aproveitamento?: number;    // 0-100
-
-  variant?: "yellow" | "red"; // pra trocar o “clima” do card (igual no print)
+  variant?: "yellow" | "red";
+  defaultOpen?: boolean;
 };
 
 const clamp01 = (n: number) => Math.max(0, Math.min(100, n));
@@ -31,21 +33,29 @@ const clamp01 = (n: number) => Math.max(0, Math.min(100, n));
 const SessionAnalysisActionCard = ({
                                      initials = "R",
                                      title = "RW2 - Ferreira",
-                                     actionsCount = 1,
-                                     positives = 1,
-                                     negatives = 0,
-                                     neutrals = 0,
+                                     actions = [],
                                      overall = 50,
                                      overallLabel = "GER",
                                      offensive = 50,
                                      defensive = 0,
                                      aproveitamento = 100,
                                      variant = "yellow",
+                                     defaultOpen = false,
                                    }: Props) => {
-  const verAcoesText = `Ver ações (${actionsCount})`;
+  const [open, setOpen] = useState(defaultOpen);
+
+  const counts = useMemo(() => {
+    const pos = actions.filter((a) => a.type === "good").length;
+    const neg = actions.filter((a) => a.type === "bad").length;
+    const neu = actions.filter((a) => a.type === "neutral").length;
+    return { pos, neg, neu };
+  }, [actions]);
+
+  const actionsCount = actions.length;
 
   return (
     <article className={`${styles.card} ${styles[`card_${variant}`]}`}>
+      {/* topo */}
       <div className={styles.topRow}>
         <div className={styles.left}>
           <div className={styles.avatar}>{initials}</div>
@@ -60,7 +70,7 @@ const SessionAnalysisActionCard = ({
           <div className={styles.counts}>
             <span className={styles.count}>
               <FontAwesomeIcon icon={faArrowTrendUp} className={styles.posIco} />
-              <span className={styles.posTxt}>{positives}</span>
+              <span className={styles.posTxt}>{counts.pos}</span>
             </span>
 
             <span className={styles.count}>
@@ -68,12 +78,12 @@ const SessionAnalysisActionCard = ({
                 icon={faArrowTrendDown}
                 className={styles.negIco}
               />
-              <span className={styles.negTxt}>{negatives}</span>
+              <span className={styles.negTxt}>{counts.neg}</span>
             </span>
 
             <span className={styles.count}>
               <FontAwesomeIcon icon={faMinus} className={styles.neuIco} />
-              <span className={styles.neuTxt}>{neutrals}</span>
+              <span className={styles.neuTxt}>{counts.neu}</span>
             </span>
           </div>
 
@@ -84,16 +94,33 @@ const SessionAnalysisActionCard = ({
         </div>
       </div>
 
+      {/* métricas */}
       <div className={styles.metrics}>
         <MiniMetric label="OFENSIVO" value={offensive} tone="blue" />
         <MiniMetric label="DEFENSIVO" value={defensive} tone="yellow" />
         <MiniMetric label="APROVEIT." value={aproveitamento} tone="green" />
       </div>
 
-      <div className={styles.bottomRow}>
-        <span className={styles.viewLink}>{verAcoesText}</span>
-        <FontAwesomeIcon icon={faChevronDown} className={styles.chevron} />
-      </div>
+      {/* botão/linha */}
+      <button
+        type="button"
+        className={styles.bottomRowBtn}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
+        <FontAwesomeIcon
+          icon={open ? faChevronUp : faChevronDown}
+          className={styles.chevron}
+        />
+      </button>
+
+      {/* view expansível */}
+      {open && (
+        <div className={styles.expandArea}>
+          <SessionAnalysisActionView actions={actions} />
+        </div>
+      )}
     </article>
   );
 };

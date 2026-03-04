@@ -232,4 +232,21 @@
     color: var(--text-muted);
     opacity: 0.8;
   }
+
+  .bottomRowBtn {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 6px;
+    cursor: pointer;
+  }
+
+  .expandArea {
+    margin-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 10px;
+  }
 }
