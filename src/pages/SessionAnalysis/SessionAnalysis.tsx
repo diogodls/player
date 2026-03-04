@@ -5,6 +5,7 @@ import type { SessionData, Session } from "../SessionView";
 import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader";
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails";
 import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
+import SessionAnalysisActionCard from "../../components/SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard.tsx";
 
 const SessionAnalysis = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +18,7 @@ const SessionAnalysis = () => {
       <SessionAnalysisHeader />
       <SessionAnalysisDetails session={session} />
       <SessionAnalysisSummary/>
+      <SessionAnalysisActionCard/>
     </div>
   );
 };

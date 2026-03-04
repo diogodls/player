@@ -1,0 +1,235 @@
+.card {
+  width: 100%;
+  background: rgba(17, 24, 39, 0.55);
+  border: 1px solid var(--border-20);
+  border-radius: 14px;
+  padding: 14px 16px 12px;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.25);
+
+  .card_yellow .avatar,
+  .card_yellow .overallBadge {
+    border-color: rgba(250, 204, 21, 0.45);
+  }
+
+  .card_red .avatar,
+  .card_red .overallBadge {
+    border-color: rgba(250, 79, 88, 0.35);
+  }
+
+  .topRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 2px solid rgba(250, 204, 21, 0.45);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    color: var(--text-light);
+    background: rgba(0, 0, 0, 0.18);
+    flex: 0 0 auto;
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .title {
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    opacity: 0.9;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+  }
+
+  .counts {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+  }
+
+  .count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .posIco {
+    font-size: 12px;
+    color: var(--green);
+  }
+
+  .negIco {
+    font-size: 12px;
+    color: var(--deep-orange);
+  }
+
+  .neuIco {
+    font-size: 12px;
+    color: var(--light-blue);
+  }
+
+  .posTxt {
+    color: var(--green);
+  }
+
+  .negTxt {
+    color: var(--deep-orange);
+  }
+
+  .neuTxt {
+    color: var(--light-blue);
+  }
+
+  .overallBadge {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 2px solid rgba(250, 204, 21, 0.45);
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, 0.18);
+    text-align: center;
+  }
+
+  .overallValue {
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--text-light);
+  }
+
+  .overallLabel {
+    margin-top: 2px;
+    font-size: 9px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .metricBox {
+    background: rgba(31, 41, 55, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 10px 10px 9px;
+  }
+
+  .metricHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 7px;
+  }
+
+  .metricLabel {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    opacity: 0.95;
+  }
+
+  .metricValue {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--text-light);
+  }
+
+  .track {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+
+  .fill {
+    height: 100%;
+    border-radius: 999px;
+  }
+
+  .tone_blue {
+    color: var(--light-blue);
+  }
+
+  .tone_yellow {
+    color: var(--yellow);
+  }
+
+  .tone_green {
+    color: var(--green);
+  }
+
+  .fill_blue {
+    background: var(--selected-blue);
+  }
+
+  .fill_yellow {
+    background: var(--yellow);
+  }
+
+  .fill_green {
+    background: var(--green);
+  }
+
+  .bottomRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 6px;
+  }
+
+  .viewLink {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    opacity: 0.9;
+  }
+
+  .chevron {
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.8;
+  }
+}
