@@ -6,7 +6,6 @@ import {
   faChevronUp,
   faArrowTrendUp,
   faArrowTrendDown,
-  faMinus,
 } from "@fortawesome/free-solid-svg-icons";
 import SessionAnalysisActionView from "../SessionAnalysisActionView.tsx";
 import type { SessionAnalysisAthlete } from "../../../../pages/SessionAnalysis";
@@ -28,8 +27,7 @@ const SessionAnalysisActionCard = ({
   const counts = useMemo(() => {
     const pos = actions.filter((a) => a.type === "good").length;
     const neg = actions.filter((a) => a.type === "bad").length;
-    const neu = actions.filter((a) => a.type === "neutral").length;
-    return { pos, neg, neu };
+    return { pos, neg };
   }, [actions]);
 
   const actionsCount = actions.length;
@@ -56,11 +54,6 @@ const SessionAnalysisActionCard = ({
             <span className={styles.count}>
               <FontAwesomeIcon icon={faArrowTrendDown} className={styles.negIco} />
               <span className={styles.negTxt}>{counts.neg}</span>
-            </span>
-
-            <span className={styles.count}>
-              <FontAwesomeIcon icon={faMinus} className={styles.neuIco} />
-              <span className={styles.neuTxt}>{counts.neu}</span>
             </span>
           </div>
 

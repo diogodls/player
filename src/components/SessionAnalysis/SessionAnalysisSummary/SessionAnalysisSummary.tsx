@@ -15,12 +15,10 @@ function pct(part: number, total: number) {
 const SessionAnalysisSummary = ({ summary }: Props) => {
   const positives = summary.positives;
   const negatives = summary.negatives;
-  const neutrals = summary.neutrals;
-  const total = positives + negatives + neutrals;
+  const total = positives + negatives;
 
   const pPos = pct(positives, total);
-  const pNeg = pct(negatives, total);
-  const pNeu = Math.max(0, 100 - pPos - pNeg);
+  const pNeg = Math.max(0, 100 - pPos);
 
   return (
     <section className={styles.wrapper}>
@@ -38,11 +36,6 @@ const SessionAnalysisSummary = ({ summary }: Props) => {
         <div className={`${styles.card} ${styles.cardNegative}`}>
           <div className={styles.value}>{negatives}</div>
           <div className={styles.label}>Negativas</div>
-        </div>
-
-        <div className={`${styles.card} ${styles.cardNeutral}`}>
-          <div className={styles.value}>{neutrals}</div>
-          <div className={styles.label}>Neutras</div>
         </div>
       </div>
 
@@ -63,11 +56,6 @@ const SessionAnalysisSummary = ({ summary }: Props) => {
           <div
             className={`${styles.progressSeg} ${styles.segNegative}`}
             style={{ width: `${pNeg}%` }}
-            aria-hidden
-          />
-          <div
-            className={`${styles.progressSeg} ${styles.segNeutral}`}
-            style={{ width: `${pNeu}%` }}
             aria-hidden
           />
         </div>

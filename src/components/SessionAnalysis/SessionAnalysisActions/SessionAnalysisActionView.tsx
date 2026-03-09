@@ -1,6 +1,6 @@
 import styles from "./SessionAnalysisActionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck, faCircleXmark, faCircleMinus, faClock } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCircleXmark, faClock } from "@fortawesome/free-solid-svg-icons";
 import type { SessionAnalysisAthleteAction } from "../../../pages/SessionAnalysis";
 
 type Props = {
@@ -9,8 +9,7 @@ type Props = {
 
 function iconByType(type: SessionAnalysisAthleteAction["type"]) {
   if (type === "good") return faCircleCheck;
-  if (type === "bad") return faCircleXmark;
-  return faCircleMinus;
+  return faCircleXmark;
 }
 
 export default function SessionAnalysisActionView({ actions }: Props) {

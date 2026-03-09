@@ -1,6 +1,7 @@
 export type SessionType = "Treino" | "Jogo";
 
-export type SessionAnalysisActionType = "good" | "bad" | "neutral";
+export type SessionAnalysisActionType = "good" | "bad";
+export type SessionAnalysisRawActionType = "positive" | "negative";
 
 export type SessionAnalysisSession = {
   id: string;
@@ -15,7 +16,6 @@ export type SessionAnalysisSession = {
 export type SessionAnalysisSummary = {
   positives: number;
   negatives: number;
-  neutrals: number;
 };
 
 export type SessionAnalysisAthleteAction = {
@@ -52,6 +52,22 @@ export type SessionAnalysis = {
   athletes: SessionAnalysisAthlete[];
 };
 
-export type SessionAnalysisData = {
-  sessionsAnalysis: SessionAnalysis[];
+export type SessionAnalysisRawAction = {
+  time: string;
+  key: string;
+  label: string;
+  type: SessionAnalysisRawActionType;
+};
+
+export type SessionAnalysisRawPlayer = {
+  playerId: number;
+  offensive: number;
+  defensive: number;
+  positive: number;
+  negative: number;
+  actions: SessionAnalysisRawAction[];
+};
+
+export type SessionAnalysisByIdData = {
+  players: SessionAnalysisRawPlayer[];
 };
