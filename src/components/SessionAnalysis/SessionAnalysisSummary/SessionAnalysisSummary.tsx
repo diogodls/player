@@ -1,11 +1,10 @@
 import styles from "../SessionAnalysisSummary/SessionAnalysisSummary.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartColumn } from "@fortawesome/free-solid-svg-icons";
+import type { SessionAnalysisSummary as SessionAnalysisSummaryData } from "../../../pages/SessionAnalysis";
 
 type Props = {
-  positives?: number;
-  negatives?: number;
-  neutrals?: number;
+  summary: SessionAnalysisSummaryData;
 };
 
 function pct(part: number, total: number) {
@@ -13,18 +12,21 @@ function pct(part: number, total: number) {
   return Math.round((part / total) * 100);
 }
 
-const SessionAnalysisSummary = ({positives = 10, negatives = 1, neutrals = 0}: Props) => {
+const SessionAnalysisSummary = ({ summary }: Props) => {
+  const positives = summary.positives;
+  const negatives = summary.negatives;
+  const neutrals = summary.neutrals;
   const total = positives + negatives + neutrals;
 
   const pPos = pct(positives, total);
   const pNeg = pct(negatives, total);
-  const pNeu = Math.max(0, 100 - pPos - pNeg); // garante 100%
+  const pNeu = Math.max(0, 100 - pPos - pNeg);
 
   return (
     <section className={styles.wrapper}>
       <header className={styles.header}>
         <FontAwesomeIcon icon={faChartColumn} className={styles.headerIcon} />
-        <span className={styles.headerTitle}>Resumo Geral das Ações</span>
+        <span className={styles.headerTitle}>Resumo Geral das Acoes</span>
       </header>
 
       <div className={styles.cards}>
@@ -50,8 +52,8 @@ const SessionAnalysisSummary = ({positives = 10, negatives = 1, neutrals = 0}: P
           <span className={styles.metaRight}>{pNeg}% negativas</span>
         </div>
 
-        <div className={styles.progressTrack} aria-label="Distribuição das ações">
-          <div className={styles.progressCenter}>{total} ações totais</div>
+        <div className={styles.progressTrack} aria-label="Distribuicao das acoes">
+          <div className={styles.progressCenter}>{total} acoes totais</div>
 
           <div
             className={`${styles.progressSeg} ${styles.segPositive}`}

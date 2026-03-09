@@ -8,40 +8,21 @@ import {
   faArrowTrendDown,
   faMinus,
 } from "@fortawesome/free-solid-svg-icons";
-import SessionAnalysisActionView, {
-  type AthleteAction,
-} from "../SessionAnalysisActionView.tsx";
+import SessionAnalysisActionView from "../SessionAnalysisActionView.tsx";
+import type { SessionAnalysisAthlete } from "../../../../pages/SessionAnalysis";
 
-type Props = {
-  initials?: string;
-  title?: string;
-  actions?: AthleteAction[];
-
-  overall?: number;
-  overallLabel?: string;
-
-  offensive?: number;
-  defensive?: number;
-  aproveitamento?: number;
-
-  variant?: "yellow" | "red";
-  defaultOpen?: boolean;
-};
+type Props = SessionAnalysisAthlete;
 
 const clamp01 = (n: number) => Math.max(0, Math.min(100, n));
 
 const SessionAnalysisActionCard = ({
-                                     initials = "R",
-                                     title = "RW2 - Ferreira",
-                                     actions = [],
-                                     overall = 50,
-                                     overallLabel = "GER",
-                                     offensive = 50,
-                                     defensive = 0,
-                                     aproveitamento = 100,
-                                     variant = "yellow",
-                                     defaultOpen = false,
-                                   }: Props) => {
+  initials,
+  title,
+  actions,
+  metrics,
+  variant = "yellow",
+  defaultOpen = false,
+}: Props) => {
   const [open, setOpen] = useState(defaultOpen);
 
   const counts = useMemo(() => {
@@ -55,14 +36,13 @@ const SessionAnalysisActionCard = ({
 
   return (
     <article className={`${styles.card} ${styles[`card_${variant}`]}`}>
-      {/* topo */}
       <div className={styles.topRow}>
         <div className={styles.left}>
           <div className={styles.avatar}>{initials}</div>
 
           <div className={styles.meta}>
             <div className={styles.title}>{title}</div>
-            <div className={styles.sub}>{actionsCount} ações registradas</div>
+            <div className={styles.sub}>{actionsCount} acoes registradas</div>
           </div>
         </div>
 
@@ -74,10 +54,7 @@ const SessionAnalysisActionCard = ({
             </span>
 
             <span className={styles.count}>
-              <FontAwesomeIcon
-                icon={faArrowTrendDown}
-                className={styles.negIco}
-              />
+              <FontAwesomeIcon icon={faArrowTrendDown} className={styles.negIco} />
               <span className={styles.negTxt}>{counts.neg}</span>
             </span>
 
@@ -88,34 +65,31 @@ const SessionAnalysisActionCard = ({
           </div>
 
           <div className={styles.overallBadge}>
-            <div className={styles.overallValue}>{overall}</div>
-            <div className={styles.overallLabel}>{overallLabel}</div>
+            <div className={styles.overallValue}>{metrics.overall}</div>
+            <div className={styles.overallLabel}>{metrics.overallLabel}</div>
           </div>
         </div>
       </div>
 
-      {/* métricas */}
       <div className={styles.metrics}>
-        <MiniMetric label="OFENSIVO" value={offensive} tone="blue" />
-        <MiniMetric label="DEFENSIVO" value={defensive} tone="yellow" />
-        <MiniMetric label="APROVEIT." value={aproveitamento} tone="green" />
+        <MiniMetric label="OFENSIVO" value={metrics.offensive} tone="blue" />
+        <MiniMetric label="DEFENSIVO" value={metrics.defensive} tone="yellow" />
+        <MiniMetric label="APROVEIT." value={metrics.aproveitamento} tone="green" />
       </div>
 
-      {/* botão/linha */}
       <button
         type="button"
         className={styles.bottomRowBtn}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
+        <span className={styles.viewLink}>Ver acoes ({actionsCount})</span>
         <FontAwesomeIcon
           icon={open ? faChevronUp : faChevronDown}
           className={styles.chevron}
         />
       </button>
 
-      {/* view expansível */}
       {open && (
         <div className={styles.expandArea}>
           <SessionAnalysisActionView actions={actions} />
@@ -126,10 +100,10 @@ const SessionAnalysisActionCard = ({
 };
 
 function MiniMetric({
-                      label,
-                      value,
-                      tone,
-                    }: {
+  label,
+  value,
+  tone,
+}: {
   label: string;
   value: number;
   tone: "blue" | "yellow" | "green";

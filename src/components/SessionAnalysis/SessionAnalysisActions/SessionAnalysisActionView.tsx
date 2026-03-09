@@ -1,21 +1,13 @@
 import styles from "./SessionAnalysisActionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck, faCircleXmark, faCircleMinus, faClock } from "@fortawesome/free-solid-svg-icons";
-
-export type AthleteAction = {
-  id: string;
-  title: string;
-  subtitle?: string;
-  time?: string;      // "00:10"
-  createdAt?: string; // "13:06:32"
-  type: "good" | "bad" | "neutral";
-};
+import type { SessionAnalysisAthleteAction } from "../../../pages/SessionAnalysis";
 
 type Props = {
-  actions: AthleteAction[];
+  actions: SessionAnalysisAthleteAction[];
 };
 
-function iconByType(type: AthleteAction["type"]) {
+function iconByType(type: SessionAnalysisAthleteAction["type"]) {
   if (type === "good") return faCircleCheck;
   if (type === "bad") return faCircleXmark;
   return faCircleMinus;
@@ -23,7 +15,7 @@ function iconByType(type: AthleteAction["type"]) {
 
 export default function SessionAnalysisActionView({ actions }: Props) {
   if (!actions.length) {
-    return <div className={styles.empty}>Sem ações para este atleta.</div>;
+    return <div className={styles.empty}>Sem acoes para este atleta.</div>;
   }
 
   return (

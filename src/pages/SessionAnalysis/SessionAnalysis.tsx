@@ -1,7 +1,7 @@
 import styles from "./SessionAnalysis.module.scss";
-import { useParams} from "react-router";
+import { useParams } from "react-router";
 import { useApi } from "../../hooks/useApi";
-import type { SessionData, Session } from "../SessionView";
+import type { SessionAnalysisData } from "./index";
 import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader";
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails";
 import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
@@ -9,16 +9,22 @@ import SessionAnalysisActionCard from "../../components/SessionAnalysis/SessionA
 
 const SessionAnalysis = () => {
   const { id } = useParams<{ id: string }>();
-  const { data } = useApi<SessionData>("sessions");
+  const { data } = useApi<SessionAnalysisData>("session-analysis");
 
-  const session: Session | undefined = data?.sessions?.find((s) => s.id === id);
+  const analysis = data?.sessionsAnalysis?.find(
+    (sessionAnalysis) => sessionAnalysis.sessionId === id
+  );
 
-    return (
+  return (
     <div className={styles.container}>
       <SessionAnalysisHeader />
-      <SessionAnalysisDetails session={session} />
-      <SessionAnalysisSummary/>
-      <SessionAnalysisActionCard/>
+      <SessionAnalysisDetails session={analysis?.session} />
+      <SessionAnalysisSummary
+        summary={analysis?.summary ?? { positives: 0, negatives: 0, neutrals: 0 }}
+      />
+      {analysis?.athletes.map((athlete) => (
+        <SessionAnalysisActionCard key={athlete.id} {...athlete} />
+      ))}
     </div>
   );
 };
