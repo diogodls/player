@@ -1,4 +1,5 @@
 import styles from "./SessionAnalysis.module.scss";
+import { useState } from "react";
 import { useParams } from "react-router";
 import { useApi } from "../../hooks/useApi";
 import type {
@@ -28,7 +29,10 @@ function safePercent(value: number, total: number) {
   return Math.round((value / total) * 100);
 }
 
+type AnalysisTab = "individual" | "team";
+
 const SessionAnalysis = () => {
+  const [activeTab, setActiveTab] = useState<AnalysisTab>("individual");
   const { id } = useParams<{ id: string }>();
   const { data: analysisData } = useApi<SessionAnalysisData>("session-analysis");
   const { data: sessionsData } = useApi<SessionData>("sessions");
@@ -72,17 +76,56 @@ const SessionAnalysis = () => {
     { positives: 0, negatives: 0 }
   ) ?? { positives: 0, negatives: 0 };
 
+  const teamTotalActions = analysisById?.team?.actions.length ?? 0;
+  const teamCard: SessionAnalysisAthlete | null = analysisById?.team
+    ? {
+        id: "team",
+        initials: "EQ",
+        title: "Equipe",
+        variant: "yellow",
+        defaultOpen: false,
+        metrics: {
+          overall: teamTotalActions,
+          overallLabel: "TOTAL",
+          offensive: analysisById.team.offensive,
+          defensive: analysisById.team.defensive,
+          aproveitamento: safePercent(analysisById.team.positive, teamTotalActions),
+        },
+        actions: analysisById.team.actions.map((action, actionIndex) => ({
+          id: `team-${action.key}-${action.time}-${actionIndex}`,
+          title: action.label,
+          subtitle: action.key,
+          time: action.time,
+          type: action.type === "positive" ? "good" : "bad",
+        })),
+      }
+    : null;
+
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader />
+      <SessionAnalysisHeader active={activeTab} onChange={setActiveTab} />
       <SessionAnalysisDetails session={session} />
       <SessionAnalysisSummary summary={summary} />
-      <h3 className={styles.sectionTitle}>Acoes por Atleta</h3>
-      <div className={styles.cardsList}>
-        {athletes.map((athlete) => (
-          <SessionAnalysisActionCard key={athlete.id} {...athlete} />
-        ))}
-      </div>
+
+      {activeTab === "individual" && (
+        <>
+          <h3 className={styles.sectionTitle}>Acoes por Atleta</h3>
+          <div className={styles.cardsList}>
+            {athletes.map((athlete) => (
+              <SessionAnalysisActionCard key={athlete.id} {...athlete} />
+            ))}
+          </div>
+        </>
+      )}
+
+      {activeTab === "team" && (
+        <>
+          <h3 className={styles.sectionTitle}>Acoes da Equipe</h3>
+          <div className={styles.cardsList}>
+            {teamCard && <SessionAnalysisActionCard {...teamCard} />}
+          </div>
+        </>
+      )}
     </div>
   );
 };

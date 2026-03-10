@@ -687,7 +687,81 @@
             }
           ]
         }
-      ]
+      ],
+      "team": {
+        "offensive": 7,
+        "defensive": 4,
+        "positive": 8,
+        "negative": 3,
+        "actions": [
+          {
+            "time": "00:45",
+            "key": "Gol TO",
+            "label": "Gol transicao ofensiva",
+            "type": "positive"
+          },
+          {
+            "time": "01:20",
+            "key": "GS TO",
+            "label": "Gol sofrido transicao defensiva",
+            "type": "negative"
+          },
+          {
+            "time": "01:58",
+            "key": "CC",
+            "label": "Chance criada",
+            "type": "positive"
+          },
+          {
+            "time": "02:31",
+            "key": "ASS",
+            "label": "Assistencia",
+            "type": "positive"
+          },
+          {
+            "time": "03:06",
+            "key": "PP",
+            "label": "Perda de posse",
+            "type": "negative"
+          },
+          {
+            "time": "03:52",
+            "key": "RB",
+            "label": "Roubada de bola",
+            "type": "positive"
+          },
+          {
+            "time": "04:27",
+            "key": "DIA",
+            "label": "Desarme, interceptacao e antecipacao",
+            "type": "positive"
+          },
+          {
+            "time": "05:11",
+            "key": "GM",
+            "label": "Gol marcado",
+            "type": "positive"
+          },
+          {
+            "time": "05:54",
+            "key": "FD",
+            "label": "Falha defensiva",
+            "type": "negative"
+          },
+          {
+            "time": "06:33",
+            "key": "AD",
+            "label": "Acao decisiva",
+            "type": "positive"
+          },
+          {
+            "time": "07:08",
+            "key": "Gol OO",
+            "label": "Gol organizacao ofensiva",
+            "type": "positive"
+          }
+        ]
+      }
     },
     "2": {
       "players": [
@@ -910,7 +984,93 @@
             }
           ]
         }
-      ]
+      ],
+      "team": {
+        "offensive": 9,
+        "defensive": 4,
+        "positive": 9,
+        "negative": 4,
+        "actions": [
+          {
+            "time": "00:39",
+            "key": "GM",
+            "label": "Gol marcado",
+            "type": "positive"
+          },
+          {
+            "time": "01:14",
+            "key": "ASS",
+            "label": "Assistencia",
+            "type": "positive"
+          },
+          {
+            "time": "01:56",
+            "key": "GS OO",
+            "label": "Gol sofrido organizacao defensiva",
+            "type": "negative"
+          },
+          {
+            "time": "02:22",
+            "key": "CC",
+            "label": "Chance criada",
+            "type": "positive"
+          },
+          {
+            "time": "03:10",
+            "key": "AD",
+            "label": "Acao decisiva",
+            "type": "positive"
+          },
+          {
+            "time": "03:45",
+            "key": "PP",
+            "label": "Perda de posse",
+            "type": "negative"
+          },
+          {
+            "time": "04:19",
+            "key": "RB",
+            "label": "Roubada de bola",
+            "type": "positive"
+          },
+          {
+            "time": "04:58",
+            "key": "DIA",
+            "label": "Desarme, interceptacao e antecipacao",
+            "type": "positive"
+          },
+          {
+            "time": "05:27",
+            "key": "FD",
+            "label": "Falha defensiva",
+            "type": "negative"
+          },
+          {
+            "time": "06:03",
+            "key": "Gol BP",
+            "label": "Gol bola parada",
+            "type": "positive"
+          },
+          {
+            "time": "06:46",
+            "key": "PP",
+            "label": "Perda de posse",
+            "type": "negative"
+          },
+          {
+            "time": "07:18",
+            "key": "GM",
+            "label": "Gol marcado",
+            "type": "positive"
+          },
+          {
+            "time": "07:55",
+            "key": "Gol GL",
+            "label": "Gol goleiro linha",
+            "type": "positive"
+          }
+        ]
+      }
     },
     "3": {
       "players": [
@@ -1139,7 +1299,99 @@
             }
           ]
         }
-      ]
+      ],
+      "team": {
+        "offensive": 8,
+        "defensive": 6,
+        "positive": 10,
+        "negative": 4,
+        "actions": [
+          {
+            "time": "00:34",
+            "key": "Gol TO",
+            "label": "Gol transicao ofensiva",
+            "type": "positive"
+          },
+          {
+            "time": "01:09",
+            "key": "GS TO",
+            "label": "Gol sofrido transicao defensiva",
+            "type": "negative"
+          },
+          {
+            "time": "01:48",
+            "key": "CC",
+            "label": "Chance criada",
+            "type": "positive"
+          },
+          {
+            "time": "02:17",
+            "key": "ASS",
+            "label": "Assistencia",
+            "type": "positive"
+          },
+          {
+            "time": "02:54",
+            "key": "PP",
+            "label": "Perda de posse",
+            "type": "negative"
+          },
+          {
+            "time": "03:26",
+            "key": "RB",
+            "label": "Roubada de bola",
+            "type": "positive"
+          },
+          {
+            "time": "04:05",
+            "key": "DIA",
+            "label": "Desarme, interceptacao e antecipacao",
+            "type": "positive"
+          },
+          {
+            "time": "04:49",
+            "key": "GM",
+            "label": "Gol marcado",
+            "type": "positive"
+          },
+          {
+            "time": "05:28",
+            "key": "FD",
+            "label": "Falha defensiva",
+            "type": "negative"
+          },
+          {
+            "time": "06:02",
+            "key": "AD",
+            "label": "Acao decisiva",
+            "type": "positive"
+          },
+          {
+            "time": "06:44",
+            "key": "Gol OO",
+            "label": "Gol organizacao ofensiva",
+            "type": "positive"
+          },
+          {
+            "time": "07:16",
+            "key": "GS GLA",
+            "label": "Gol sofrido goleiro linha adversario",
+            "type": "negative"
+          },
+          {
+            "time": "07:52",
+            "key": "DIA",
+            "label": "Desarme, interceptacao e antecipacao",
+            "type": "positive"
+          },
+          {
+            "time": "08:21",
+            "key": "Gol GL",
+            "label": "Gol goleiro linha",
+            "type": "positive"
+          }
+        ]
+      }
     }
   },
   "players": [

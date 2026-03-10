@@ -65,6 +65,10 @@
     }
   }
 
+  .pill:not(.active) {
+    opacity: 0.78;
+  }
+
   .icon {
     font-size: 14px;
     opacity: 0.95;
@@ -79,6 +83,7 @@
   }
 
   .active {
-    border: white;
+    opacity: 1;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 8px 18px rgba(0, 0, 0, 0.24);
   }
 }
