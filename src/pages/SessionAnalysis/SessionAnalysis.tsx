@@ -4,6 +4,7 @@ import { useApi } from "../../hooks/useApi";
 import type {
   SessionAnalysisAthlete,
   SessionAnalysisByIdData,
+  SessionAnalysisData,
   SessionAnalysisSummary as SessionAnalysisSummaryData,
 } from "./index";
 import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader";
@@ -29,17 +30,16 @@ function safePercent(value: number, total: number) {
 
 const SessionAnalysis = () => {
   const { id } = useParams<{ id: string }>();
-  const { data: analysisById } = useApi<SessionAnalysisByIdData>(
-    id ? `session-analysis/${id}` : null
-  );
+  const { data: analysisData } = useApi<SessionAnalysisData>("session-analysis");
   const { data: sessionsData } = useApi<SessionData>("sessions");
   const { data: players } = useApi<Player[]>("players");
+  const analysisById: SessionAnalysisByIdData | undefined = id ? analysisData?.[id] : undefined;
 
   const session = sessionsData?.sessions.find((item) => item.id === id);
 
   const athletes: SessionAnalysisAthlete[] =
     analysisById?.players.map((athlete, index) => {
-      const player = players?.find((item) => item.id === athlete.playerId);
+      const player = players?.find((item) => String(item.id) === String(athlete.playerId));
       const totalActions = athlete.actions.length;
 
       return {

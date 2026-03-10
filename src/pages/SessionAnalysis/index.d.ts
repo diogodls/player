@@ -60,7 +60,7 @@ export type SessionAnalysisRawAction = {
 };
 
 export type SessionAnalysisRawPlayer = {
-  playerId: number;
+  playerId: number | string;
   offensive: number;
   defensive: number;
   positive: number;
@@ -71,3 +71,5 @@ export type SessionAnalysisRawPlayer = {
 export type SessionAnalysisByIdData = {
   players: SessionAnalysisRawPlayer[];
 };
+
+export type SessionAnalysisData = Record<string, SessionAnalysisByIdData>;
