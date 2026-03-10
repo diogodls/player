@@ -1,0 +1,62 @@
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 20px;
+  gap: 20px;
+  max-height: 80vh;
+  overflow-y: scroll;
+
+  .actionsType {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    background: var(--secondary-bg-dark);
+
+    .actionsTitle {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.2em;
+      border-bottom: 1px solid var(--border-50);
+      padding-bottom: 5px;
+    }
+
+    .tagActions {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+
+      .action {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: var(--border-radius);
+        padding: 10px;
+        transition: .2s all ease-in-out;
+
+        &:hover {
+          transform: scale(1.02);
+        }
+      }
+
+      .goodAction {
+        background: var(--action-green);
+
+        &:hover {
+          background: #16A34A90;
+        }
+      }
+
+      .badAction {
+        background: var(--action-red);
+
+        &:hover {
+          background: #DC262690;
+        }
+      }
+    }
+  }
+}

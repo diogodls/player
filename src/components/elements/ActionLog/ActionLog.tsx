@@ -20,7 +20,9 @@ type ActionLog = {
   logType: 'team' | 'individual';
 };
 
-const ActionLog = ({ session }: ActionLogProps) => {
+const ActionLog = ({logType}: ActionLog) => {
+  const {actions, setActions} = useContext(ActionsContext);
+  const selectedActions = actions.filter((action) => action.type === logType);
   const { actions, setActions } = useContext(ActionsContext);
   const { success, info, error } = useContext(ToastContext);
   const navigate = useNavigate();
@@ -36,6 +38,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
   const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
   const hasLoadedCookie = useRef(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
   useEffect(() => {
     const cookieValue = new Cookies().get(cookieKey);
 
@@ -61,6 +64,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
     }
   }, [cookieKey, removeCookie, setActions]);
 
+  // Save actions to cookie whenever they change
   useEffect(() => {
     if (loadedCookieKey !== cookieKey) return;
 

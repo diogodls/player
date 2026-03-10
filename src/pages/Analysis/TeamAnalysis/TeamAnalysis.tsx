@@ -1,12 +1,12 @@
-import VideoAnalysis from "../../components/elements/VideoAnalysis/VideoAnalysis.tsx";
-import ActionLog from "../../components/elements/ActionLog/ActionLog.tsx";
+import VideoAnalysis from "../../../components/elements/VideoAnalysis/VideoAnalysis.tsx";
+import ActionLog from "../../../components/elements/ActionLog/ActionLog.tsx";
 import styles from "./TeamAnalysis.module.scss";
-import {useApi} from "../../hooks/useApi.ts";
-import type {TeamAnalysisData} from "./index";
-import TeamActions from "../../components/TeamAnalysis/TeamActions/TeamActions.tsx";
+import {useApi} from "../../../hooks/useApi.ts";
+import type {AnalysisData} from "../index";
+import TeamActions from "../../../components/TeamAnalysis/TeamActions/TeamActions.tsx";
 
 const TeamAnalysis = () => {
-  const {data} = useApi<TeamAnalysisData>("team-analysis");
+  const {data} = useApi<AnalysisData>("team-analysis");
 
   return (
     <div className={styles.container}>

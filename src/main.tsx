@@ -4,7 +4,7 @@ import {BrowserRouter, Route, Routes} from "react-router";
 import Home from "./pages/Home/Home.tsx";
 import App from "./App.tsx";
 import CoachDashboard from "./pages/CoachDashboard/CoachDashboard.tsx";
-import IndividualAnalysis from "./pages/IndividualAnalysis/IndividualAnalysis.tsx";
+import IndividualAnalysis from "./pages/Analysis/IndividualAnalysis/IndividualAnalysis.tsx";
 import {ToastProvider} from "./contexts/ToastContext/ToastContext.tsx";
 import {CookiesProvider} from "react-cookie";
 import {ActionsProvider} from "./contexts/ActionsContext/ActionsContext.tsx";

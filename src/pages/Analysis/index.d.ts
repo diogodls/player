@@ -23,3 +23,5 @@ export type Action = {
   category: string,
   goodAction: boolean,
 };
+
+type ActionType = 'team' | 'individual';

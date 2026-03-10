@@ -6,18 +6,19 @@ import {
   type ReactNode, useMemo,
 } from "react";
 import type {Player} from "../../pages/CoachDashboard";
-import type {ActionTagged} from "../../pages/IndividualAnalysis";
-import type {TeamActionTagged} from "../../pages/TeamAnalysis";
+import type {ActionTagged} from "../../pages/Analysis";
 
 type ActionsContextValue = {
   selectedPlayer: Player | null;
   setSelectedPlayer: Dispatch<SetStateAction<Player | null>>;
   actions: ActionTagged[];
   setActions: Dispatch<SetStateAction<ActionTagged[]>>;
-  teamActions: TeamActionTagged[];
-  setTeamActions: Dispatch<SetStateAction<TeamActionTagged[]>>;
   actionTagged: ActionTagged | null;
   setActionTagged: Dispatch<SetStateAction<ActionTagged | null>>;
+  currentVideoTime: string;
+  setCurrentVideoTime: Dispatch<SetStateAction<string>>;
+  isTagging: boolean;
+  setIsTagging: Dispatch<SetStateAction<boolean>>;
 };
 
 type ActionsProviderProps = {
@@ -29,8 +30,9 @@ const ActionsContext = createContext<ActionsContextValue>({} as ActionsContextVa
 const ActionsProvider = ({children}: ActionsProviderProps) => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [actions, setActions] = useState<ActionTagged[]>([]);
-  const [teamActions, setTeamActions] = useState<TeamActionTagged[]>([]);
   const [actionTagged, setActionTagged] = useState<ActionTagged | null>(null);
+  const [currentVideoTime, setCurrentVideoTime] = useState('0');
+  const [isTagging, setIsTagging] = useState(false);
 
   const value = useMemo(
     () => ({
@@ -38,12 +40,14 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
       setSelectedPlayer,
       actions,
       setActions,
-      teamActions,
-      setTeamActions,
       actionTagged,
       setActionTagged,
+      currentVideoTime,
+      setCurrentVideoTime,
+      isTagging,
+      setIsTagging
     }),
-    [selectedPlayer, actions, actionTagged, teamActions]
+    [selectedPlayer, actions, actionTagged, currentVideoTime, isTagging]
   );
 
   return (

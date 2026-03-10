@@ -1,4 +1,4 @@
-import type {Action} from "../pages/TeamAnalysis";
+import type {Action} from "../pages/Analysis";
 
 export function agroupActions(actions: Action[]) {
   return actions.reduce((acc, action) => {
