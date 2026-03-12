@@ -122,7 +122,6 @@
     border-radius: 999px;
     border: 2px solid rgba(250, 204, 21, 0.45);
     display: grid;
-    place-items: center;
     background: rgba(0, 0, 0, 0.18);
     text-align: center;
   }
@@ -130,12 +129,10 @@
   .overallValue {
     font-size: 12px;
     font-weight: 900;
-    line-height: 1;
     color: var(--text-light);
   }
 
   .overallLabel {
-    margin-top: 2px;
     font-size: 9px;
     font-weight: 800;
     color: var(--text-muted);

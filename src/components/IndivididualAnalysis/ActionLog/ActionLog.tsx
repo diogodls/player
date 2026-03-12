@@ -1,51 +1,59 @@
 import styles from "./ActionLog.module.scss";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef} from "react";
 import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
-import SaveSessionModal from "../SaveSessionModal/SaveSessionModal";
-import type { SessionMeta } from "../../../pages/SessionView";
+import type { Session } from "../../../pages/SessionView";
 
-const COOKIE_KEY = "ufsm_action_log";
+const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 
-const ActionLog = () => {
+type ActionLogProps = {
+  session: Session;
+};
+
+const ActionLog = ({ session }: ActionLogProps) => {
   const {actions, setActions} = useContext(ActionsContext);
   const {success, info, error} = useContext(ToastContext);
-  const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
+  const cookieKey = `${COOKIE_KEY_PREFIX}${session.id}`;
+  const [cookies, setCookie, removeCookie] = useCookies([cookieKey]);
   const hasLoadedCookie = useRef(false);
-  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   useEffect(() => {
-    const raw = cookies[COOKIE_KEY];
+    const raw = cookies[cookieKey];
 
     hasLoadedCookie.current = true;
-    if (!raw) return;
+    if (!raw) {
+      setActions([]);
+      return;
+    }
+
     try {
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) setActions(parsed);
     } catch {
-      removeCookie(COOKIE_KEY, { path: "/" });
+      removeCookie(cookieKey, { path: "/" });
+      setActions([]);
     }
-  }, []);
+  }, [cookieKey, cookies, removeCookie, setActions]);
 
   useEffect(() => {
     if (!hasLoadedCookie.current) return;
 
     if (actions.length === 0) {
-      removeCookie(COOKIE_KEY, { path: "/" });
+      removeCookie(cookieKey, { path: "/" });
       return;
     }
 
     const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
-    setCookie(COOKIE_KEY, JSON.stringify(actions), {
+    setCookie(cookieKey, JSON.stringify(actions), {
       path: "/",
       expires,
       sameSite: "lax",
     });
-  }, [actions, setCookie, removeCookie]);
+  }, [actions, cookieKey, setCookie, removeCookie]);
 
   const handleClear = () => {
     setActions([]);
@@ -54,13 +62,19 @@ const ActionLog = () => {
 
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
-    info("AÃ§Ã£o removida");
+    info("Ação removida");
   };
 
-  const handleSubmitSession = async (meta: SessionMeta) => {
+  const handleSubmitSession = async () => {
+    if (actions.length === 0) {
+      info("Adicione ao menos uma ação antes de salvar");
+      return;
+    }
+
     try {
       const payload = {
-        session: meta,
+        sessionId: session.id,
+        sessionType: session.type,
         actions,
         savedAt: new Date().toISOString(),
       };
@@ -70,7 +84,7 @@ const ActionLog = () => {
       console.table(actions);
 
       setActions([]);
-      success("Salvo com sucesso!");
+      success(`Análise salva para ${session.type.toLowerCase()} ${session.date}`);
     } catch {
       error("Falha ao salvar no banco");
     }
@@ -80,12 +94,12 @@ const ActionLog = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <span>Linha do tempo de aÃ§Ãµes</span>
+          <span>Linha do tempo de ações</span>
           <span className={styles.badge}>{actions.length}</span>
         </div>
 
         <div className={styles.actions}>
-          <button className={styles.save} onClick={() => setIsSaveModalOpen(true)}>
+          <button className={styles.save} onClick={handleSubmitSession}>
             Salvar
           </button>
           <button className={styles.clear} onClick={handleClear}>
@@ -96,7 +110,7 @@ const ActionLog = () => {
 
       {actions.length === 0 ? (
         <div className={styles.emptyState}>
-          <span>Sem aÃ§Ãµes taggeadas. Comece a taggear aÃ§Ãµes e elas aparecerÃ£o aqui.</span>
+          <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerão aqui.</span>
         </div>
       ) : (
         <div className={styles.list}>
@@ -124,7 +138,7 @@ const ActionLog = () => {
                 <button
                   className={styles.removeBtn}
                   onClick={() => handleRemoveAction(action.id)}
-                  aria-label="Remover aÃ§Ã£o"
+                  aria-label="Remover ação"
                   title="Remover"
                 >
                   <FontAwesomeIcon icon={faXmark} />
@@ -134,12 +148,6 @@ const ActionLog = () => {
           ))}
         </div>
       )}
-
-      <SaveSessionModal
-        isOpen={isSaveModalOpen}
-        onClose={() => setIsSaveModalOpen(false)}
-        onSubmit={handleSubmitSession}
-      />
     </div>
   );
 };

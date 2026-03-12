@@ -12,8 +12,8 @@ import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnaly
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails";
 import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
 import SessionAnalysisActionCard from "../../components/SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard.tsx";
-import type { SessionData } from "../SessionView";
 import type { Player } from "../CoachDashboard";
+import { useSessions } from "../../contexts/SessionsContext/SessionsContext";
 
 function getInitials(name: string) {
   return name
@@ -35,11 +35,11 @@ const SessionAnalysis = () => {
   const [activeTab, setActiveTab] = useState<AnalysisTab>("individual");
   const { id } = useParams<{ id: string }>();
   const { data: analysisData } = useApi<SessionAnalysisData>("session-analysis");
-  const { data: sessionsData } = useApi<SessionData>("sessions");
   const { data: players } = useApi<Player[]>("players");
+  const { sessions } = useSessions();
   const analysisById: SessionAnalysisByIdData | undefined = id ? analysisData?.[id] : undefined;
 
-  const session = sessionsData?.sessions.find((item) => item.id === id);
+  const session = sessions.find((item) => item.id === id);
 
   const athletes: SessionAnalysisAthlete[] =
     analysisById?.players.map((athlete, index) => {
@@ -79,26 +79,26 @@ const SessionAnalysis = () => {
   const teamTotalActions = analysisById?.team?.actions.length ?? 0;
   const teamCard: SessionAnalysisAthlete | null = analysisById?.team
     ? {
-        id: "team",
-        initials: "EQ",
-        title: "Equipe",
-        variant: "yellow",
-        defaultOpen: false,
-        metrics: {
-          overall: teamTotalActions,
-          overallLabel: "TOTAL",
-          offensive: analysisById.team.offensive,
-          defensive: analysisById.team.defensive,
-          aproveitamento: safePercent(analysisById.team.positive, teamTotalActions),
-        },
-        actions: analysisById.team.actions.map((action, actionIndex) => ({
-          id: `team-${action.key}-${action.time}-${actionIndex}`,
-          title: action.label,
-          subtitle: action.key,
-          time: action.time,
-          type: action.type === "positive" ? "good" : "bad",
-        })),
-      }
+      id: "team",
+      initials: "EQ",
+      title: "Equipe",
+      variant: "yellow",
+      defaultOpen: false,
+      metrics: {
+        overall: teamTotalActions,
+        overallLabel: "TOTAL",
+        offensive: analysisById.team.offensive,
+        defensive: analysisById.team.defensive,
+        aproveitamento: safePercent(analysisById.team.positive, teamTotalActions),
+      },
+      actions: analysisById.team.actions.map((action, actionIndex) => ({
+        id: `team-${action.key}-${action.time}-${actionIndex}`,
+        title: action.label,
+        subtitle: action.key,
+        time: action.time,
+        type: action.type === "positive" ? "good" : "bad",
+      })),
+    }
     : null;
 
   return (

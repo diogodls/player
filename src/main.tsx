@@ -11,24 +11,27 @@ import {ActionsProvider} from "./contexts/ActionsContext/ActionsContext.tsx";
 import SessionView from "./pages/SessionView/SessionView.tsx";
 import PlayerView from "./pages/PlayerView/PlayerView.tsx";
 import SessionAnalysis from "./pages/SessionAnalysis/SessionAnalysis.tsx";
+import {SessionsProvider} from "./contexts/SessionsContext/SessionsContext.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <CookiesProvider>
-    <ActionsProvider>
-      <ToastProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<App/>}>
-              <Route path={"/"} element={<Home/>}/>
-              <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
-              <Route path={"/individual-analysis"} element={<IndividualAnalysis/>}/>
-              <Route path={"/player/:id"} element={<PlayerView/>}/>
-              <Route path={"/session-screen"} element={<SessionView />}/>
-              <Route path="/sessions/:id/analysis" element={<SessionAnalysis />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </ToastProvider>
-    </ActionsProvider>
+    <SessionsProvider>
+      <ActionsProvider>
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<App/>}>
+                <Route path={"/"} element={<Home/>}/>
+                <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
+                <Route path={"/individual-analysis"} element={<IndividualAnalysis/>}/>
+                <Route path={"/player/:id"} element={<PlayerView/>}/>
+                <Route path={"/session-screen"} element={<SessionView />}/>
+                <Route path="/sessions/:id/analysis" element={<SessionAnalysis />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
+      </ActionsProvider>
+    </SessionsProvider>
   </CookiesProvider>
 )

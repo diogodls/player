@@ -14,7 +14,7 @@ function iconByType(type: SessionAnalysisAthleteAction["type"]) {
 
 export default function SessionAnalysisActionView({ actions }: Props) {
   if (!actions.length) {
-    return <div className={styles.empty}>Sem acoes para este atleta.</div>;
+    return <div className={styles.empty}>Sem ações para este atleta.</div>;
   }
 
   return (
