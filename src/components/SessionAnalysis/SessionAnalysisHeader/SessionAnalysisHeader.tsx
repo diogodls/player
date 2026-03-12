@@ -1,33 +1,32 @@
 import styles from "./SessionAnalysisHeader.module.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router";
 
 type Tab = "individual" | "team";
 
 type Props = {
-  active?: Tab;
-  onChange?: (tab: Tab) => void;
+  active: Tab;
+  sessionId: string;
 };
 
-const SessionAnalysisHeader = ({ active = "individual", onChange }: Props) => {
+const SessionAnalysisHeader = ({ active, sessionId }: Props) => {
   const navigate = useNavigate();
 
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <button className={styles.back} onClick={()=> navigate(-1)}>
-          <FontAwesomeIcon icon={faArrowLeft}/>
+        <button className={styles.back} onClick={() => navigate(`/sessions/${sessionId}`)}>
+          <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h2 className={styles.title}>Detalhes</h2>
+        <h2 className={styles.title}>Análise da sessão</h2>
       </div>
+
       <div className={styles.actions}>
         <button
           type="button"
-          className={`${styles.pill} ${styles.pillBlue} ${
-            active === "individual" ? styles.active : ""
-          }`}
-          onClick={() => onChange?.("individual")}
+          className={`${styles.pill} ${styles.pillBlue} ${active === "individual" ? styles.active : ""}`}
+          onClick={() => navigate(`/sessions/${sessionId}/analysis/individual`)}
         >
           <FontAwesomeIcon icon={faUser} className={styles.icon} />
           Análise Individual
@@ -35,10 +34,8 @@ const SessionAnalysisHeader = ({ active = "individual", onChange }: Props) => {
 
         <button
           type="button"
-          className={`${styles.pill} ${styles.pillGreen} ${
-            active === "team" ? styles.active : ""
-          }`}
-          onClick={() => onChange?.("team")}
+          className={`${styles.pill} ${styles.pillGreen} ${active === "team" ? styles.active : ""}`}
+          onClick={() => navigate(`/sessions/${sessionId}/analysis/team`)}
         >
           <FontAwesomeIcon icon={faUsers} className={styles.icon} />
           Análise de Equipe

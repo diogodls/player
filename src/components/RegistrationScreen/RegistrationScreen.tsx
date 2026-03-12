@@ -7,9 +7,11 @@ import type { Session } from "../../pages/SessionView";
 
 type RegistrationScreen = {
   sessions: Session[];
+  onEditSession: (session: Session) => void;
+  onDeleteSession: (session: Session) => void;
 };
 
-const RegistrationScreen = ({ sessions }: RegistrationScreen) => {
+const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession }: RegistrationScreen) => {
   const total = sessions.length;
 
   return (
@@ -37,6 +39,8 @@ const RegistrationScreen = ({ sessions }: RegistrationScreen) => {
               <SessionCard
                 key={session.id}
                 item={session}
+                onEdit={onEditSession}
+                onDelete={onDeleteSession}
               />
             ))}
           </div>

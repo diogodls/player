@@ -4,6 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 
   .title {
     margin: 0;
@@ -40,6 +41,7 @@
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
   }
 
   .pill {
@@ -85,5 +87,25 @@
   .active {
     opacity: 1;
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 8px 18px rgba(0, 0, 0, 0.24);
+  }
+}
+
+@media (max-width: 860px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+
+    .left {
+      justify-content: flex-start;
+    }
+
+    .actions {
+      width: 100%;
+    }
+
+    .pill {
+      justify-content: center;
+      flex: 1;
+    }
   }
 }

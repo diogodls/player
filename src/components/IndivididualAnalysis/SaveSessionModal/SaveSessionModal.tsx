@@ -1,4 +1,4 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
 import type { SessionMeta, SessionType } from "../../../pages/SessionView";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -8,6 +8,8 @@ type SaveSessionModal = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (meta: SessionMeta) => void;
+  initialMeta?: SessionMeta | null;
+  mode?: "create" | "edit";
 };
 
 function todayISO() {
@@ -18,12 +20,40 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-const SaveSessionModal = ({isOpen, onClose, onSubmit}: SaveSessionModal) => {
+function toInputDate(value?: string) {
+  if (!value) return todayISO();
+  if (value.includes("-")) return value;
+
+  const [day, month, year] = value.split("/");
+  if (!day || !month || !year) return todayISO();
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+
+const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "create"}: SaveSessionModal) => {
   const [type, setType] = useState<SessionType>("Treino");
   const [date, setDate] = useState<string>(todayISO());
   const [local, setLocal] = useState("");
   const [description, setDescription] = useState("");
   const [opponent, setOpponent] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (initialMeta) {
+      setType(initialMeta.type);
+      setDate(toInputDate(initialMeta.date));
+      setLocal(initialMeta.local ?? "");
+      setDescription(initialMeta.description ?? "");
+      setOpponent(initialMeta.opponent ?? "");
+      return;
+    }
+
+    setType("Treino");
+    setDate(todayISO());
+    setLocal("");
+    setDescription("");
+    setOpponent("");
+  }, [isOpen, initialMeta]);
 
   const canSubmit = useMemo(() => {
     if (!date.trim() || !local.trim()) return false;
@@ -53,7 +83,7 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit}: SaveSessionModal) => {
     <div className={styles.overlay} onMouseDown={onClose}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Novo Treino/Jogo</h2>
+          <h2 className={styles.title}>{mode === "edit" ? "Editar Treino/Jogo" : "Novo Treino/Jogo"}</h2>
           <button className={styles.close} onClick={onClose} aria-label="Fechar">
             <FontAwesomeIcon icon={faX} />
           </button>
@@ -84,20 +114,20 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit}: SaveSessionModal) => {
 
           {type === "Treino" ? (
             <div className={styles.field}>
-              <label className={styles.label}>Descri√ß√£o do Treino *</label>
+              <label className={styles.label}>DescriÁ„o do Treino *</label>
               <input
                 className={styles.input}
-                placeholder="Ex: sa√≠da de press√£o, bolas paradas..."
+                placeholder="Ex: saÌda de press„o, bolas paradas..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           ) : (
             <div className={styles.field}>
-              <label className={styles.label}>Advers√°rio *</label>
+              <label className={styles.label}>Advers·rio *</label>
               <input
                 className={styles.input}
-                placeholder="Ex: Atl√¢ntico, ACBF..."
+                placeholder="Ex: Atl‚ntico, ACBF..."
                 value={opponent}
                 onChange={(e) => setOpponent(e.target.value)}
               />
@@ -124,12 +154,12 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit}: SaveSessionModal) => {
             onClick={handleSubmit}
             disabled={!canSubmit}
           >
-            Continuar
+            {mode === "edit" ? "Salvar" : "Continuar"}
           </button>
         </div>
       </div>
     </div>
   );
 }
-//todo: enviar para um endpoint com axios
+
 export default SaveSessionModal;
