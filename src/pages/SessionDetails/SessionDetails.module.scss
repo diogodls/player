@@ -1,137 +1,176 @@
-.container {
+﻿.container {
   min-height: 100svh;
   background:
-    radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 30%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(2, 6, 23, 1));
-  padding: 28px 18px 40px;
+    radial-gradient(circle at 85% -10%, rgba(37, 99, 235, 0.12), transparent 36%),
+    linear-gradient(180deg, #111827 0%, #0f172a 55%, #0f172a 100%);
+  padding: 24px 16px 40px;
   color: var(--text-light);
+}
+
+.contentWrap {
+  width: min(1100px, 100%);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .header {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  max-width: 1100px;
-  width: 100%;
-  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: 14px;
 }
 
 .backButton {
   width: 44px;
   height: 44px;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid var(--border-20);
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-light);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, border-color 0.18s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(221, 221, 221, 0.24);
+  }
+
+  svg {
+    font-size: 14px;
+  }
 }
 
 .headerContent {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .eyebrow {
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--light-blue);
+  font-weight: 700;
 }
 
 .title {
   margin: 0;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: clamp(26px, 3.3vw, 36px);
+  line-height: 1.1;
 }
 
 .subtitle {
   margin: 0;
   color: var(--text-muted);
+  max-width: 70ch;
 }
 
 .topActionsCard,
 .viewerCard {
-  max-width: 1100px;
   width: 100%;
-  margin: 0 auto;
-  background: rgba(15, 23, 42, 0.84);
+  background: rgba(15, 23, 42, 0.82);
   border: 1px solid var(--border-20);
-  border-radius: 20px;
-  padding: 22px;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.topActionsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .actionsHeader {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 18px;
+  gap: 4px;
 }
 
 .actionsTitle {
   margin: 0;
-  font-size: 22px;
+  font-size: 19px;
 }
 
 .actionsSubtitle {
   color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .actionsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .actionButton {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
+  align-items: center;
+  gap: 12px;
   width: 100%;
-  border-radius: 18px;
+  border-radius: 14px;
   border: 1px solid transparent;
-  padding: 18px;
+  padding: 14px;
   color: #fff;
   cursor: pointer;
   text-align: left;
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 
-  svg {
-    margin-top: 2px;
-    font-size: 18px;
+  &:hover {
+    transform: translateY(-1px);
   }
+}
 
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.actionIconWrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex: 0 0 auto;
+
+  svg {
+    font-size: 14px;
   }
+}
+
+.actionText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
 
   strong {
-    font-size: 16px;
+    font-size: 14px;
+    line-height: 1.25;
   }
 
   span {
-    color: rgba(255, 255, 255, 0.82);
-  }
-
-  &:hover {
-    transform: translateY(-2px);
+    color: rgba(255, 255, 255, 0.84);
+    font-size: 12px;
+    line-height: 1.35;
   }
 }
 
 .individualButton {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.92), rgba(30, 64, 175, 0.88));
-  border-color: rgba(147, 197, 253, 0.28);
-  box-shadow: 0 18px 36px rgba(37, 99, 235, 0.18);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.86), rgba(30, 64, 175, 0.8));
+  border-color: rgba(147, 197, 253, 0.3);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.14);
 }
 
 .teamButton {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.92), rgba(21, 128, 61, 0.88));
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.86), rgba(21, 128, 61, 0.8));
   border-color: rgba(134, 239, 172, 0.24);
-  box-shadow: 0 18px 36px rgba(34, 197, 94, 0.18);
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.14);
 }
 
 .viewerCard {
@@ -142,33 +181,127 @@
 
 .viewerSwitch {
   display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
-  gap: 12px;
-  align-self: center;
-  width: min(560px, 100%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: min(540px, 100%);
 }
 
 .switchButton {
   height: 40px;
-  border-radius: 12px;
+  border-radius: 11px;
   border: 1px solid var(--border-20);
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-light);
   cursor: pointer;
   font-weight: 700;
+  padding: 0 12px;
+  text-align: center;
   transition: background 0.18s ease, border-color 0.18s ease;
 }
 
 .switchActive {
-  background: var(--selected-blue);
-  border-color: rgba(147, 197, 253, 0.45);
+  background: rgba(37, 99, 235, 0.7);
+  border-color: rgba(147, 197, 253, 0.5);
 }
 
 .sectionTitle {
   margin: 2px 4px 0;
   color: var(--text-light);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filtersCard {
+  border: 1px solid var(--border-20);
+  border-radius: 12px;
+  background: rgba(17, 24, 39, 0.55);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filtersTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-light);
+  }
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 10px;
+  align-items: end;
+}
+
+.filterBlock,
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filterLabel {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.typeFilters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.typeFilterButton {
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border-20);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-light);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.typeFilterActive {
+  background: rgba(37, 99, 235, 0.62);
+  border-color: rgba(147, 197, 253, 0.5);
+}
+
+.filterField {
+  select {
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--border-20);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-light);
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  option {
+    background: #111827;
+    color: var(--text-light);
+  }
 }
 
 .cardsList {
@@ -177,29 +310,49 @@
   gap: 12px;
 }
 
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .emptyState {
   border: 1px solid var(--border-20);
-  border-radius: 16px;
-  padding: 24px;
-  background: var(--surface);
+  border-radius: 14px;
+  padding: 22px;
+  background: rgba(17, 24, 39, 0.45);
   color: var(--text-light);
 
   h3 {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 980px) {
+  .actionsGrid,
+  .cardsGrid,
+  .filtersGrid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 720px) {
   .container {
-    padding-inline: 12px;
+    padding: 18px 12px 28px;
   }
 
   .header {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+
+  .backButton {
+    width: 40px;
+    height: 40px;
   }
 
   .viewerSwitch {
+    width: 100%;
     grid-template-columns: 1fr;
   }
 }

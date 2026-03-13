@@ -1,18 +1,18 @@
-.card {
+﻿.card {
   width: 100%;
   background: rgba(17, 24, 39, 0.55);
   border: 1px solid var(--border-20);
   border-radius: 14px;
-  padding: 14px 16px 12px;
-  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.25);
+  padding: 14px 14px 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.22);
 
-  .card_yellow .avatar,
-  .card_yellow .overallBadge {
+  .card_yellow .playerIcon,
+  .card_yellow .totalBadge {
     border-color: rgba(250, 204, 21, 0.45);
   }
 
-  .card_red .avatar,
-  .card_red .overallBadge {
+  .card_red .playerIcon,
+  .card_red .totalBadge {
     border-color: rgba(250, 79, 88, 0.35);
   }
 
@@ -31,17 +31,21 @@
     min-width: 0;
   }
 
-  .avatar {
+  .playerIcon {
     width: 34px;
     height: 34px;
-    border-radius: 999px;
-    border: 2px solid rgba(250, 204, 21, 0.45);
-    display: grid;
-    place-items: center;
-    font-weight: 800;
+    border-radius: 10px;
+    border: 1px solid rgba(250, 204, 21, 0.45);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     color: var(--text-light);
-    background: rgba(0, 0, 0, 0.18);
+    background: rgba(0, 0, 0, 0.16);
     flex: 0 0 auto;
+
+    svg {
+      font-size: 14px;
+    }
   }
 
   .meta {
@@ -64,44 +68,43 @@
     font-size: 11px;
     color: var(--text-muted);
     font-weight: 600;
-    opacity: 0.9;
+    opacity: 0.92;
   }
 
   .right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex: 0 0 auto;
   }
 
   .counts {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     font-size: 12px;
     font-weight: 800;
-    color: var(--text-muted);
   }
 
   .count {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    height: 28px;
+    padding: 0 9px;
   }
 
   .posIco {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--green);
   }
 
   .negIco {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--deep-orange);
-  }
-
-  .neuIco {
-    font-size: 12px;
-    color: var(--light-blue);
   }
 
   .posTxt {
@@ -112,37 +115,35 @@
     color: var(--deep-orange);
   }
 
-  .neuTxt {
-    color: var(--light-blue);
-  }
-
-  .overallBadge {
-    width: 40px;
-    height: 40px;
+  .totalBadge {
+    height: 28px;
     border-radius: 999px;
-    border: 2px solid rgba(250, 204, 21, 0.45);
-    display: grid;
+    border: 1px solid rgba(250, 204, 21, 0.45);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     background: rgba(0, 0, 0, 0.18);
-    text-align: center;
+    padding: 0 10px;
   }
 
-  .overallValue {
+  .totalLabel {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .totalValue {
     font-size: 12px;
     font-weight: 900;
     color: var(--text-light);
   }
 
-  .overallLabel {
-    font-size: 9px;
-    font-weight: 800;
-    color: var(--text-muted);
-    letter-spacing: 0.04em;
-  }
-
   .metrics {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
     margin-bottom: 10px;
   }
 
@@ -210,24 +211,17 @@
     background: var(--green);
   }
 
-  .bottomRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 6px;
-  }
-
   .viewLink {
     font-size: 11px;
     color: var(--text-muted);
     font-weight: 700;
-    opacity: 0.9;
+    opacity: 0.92;
   }
 
   .chevron {
     font-size: 12px;
     color: var(--text-muted);
-    opacity: 0.8;
+    opacity: 0.82;
   }
 
   .bottomRowBtn {
@@ -245,5 +239,21 @@
     margin-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
     padding-top: 10px;
+  }
+
+  @media (max-width: 560px) {
+    .topRow {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .right {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .metrics {
+      grid-template-columns: 1fr;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import styles from "./SessionAnalysisActionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -6,6 +6,8 @@ import {
   faChevronUp,
   faArrowTrendUp,
   faArrowTrendDown,
+  faPeopleGroup,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import SessionAnalysisActionView from "../SessionAnalysisActionView.tsx";
 import type { SessionAnalysisAthlete } from "../../../../pages/SessionAnalysis";
@@ -15,7 +17,7 @@ type Props = SessionAnalysisAthlete;
 const clamp01 = (n: number) => Math.max(0, Math.min(100, n));
 
 const SessionAnalysisActionCard = ({
-  initials,
+  id,
   title,
   actions,
   metrics,
@@ -31,16 +33,19 @@ const SessionAnalysisActionCard = ({
   }, [actions]);
 
   const actionsCount = actions.length;
+  const isTeam = id === "team";
 
   return (
     <article className={`${styles.card} ${styles[`card_${variant}`]}`}>
       <div className={styles.topRow}>
         <div className={styles.left}>
-          <div className={styles.avatar}>{initials}</div>
+          <div className={styles.playerIcon}>
+            <FontAwesomeIcon icon={isTeam ? faPeopleGroup : faUser} />
+          </div>
 
           <div className={styles.meta}>
             <div className={styles.title}>{title}</div>
-            <div className={styles.sub}>{actionsCount} ações registradas</div>
+            <div className={styles.sub}>{actionsCount} acoes exibidas</div>
           </div>
         </div>
 
@@ -57,9 +62,9 @@ const SessionAnalysisActionCard = ({
             </span>
           </div>
 
-          <div className={styles.overallBadge}>
-            <div className={styles.overallValue}>{metrics.overall}</div>
-            <div className={styles.overallLabel}>{metrics.overallLabel}</div>
+          <div className={styles.totalBadge}>
+            <span className={styles.totalLabel}>Total</span>
+            <span className={styles.totalValue}>{metrics.overall}</span>
           </div>
         </div>
       </div>
@@ -76,11 +81,8 @@ const SessionAnalysisActionCard = ({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
-        <FontAwesomeIcon
-          icon={open ? faChevronUp : faChevronDown}
-          className={styles.chevron}
-        />
+        <span className={styles.viewLink}>Ver acoes ({actionsCount})</span>
+        <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className={styles.chevron} />
       </button>
 
       {open && (
@@ -106,17 +108,12 @@ function MiniMetric({
   return (
     <div className={styles.metricBox}>
       <div className={styles.metricHeader}>
-        <span className={`${styles.metricLabel} ${styles[`tone_${tone}`]}`}>
-          {label}
-        </span>
+        <span className={`${styles.metricLabel} ${styles[`tone_${tone}`]}`}>{label}</span>
         <span className={styles.metricValue}>{v}</span>
       </div>
 
       <div className={styles.track}>
-        <div
-          className={`${styles.fill} ${styles[`fill_${tone}`]}`}
-          style={{ width: `${v}%` }}
-        />
+        <div className={`${styles.fill} ${styles[`fill_${tone}`]}`} style={{ width: `${v}%` }} />
       </div>
     </div>
   );
