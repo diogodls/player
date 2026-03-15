@@ -6,19 +6,22 @@
   align-items: center;
   justify-content: center;
   padding: 18px;
-  background: rgba(2, 6, 23, 0.66);
+  background: rgba(2, 6, 23, 0.72);
   backdrop-filter: blur(4px);
 }
 
 .modal {
   width: 460px;
   max-width: 100%;
-  border-radius: 16px;
-  border: 1px solid var(--border-20);
-  background: var(--surface-dark);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top, rgba(220, 38, 38, 0.1), transparent 42%),
+    radial-gradient(circle at 80% 0%, rgba(251, 146, 60, 0.06), transparent 46%),
+    var(--bg-dark);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
   padding: 20px;
-  color: var(--text-primary);
+  color: var(--text-light);
 }
 
 .header {
@@ -33,19 +36,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
-  border: 1px solid rgba(220, 38, 38, 0.35);
-  background: rgba(220, 38, 38, 0.12);
-  color: #fca5a5;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.14), rgba(220, 38, 38, 0.14));
+  color: var(--accent-orange);
 }
 
 .close {
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  border: 1px solid var(--border-20);
-  background: var(--secondary-bg-dark);
-  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-light);
   cursor: pointer;
 }
 
@@ -68,8 +70,8 @@
   margin-top: 18px;
   padding: 14px;
   border-radius: 16px;
-  border: 1px solid rgba(220, 38, 38, 0.24);
-  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -99,24 +101,20 @@
 }
 
 .cancel {
-  border: 1px solid var(--border-20);
-  background: var(--secondary-bg-dark);
-  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-light);
 }
 
 .confirm {
-  border: 1px solid rgba(220, 38, 38, 0.45);
-  background: rgba(220, 38, 38, 0.22);
+  border: 1px solid rgba(220, 38, 38, 0.34);
+  background: linear-gradient(135deg, var(--action-red), var(--deep-red));
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: none;
-
-  &:hover {
-    background: rgba(220, 38, 38, 0.3);
-  }
+  box-shadow: 0 12px 24px rgba(127, 29, 29, 0.22);
 }
 
 @media (max-width: 640px) {
