@@ -24,7 +24,7 @@ const SessionAnalysisSummary = ({ summary }: Props) => {
     <section className={styles.wrapper}>
       <header className={styles.header}>
         <FontAwesomeIcon icon={faChartColumn} className={styles.headerIcon} />
-        <span className={styles.headerTitle}>Resumo Geral das Acoes</span>
+        <span className={styles.headerTitle}>Resumo Geral das ações</span>
       </header>
 
       <div className={styles.cards}>
@@ -45,8 +45,7 @@ const SessionAnalysisSummary = ({ summary }: Props) => {
           <span className={styles.metaRight}>{pNeg}% negativas</span>
         </div>
 
-        <div className={styles.progressTrack} aria-label="Distribuicao das acoes">
-          <div className={styles.progressCenter}>{total} acoes totais</div>
+        <div className={styles.progressTrack} aria-label="Distribuição das ações">
 
           <div
             className={`${styles.progressSeg} ${styles.segPositive}`}

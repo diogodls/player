@@ -45,7 +45,7 @@ const SessionAnalysisActionCard = ({
 
           <div className={styles.meta}>
             <div className={styles.title}>{title}</div>
-            <div className={styles.sub}>{actionsCount} acoes exibidas</div>
+            <div className={styles.sub}>{actionsCount} ações exibidas</div>
           </div>
         </div>
 
@@ -81,7 +81,7 @@ const SessionAnalysisActionCard = ({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
-        <span className={styles.viewLink}>Ver acoes ({actionsCount})</span>
+        <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
         <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className={styles.chevron} />
       </button>
 

@@ -18,7 +18,7 @@ const SessionAnalysisDetails = ({ session }: Props) => {
   if (!session) {
     return (
       <section className={styles.wrapper}>
-        <span className={styles.empty}>Sessao nao encontrada.</span>
+        <span className={styles.empty}>Sessão não encontrada.</span>
       </section>
     );
   }

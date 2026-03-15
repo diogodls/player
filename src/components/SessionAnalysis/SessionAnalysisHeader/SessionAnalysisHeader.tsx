@@ -16,7 +16,7 @@ const SessionAnalysisHeader = ({ sessionId }: Props) => {
         <button className={styles.back} onClick={() => navigate(`/sessions/${sessionId}`)}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h2 className={styles.title}>Analise da sessao</h2>
+        <h2 className={styles.title}>Análise da sessão</h2>
       </div>
     </header>
   );

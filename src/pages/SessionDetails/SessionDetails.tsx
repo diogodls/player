@@ -210,8 +210,8 @@ const SessionDetails = () => {
 
           <div className={styles.headerContent}>
             <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
-            <h1 className={styles.title}>Detalhes da sessao</h1>
-            <p className={styles.subtitle}>Acesse o fluxo de analise e acompanhe os dados desta sessao.</p>
+            <h1 className={styles.title}>Detalhes da sessão</h1>
+            <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
           </div>
         </header>
 
@@ -219,8 +219,8 @@ const SessionDetails = () => {
 
         <section className={styles.topActionsCard}>
           <div className={styles.actionsHeader}>
-            <h2 className={styles.actionsTitle}>Acoes principais</h2>
-            <span className={styles.actionsSubtitle}>Use os botoes abaixo para iniciar uma analise.</span>
+            <h2 className={styles.actionsTitle}>Ações principais</h2>
+            <span className={styles.actionsSubtitle}>Use os botões abaixo para iniciar uma análise.</span>
           </div>
 
           <div className={styles.actionsGrid}>
@@ -233,7 +233,7 @@ const SessionDetails = () => {
               </div>
 
               <div className={styles.actionText}>
-                <strong>Fazer analise individual</strong>
+                <strong>Fazer análise individual</strong>
                 <span>Registrar acoes por atleta neste treino/jogo.</span>
               </div>
             </button>
@@ -247,8 +247,8 @@ const SessionDetails = () => {
               </div>
 
               <div className={styles.actionText}>
-                <strong>Fazer analise de equipe</strong>
-                <span>Ir para a tela dedicada de analise de equipe.</span>
+                <strong>Fazer análise de equipe</strong>
+                <span>Ir para a tela dedicada de análise de equipe.</span>
               </div>
             </button>
           </div>
@@ -261,14 +261,14 @@ const SessionDetails = () => {
               className={`${styles.switchButton} ${viewMode === "individual" ? styles.switchActive : ""}`}
               onClick={() => setViewMode("individual")}
             >
-              Ver analise individual
+              Ver análise individual
             </button>
             <button
               type="button"
               className={`${styles.switchButton} ${viewMode === "team" ? styles.switchActive : ""}`}
               onClick={() => setViewMode("team")}
             >
-              Ver analise de equipe
+              Ver análise de equipe
             </button>
           </div>
 
@@ -283,7 +283,7 @@ const SessionDetails = () => {
               <section className={styles.filtersCard}>
                 <div className={styles.filtersTitleRow}>
                   <FontAwesomeIcon icon={faFilter} />
-                  <h4>Filtros de acoes</h4>
+                  <h4>Filtros de ações</h4>
                 </div>
 
                 <div className={styles.filtersGrid}>

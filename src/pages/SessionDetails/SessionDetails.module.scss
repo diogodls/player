@@ -1,8 +1,6 @@
 ﻿.container {
   min-height: 100svh;
-  background:
-    radial-gradient(circle at 85% -10%, rgba(37, 99, 235, 0.12), transparent 36%),
-    linear-gradient(180deg, #111827 0%, #0f172a 55%, #0f172a 100%);
+  background: var(--bg-dark);
   padding: 24px 16px 40px;
   color: var(--text-light);
 }
