@@ -35,7 +35,7 @@ const IndividualAnalysis = () => {
 
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader active="individual" sessionId={selectedSession.id} />
+      <SessionAnalysisHeader sessionId={selectedSession.id} />
       <SessionAnalysisDetails session={selectedSession} />
 
       <div className={styles.content}>

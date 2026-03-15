@@ -1,16 +1,13 @@
 import styles from "./SessionAnalysisHeader.module.scss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faArrowLeft, faUser, faUsers} from "@fortawesome/free-solid-svg-icons";
+import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
 import {useNavigate} from "react-router";
 
-type Tab = "individual" | "team";
-
 type Props = {
-  active: Tab;
   sessionId: string;
 };
 
-const SessionAnalysisHeader = ({ active, sessionId }: Props) => {
+const SessionAnalysisHeader = ({ sessionId }: Props) => {
   const navigate = useNavigate();
 
   return (
@@ -19,27 +16,7 @@ const SessionAnalysisHeader = ({ active, sessionId }: Props) => {
         <button className={styles.back} onClick={() => navigate(`/sessions/${sessionId}`)}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
-        <h2 className={styles.title}>Análise da sessão</h2>
-      </div>
-
-      <div className={styles.actions}>
-        <button
-          type="button"
-          className={`${styles.pill} ${styles.pillBlue} ${active === "individual" ? styles.active : ""}`}
-          onClick={() => navigate(`/sessions/${sessionId}/analysis/individual`)}
-        >
-          <FontAwesomeIcon icon={faUser} className={styles.icon} />
-          Análise Individual
-        </button>
-
-        <button
-          type="button"
-          className={`${styles.pill} ${styles.pillGreen} ${active === "team" ? styles.active : ""}`}
-          onClick={() => navigate(`/sessions/${sessionId}/analysis/team`)}
-        >
-          <FontAwesomeIcon icon={faUsers} className={styles.icon} />
-          Análise de Equipe
-        </button>
+        <h2 className={styles.title}>Analise da sessao</h2>
       </div>
     </header>
   );

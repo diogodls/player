@@ -456,24 +456,40 @@
               "goodAction": true
             },
             {
+              "key": "AD",
+              "goodAction": true
+            },
+            {
               "key": "PP",
               "goodAction": false
+            },
+            {
+              "key": "RB",
+              "goodAction": true
+            },
+            {
+              "key": "DIA",
+              "goodAction": true
             },
             {
               "key": "FD",
               "goodAction": false
             },
             {
-              "key": "RB",
-              "goodAction": true
-            },
-            {
-              "key": "DIA",
-              "goodAction": true
+              "key": "GS OO",
+              "goodAction": false
             },
             {
               "key": "GM",
               "goodAction": true
+            },
+            {
+              "key": "CC",
+              "goodAction": true
+            },
+            {
+              "key": "GP",
+              "goodAction": false
             },
             {
               "key": "PP",
@@ -481,10 +497,6 @@
             },
             {
               "key": "RB",
-              "goodAction": true
-            },
-            {
-              "key": "DIA",
               "goodAction": true
             }
           ]
@@ -502,12 +514,12 @@
               "goodAction": true
             },
             {
-              "key": "PP",
-              "goodAction": false
-            },
-            {
               "key": "GM",
               "goodAction": true
+            },
+            {
+              "key": "PP",
+              "goodAction": false
             },
             {
               "key": "AD",
@@ -522,12 +534,28 @@
               "goodAction": true
             },
             {
+              "key": "DIA",
+              "goodAction": true
+            },
+            {
+              "key": "GS OO",
+              "goodAction": false
+            },
+            {
+              "key": "CC",
+              "goodAction": true
+            },
+            {
+              "key": "GP",
+              "goodAction": false
+            },
+            {
               "key": "GM",
               "goodAction": true
             },
             {
-              "key": "DIA",
-              "goodAction": true
+              "key": "PP",
+              "goodAction": false
             }
           ]
         },
@@ -548,6 +576,14 @@
               "goodAction": true
             },
             {
+              "key": "GM",
+              "goodAction": true
+            },
+            {
+              "key": "PP",
+              "goodAction": false
+            },
+            {
               "key": "FD",
               "goodAction": false
             },
@@ -556,15 +592,11 @@
               "goodAction": false
             },
             {
-              "key": "RB",
+              "key": "AD",
               "goodAction": true
             },
             {
-              "key": "PP",
-              "goodAction": false
-            },
-            {
-              "key": "AD",
+              "key": "RB",
               "goodAction": true
             },
             {
@@ -572,8 +604,24 @@
               "goodAction": true
             },
             {
+              "key": "CC",
+              "goodAction": true
+            },
+            {
+              "key": "GP",
+              "goodAction": false
+            },
+            {
+              "key": "PP",
+              "goodAction": false
+            },
+            {
               "key": "GM",
               "goodAction": true
+            },
+            {
+              "key": "FD",
+              "goodAction": false
             }
           ]
         },
@@ -610,6 +658,22 @@
               "goodAction": true
             },
             {
+              "key": "DIA",
+              "goodAction": true
+            },
+            {
+              "key": "GS OO",
+              "goodAction": false
+            },
+            {
+              "key": "CC",
+              "goodAction": true
+            },
+            {
+              "key": "GP",
+              "goodAction": false
+            },
+            {
               "key": "GM",
               "goodAction": true
             }
@@ -625,6 +689,14 @@
             },
             {
               "key": "AD",
+              "goodAction": true
+            },
+            {
+              "key": "CC",
+              "goodAction": true
+            },
+            {
+              "key": "ASS",
               "goodAction": true
             },
             {
@@ -648,15 +720,15 @@
               "goodAction": false
             },
             {
-              "key": "ASS",
+              "key": "GS OO",
+              "goodAction": false
+            },
+            {
+              "key": "GM",
               "goodAction": true
             },
             {
               "key": "CC",
-              "goodAction": true
-            },
-            {
-              "key": "GM",
               "goodAction": true
             },
             {
@@ -666,6 +738,14 @@
             {
               "key": "DIA",
               "goodAction": true
+            },
+            {
+              "key": "AD",
+              "goodAction": true
+            },
+            {
+              "key": "FD",
+              "goodAction": false
             }
           ]
         }
@@ -711,10 +791,11 @@
       },
       {
         "id": "99",
-        "type": "Treino",
-        "date": "20/02/2026",
-        "local": "UFSM",
-        "description": "Treino tatico 4x3 + finalizacao"
+        "type": "Jogo",
+        "date": "25/02/2026",
+        "local": "Farrezao",
+        "opponent": "Atlantico",
+        "description": "Jogo teste para analise"
       }
     ]
   },
@@ -1638,10 +1719,10 @@
       "players": [
         {
           "playerId": 1,
-          "offensive": 6,
-          "defensive": 5,
-          "positive": 8,
-          "negative": 3,
+          "offensive": 8,
+          "defensive": 6,
+          "positive": 9,
+          "negative": 5,
           "actions": [
             {
               "time": "00:18",
@@ -1650,73 +1731,91 @@
               "type": "positive"
             },
             {
-              "time": "00:44",
+              "time": "00:46",
               "key": "ASS",
               "label": "Assistencia",
               "type": "positive"
             },
             {
-              "time": "01:11",
+              "time": "01:10",
               "key": "CC",
               "label": "Chance criada",
               "type": "positive"
             },
             {
-              "time": "01:39",
+              "time": "01:33",
+              "key": "AD",
+              "label": "Acao decisiva",
+              "type": "positive"
+            },
+            {
+              "time": "01:58",
               "key": "PP",
               "label": "Perda de posse",
               "type": "negative"
             },
             {
-              "time": "02:04",
+              "time": "02:24",
+              "key": "RB",
+              "label": "Roubada de bola",
+              "type": "positive"
+            },
+            {
+              "time": "02:50",
+              "key": "DIA",
+              "label": "Desarme, interceptacao e antecipacao",
+              "type": "positive"
+            },
+            {
+              "time": "03:16",
               "key": "FD",
               "label": "Falha defensiva",
               "type": "negative"
             },
             {
-              "time": "02:36",
-              "key": "RB",
-              "label": "Roubada de bola",
-              "type": "positive"
+              "time": "03:48",
+              "key": "GS OO",
+              "label": "Gol sofrido organizacao defensiva",
+              "type": "negative"
             },
             {
-              "time": "03:02",
-              "key": "DIA",
-              "label": "Desarme, interceptacao e antecipacao",
-              "type": "positive"
-            },
-            {
-              "time": "03:31",
+              "time": "04:09",
               "key": "GM",
               "label": "Gol marcado",
               "type": "positive"
             },
             {
-              "time": "04:07",
+              "time": "04:41",
+              "key": "CC",
+              "label": "Chance criada",
+              "type": "positive"
+            },
+            {
+              "time": "05:03",
+              "key": "GP",
+              "label": "Gol pago",
+              "type": "negative"
+            },
+            {
+              "time": "05:29",
               "key": "PP",
               "label": "Perda de posse",
               "type": "negative"
             },
             {
-              "time": "04:40",
+              "time": "05:56",
               "key": "RB",
               "label": "Roubada de bola",
-              "type": "positive"
-            },
-            {
-              "time": "05:16",
-              "key": "DIA",
-              "label": "Desarme, interceptacao e antecipacao",
               "type": "positive"
             }
           ]
         },
         {
           "playerId": 2,
-          "offensive": 6,
-          "defensive": 3,
-          "positive": 7,
-          "negative": 2,
+          "offensive": 8,
+          "defensive": 5,
+          "positive": 8,
+          "negative": 5,
           "actions": [
             {
               "time": "00:27",
@@ -1731,55 +1830,79 @@
               "type": "positive"
             },
             {
-              "time": "01:28",
+              "time": "01:23",
+              "key": "GM",
+              "label": "Gol marcado",
+              "type": "positive"
+            },
+            {
+              "time": "01:49",
               "key": "PP",
               "label": "Perda de posse",
               "type": "negative"
             },
             {
-              "time": "01:54",
-              "key": "GM",
-              "label": "Gol marcado",
-              "type": "positive"
-            },
-            {
-              "time": "02:21",
+              "time": "02:11",
               "key": "AD",
               "label": "Acao decisiva",
               "type": "positive"
             },
             {
-              "time": "02:55",
+              "time": "02:39",
               "key": "FD",
               "label": "Falha defensiva",
               "type": "negative"
             },
             {
-              "time": "03:26",
+              "time": "03:05",
               "key": "RB",
               "label": "Roubada de bola",
               "type": "positive"
             },
             {
-              "time": "04:03",
+              "time": "03:31",
+              "key": "DIA",
+              "label": "Desarme, interceptacao e antecipacao",
+              "type": "positive"
+            },
+            {
+              "time": "03:56",
+              "key": "GS OO",
+              "label": "Gol sofrido organizacao defensiva",
+              "type": "negative"
+            },
+            {
+              "time": "04:19",
+              "key": "CC",
+              "label": "Chance criada",
+              "type": "positive"
+            },
+            {
+              "time": "04:42",
+              "key": "GP",
+              "label": "Gol pago",
+              "type": "negative"
+            },
+            {
+              "time": "05:08",
               "key": "GM",
               "label": "Gol marcado",
               "type": "positive"
             },
             {
-              "time": "04:37",
-              "key": "DIA",
-              "label": "Desarme, interceptacao e antecipacao",
-              "type": "positive"
+              "time": "05:39",
+              "key": "PP",
+              "label": "Perda de posse",
+              "type": "negative"
             }
           ]
         },
         {
           "playerId": 3,
-          "offensive": 6,
-          "defensive": 4,
-          "positive": 7,
-          "negative": 3,
+          "offensive": 9,
+          "defensive": 6,
+          "positive": 9,
+          "negative": 6,
           "actions": [
             {
               "time": "00:33",
@@ -1800,55 +1923,85 @@
               "type": "positive"
             },
             {
-              "time": "02:10",
-              "key": "FD",
-              "label": "Falha defensiva",
-              "type": "negative"
-            },
-            {
-              "time": "02:44",
-              "key": "GS OO",
-              "label": "Gol sofrido organizacao defensiva",
-              "type": "negative"
-            },
-            {
-              "time": "03:15",
-              "key": "RB",
-              "label": "Roubada de bola",
+              "time": "02:08",
+              "key": "GM",
+              "label": "Gol marcado",
               "type": "positive"
             },
             {
-              "time": "03:52",
+              "time": "02:34",
               "key": "PP",
               "label": "Perda de posse",
               "type": "negative"
             },
             {
-              "time": "04:26",
+              "time": "02:58",
+              "key": "FD",
+              "label": "Falha defensiva",
+              "type": "negative"
+            },
+            {
+              "time": "03:22",
+              "key": "GS OO",
+              "label": "Gol sofrido organizacao defensiva",
+              "type": "negative"
+            },
+            {
+              "time": "03:49",
               "key": "AD",
               "label": "Acao decisiva",
               "type": "positive"
             },
             {
-              "time": "04:58",
+              "time": "04:16",
+              "key": "RB",
+              "label": "Roubada de bola",
+              "type": "positive"
+            },
+            {
+              "time": "04:44",
               "key": "DIA",
               "label": "Desarme, interceptacao e antecipacao",
               "type": "positive"
             },
             {
-              "time": "05:35",
+              "time": "05:07",
+              "key": "CC",
+              "label": "Chance criada",
+              "type": "positive"
+            },
+            {
+              "time": "05:36",
+              "key": "GP",
+              "label": "Gol pago",
+              "type": "negative"
+            },
+            {
+              "time": "06:01",
               "key": "GM",
               "label": "Gol marcado",
               "type": "positive"
+            },
+            {
+              "time": "06:28",
+              "key": "PP",
+              "label": "Perda de posse",
+              "type": "negative"
+            },
+            {
+              "time": "06:57",
+              "key": "FD",
+              "label": "Falha defensiva",
+              "type": "negative"
             }
           ]
         },
         {
           "playerId": 4,
-          "offensive": 6,
-          "defensive": 2,
-          "positive": 6,
-          "negative": 2,
+          "offensive": 7,
+          "defensive": 5,
+          "positive": 7,
+          "negative": 5,
           "actions": [
             {
               "time": "00:22",
@@ -1869,31 +2022,55 @@
               "type": "positive"
             },
             {
-              "time": "01:58",
+              "time": "01:43",
               "key": "PP",
               "label": "Perda de posse",
               "type": "negative"
             },
             {
-              "time": "02:29",
+              "time": "02:09",
               "key": "AD",
               "label": "Acao decisiva",
               "type": "positive"
             },
             {
-              "time": "03:03",
+              "time": "02:37",
               "key": "FD",
               "label": "Falha defensiva",
               "type": "negative"
             },
             {
-              "time": "03:36",
+              "time": "03:04",
               "key": "RB",
               "label": "Roubada de bola",
               "type": "positive"
             },
             {
-              "time": "04:10",
+              "time": "03:32",
+              "key": "DIA",
+              "label": "Desarme, interceptacao e antecipacao",
+              "type": "positive"
+            },
+            {
+              "time": "03:58",
+              "key": "GS OO",
+              "label": "Gol sofrido organizacao defensiva",
+              "type": "negative"
+            },
+            {
+              "time": "04:21",
+              "key": "CC",
+              "label": "Chance criada",
+              "type": "positive"
+            },
+            {
+              "time": "04:47",
+              "key": "GP",
+              "label": "Gol pago",
+              "type": "negative"
+            },
+            {
+              "time": "05:11",
               "key": "GM",
               "label": "Gol marcado",
               "type": "positive"
@@ -1902,10 +2079,10 @@
         },
         {
           "playerId": 5,
-          "offensive": 7,
-          "defensive": 5,
-          "positive": 8,
-          "negative": 4,
+          "offensive": 9,
+          "defensive": 7,
+          "positive": 10,
+          "negative": 6,
           "actions": [
             {
               "time": "00:25",
@@ -1920,154 +2097,218 @@
               "type": "positive"
             },
             {
-              "time": "01:24",
-              "key": "PP",
-              "label": "Perda de posse",
-              "type": "negative"
-            },
-            {
-              "time": "01:53",
-              "key": "GP",
-              "label": "Gol pago",
-              "type": "negative"
-            },
-            {
-              "time": "02:20",
-              "key": "DIA",
-              "label": "Desarme, interceptacao e antecipacao",
-              "type": "positive"
-            },
-            {
-              "time": "02:49",
-              "key": "RB",
-              "label": "Roubada de bola",
-              "type": "positive"
-            },
-            {
-              "time": "03:18",
-              "key": "FD",
-              "label": "Falha defensiva",
-              "type": "negative"
-            },
-            {
-              "time": "03:47",
-              "key": "ASS",
-              "label": "Assistencia",
-              "type": "positive"
-            },
-            {
-              "time": "04:15",
+              "time": "01:21",
               "key": "CC",
               "label": "Chance criada",
               "type": "positive"
             },
             {
-              "time": "04:46",
-              "key": "GM",
-              "label": "Gol marcado",
+              "time": "01:46",
+              "key": "ASS",
+              "label": "Assistencia",
               "type": "positive"
             },
             {
-              "time": "05:12",
+              "time": "02:08",
               "key": "PP",
               "label": "Perda de posse",
               "type": "negative"
             },
             {
-              "time": "05:44",
+              "time": "02:33",
+              "key": "GP",
+              "label": "Gol pago",
+              "type": "negative"
+            },
+            {
+              "time": "02:59",
               "key": "DIA",
               "label": "Desarme, interceptacao e antecipacao",
               "type": "positive"
+            },
+            {
+              "time": "03:24",
+              "key": "RB",
+              "label": "Roubada de bola",
+              "type": "positive"
+            },
+            {
+              "time": "03:48",
+              "key": "FD",
+              "label": "Falha defensiva",
+              "type": "negative"
+            },
+            {
+              "time": "04:14",
+              "key": "GS OO",
+              "label": "Gol sofrido organizacao defensiva",
+              "type": "negative"
+            },
+            {
+              "time": "04:39",
+              "key": "GM",
+              "label": "Gol marcado",
+              "type": "positive"
+            },
+            {
+              "time": "05:03",
+              "key": "CC",
+              "label": "Chance criada",
+              "type": "positive"
+            },
+            {
+              "time": "05:27",
+              "key": "PP",
+              "label": "Perda de posse",
+              "type": "negative"
+            },
+            {
+              "time": "05:51",
+              "key": "DIA",
+              "label": "Desarme, interceptacao e antecipacao",
+              "type": "positive"
+            },
+            {
+              "time": "06:17",
+              "key": "AD",
+              "label": "Acao decisiva",
+              "type": "positive"
+            },
+            {
+              "time": "06:44",
+              "key": "FD",
+              "label": "Falha defensiva",
+              "type": "negative"
             }
           ]
         }
       ],
       "teamActions": [
         {
-          "type": "Transicao ofensiva rapida",
+          "type": "Transicao ofensiva bem sucedida",
           "goodAction": true
         },
         {
-          "type": "Erro de marcacao coletiva",
+          "type": "Erro de posicionamento defensivo",
           "goodAction": false
         },
         {
-          "type": "Pressao defensiva bem sucedida",
+          "type": "Pressao defensiva alta",
           "goodAction": true
         },
         {
-          "type": "Perda de organizacao defensiva",
+          "type": "Saida de bola errada",
           "goodAction": false
         },
         {
-          "type": "Rotacao sem posse eficiente",
+          "type": "Bola parada ofensiva bem executada",
           "goodAction": true
         },
         {
-          "type": "Falha de cobertura no segundo pau",
+          "type": "Cobertura defensiva atrasada",
           "goodAction": false
         },
         {
-          "type": "Bola parada trabalhada",
+          "type": "Recuperacao alta de posse",
           "goodAction": true
         },
         {
-          "type": "Retorno defensivo rapido",
+          "type": "Finalizacao precipitada",
+          "goodAction": false
+        },
+        {
+          "type": "Construcao ofensiva paciente",
+          "goodAction": true
+        },
+        {
+          "type": "Erro de passe na primeira fase",
+          "goodAction": false
+        },
+        {
+          "type": "Transicao defensiva eficiente",
+          "goodAction": true
+        },
+        {
+          "type": "Pressao coordenada no meio bloco",
           "goodAction": true
         }
       ],
       "team": {
-        "offensive": 4,
-        "defensive": 4,
-        "positive": 5,
-        "negative": 3,
+        "offensive": 6,
+        "defensive": 6,
+        "positive": 7,
+        "negative": 5,
         "actions": [
           {
             "time": "00:30",
-            "key": "TO RAP",
-            "label": "Transicao ofensiva rapida",
+            "key": "TOBS",
+            "label": "Transicao ofensiva bem sucedida",
             "type": "positive"
           },
           {
             "time": "01:05",
-            "key": "EMC",
-            "label": "Erro de marcacao coletiva",
+            "key": "EPD",
+            "label": "Erro de posicionamento defensivo",
             "type": "negative"
           },
           {
             "time": "01:42",
-            "key": "PDBS",
-            "label": "Pressao defensiva bem sucedida",
+            "key": "PDA",
+            "label": "Pressao defensiva alta",
             "type": "positive"
           },
           {
             "time": "02:18",
-            "key": "POD",
-            "label": "Perda de organizacao defensiva",
+            "key": "SBE",
+            "label": "Saida de bola errada",
             "type": "negative"
           },
           {
             "time": "02:54",
-            "key": "RSPE",
-            "label": "Rotacao sem posse eficiente",
+            "key": "BPO",
+            "label": "Bola parada ofensiva bem executada",
             "type": "positive"
           },
           {
             "time": "03:31",
-            "key": "FCSP",
-            "label": "Falha de cobertura no segundo pau",
+            "key": "CDA",
+            "label": "Cobertura defensiva atrasada",
             "type": "negative"
           },
           {
             "time": "04:07",
-            "key": "BPT",
-            "label": "Bola parada trabalhada",
+            "key": "RAP",
+            "label": "Recuperacao alta de posse",
             "type": "positive"
           },
           {
-            "time": "04:45",
-            "key": "RDR",
-            "label": "Retorno defensivo rapido",
+            "time": "04:39",
+            "key": "FPR",
+            "label": "Finalizacao precipitada",
+            "type": "negative"
+          },
+          {
+            "time": "05:11",
+            "key": "COP",
+            "label": "Construcao ofensiva paciente",
+            "type": "positive"
+          },
+          {
+            "time": "05:45",
+            "key": "EPP",
+            "label": "Erro de passe na primeira fase",
+            "type": "negative"
+          },
+          {
+            "time": "06:16",
+            "key": "TDE",
+            "label": "Transicao defensiva eficiente",
+            "type": "positive"
+          },
+          {
+            "time": "06:49",
+            "key": "PCM",
+            "label": "Pressao coordenada no meio bloco",
             "type": "positive"
           }
         ]

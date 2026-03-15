@@ -64,7 +64,7 @@ const SessionAnalysis = () => {
 
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader active="team" sessionId={session.id} />
+      <SessionAnalysisHeader sessionId={session.id} />
       <SessionAnalysisDetails session={session} />
 
       {analysisById ? (
