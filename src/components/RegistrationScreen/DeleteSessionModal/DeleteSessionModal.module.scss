@@ -1,6 +1,12 @@
 .overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0 !important;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -104,14 +110,14 @@
 }
 
 .confirm {
-  border: 1px solid rgba(220, 38, 38, 0.34);
+  border: 1px solid color-mix(in srgb, var(--action-red) 34%, transparent);
   background: var(--action-red);
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 12px 24px rgba(127, 29, 29, 0.22);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--action-red) 22%, transparent);
 }
 
 @media (max-width: 640px) {

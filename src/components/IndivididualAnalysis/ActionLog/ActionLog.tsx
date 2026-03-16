@@ -62,12 +62,12 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
-    info("Ação removida");
+    info("AÃ§Ã£o removida");
   };
 
   const handleSubmitSession = async () => {
     if (actions.length === 0) {
-      info("Adicione ao menos uma ação antes de salvar");
+      info("Adicione ao menos uma aÃ§Ã£o antes de salvar");
       return;
     }
 
@@ -84,7 +84,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
       console.table(actions);
 
       setActions([]);
-      success(`Análise salva para ${session.type.toLowerCase()} ${session.date}`);
+      success(`AnÃ¡lise salva para ${session.type.toLowerCase()} ${session.date}`);
     } catch {
       error("Falha ao salvar no banco");
     }
@@ -94,7 +94,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <span>Linha do tempo de ações</span>
+          <span>Linha do tempo de aÃ§Ãµes</span>
           <span className={styles.badge}>{actions.length}</span>
         </div>
 
@@ -110,7 +110,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
       {actions.length === 0 ? (
         <div className={styles.emptyState}>
-          <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerão aqui.</span>
+          <span>Sem aÃ§Ãµes taggeadas. Comece a taggear aÃ§Ãµes e elas aparecerÃ£o aqui.</span>
         </div>
       ) : (
         <div className={styles.list}>
@@ -138,7 +138,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
                 <button
                   className={styles.removeBtn}
                   onClick={() => handleRemoveAction(action.id)}
-                  aria-label="Remover ação"
+                  aria-label="Remover aÃ§Ã£o"
                   title="Remover"
                 >
                   <FontAwesomeIcon icon={faXmark} />

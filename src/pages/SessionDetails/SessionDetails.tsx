@@ -209,50 +209,43 @@ const SessionDetails = () => {
           </button>
 
           <div className={styles.headerContent}>
-            <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
-            <h1 className={styles.title}>Detalhes da sessão</h1>
-            <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
+            <div className={styles.headerText}>
+              <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
+              <h1 className={styles.title}>Detalhes da sessão</h1>
+              <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
+            </div>
+
+            <div className={styles.headerActions}>
+              <button
+                className={`${styles.actionButton} ${styles.individualButton}`}
+                onClick={() => navigate(`/sessions/${session.id}/analysis/individual`)}
+              >
+                <div className={styles.actionIconWrap}>
+                  <FontAwesomeIcon icon={faUser} />
+                </div>
+
+                <div className={styles.actionText}>
+                  <strong>Fazer análise individual</strong>
+                </div>
+              </button>
+
+              <button
+                className={`${styles.actionButton} ${styles.teamButton}`}
+                onClick={() => navigate(`/sessions/${session.id}/analysis/team`)}
+              >
+                <div className={styles.actionIconWrap}>
+                  <FontAwesomeIcon icon={faPeopleGroup} />
+                </div>
+
+                <div className={styles.actionText}>
+                  <strong>Fazer análise de equipe</strong>
+                </div>
+              </button>
+            </div>
           </div>
         </header>
 
         <SessionAnalysisDetails session={session} />
-
-        <section className={styles.topActionsCard}>
-          <div className={styles.actionsHeader}>
-            <h2 className={styles.actionsTitle}>Ações principais</h2>
-            <span className={styles.actionsSubtitle}>Use os botões abaixo para iniciar uma análise.</span>
-          </div>
-
-          <div className={styles.actionsGrid}>
-            <button
-              className={`${styles.actionButton} ${styles.individualButton}`}
-              onClick={() => navigate(`/sessions/${session.id}/analysis/individual`)}
-            >
-              <div className={styles.actionIconWrap}>
-                <FontAwesomeIcon icon={faUser} />
-              </div>
-
-              <div className={styles.actionText}>
-                <strong>Fazer análise individual</strong>
-                <span>Registrar acoes por atleta neste treino/jogo.</span>
-              </div>
-            </button>
-
-            <button
-              className={`${styles.actionButton} ${styles.teamButton}`}
-              onClick={() => navigate(`/sessions/${session.id}/analysis/team`)}
-            >
-              <div className={styles.actionIconWrap}>
-                <FontAwesomeIcon icon={faPeopleGroup} />
-              </div>
-
-              <div className={styles.actionText}>
-                <strong>Fazer análise de equipe</strong>
-                <span>Ir para a tela dedicada de análise de equipe.</span>
-              </div>
-            </button>
-          </div>
-        </section>
 
         <section className={styles.viewerCard}>
           <div className={styles.viewerSwitch}>

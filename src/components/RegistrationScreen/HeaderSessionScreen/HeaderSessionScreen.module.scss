@@ -22,7 +22,7 @@
 }
 
 .addButton {
-  background: var(--selected-blue);
+  background: var(--green);
   color: var(--text-primary);
   border: none;
   border-radius: 8px;
@@ -33,6 +33,6 @@
   transition: background 0.2s ease-in-out;
 
   &:hover {
-    background: color-mix(in srgb, var(--selected-blue) 80%, white);
+    background: color-mix(in srgb, var(--green) 80%, white);
   }
 }

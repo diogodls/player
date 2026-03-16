@@ -1,5 +1,5 @@
-import styles from "./SessionAnalysis.module.scss";
-import {Navigate, useParams} from "react-router";
+﻿import styles from "./SessionAnalysis.module.scss";
+import { Navigate, useParams } from "react-router";
 import { useApi } from "../../hooks/useApi";
 import type {
   SessionAnalysisAthlete,
@@ -25,13 +25,14 @@ const SessionAnalysis = () => {
   const analysisById: SessionAnalysisByIdData | undefined = id ? analysisData?.[id] : undefined;
   const session = sessions.find((item) => item.id === id);
 
-  const summary: SessionAnalysisSummaryData = analysisById?.players.reduce(
-    (acc, athlete) => ({
-      positives: acc.positives + athlete.positive,
-      negatives: acc.negatives + athlete.negative,
-    }),
-    { positives: 0, negatives: 0 }
-  ) ?? { positives: 0, negatives: 0 };
+  const summary: SessionAnalysisSummaryData =
+    analysisById?.players.reduce(
+      (acc, athlete) => ({
+        positives: acc.positives + athlete.positive,
+        negatives: acc.negatives + athlete.negative,
+      }),
+      { positives: 0, negatives: 0 }
+    ) ?? { positives: 0, negatives: 0 };
 
   const teamTotalActions = analysisById?.team?.actions.length ?? 0;
   const teamCard: SessionAnalysisAthlete | null = analysisById?.team
@@ -64,24 +65,24 @@ const SessionAnalysis = () => {
 
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader sessionId={session.id} />
-      <SessionAnalysisDetails session={session} />
+      <div className={styles.contentWrap}>
+        <SessionAnalysisHeader sessionId={session.id} />
+        <SessionAnalysisDetails session={session} />
 
-      {analysisById ? (
-        <>
-          <SessionAnalysisSummary summary={summary} />
+        {analysisById ? (
+          <>
+            <SessionAnalysisSummary summary={summary} />
 
-          <h3 className={styles.sectionTitle}>Ações da Equipe</h3>
-          <div className={styles.cardsList}>
-            {teamCard && <SessionAnalysisActionCard {...teamCard} />}
-          </div>
-        </>
-      ) : (
-        <section className={styles.emptyState}>
-          <h3>Nenhuma análise de equipe encontrada</h3>
-          <p>Esta sessão ainda não possui dados consolidados para exibição.</p>
-        </section>
-      )}
+            <h3 className={styles.sectionTitle}>Ações da Equipe</h3>
+            <div className={styles.cardsList}>{teamCard && <SessionAnalysisActionCard {...teamCard} />}</div>
+          </>
+        ) : (
+          <section className={styles.emptyState}>
+            <h3>Nenhuma análise de equipe encontrada</h3>
+            <p>Esta sessão ainda não possui dados consolidados para exibição.</p>
+          </section>
+        )}
+      </div>
     </div>
   );
 };
