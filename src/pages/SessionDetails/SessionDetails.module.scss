@@ -45,7 +45,6 @@
 
 .headerContent {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -68,7 +67,6 @@
 .title {
   margin: 0;
   font-size: clamp(26px, 3.3vw, 36px);
-  line-height: 1.1;
 }
 
 .subtitle {
@@ -163,6 +161,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   width: min(540px, 100%);
+  margin: 0 auto;
 }
 
 .switchButton {
