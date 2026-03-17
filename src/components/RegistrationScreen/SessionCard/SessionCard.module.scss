@@ -74,6 +74,7 @@
 
       .text {
         font-weight: 500;
+        word-break: break-word;
       }
     }
   }
@@ -105,6 +106,36 @@
     .deleteBtn {
       background: color-mix(in srgb, var(--deep-orange) 20%, transparent);
       color: #fca5a5;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .openArea {
+      padding: 12px 12px 10px;
+    }
+
+    .info {
+      .row {
+        align-items: flex-start;
+      }
+    }
+
+    .cardActions {
+      justify-content: stretch;
+      gap: 8px;
+      padding: 10px 12px 12px;
+
+      button {
+        flex: 1;
+        justify-content: center;
+        min-height: 36px;
+      }
+    }
+  }
+
+  @media (max-width: 420px) {
+    .cardActions {
+      flex-direction: column;
     }
   }
 }

@@ -256,4 +256,21 @@
       grid-template-columns: 1fr;
     }
   }
+
+  @media (max-width: 420px) {
+    .right {
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-start;
+    }
+
+    .counts {
+      width: 100%;
+    }
+
+    .count {
+      flex: 1;
+      justify-content: center;
+    }
+  }
 }

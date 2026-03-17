@@ -1,5 +1,6 @@
 .wrapper {
   width: 100%;
+  max-width: 100%;
   padding: 14px 16px;
   border-radius: 14px;
   background: var(--surface);
@@ -15,6 +16,7 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 12px;
+    flex-wrap: wrap;
   }
 
   .badge {
@@ -42,6 +44,8 @@
     color: var(--text-light);
     font-weight: 800;
     font-size: 16px;
+    min-width: 0;
+    word-break: break-word;
   }
 
   .grid {
@@ -91,6 +95,25 @@
   @media (max-width: 900px) {
     .grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 420px) {
+    padding: 12px 10px;
+
+    .opponent {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .infoCard {
+      padding: 12px 10px;
+    }
+
+    .value,
+    .valueMuted {
+      font-size: 13px;
+      line-height: 1.25;
     }
   }
 }

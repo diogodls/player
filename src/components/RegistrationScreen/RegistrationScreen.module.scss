@@ -187,3 +187,23 @@
     }
   }
 }
+
+@media (max-width: 420px) {
+  .card {
+    .pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .paginationButton {
+      flex: 1 1 calc(50% - 4px);
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .pageIndicator {
+      order: -1;
+      flex: 0 0 100%;
+    }
+  }
+}

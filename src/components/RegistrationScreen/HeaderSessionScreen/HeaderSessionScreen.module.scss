@@ -14,10 +14,12 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 
   .title {
     font-weight: bold;
     font-size: 25px;
+    line-height: 1.12;
   }
 }
 
@@ -34,5 +36,32 @@
 
   &:hover {
     background: color-mix(in srgb, var(--green) 80%, white);
+  }
+}
+
+@media (max-width: 768px) {
+  .headerText {
+    .title {
+      font-size: 22px;
+    }
+  }
+
+  .addButton {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .headerText {
+    .title {
+      font-size: 20px;
+    }
+  }
+
+  .addButton {
+    padding: 10px 12px;
+    font-size: 13px;
   }
 }
