@@ -1,9 +1,13 @@
 import styles from "./Navbar.module.scss";
 import reactLogo from "../../../assets/logoo.png";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCalendar, faChartColumn, faHouse} from "@fortawesome/free-solid-svg-icons";
-import {classNames} from "../../../utils/classNames.ts";
-import {useLocation, useNavigate} from "react-router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCalendar,
+  faChartColumn,
+  faHouse,
+} from "@fortawesome/free-solid-svg-icons";
+import { classNames } from "../../../utils/classNames.ts";
+import { useLocation, useNavigate } from "react-router";
 
 const buttons = [
   {
@@ -26,32 +30,36 @@ const buttons = [
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const isSessionsRoute = location.pathname === "/session-screen" || location.pathname.startsWith("/sessions/");
+
+  const isSessionsRoute =
+    location.pathname === "/session-screen" ||
+    location.pathname.startsWith("/sessions/");
 
   return (
     <nav className={styles.navbar}>
       <img className={styles.img} src={reactLogo} alt="" />
 
       <div className={styles.buttons}>
-        {buttons.map((btn) => (
-          <button
-            key={btn.label}
-            className={classNames([
-              styles.button,
-              btn.link === "/session-screen"
-                ? isSessionsRoute
-                  ? styles.active
-                  : ""
-                : location.pathname === btn.link
-                  ? styles.active
-                  : "",
-            ])}
-            onClick={() => navigate(btn.link)}
-          >
-            <FontAwesomeIcon icon={btn.icon} />
-            <span>{btn.label}</span>
-          </button>
-        ))}
+        {buttons.map((btn) => {
+          const isActive =
+            btn.link === "/session-screen"
+              ? isSessionsRoute
+              : location.pathname === btn.link;
+
+          return (
+            <button
+              key={btn.label}
+              className={classNames([
+                styles.button,
+                isActive ? styles.active : "",
+              ])}
+              onClick={() => navigate(btn.link)}
+            >
+              <FontAwesomeIcon icon={btn.icon} />
+              <span>{btn.label}</span>
+            </button>
+          );
+        })}
       </div>
     </nav>
   );
