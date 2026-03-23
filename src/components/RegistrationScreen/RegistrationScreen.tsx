@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./RegistrationScreen.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
-import { faCalendar, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import SessionCard from "./SessionCard/SessionCard.tsx";
 import type { Session } from "../../pages/SessionView";
+import Pagination from "../elements/Pagination/Pagination.tsx";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -29,16 +30,6 @@ const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession }: Regist
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);
-
-  const handleGoToPreviousPage = () => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  };
-
-  const handleGoToNextPage = () => {
-    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-  };
-
-  const hasMultiplePages = totalPages > 1;
 
   return (
     <div className={styles.wrapper}>
@@ -72,33 +63,12 @@ const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession }: Regist
               ))}
             </div>
 
-            {hasMultiplePages && (
-              <div className={styles.pagination}>
-                <button
-                  type="button"
-                  className={styles.paginationButton}
-                  onClick={handleGoToPreviousPage}
-                  disabled={currentPage === 1}
-                >
-                  <FontAwesomeIcon icon={faChevronLeft} />
-                  Anterior
-                </button>
-
-                <span className={styles.pageIndicator}>
-                  Pagina {currentPage} de {totalPages}
-                </span>
-
-                <button
-                  type="button"
-                  className={styles.paginationButton}
-                  onClick={handleGoToNextPage}
-                  disabled={currentPage === totalPages}
-                >
-                  Proxima
-                  <FontAwesomeIcon icon={faChevronRight} />
-                </button>
-              </div>
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              className={styles.pagination}
+            />
           </>
         )}
       </div>

@@ -74,42 +74,6 @@
 
   .pagination {
     margin-top: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .paginationButton {
-    border: 1px solid var(--border-20);
-    background: color-mix(in srgb, var(--surface) 80%, transparent);
-    color: var(--text-light);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: background 0.2s ease-in-out, opacity 0.2s ease-in-out;
-
-    &:hover:enabled {
-      background: color-mix(in srgb, var(--light-blue) 15%, var(--surface));
-    }
-
-    &:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-  }
-
-  .pageIndicator {
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    flex: 1;
   }
 
   .emptySub {
@@ -156,16 +120,6 @@
 
     .pagination {
       margin-top: 12px;
-      gap: 8px;
-    }
-
-    .paginationButton {
-      padding: 6px 8px;
-      font-size: 11px;
-    }
-
-    .pageIndicator {
-      font-size: 11px;
     }
 
     .emptyState {
@@ -191,19 +145,7 @@
 @media (max-width: 420px) {
   .card {
     .pagination {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .paginationButton {
-      flex: 1 1 calc(50% - 4px);
-      justify-content: center;
-      min-width: 0;
-    }
-
-    .pageIndicator {
-      order: -1;
-      flex: 0 0 100%;
+      margin-top: 12px;
     }
   }
 }

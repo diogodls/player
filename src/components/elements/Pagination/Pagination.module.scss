@@ -1,0 +1,130 @@
+.pagination {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.paginationButton,
+.pageNumber {
+  border: 1px solid var(--border-20);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--text-light);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s ease-in-out, opacity 0.2s ease-in-out, color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
+
+  &:hover:enabled {
+    background: color-mix(in srgb, var(--light-blue) 15%, var(--surface));
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.paginationButton {
+  padding: 6px 10px;
+}
+
+.pageNumbers {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pageNumber {
+  min-width: 34px;
+  padding: 6px 8px;
+}
+
+.pageNumberActive {
+  background: color-mix(in srgb, var(--light-blue) 22%, var(--surface));
+  border-color: color-mix(in srgb, var(--light-blue) 45%, var(--border-20));
+  color: var(--text-light);
+}
+
+.ellipsis {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+}
+
+.disabled {
+  pointer-events: none;
+}
+
+.sizeSM {
+  margin-top: 12px;
+
+  .paginationButton,
+  .pageNumber {
+    font-size: 11px;
+  }
+
+  .paginationButton {
+    padding: 6px 8px;
+  }
+
+  .pageNumber {
+    min-width: 30px;
+    padding: 5px 7px;
+  }
+}
+
+.sizeMD {
+  margin-top: 14px;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .paginationButton,
+  .pageNumber,
+  .ellipsis {
+    font-size: 11px;
+  }
+
+  .paginationButton {
+    padding: 6px 8px;
+  }
+
+  .pageNumber {
+    min-width: 30px;
+    padding: 5px 7px;
+  }
+}
+
+@media (max-width: 420px) {
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .paginationButton {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .pageNumbers {
+    order: -1;
+    flex: 0 0 100%;
+  }
+}
