@@ -15,7 +15,6 @@ import type {
   SessionAnalysisSummary as SessionAnalysisSummaryData,
 } from "../SessionAnalysis";
 import type { IndividualAnalysisData } from "../IndividualAnalysis";
-import { mergeSessionAnalysisData } from "../../utils/sessionAnalysisStore.ts";
 
 type ViewMode = "individual" | "team";
 type ActionTypeFilter = "all" | "good" | "bad";
@@ -36,9 +35,8 @@ const SessionDetails = () => {
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const mergedAnalysisData = useMemo(() => mergeSessionAnalysisData(analysisData), [analysisData]);
   const session = sessions.find((item) => item.id === id);
-  const analysisById: SessionAnalysisByIdData | undefined = id ? mergedAnalysisData[id] : undefined;
+  const analysisById: SessionAnalysisByIdData | undefined = id ? analysisData?.[id] : undefined;
 
   const playersById = useMemo(() => {
     const entries = (individualAnalysisData?.players ?? []).map((player) => [

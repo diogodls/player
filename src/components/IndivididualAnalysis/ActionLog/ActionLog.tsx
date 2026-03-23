@@ -16,10 +16,6 @@ import type {
 } from "../../../pages/SessionAnalysis";
 import { useNavigate } from "react-router";
 import { useSWRConfig } from "swr";
-import {
-  readSessionAnalysisOverrides,
-  saveSessionAnalysisOverride,
-} from "../../../utils/sessionAnalysisStore.ts";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
@@ -115,6 +111,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
   const [cookies, setCookie, removeCookie] = useCookies([cookieKey]);
   const hasLoadedCookie = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -167,27 +164,24 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
-    info("Ação removida");
+    info("Acao removida");
   };
-
-  const confirmSaveActions = () => window.confirm("Tem certeza que quer salvar?");
 
   const persistSessionAnalysis = async (sessionId: string, currentActions: ActionTagged[]) => {
     const sessionAnalysisById = buildSessionAnalysisById(currentActions);
-    saveSessionAnalysisOverride(sessionId, sessionAnalysisById);
 
     await mutate<SessionAnalysisData>(
       "session-analysis",
       (currentData) => ({
         ...(currentData ?? {}),
-        ...readSessionAnalysisOverrides(),
+        [sessionId]: sessionAnalysisById,
       }),
       false
     );
   };
 
   const showSuccessAndRedirect = (sessionId: string) => {
-    success("Ações salvas com sucesso!");
+    success("Acoes salvas com sucesso!");
     setActions([]);
     removeCookie(cookieKey, { path: "/" });
 
@@ -196,21 +190,30 @@ const ActionLog = ({ session }: ActionLogProps) => {
     }, REDIRECT_DELAY_MS);
   };
 
-  const handleSaveActions = async () => {
+  const handleSaveActions = () => {
     if (actions.length === 0) {
-      info("Adicione ao menos uma ação antes de salvar");
+      info("Adicione ao menos uma acao antes de salvar");
       return;
     }
 
-    if (!confirmSaveActions()) return;
+    setIsConfirmModalOpen(true);
+  };
 
+  const handleCancelConfirmation = () => {
+    if (isSaving) return;
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleConfirmSaveActions = async () => {
+    setIsConfirmModalOpen(false);
     setIsSaving(true);
+
     try {
       await persistSessionAnalysis(session.id, actions);
       showSuccessAndRedirect(session.id);
     } catch {
       setIsSaving(false);
-      error("Falha ao salvar ações");
+      error("Falha ao salvar acoes");
     }
   };
 
@@ -218,7 +221,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <span>Linha do tempo de ações</span>
+          <span>Linha do tempo de acoes</span>
           <span className={styles.badge}>{actions.length}</span>
         </div>
 
@@ -234,7 +237,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
       {actions.length === 0 ? (
         <div className={styles.emptyState}>
-          <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerão aqui.</span>
+          <span>Sem acoes taggeadas. Comece a taggear acoes e elas aparecerao aqui.</span>
         </div>
       ) : (
         <div className={styles.list}>
@@ -262,7 +265,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
                 <button
                   className={styles.removeBtn}
                   onClick={() => handleRemoveAction(action.id)}
-                  aria-label="Remover ação"
+                  aria-label="Remover acao"
                   title="Remover"
                   disabled={isSaving}
                 >
@@ -271,6 +274,34 @@ const ActionLog = ({ session }: ActionLogProps) => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {isConfirmModalOpen && (
+        <div className={styles.confirmOverlay} onMouseDown={handleCancelConfirmation}>
+          <div className={styles.confirmModal} onMouseDown={(event) => event.stopPropagation()}>
+            <h3>Deseja confirmar envio?</h3>
+            <p>As acoes desta sessao serao salvas para a visualizacao de analise.</p>
+
+            <div className={styles.confirmActions}>
+              <button
+                type="button"
+                className={styles.confirmCancel}
+                onClick={handleCancelConfirmation}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className={styles.confirmSubmit}
+                onClick={handleConfirmSaveActions}
+                disabled={isSaving}
+              >
+                Confirmar envio
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
