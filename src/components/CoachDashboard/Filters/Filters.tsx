@@ -1,45 +1,18 @@
-import type {IconDefinition} from "@fortawesome/fontawesome-svg-core";
-import {faBullseye, faPeopleGroup, faShield, faFilter} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import styles from "./Filters.module.scss"
-import {classNames} from "../../../utils/classNames.ts";
-import Select, { Option } from 'rc-select';
-import 'rc-select/assets/index.css';
-import { useState } from "react";
-import {PLAYERS_POSITIONS} from "../../../constants/players.ts";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Select, { Option } from "rc-select";
+import "rc-select/assets/index.css";
+import styles from "./Filters.module.scss";
+import { PLAYERS_POSITIONS } from "../../../constants/players.ts";
 
-type ButtonsType = {
-  label : string,
-  icon :  IconDefinition,
-  mode : 'all phases' | 'offensive' | 'defensive'
-};
-
-const buttons: ButtonsType[] = [
-  {
-    label: "Todas as fases",
-    icon: faPeopleGroup,
-    mode:'all phases'
-  },
-  {
-    label: "Ofensiva",
-    icon: faBullseye,
-    mode:'offensive'
-  },
-  {
-    label: "Defensiva",
-    icon: faShield,
-    mode:'defensive'
-  }
-];
+type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 type Props = {
-  viewMode: 'all phases' | 'offensive' | 'defensive';
-  onChangeView: (mode: Props['viewMode']) => void;
+  position: PositionFilter;
+  onChangePosition: (position: PositionFilter) => void;
 };
 
-const Filters = ({ viewMode, onChangeView }: Props) => {
-  const [position, setPosition] = useState('all');
-
+const Filters = ({ position, onChangePosition }: Props) => {
   return (
     <div className={styles.filter}>
       <div className={styles.header}>
@@ -52,39 +25,22 @@ const Filters = ({ viewMode, onChangeView }: Props) => {
           <span className={styles.groupLabel}>Filtrar por posição</span>
           <Select
             value={position}
-            onChange={(value) => setPosition(value as string)}
+            onChange={(value) => onChangePosition(value as PositionFilter)}
             className={styles.select}
             dropdownMatchSelectWidth
           >
             <Option value="all">Todas as posições</Option>
-            {PLAYERS_POSITIONS.map((position) => (
-              <Option value={position}>{position}</Option>
+            {PLAYERS_POSITIONS.map((playerPosition) => (
+              <Option key={playerPosition} value={playerPosition}>
+                {playerPosition}
+              </Option>
             ))}
           </Select>
-        </div>
-
-        <div className={styles.group}>
-          <span className={styles.groupLabel}>Filtrar por fase</span>
-
-          <div className={styles.button}>
-            {buttons.map((button) => (
-              <button
-                key={button.mode}
-                className={classNames([
-                  styles.buttons,
-                  viewMode === button.mode ? styles.active : ""
-                ])}
-                onClick={() => onChangeView(button.mode)}
-              >
-                <FontAwesomeIcon icon={button.icon} />
-                <span>{button.label}</span>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Filters;
+

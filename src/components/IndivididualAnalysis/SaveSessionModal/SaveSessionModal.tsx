@@ -114,20 +114,20 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "creat
 
           {type === "Treino" ? (
             <div className={styles.field}>
-              <label className={styles.label}>DescriÁ„o do Treino *</label>
+              <label className={styles.label}>Descri√ß√£o do Treino *</label>
               <input
                 className={styles.input}
-                placeholder="Ex: saÌda de press„o, bolas paradas..."
+                placeholder="Ex: sa√≠da de press√£o, bolas paradas..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
           ) : (
             <div className={styles.field}>
-              <label className={styles.label}>Advers·rio *</label>
+              <label className={styles.label}>Advers√°rio *</label>
               <input
                 className={styles.input}
-                placeholder="Ex: Atl‚ntico, ACBF..."
+                placeholder="Ex: Atlantico, ACBF..."
                 value={opponent}
                 onChange={(e) => setOpponent(e.target.value)}
               />

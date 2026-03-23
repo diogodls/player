@@ -7,14 +7,20 @@ import {useState} from "react";
 import PlayerComparison from "../../components/CoachDashboard/PlayerComparison/PlayerComparison.tsx";
 import PlayersSection from "../../components/CoachDashboard/PlayersSection/PlayersSection.tsx";
 import Filters from "../../components/CoachDashboard/Filters/Filters.tsx";
+import {PLAYERS_POSITIONS} from "../../constants/players.ts";
 
 type ViewMode = 'team' | 'individual' | 'compare';
-type FilterMode = 'all phases' | 'offensive' | 'defensive';
+type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 const CoachDashboard = () => {
   const { data } = useApi<CoachDashboardData>("coach-dashboard");
   const [viewMode, setViewMode] = useState<ViewMode>('team');
-  const [filterMode, setFilterMode] = useState<FilterMode>('all phases');
+  const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
+
+  const filteredPlayers = (data?.players ?? []).filter((player) => {
+    if (positionFilter === "all") return true;
+    return player.position === positionFilter;
+  });
 
   return (
     <div className={styles.container}>
@@ -27,17 +33,13 @@ const CoachDashboard = () => {
         {viewMode === 'individual' &&
           <>
               <Filters
-                viewMode={filterMode}
-                onChangeView={setFilterMode}
+                position={positionFilter}
+                onChangePosition={setPositionFilter}
               />
-              <PlayersSection players={data?.players ?? []} />
+              <PlayersSection players={filteredPlayers} />
           </>
         }
       {viewMode === 'compare' && <PlayerComparison players={data?.players} metrics={data?.metrics} />}
-
-      {/*{filterMode === 'all phases' && <All Phases />}*/}
-      {/*{filterMode === 'offensive' && <offensive />}*/}
-      {/*{filterMode === 'defensive' && <defensive />}*/}
     </div>
   );
 };
