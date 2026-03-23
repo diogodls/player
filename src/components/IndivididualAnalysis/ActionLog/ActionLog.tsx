@@ -1,24 +1,121 @@
 import styles from "./ActionLog.module.scss";
-import {useContext, useEffect, useRef} from "react";
-import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
+import { useContext, useEffect, useRef, useState } from "react";
+import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
 import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
-import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
+import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import type { Session } from "../../../pages/SessionView";
+import type { ActionTagged } from "../../../pages/IndividualAnalysis";
+import type {
+  SessionAnalysisByIdData,
+  SessionAnalysisData,
+  SessionAnalysisRawAction,
+  SessionAnalysisRawPlayer,
+  SessionAnalysisRawTeam,
+} from "../../../pages/SessionAnalysis";
+import { useNavigate } from "react-router";
+import { useSWRConfig } from "swr";
+import {
+  readSessionAnalysisOverrides,
+  saveSessionAnalysisOverride,
+} from "../../../utils/sessionAnalysisStore.ts";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
+const REDIRECT_DELAY_MS = 1000;
 
 type ActionLogProps = {
   session: Session;
 };
 
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function classifyMetricBucket(action: ActionTagged): "offensive" | "defensive" {
+  const normalizedCategory = normalizeText(action.category ?? "");
+  const hasDefensiveHint =
+    normalizedCategory.includes("defens") || normalizedCategory.includes("gols tomados");
+
+  return hasDefensiveHint ? "defensive" : "offensive";
+}
+
+function toRawAction(action: ActionTagged): SessionAnalysisRawAction {
+  return {
+    time: action.time,
+    key: action.key ?? action.title,
+    label: action.title,
+    type: action.goodAction ? "positive" : "negative",
+  };
+}
+
+function buildSessionAnalysisById(actions: ActionTagged[]): SessionAnalysisByIdData {
+  const playersById = new Map<string, SessionAnalysisRawPlayer>();
+  const teamActions: SessionAnalysisRawAction[] = [];
+
+  let teamOffensive = 0;
+  let teamDefensive = 0;
+  let teamPositive = 0;
+  let teamNegative = 0;
+
+  actions.forEach((action) => {
+    if (!action.player?.id) return;
+
+    const playerId = String(action.player.id);
+    const metricBucket = classifyMetricBucket(action);
+    const rawAction = toRawAction(action);
+
+    teamActions.push(rawAction);
+    if (metricBucket === "offensive") teamOffensive += 1;
+    if (metricBucket === "defensive") teamDefensive += 1;
+    if (rawAction.type === "positive") teamPositive += 1;
+    if (rawAction.type === "negative") teamNegative += 1;
+
+    const current = playersById.get(playerId) ?? {
+      playerId,
+      offensive: 0,
+      defensive: 0,
+      positive: 0,
+      negative: 0,
+      actions: [],
+    };
+
+    current.actions.push(rawAction);
+    if (metricBucket === "offensive") current.offensive += 1;
+    if (metricBucket === "defensive") current.defensive += 1;
+    if (rawAction.type === "positive") current.positive += 1;
+    if (rawAction.type === "negative") current.negative += 1;
+
+    playersById.set(playerId, current);
+  });
+
+  const team: SessionAnalysisRawTeam = {
+    offensive: teamOffensive,
+    defensive: teamDefensive,
+    positive: teamPositive,
+    negative: teamNegative,
+    actions: teamActions,
+  };
+
+  return {
+    players: Array.from(playersById.values()),
+    team,
+  };
+}
+
 const ActionLog = ({ session }: ActionLogProps) => {
-  const {actions, setActions} = useContext(ActionsContext);
-  const {success, info, error} = useContext(ToastContext);
+  const { actions, setActions } = useContext(ActionsContext);
+  const { success, info, error } = useContext(ToastContext);
+  const navigate = useNavigate();
+  const { mutate } = useSWRConfig();
   const cookieKey = `${COOKIE_KEY_PREFIX}${session.id}`;
   const [cookies, setCookie, removeCookie] = useCookies([cookieKey]);
   const hasLoadedCookie = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const redirectTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     const raw = cookies[cookieKey];
@@ -55,6 +152,14 @@ const ActionLog = ({ session }: ActionLogProps) => {
     });
   }, [actions, cookieKey, setCookie, removeCookie]);
 
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        window.clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleClear = () => {
     setActions([]);
     info("Log limpo com sucesso!");
@@ -65,28 +170,47 @@ const ActionLog = ({ session }: ActionLogProps) => {
     info("Ação removida");
   };
 
-  const handleSubmitSession = async () => {
+  const confirmSaveActions = () => window.confirm("Tem certeza que quer salvar?");
+
+  const persistSessionAnalysis = async (sessionId: string, currentActions: ActionTagged[]) => {
+    const sessionAnalysisById = buildSessionAnalysisById(currentActions);
+    saveSessionAnalysisOverride(sessionId, sessionAnalysisById);
+
+    await mutate<SessionAnalysisData>(
+      "session-analysis",
+      (currentData) => ({
+        ...(currentData ?? {}),
+        ...readSessionAnalysisOverrides(),
+      }),
+      false
+    );
+  };
+
+  const showSuccessAndRedirect = (sessionId: string) => {
+    success("Ações salvas com sucesso!");
+    setActions([]);
+    removeCookie(cookieKey, { path: "/" });
+
+    redirectTimeoutRef.current = window.setTimeout(() => {
+      navigate(`/sessions/${sessionId}`);
+    }, REDIRECT_DELAY_MS);
+  };
+
+  const handleSaveActions = async () => {
     if (actions.length === 0) {
       info("Adicione ao menos uma ação antes de salvar");
       return;
     }
 
+    if (!confirmSaveActions()) return;
+
+    setIsSaving(true);
     try {
-      const payload = {
-        sessionId: session.id,
-        sessionType: session.type,
-        actions,
-        savedAt: new Date().toISOString(),
-      };
-
-      // futuro: mandar pro backend
-      console.log("PAYLOAD SALVO:", payload);
-      console.table(actions);
-
-      setActions([]);
-      success(`Análise salva para ${session.type.toLowerCase()} ${session.date}`);
+      await persistSessionAnalysis(session.id, actions);
+      showSuccessAndRedirect(session.id);
     } catch {
-      error("Falha ao salvar no banco");
+      setIsSaving(false);
+      error("Falha ao salvar ações");
     }
   };
 
@@ -99,10 +223,10 @@ const ActionLog = ({ session }: ActionLogProps) => {
         </div>
 
         <div className={styles.actions}>
-          <button className={styles.save} onClick={handleSubmitSession}>
-            Salvar
+          <button className={styles.save} onClick={handleSaveActions} disabled={isSaving}>
+            {isSaving ? "Salvando..." : "Salvar"}
           </button>
-          <button className={styles.clear} onClick={handleClear}>
+          <button className={styles.clear} onClick={handleClear} disabled={isSaving}>
             Limpar
           </button>
         </div>
@@ -140,6 +264,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
                   onClick={() => handleRemoveAction(action.id)}
                   aria-label="Remover ação"
                   title="Remover"
+                  disabled={isSaving}
                 >
                   <FontAwesomeIcon icon={faXmark} />
                 </button>

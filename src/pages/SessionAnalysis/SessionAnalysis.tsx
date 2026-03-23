@@ -12,6 +12,8 @@ import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnal
 import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
 import SessionAnalysisActionCard from "../../components/SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard.tsx";
 import { useSessions } from "../../contexts/SessionsContext/SessionsContext";
+import { useMemo } from "react";
+import { mergeSessionAnalysisData } from "../../utils/sessionAnalysisStore.ts";
 
 function safePercent(value: number, total: number) {
   if (total <= 0) return 0;
@@ -22,7 +24,8 @@ const SessionAnalysis = () => {
   const { id } = useParams<{ id: string }>();
   const { data: analysisData } = useApi<SessionAnalysisData>("session-analysis");
   const { sessions } = useSessions();
-  const analysisById: SessionAnalysisByIdData | undefined = id ? analysisData?.[id] : undefined;
+  const mergedAnalysisData = useMemo(() => mergeSessionAnalysisData(analysisData), [analysisData]);
+  const analysisById: SessionAnalysisByIdData | undefined = id ? mergedAnalysisData[id] : undefined;
   const session = sessions.find((item) => item.id === id);
 
   const summary: SessionAnalysisSummaryData =

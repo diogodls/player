@@ -15,6 +15,7 @@ import type {
   SessionAnalysisSummary as SessionAnalysisSummaryData,
 } from "../SessionAnalysis";
 import type { IndividualAnalysisData } from "../IndividualAnalysis";
+import { mergeSessionAnalysisData } from "../../utils/sessionAnalysisStore.ts";
 
 type ViewMode = "individual" | "team";
 type ActionTypeFilter = "all" | "good" | "bad";
@@ -35,8 +36,9 @@ const SessionDetails = () => {
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
+  const mergedAnalysisData = useMemo(() => mergeSessionAnalysisData(analysisData), [analysisData]);
   const session = sessions.find((item) => item.id === id);
-  const analysisById: SessionAnalysisByIdData | undefined = id ? analysisData?.[id] : undefined;
+  const analysisById: SessionAnalysisByIdData | undefined = id ? mergedAnalysisData[id] : undefined;
 
   const playersById = useMemo(() => {
     const entries = (individualAnalysisData?.players ?? []).map((player) => [
@@ -195,6 +197,19 @@ const SessionDetails = () => {
   const hasIndividualAnalysis = filteredIndividualCards.length > 0;
   const hasTeamAnalysis = Boolean(filteredTeamCard && filteredTeamCard.actions.length > 0);
   const hasAnalysisForView = viewMode === "individual" ? hasIndividualAnalysis : hasTeamAnalysis;
+  const hasBaseIndividualAnalysis = filteredCardsByAthlete.length > 0;
+  const hasBaseTeamAnalysis = Boolean(teamCard && teamCard.actions.length > 0);
+  const hasBaseAnalysisForView = viewMode === "individual" ? hasBaseIndividualAnalysis : hasBaseTeamAnalysis;
+  const hasActiveFilters =
+    actionTypeFilter !== "all" ||
+    selectedCategory !== "all" ||
+    (viewMode === "individual" && selectedAthleteId !== "all");
+
+  const handleResetFilters = () => {
+    setActionTypeFilter("all");
+    setSelectedCategory("all");
+    setSelectedAthleteId("all");
+  };
 
   if (!id || !session) {
     return <Navigate to="/session-screen" replace />;
@@ -203,45 +218,44 @@ const SessionDetails = () => {
   return (
     <div className={styles.container}>
       <div className={styles.contentWrap}>
-        <header className={styles.header}>
-          <button className={styles.backButton} onClick={() => navigate("/session-screen")}> 
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>
+        <header className={styles.sessionHeader}>
+          <div className={styles.headerLeft}>
+            <button className={styles.backButton} onClick={() => navigate("/session-screen")}>
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
 
-          <div className={styles.headerContent}>
             <div className={styles.headerText}>
               <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
               <h1 className={styles.title}>Detalhes da sessão</h1>
               <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
             </div>
+          </div>
 
-            <div className={styles.headerActions}>
-              <button
-                className={`${styles.actionButton} ${styles.individualButton}`}
-                onClick={() => navigate(`/sessions/${session.id}/analysis/individual`)}
-              >
-                <div className={styles.actionIconWrap}>
-                  <FontAwesomeIcon icon={faUser} />
-                </div>
+          <div className={styles.headerActions}>
+            <button
+              className={`${styles.actionButton} ${styles.individualButton}`}
+              onClick={() => navigate(`/sessions/${session.id}/analysis/individual`)}
+            >
+              <div className={styles.actionIconWrap}>
+                <FontAwesomeIcon icon={faUser} />
+              </div>
 
-                <div className={styles.actionText}>
-                  <strong>Fazer análise individual</strong>
-                </div>
-              </button>
+              <div className={styles.actionText}>
+                <strong>Fazer análise individual</strong>
+              </div>
+            </button>
 
-              <button
-                className={`${styles.actionButton} ${styles.teamButton}`}
-                onClick={() => navigate(`/sessions/${session.id}/analysis/team`)}
-              >
-                <div className={styles.actionIconWrap}>
-                  <FontAwesomeIcon icon={faPeopleGroup} />
-                </div>
+            <button
+              className={`${styles.actionButton} ${styles.teamButton}`}
+            >
+              <div className={styles.actionIconWrap}>
+                <FontAwesomeIcon icon={faPeopleGroup} />
+              </div>
 
-                <div className={styles.actionText}>
-                  <strong>Fazer análise de equipe</strong>
-                </div>
-              </button>
-            </div>
+              <div className={styles.actionText}>
+                <strong>Fazer análise de equipe</strong>
+              </div>
+            </button>
           </div>
         </header>
 
@@ -265,93 +279,104 @@ const SessionDetails = () => {
             </button>
           </div>
 
-          {hasAnalysisForView ? (
-            <>
-              <SessionAnalysisSummary summary={viewMode === "individual" ? individualSummary : teamSummary} />
+          <SessionAnalysisSummary summary={viewMode === "individual" ? individualSummary : teamSummary} />
 
-              <h3 className={styles.sectionTitle}>
-                {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
-              </h3>
+          <h3 className={styles.sectionTitle}>
+            {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
+          </h3>
 
-              <section className={styles.filtersCard}>
-                <div className={styles.filtersTitleRow}>
-                  <FontAwesomeIcon icon={faFilter} />
-                  <h4>Filtros de ações</h4>
+          <section className={styles.filtersCard}>
+            <div className={styles.filtersTitleRow}>
+              <FontAwesomeIcon icon={faFilter} />
+              <h4>Filtros de ações</h4>
+            </div>
+
+            <div className={styles.filtersGrid}>
+              <div className={styles.filterBlock}>
+                <span className={styles.filterLabel}>Resultado</span>
+                <div className={styles.typeFilters}>
+                  <button
+                    type="button"
+                    className={`${styles.typeFilterButton} ${actionTypeFilter === "all" ? styles.typeFilterActive : ""}`}
+                    onClick={() => setActionTypeFilter("all")}
+                  >
+                    Todas
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.typeFilterButton} ${actionTypeFilter === "good" ? styles.typeFilterActive : ""}`}
+                    onClick={() => setActionTypeFilter("good")}
+                  >
+                    Positivas
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.typeFilterButton} ${actionTypeFilter === "bad" ? styles.typeFilterActive : ""}`}
+                    onClick={() => setActionTypeFilter("bad")}
+                  >
+                    Negativas
+                  </button>
                 </div>
-
-                <div className={styles.filtersGrid}>
-                  <div className={styles.filterBlock}>
-                    <span className={styles.filterLabel}>Resultado</span>
-                    <div className={styles.typeFilters}>
-                      <button
-                        type="button"
-                        className={`${styles.typeFilterButton} ${actionTypeFilter === "all" ? styles.typeFilterActive : ""}`}
-                        onClick={() => setActionTypeFilter("all")}
-                      >
-                        Todas
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.typeFilterButton} ${actionTypeFilter === "good" ? styles.typeFilterActive : ""}`}
-                        onClick={() => setActionTypeFilter("good")}
-                      >
-                        Positivas
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.typeFilterButton} ${actionTypeFilter === "bad" ? styles.typeFilterActive : ""}`}
-                        onClick={() => setActionTypeFilter("bad")}
-                      >
-                        Negativas
-                      </button>
-                    </div>
-                  </div>
-
-                  {viewMode === "individual" && (
-                    <label className={styles.filterField}>
-                      <span className={styles.filterLabel}>Atleta</span>
-                      <select
-                        value={selectedAthleteId}
-                        onChange={(event) => setSelectedAthleteId(event.target.value)}
-                      >
-                        <option value="all">Todos os atletas</option>
-                        {individualCards.map((athlete) => (
-                          <option key={athlete.id} value={athlete.id}>
-                            {athlete.title}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  )}
-
-                  <label className={styles.filterField}>
-                    <span className={styles.filterLabel}>Categoria</span>
-                    <select
-                      value={selectedCategory}
-                      onChange={(event) => setSelectedCategory(event.target.value)}
-                    >
-                      <option value="all">Todas as categorias</option>
-                      {availableCategories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              </section>
-
-              <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
-                {viewMode === "individual"
-                  ? filteredIndividualCards.map((athlete) => (
-                      <SessionAnalysisActionCard key={athlete.id} {...athlete} />
-                    ))
-                  : filteredTeamCard && <SessionAnalysisActionCard {...filteredTeamCard} />}
               </div>
-            </>
+
+              {viewMode === "individual" && (
+                <label className={styles.filterField}>
+                  <span className={styles.filterLabel}>Atleta</span>
+                  <select
+                    value={selectedAthleteId}
+                    onChange={(event) => setSelectedAthleteId(event.target.value)}
+                  >
+                    <option value="all">Todos os atletas</option>
+                    {individualCards.map((athlete) => (
+                      <option key={athlete.id} value={athlete.id}>
+                        {athlete.title}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              <label className={styles.filterField}>
+                <span className={styles.filterLabel}>Categoria</span>
+                <select
+                  value={selectedCategory}
+                  onChange={(event) => setSelectedCategory(event.target.value)}
+                >
+                  <option value="all">Todas as categorias</option>
+                  {availableCategories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          {hasAnalysisForView ? (
+            <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
+              {viewMode === "individual"
+                ? filteredIndividualCards.map((athlete) => (
+                    <SessionAnalysisActionCard key={athlete.id} {...athlete} />
+                  ))
+                : filteredTeamCard && <SessionAnalysisActionCard {...filteredTeamCard} />}
+            </div>
           ) : (
             <section className={styles.emptyState}>
-              <h3>Nenhuma acao encontrada com os filtros atuais.</h3>
+              <h3>
+                {hasBaseAnalysisForView
+                  ? "Nenhuma acao encontrada com os filtros atuais."
+                  : "Esta sessão ainda não possui ações para esta visualização."}
+              </h3>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  className={styles.switchButton}
+                  onClick={handleResetFilters}
+                >
+                  Limpar filtros
+                </button>
+              )}
             </section>
           )}
         </section>

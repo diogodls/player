@@ -15,11 +15,19 @@
   min-width: 0;
 }
 
-.header {
-  display: grid;
-  grid-template-columns: 44px 1fr;
-  align-items: start;
-  gap: 14px;
+.sessionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
 .backButton {
@@ -45,19 +53,11 @@
   }
 }
 
-.headerContent {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-}
-
 .headerText {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
-  flex: 1;
 }
 
 .eyebrow {
@@ -66,17 +66,20 @@
   letter-spacing: 0.08em;
   color: var(--light-blue);
   font-weight: 700;
+  margin: 0 0 1px;
 }
 
 .title {
-  margin: 0;
+  margin: 0 0 2px;
   font-size: clamp(26px, 3.3vw, 36px);
+  line-height: 1.08;
 }
 
 .subtitle {
   margin: 0;
   color: var(--text-muted);
   max-width: 70ch;
+  line-height: 1.32;
 }
 
 .headerActions {
@@ -86,6 +89,7 @@
   gap: 10px;
   flex-wrap: wrap;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .viewerCard {
@@ -322,9 +326,14 @@
     grid-template-columns: 1fr;
   }
 
-  .headerContent {
+  .sessionHeader {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
+  }
+
+  .headerLeft {
+    width: 100%;
   }
 
   .headerActions {
@@ -343,9 +352,12 @@
     padding: 18px 12px 28px;
   }
 
-  .header {
-    grid-template-columns: 1fr;
+  .headerLeft {
     gap: 10px;
+  }
+
+  .headerText {
+    gap: 2px;
   }
 
   .backButton {
@@ -365,6 +377,11 @@
   .title {
     font-size: clamp(22px, 7.4vw, 30px);
     line-height: 1.12;
+    margin-bottom: 1px;
+  }
+
+  .eyebrow {
+    margin-bottom: 0;
   }
 
   .subtitle {

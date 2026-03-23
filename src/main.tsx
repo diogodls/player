@@ -12,7 +12,7 @@ import SessionView from "./pages/SessionView/SessionView.tsx";
 import PlayerView from "./pages/PlayerView/PlayerView.tsx";
 import {SessionsProvider} from "./contexts/SessionsContext/SessionsContext.tsx";
 import SessionDetails from "./pages/SessionDetails/SessionDetails.tsx";
-import TeamAnalysisPlaceholder from "./pages/TeamAnalysisPlaceholder/TeamAnalysisPlaceholder.tsx";
+import SessionAnalysis from "./pages/SessionAnalysis/SessionAnalysis.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <CookiesProvider>
@@ -28,7 +28,7 @@ createRoot(document.getElementById('root')!).render(
                 <Route path={"/session-screen"} element={<SessionView />}/>
                 <Route path="/sessions/:id" element={<SessionDetails />} />
                 <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
-                <Route path="/sessions/:id/analysis/team" element={<TeamAnalysisPlaceholder />} />
+                <Route path="/sessions/:id/analysis/team" element={<SessionAnalysis />} />
               </Route>
             </Routes>
           </BrowserRouter>

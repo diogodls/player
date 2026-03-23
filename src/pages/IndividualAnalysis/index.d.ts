@@ -4,6 +4,8 @@ export type ActionTagged = {
   id: string;
   time: string;
   title: string;
+  key?: string;
+  category?: string;
   goodAction: boolean;
   player: Player;
 };
