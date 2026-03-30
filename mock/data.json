@@ -372,7 +372,7 @@
       },
       {
         "key": "GS GLA",
-        "label": "Gol sofrido goleiro linha adversÃ¡rio",
+        "label": "Gol sofrido goleiro linha adversário",
         "category": "Gols tomados em quadra",
         "goodAction": false
       },
@@ -397,43 +397,43 @@
       {
         "key": "AD",
         "label": "Ação decisiva",
-        "category": "AÃ‡Ã•ES OFENSIVAS",
+        "category": "AÇÕES OFENSIVAS",
         "goodAction": true
       },
       {
         "key": "CC",
         "label": "Chance criada",
-        "category": "AÃ‡Ã•ES OFENSIVAS",
+        "category": "AÇÕES OFENSIVAS",
         "goodAction": true
       },
       {
         "key": "PP",
         "label": "Perda de posse",
-        "category": "AÃ‡Ã•ES OFENSIVAS",
+        "category": "AÇÕES OFENSIVAS",
         "goodAction": false
       },
       {
         "key": "GP",
         "label": "Gol pago",
-        "category": "AÃ‡Ã•ES DEFENSIVAS",
+        "category": "AÇÕES DEFENSIVAS",
         "goodAction": false
       },
       {
         "key": "FD",
         "label": "Falha defensiva",
-        "category": "AÃ‡Ã•ES DEFENSIVAS",
+        "category": "AÇÕES DEFENSIVAS",
         "goodAction": false
       },
       {
         "key": "RB",
         "label": "Roubada de bola",
-        "category": "AÃ‡Ã•ES DEFENSIVAS",
+        "category": "AÇÕES DEFENSIVAS",
         "goodAction": true
       },
       {
         "key": "DIA",
         "label": "Desarme, interceptaÃ§Ã£o e antecipaÃ§Ã£o",
-        "category": "AÃ‡Ã•ES DEFENSIVAS",
+        "category": "AÇÕES DEFENSIVAS",
         "goodAction": true
       }
     ]
