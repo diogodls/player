@@ -5,12 +5,14 @@ import type { Session } from "../../../pages/SessionView";
 
 type DeleteSessionModalProps = {
   isOpen: boolean;
-  session: Session;
+  session: Session | null;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-const DeleteSessionModal = ({session, onClose, onConfirm,}: DeleteSessionModalProps) => {
+const DeleteSessionModal = ({ isOpen, session, onClose, onConfirm }: DeleteSessionModalProps) => {
+  if (!isOpen || !session) return null;
+
   const detail =
     session.type === "Treino"
       ? session.description
