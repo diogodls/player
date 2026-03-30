@@ -31,10 +31,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isSessionsRoute =
-    location.pathname === "/session-screen" ||
-    location.pathname.startsWith("/sessions/");
-
   return (
     <nav className={styles.navbar}>
       <img className={styles.img} src={reactLogo} alt="" />
@@ -43,7 +39,7 @@ const Navbar = () => {
         {buttons.map((btn) => {
           const isActive =
             btn.link === "/session-screen"
-              ? isSessionsRoute
+              ? location.pathname.startsWith("/session")
               : location.pathname === btn.link;
 
           return (
