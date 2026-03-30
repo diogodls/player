@@ -453,51 +453,6 @@
         "date": "19/02/2026",
         "local": "Farrezao",
         "opponent": "Atlantico"
-      },
-      {
-        "id": "3",
-        "type": "Jogo",
-        "date": "13/02/2026",
-        "local": "Carlos Barbosa",
-        "opponent": "ACBF"
-      },
-      {
-        "id": "6",
-        "type": "Jogo",
-        "date": "13/02/2026",
-        "local": "Passo Fundo",
-        "opponent": "AGF"
-      },
-      {
-        "id": "7",
-        "type": "Jogo",
-        "date": "14/02/2026",
-        "local": "Alegrete",
-        "opponent": "Teste"
-      },
-      {
-        "id": "99",
-        "type": "Jogo",
-        "date": "25/02/2026",
-        "local": "Farrezao",
-        "opponent": "Atlantico",
-        "description": "Jogo teste para analise"
-      },
-      {
-        "id": "111",
-        "type": "Jogo",
-        "date": "25/02/2026",
-        "local": "Farrezao",
-        "opponent": "Atlantico",
-        "description": "Jogo teste para analise"
-      },
-      {
-        "id": "34",
-        "type": "Jogo",
-        "date": "25/02/2026",
-        "local": "Farrezao",
-        "opponent": "Atlantico",
-        "description": "Jogo teste para analise"
       }
     ]
   },
