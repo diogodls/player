@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from "react";
+import { useState } from "react";
 import styles from "./SessionAnalysisActionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,26 +14,18 @@ import type { SessionAnalysisAthlete } from "../../../../pages/SessionAnalysis";
 
 type Props = SessionAnalysisAthlete;
 
-const clamp01 = (n: number) => Math.max(0, Math.min(100, n));
-
 const SessionAnalysisActionCard = ({
-  id,
+  entityType,
   title,
   actions,
   metrics,
+  counters,
   variant = "yellow",
   defaultOpen = false,
 }: Props) => {
   const [open, setOpen] = useState(defaultOpen);
-
-  const counts = useMemo(() => {
-    const pos = actions.filter((a) => a.type === "good").length;
-    const neg = actions.filter((a) => a.type === "bad").length;
-    return { pos, neg };
-  }, [actions]);
-
   const actionsCount = actions.length;
-  const isTeam = id === "team";
+  const isTeam = entityType === "team";
 
   return (
     <article className={`${styles.card} ${styles[`card_${variant}`]}`}>
@@ -53,12 +45,12 @@ const SessionAnalysisActionCard = ({
           <div className={styles.counts}>
             <span className={styles.count}>
               <FontAwesomeIcon icon={faArrowTrendUp} className={styles.posIco} />
-              <span className={styles.posTxt}>{counts.pos}</span>
+              <span className={styles.posTxt}>{counters.positive}</span>
             </span>
 
             <span className={styles.count}>
               <FontAwesomeIcon icon={faArrowTrendDown} className={styles.negIco} />
-              <span className={styles.negTxt}>{counts.neg}</span>
+              <span className={styles.negTxt}>{counters.negative}</span>
             </span>
           </div>
 
@@ -78,7 +70,7 @@ const SessionAnalysisActionCard = ({
       <button
         type="button"
         className={styles.bottomRowBtn}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
       >
         <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
@@ -103,17 +95,15 @@ function MiniMetric({
   value: number;
   tone: "blue" | "yellow" | "green";
 }) {
-  const v = clamp01(value);
-
   return (
     <div className={styles.metricBox}>
       <div className={styles.metricHeader}>
         <span className={`${styles.metricLabel} ${styles[`tone_${tone}`]}`}>{label}</span>
-        <span className={styles.metricValue}>{v}</span>
+        <span className={styles.metricValue}>{value}</span>
       </div>
 
       <div className={styles.track}>
-        <div className={`${styles.fill} ${styles[`fill_${tone}`]}`} style={{ width: `${v}%` }} />
+        <div className={`${styles.fill} ${styles[`fill_${tone}`]}`} style={{ width: `${value}%` }} />
       </div>
     </div>
   );

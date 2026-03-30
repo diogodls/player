@@ -7,18 +7,11 @@ type Props = {
   summary: SessionAnalysisSummaryData;
 };
 
-function pct(part: number, total: number) {
-  if (total <= 0) return 0;
-  return Math.round((part / total) * 100);
-}
-
 const SessionAnalysisSummary = ({ summary }: Props) => {
   const positives = summary.positives;
   const negatives = summary.negatives;
-  const total = positives + negatives;
-
-  const pPos = pct(positives, total);
-  const pNeg = Math.max(0, 100 - pPos);
+  const pPos = summary.positivePercentage;
+  const pNeg = summary.negativePercentage;
 
   return (
     <section className={styles.wrapper}>

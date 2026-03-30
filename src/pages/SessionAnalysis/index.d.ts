@@ -16,6 +16,8 @@ export type SessionAnalysisSession = {
 export type SessionAnalysisSummary = {
   positives: number;
   negatives: number;
+  positivePercentage: number;
+  negativePercentage: number;
 };
 
 export type SessionAnalysisAthleteAction = {
@@ -37,20 +39,46 @@ export type SessionAnalysisAthleteMetrics = {
 
 export type SessionAnalysisAthlete = {
   id: string;
-  initials: string;
+  entityType: "team" | "player";
   title: string;
   variant?: "yellow" | "red";
   defaultOpen?: boolean;
   metrics: SessionAnalysisAthleteMetrics;
+  counters: {
+    positive: number;
+    negative: number;
+  };
   actions: SessionAnalysisAthleteAction[];
 };
 
 export type SessionAnalysis = {
   sessionId: string;
-  session: SessionAnalysisSession;
+  session?: SessionAnalysisSession | null;
   summary: SessionAnalysisSummary;
   athletes: SessionAnalysisAthlete[];
 };
+
+export type SessionAnalysisViewData = Record<string, SessionAnalysis>;
+
+export type SessionDetailsViewSection = {
+  summary: SessionAnalysisSummary;
+  athletes: SessionAnalysisAthlete[];
+  athleteOptions: Array<{
+    value: string;
+    label: string;
+  }>;
+  categoryOptions: Array<{
+    value: string;
+    label: string;
+  }>;
+};
+
+export type SessionDetailsView = {
+  individual: SessionDetailsViewSection;
+  team: SessionDetailsViewSection;
+};
+
+export type SessionDetailsViewData = Record<string, SessionDetailsView>;
 
 export type SessionAnalysisRawAction = {
   time: string;
