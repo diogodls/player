@@ -1,10 +1,12 @@
 import styles from "./SessionAnalysisDetails.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarDays, faLocationDot, faVideo } from "@fortawesome/free-solid-svg-icons";
-import type { SessionAnalysisSession } from "../../../pages/SessionAnalysis";
+import { faCalendarDays, faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import type { Session } from "../../../pages/SessionAnalysis";
+
+type SessionDetailsData = Pick<Session, "type" | "date" | "local" | "description" | "opponent">;
 
 type Props = {
-  session?: SessionAnalysisSession;
+  session?: SessionDetailsData;
 };
 
 function formatDateBR(dateStr: string) {
@@ -18,14 +20,13 @@ const SessionAnalysisDetails = ({ session }: Props) => {
   if (!session) {
     return (
       <section className={styles.wrapper}>
-        <span className={styles.empty}>Sessão não encontrada.</span>
+        <span className={styles.empty}>Sessao nao encontrada.</span>
       </section>
     );
   }
 
   const isGame = session.type === "Jogo";
   const topTitle = isGame ? (session.opponent ?? "N/D") : (session.description ?? "Treino");
-  const videoText = session.videoUrl ? "Anexado" : "Nao anexado";
 
   return (
     <section className={styles.wrapper}>
@@ -51,14 +52,6 @@ const SessionAnalysisDetails = ({ session }: Props) => {
             <span className={styles.label}>Local</span>
           </div>
           <span className={styles.value}>{session.local}</span>
-        </div>
-
-        <div className={styles.infoCard}>
-          <div className={styles.labelRow}>
-            <FontAwesomeIcon icon={faVideo} className={styles.icon} />
-            <span className={styles.label}>Video</span>
-          </div>
-          <span className={styles.valueMuted}>{videoText}</span>
         </div>
       </div>
     </section>

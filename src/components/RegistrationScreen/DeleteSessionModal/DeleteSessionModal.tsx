@@ -7,10 +7,9 @@ type DeleteSessionModalProps = {
   isOpen: boolean;
   session: Session | null;
   onClose: () => void;
-  onConfirm: () => void;
 };
 
-const DeleteSessionModal = ({ isOpen, session, onClose, onConfirm }: DeleteSessionModalProps) => {
+const DeleteSessionModal = ({ isOpen, session, onClose }: DeleteSessionModalProps) => {
   if (!isOpen || !session) return null;
 
   const detail =
@@ -57,7 +56,7 @@ const DeleteSessionModal = ({ isOpen, session, onClose, onConfirm }: DeleteSessi
             Cancelar
           </button>
 
-          <button className={styles.confirm} onClick={onConfirm}>
+          <button className={styles.confirm} onClick={onClose}>
             <FontAwesomeIcon icon={faTrashCan} />
             Confirmar exclusão
           </button>

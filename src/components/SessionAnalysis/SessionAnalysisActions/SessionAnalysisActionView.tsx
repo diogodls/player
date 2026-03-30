@@ -1,43 +1,36 @@
 import styles from "./SessionAnalysisActionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck, faCircleXmark, faClock } from "@fortawesome/free-solid-svg-icons";
-import type { SessionAnalysisAthleteAction } from "../../../pages/SessionAnalysis";
+import { faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import type { SessionItemAction } from "../../../pages/SessionAnalysis";
 
 type Props = {
-  actions: SessionAnalysisAthleteAction[];
+  actions: SessionItemAction[];
 };
 
-function iconByType(type: SessionAnalysisAthleteAction["type"]) {
-  if (type === "good") return faCircleCheck;
-  return faCircleXmark;
+function iconByType(goodAction: SessionItemAction["goodAction"]) {
+  return goodAction ? faCircleCheck : faCircleXmark;
 }
 
 export default function SessionAnalysisActionView({ actions }: Props) {
   if (!actions.length) {
-    return <div className={styles.empty}>Sem ações para este atleta.</div>;
+    return <div className={styles.empty}>Sem acoes para este item.</div>;
   }
 
   return (
     <div className={styles.list}>
-      {actions.map((a) => (
-        <div key={a.id} className={styles.row}>
-          <div className={`${styles.icon} ${styles[`icon_${a.type}`]}`}>
-            <FontAwesomeIcon icon={iconByType(a.type)} />
+      {actions.map((action, index) => (
+        <div key={`${action.key}-${action.time}-${index}`} className={styles.row}>
+          <div className={`${styles.icon} ${styles[`icon_${action.goodAction ? "good" : "bad"}`]}`}>
+            <FontAwesomeIcon icon={iconByType(action.goodAction)} />
           </div>
 
           <div className={styles.main}>
-            <div className={styles.title}>{a.title}</div>
-            {a.subtitle && <div className={styles.subtitle}>{a.subtitle}</div>}
+            <div className={styles.title}>{action.label}</div>
+            <div className={styles.subtitle}>{action.category}</div>
           </div>
 
           <div className={styles.meta}>
-            {a.time && <span className={styles.time}>{a.time}</span>}
-            {a.createdAt && (
-              <span className={styles.clock}>
-                <FontAwesomeIcon icon={faClock} />
-                {a.createdAt}
-              </span>
-            )}
+            <span className={styles.time}>{action.time}</span>
           </div>
         </div>
       ))}

@@ -10,11 +10,12 @@ import {Navigate, useParams} from "react-router";
 import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext";
 import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails.tsx";
-import { useSessionsData } from "../../hooks/useSessionsData.ts";
+import type { SessionData } from "../SessionView";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
-  const { sessions} = useSessionsData();
+  const { data: sessionsData } = useApi<SessionData>("sessions");
+  const sessions = sessionsData?.sessions ?? [];
   const { setActions, setSelectedPlayer } = useContext(ActionsContext);
   const { id } = useParams<{ id: string }>();
   const [actionsModalOpen, setActionsModalOpen] = useState(false);

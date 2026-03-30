@@ -7,7 +7,6 @@ import {faX} from "@fortawesome/free-solid-svg-icons";
 type SaveSessionModal = {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (meta: SessionMeta) => void;
   initialMeta?: SessionMeta | null;
   mode?: "create" | "edit";
 };
@@ -49,7 +48,7 @@ function getInitialFormState(initialMeta?: SessionMeta | null) {
   };
 }
 
-const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "create"}: SaveSessionModal) => {
+const SaveSessionModal = ({isOpen, onClose, initialMeta, mode = "create"}: SaveSessionModal) => {
   const [initialState] = useState(() => getInitialFormState(initialMeta));
   const [type, setType] = useState<SessionType>(initialState.type);
   const [date, setDate] = useState<string>(initialState.date);
@@ -64,22 +63,6 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "creat
   }, [type, date, local, description, opponent]);
 
   if (!isOpen) return null;
-
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-
-    const meta: SessionMeta = {
-      type,
-      date,
-      local: local.trim(),
-      ...(type === "Treino"
-        ? {description: description.trim()}
-        : {opponent: opponent.trim()}),
-    };
-
-    onSubmit(meta);
-    onClose();
-  };
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>
@@ -153,7 +136,7 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "creat
           </button>
           <button
             className={styles.primary}
-            onClick={handleSubmit}
+            onClick={onClose}
             disabled={!canSubmit}
           >
             {mode === "edit" ? "Salvar" : "Continuar"}

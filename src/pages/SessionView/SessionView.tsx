@@ -1,11 +1,10 @@
-import { useContext, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./SessionView.module.scss";
 import HeaderSessionScreen from "../../components/RegistrationScreen/HeaderSessionScreen/HeaderSessionScreen";
 import RegistrationScreen from "../../components/RegistrationScreen/RegistrationScreen";
 import SaveSessionModal from "../../components/IndivididualAnalysis/SaveSessionModal/SaveSessionModal";
-import { ToastContext } from "../../contexts/ToastContext/ToastContext";
-import { useSessionsData } from "../../hooks/useSessionsData";
-import type { Session, SessionMeta } from "./index";
+import { useApi } from "../../hooks/useApi";
+import type { Session, SessionData, SessionMeta } from "./index";
 import DeleteSessionModal from "../../components/RegistrationScreen/DeleteSessionModal/DeleteSessionModal.tsx";
 
 function toSessionMeta(session: Session): SessionMeta {
@@ -20,8 +19,8 @@ function toSessionMeta(session: Session): SessionMeta {
 }
 
 const SessionView = () => {
-  const { sessions, addSession, updateSession, deleteSession, isLoading } = useSessionsData();
-  const { success } = useContext(ToastContext);
+  const { data, isLoading } = useApi<SessionData>("sessions");
+  const sessions = data?.sessions ?? [];
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [sessionBeingEdited, setSessionBeingEdited] = useState<Session | null>(null);
   const [sessionPendingDelete, setSessionPendingDelete] = useState<Session | null>(null);
@@ -31,11 +30,6 @@ const SessionView = () => {
     [sessionBeingEdited]
   );
 
-  const handleCreateSession = (meta: SessionMeta) => {
-    const created = addSession(meta);
-    success(`Registro ${created.type.toLowerCase()} criado com sucesso!`);
-  };
-
   const handleEditSession = (session: Session) => {
     setSessionBeingEdited(session);
     setIsSaveModalOpen(true);
@@ -43,25 +37,6 @@ const SessionView = () => {
 
   const handleDeleteSession = (session: Session) => {
     setSessionPendingDelete(session);
-  };
-
-  const handleConfirmDelete = () => {
-    if (!sessionPendingDelete) return;
-
-    deleteSession(sessionPendingDelete.id);
-    success("Treino/Jogo removido com sucesso");
-    setSessionPendingDelete(null);
-  };
-
-  const handleSubmit = (meta: SessionMeta) => {
-    if (sessionBeingEdited) {
-      const updated = updateSession(sessionBeingEdited.id, meta);
-      if (!updated) return;
-      success(`${updated.type} atualizado com sucesso!`);
-      return;
-    }
-
-    handleCreateSession(meta);
   };
 
   const handleOpenCreate = () => {
@@ -92,7 +67,6 @@ const SessionView = () => {
         key={sessionBeingEdited ? `edit-${sessionBeingEdited.id}` : `create-${isSaveModalOpen ? "open" : "closed"}`}
         isOpen={isSaveModalOpen}
         onClose={handleCloseModal}
-        onSubmit={handleSubmit}
         initialMeta={editingMeta}
         mode={sessionBeingEdited ? "edit" : "create"}
       />
@@ -101,7 +75,6 @@ const SessionView = () => {
         isOpen={Boolean(sessionPendingDelete)}
         session={sessionPendingDelete}
         onClose={handleCloseDeleteModal}
-        onConfirm={handleConfirmDelete}
       />
     </div>
   );

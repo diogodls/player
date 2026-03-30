@@ -7,13 +7,6 @@ import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import type { Session } from "../../../pages/SessionView";
 import type { ActionTagged } from "../../../pages/IndividualAnalysis";
-import type {
-  SessionAnalysisByIdData,
-  SessionAnalysisData,
-  SessionAnalysisRawAction,
-  SessionAnalysisRawPlayer,
-  SessionAnalysisRawTeam,
-} from "../../../pages/SessionAnalysis";
 import { useNavigate } from "react-router";
 import { useSWRConfig } from "swr";
 
@@ -23,6 +16,37 @@ const REDIRECT_DELAY_MS = 1000;
 type ActionLogProps = {
   session: Session;
 };
+
+type SessionAnalysisRawAction = {
+  time: string;
+  key: string;
+  label: string;
+  type: "positive" | "negative";
+};
+
+type SessionAnalysisRawPlayer = {
+  playerId: string;
+  offensive: number;
+  defensive: number;
+  positive: number;
+  negative: number;
+  actions: SessionAnalysisRawAction[];
+};
+
+type SessionAnalysisRawTeam = {
+  offensive: number;
+  defensive: number;
+  positive: number;
+  negative: number;
+  actions: SessionAnalysisRawAction[];
+};
+
+type SessionAnalysisByIdData = {
+  players: SessionAnalysisRawPlayer[];
+  team: SessionAnalysisRawTeam;
+};
+
+type SessionAnalysisData = Record<string, SessionAnalysisByIdData>;
 
 function normalizeText(value: string) {
   return value

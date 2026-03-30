@@ -1,23 +1,20 @@
 import styles from "../SessionAnalysisSummary/SessionAnalysisSummary.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartColumn } from "@fortawesome/free-solid-svg-icons";
-import type { SessionAnalysisSummary as SessionAnalysisSummaryData } from "../../../pages/SessionAnalysis";
 
 type Props = {
-  summary: SessionAnalysisSummaryData;
+  positives: number;
+  negatives: number;
+  positivePercentage: number;
+  negativePercentage: number;
 };
 
-const SessionAnalysisSummary = ({ summary }: Props) => {
-  const positives = summary.positives;
-  const negatives = summary.negatives;
-  const pPos = summary.positivePercentage;
-  const pNeg = summary.negativePercentage;
-
+const SessionAnalysisSummary = ({ positives, negatives, positivePercentage, negativePercentage }: Props) => {
   return (
     <section className={styles.wrapper}>
       <header className={styles.header}>
         <FontAwesomeIcon icon={faChartColumn} className={styles.headerIcon} />
-        <span className={styles.headerTitle}>Resumo Geral das ações</span>
+        <span className={styles.headerTitle}>Resumo Geral das acoes</span>
       </header>
 
       <div className={styles.cards}>
@@ -34,20 +31,19 @@ const SessionAnalysisSummary = ({ summary }: Props) => {
 
       <div className={styles.progressRow}>
         <div className={styles.progressMeta}>
-          <span className={styles.metaLeft}>{pPos}% positivas</span>
-          <span className={styles.metaRight}>{pNeg}% negativas</span>
+          <span className={styles.metaLeft}>{positivePercentage}% positivas</span>
+          <span className={styles.metaRight}>{negativePercentage}% negativas</span>
         </div>
 
-        <div className={styles.progressTrack} aria-label="Distribuição das ações">
-
+        <div className={styles.progressTrack} aria-label="Distribuicao das acoes">
           <div
             className={`${styles.progressSeg} ${styles.segPositive}`}
-            style={{ width: `${pPos}%` }}
+            style={{ width: `${positivePercentage}%` }}
             aria-hidden
           />
           <div
             className={`${styles.progressSeg} ${styles.segNegative}`}
-            style={{ width: `${pNeg}%` }}
+            style={{ width: `${negativePercentage}%` }}
             aria-hidden
           />
         </div>
