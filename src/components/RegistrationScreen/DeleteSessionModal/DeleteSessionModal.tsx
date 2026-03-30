@@ -1,29 +1,37 @@
 import styles from "./DeleteSessionModal.module.scss";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTrashCan, faXmark} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
 import type { Session } from "../../../pages/SessionView";
 
 type DeleteSessionModalProps = {
   isOpen: boolean;
-  session: Session | null;
+  session: Session;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-const DeleteSessionModal = ({ isOpen, session, onClose, onConfirm }: DeleteSessionModalProps) => {
-  if (!isOpen || !session) return null;
-
-  const detail = session.type === "Treino" ? session.description : session.opponent;
+const DeleteSessionModal = ({session, onClose, onConfirm,}: DeleteSessionModalProps) => {
+  const detail =
+    session.type === "Treino"
+      ? session.description
+      : session.opponent;
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>
-      <div className={styles.modal} onMouseDown={(event) => event.stopPropagation()}>
+      <div
+        className={styles.modal}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <div className={styles.header}>
           <div className={styles.iconWrap}>
             <FontAwesomeIcon icon={faTrashCan} />
           </div>
 
-          <button className={styles.close} onClick={onClose} aria-label="Fechar">
+          <button
+            className={styles.close}
+            onClick={onClose}
+            aria-label="Fechar"
+          >
             <FontAwesomeIcon icon={faXmark} />
           </button>
         </div>
@@ -46,6 +54,7 @@ const DeleteSessionModal = ({ isOpen, session, onClose, onConfirm }: DeleteSessi
           <button className={styles.cancel} onClick={onClose}>
             Cancelar
           </button>
+
           <button className={styles.confirm} onClick={onConfirm}>
             <FontAwesomeIcon icon={faTrashCan} />
             Confirmar exclusão
