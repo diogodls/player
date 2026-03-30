@@ -3,11 +3,11 @@ import styles from "./SessionDetails.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPeopleGroup, faUser, faFilter } from "@fortawesome/free-solid-svg-icons";
 import { Navigate, useNavigate, useParams } from "react-router";
-import { useSessions } from "../../contexts/SessionsContext/SessionsContext.tsx";
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails.tsx";
 import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
 import SessionAnalysisActionCard from "../../components/SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard.tsx";
 import { useApi } from "../../hooks/useApi.ts";
+import { useSessionsData } from "../../hooks/useSessionsData";
 import type { SessionAnalysisAthlete, SessionDetailsView, SessionDetailsViewData } from "../SessionAnalysis";
 
 type ViewMode = "individual" | "team";
@@ -16,7 +16,7 @@ type ActionTypeFilter = "all" | "good" | "bad";
 const SessionDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { sessions } = useSessions();
+  const { sessions, isLoading: isSessionsLoading } = useSessionsData();
   const { data: detailsData } = useApi<SessionDetailsViewData>("session-details-view");
   const [viewMode, setViewMode] = useState<ViewMode>("individual");
   const [actionTypeFilter, setActionTypeFilter] = useState<ActionTypeFilter>("all");
@@ -79,7 +79,19 @@ const SessionDetails = () => {
     setSelectedAthleteId("all");
   };
 
-  if (!id || !session) {
+  if (!id) {
+    return <Navigate to="/session-screen" replace />;
+  }
+
+  if (isSessionsLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentWrap}>Carregando sessão...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
     return <Navigate to="/session-screen" replace />;
   }
 

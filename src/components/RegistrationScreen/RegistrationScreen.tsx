@@ -13,9 +13,10 @@ type RegistrationScreen = {
   sessions: Session[];
   onEditSession: (session: Session) => void;
   onDeleteSession: (session: Session) => void;
+  isLoading?: boolean;
 };
 
-const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession }: RegistrationScreen) => {
+const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession, isLoading = false }: RegistrationScreen) => {
   const [currentPage, setCurrentPage] = useState(1);
   const total = sessions.length;
   const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
@@ -42,7 +43,15 @@ const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession }: Regist
           </div>
         </div>
 
-        {total === 0 ? (
+        {isLoading ? (
+          <div className={styles.emptyState}>
+            <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
+            <span className={styles.emptyTitle}>Carregando registros</span>
+            <span className={styles.emptySub}>
+              Buscando treinos e jogos salvos
+            </span>
+          </div>
+        ) : total === 0 ? (
           <div className={styles.emptyState}>
             <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
             <span className={styles.emptyTitle}>Nenhum registro encontrado</span>

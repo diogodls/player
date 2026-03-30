@@ -4,7 +4,7 @@ import HeaderSessionScreen from "../../components/RegistrationScreen/HeaderSessi
 import RegistrationScreen from "../../components/RegistrationScreen/RegistrationScreen";
 import SaveSessionModal from "../../components/IndivididualAnalysis/SaveSessionModal/SaveSessionModal";
 import { ToastContext } from "../../contexts/ToastContext/ToastContext";
-import { useSessions } from "../../contexts/SessionsContext/SessionsContext";
+import { useSessionsData } from "../../hooks/useSessionsData";
 import type { Session, SessionMeta } from "./index";
 import DeleteSessionModal from "../../components/RegistrationScreen/DeleteSessionModal/DeleteSessionModal.tsx";
 
@@ -20,7 +20,7 @@ function toSessionMeta(session: Session): SessionMeta {
 }
 
 const SessionView = () => {
-  const { sessions, addSession, updateSession, deleteSession } = useSessions();
+  const { sessions, addSession, updateSession, deleteSession, isLoading } = useSessionsData();
   const { success } = useContext(ToastContext);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [sessionBeingEdited, setSessionBeingEdited] = useState<Session | null>(null);
@@ -85,6 +85,7 @@ const SessionView = () => {
         sessions={sessions}
         onEditSession={handleEditSession}
         onDeleteSession={handleDeleteSession}
+        isLoading={isLoading}
       />
 
       <SaveSessionModal

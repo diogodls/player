@@ -6,16 +6,28 @@ import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnaly
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails";
 import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary.tsx";
 import SessionAnalysisActionCard from "../../components/SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard.tsx";
-import { useSessions } from "../../contexts/SessionsContext/SessionsContext";
+import { useSessionsData } from "../../hooks/useSessionsData";
 
 const SessionAnalysis = () => {
   const { id } = useParams<{ id: string }>();
   const { data: analysisData } = useApi<SessionAnalysisViewData>("session-analysis-view");
-  const { sessions } = useSessions();
+  const { sessions, isLoading: isSessionsLoading } = useSessionsData();
   const session = sessions.find((item) => item.id === id);
   const analysisView: SessionAnalysisView | undefined = id ? analysisData?.[id] : undefined;
 
-  if (!id || !session) {
+  if (!id) {
+    return <Navigate to="/session-screen" replace />;
+  }
+
+  if (isSessionsLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentWrap}>Carregando sessão...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
     return <Navigate to="/session-screen" replace />;
   }
 

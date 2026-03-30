@@ -6,15 +6,15 @@ import {useApi} from "../../hooks/useApi.ts";
 import {useContext, useEffect, useMemo, useState} from "react";
 import ActionsModal from "../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
-import {useSessions} from "../../contexts/SessionsContext/SessionsContext";
 import {Navigate, useParams} from "react-router";
 import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext";
 import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails.tsx";
+import { useSessionsData } from "../../hooks/useSessionsData.ts";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
-  const { sessions } = useSessions();
+  const { sessions, isLoading: isSessionsLoading } = useSessionsData();
   const { setActions, setSelectedPlayer } = useContext(ActionsContext);
   const { id } = useParams<{ id: string }>();
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
@@ -29,7 +29,19 @@ const IndividualAnalysis = () => {
     setSelectedPlayer(null);
   }, [selectedSession?.id, setActions, setSelectedPlayer]);
 
-  if (!id || !selectedSession) {
+  if (!id) {
+    return <Navigate to="/session-screen" replace />;
+  }
+
+  if (isSessionsLoading) {
+    return (
+      <div className={styles.container}>
+        Carregando sessão...
+      </div>
+    );
+  }
+
+  if (!selectedSession) {
     return <Navigate to="/session-screen" replace />;
   }
 
