@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./RegistrationScreen.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
@@ -9,28 +9,34 @@ import Pagination from "../elements/Pagination/Pagination.tsx";
 
 const ITEMS_PER_PAGE = 5;
 
-type RegistrationScreen = {
+type RegistrationScreenProps = {
   sessions: Session[];
   onEditSession: (session: Session) => void;
   onDeleteSession: (session: Session) => void;
   isLoading?: boolean;
 };
 
-const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession, isLoading = false }: RegistrationScreen) => {
+const RegistrationScreen = ({
+                              sessions,
+                              onEditSession,
+                              onDeleteSession,
+                              isLoading = false,
+                            }: RegistrationScreenProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+
   const total = sessions.length;
   const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
 
   const pagedSessions = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
     return sessions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [currentPage, sessions]);
+  }, [safeCurrentPage, sessions]);
 
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [currentPage, totalPages]);
+  const handlePageChange = (page: number) => {
+    const nextPage = Math.max(1, Math.min(page, totalPages));
+    setCurrentPage(nextPage);
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -73,9 +79,9 @@ const RegistrationScreen = ({ sessions, onEditSession, onDeleteSession, isLoadin
             </div>
 
             <Pagination
-              currentPage={currentPage}
+              currentPage={safeCurrentPage}
               totalPages={totalPages}
-              onPageChange={setCurrentPage}
+              onPageChange={handlePageChange}
               className={styles.pagination}
             />
           </>
