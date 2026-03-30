@@ -14,7 +14,7 @@ import { useSessionsData } from "../../hooks/useSessionsData.ts";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
-  const { sessions, isLoading: isSessionsLoading } = useSessionsData();
+  const { sessions} = useSessionsData();
   const { setActions, setSelectedPlayer } = useContext(ActionsContext);
   const { id } = useParams<{ id: string }>();
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
@@ -31,14 +31,6 @@ const IndividualAnalysis = () => {
 
   if (!id) {
     return <Navigate to="/session-screen" replace />;
-  }
-
-  if (isSessionsLoading) {
-    return (
-      <div className={styles.container}>
-        Carregando sessão...
-      </div>
-    );
   }
 
   if (!selectedSession) {
