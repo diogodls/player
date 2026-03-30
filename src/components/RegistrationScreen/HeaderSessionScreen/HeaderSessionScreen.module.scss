@@ -9,6 +9,25 @@
     flex-direction: column;
     gap: 4px;
     min-width: 0;
+    align-items: center;
+    text-align: center;
+
+    .subtitle{
+      font-size: 18px;
+    }
+
+    .titleRow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+
+      .titleIcon {
+        color: var(--light-blue);
+        font-size: 25px;
+        flex: 0 0 auto;
+      }
+    }
 
     .title {
       font-weight: bold;
@@ -38,6 +57,12 @@
     align-items: flex-start;
 
     .headerText {
+      .titleRow {
+        .titleIcon {
+          font-size: 18px;
+        }
+      }
+
       .title {
         font-size: 22px;
       }
@@ -52,6 +77,14 @@
 
   @media (max-width: 420px) {
     .headerText {
+      .titleRow {
+        gap: 6px;
+
+        .titleIcon {
+          font-size: 17px;
+        }
+      }
+
       .title {
         font-size: 20px;
       }
