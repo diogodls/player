@@ -160,7 +160,7 @@ const SessionDetails = () => {
           {activeView && <SessionAnalysisSummary summary={activeView.summary} />}
 
           <h3 className={styles.sectionTitle}>
-            {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
+            {viewMode === "individual" ? "Ações Individuais" : "Ações da Equipe"}
           </h3>
 
           <section className={styles.filtersCard}>

@@ -181,7 +181,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
   };
 
   const showSuccessAndRedirect = (sessionId: string) => {
-    success("Acoes salvas com sucesso!");
+    success("Ações salvas com sucesso!");
     setActions([]);
     removeCookie(cookieKey, { path: "/" });
 
@@ -213,7 +213,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
       showSuccessAndRedirect(session.id);
     } catch {
       setIsSaving(false);
-      error("Falha ao salvar acoes");
+      error("Falha ao salvar ações");
     }
   };
 
@@ -221,7 +221,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>
-          <span>Linha do tempo de acoes</span>
+          <span>Linha do tempo de ações</span>
           <span className={styles.badge}>{actions.length}</span>
         </div>
 
@@ -237,7 +237,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
       {actions.length === 0 ? (
         <div className={styles.emptyState}>
-          <span>Sem acoes taggeadas. Comece a taggear acoes e elas aparecerao aqui.</span>
+          <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerao aqui.</span>
         </div>
       ) : (
         <div className={styles.list}>
@@ -281,7 +281,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
         <div className={styles.confirmOverlay} onMouseDown={handleCancelConfirmation}>
           <div className={styles.confirmModal} onMouseDown={(event) => event.stopPropagation()}>
             <h3>Deseja confirmar envio?</h3>
-            <p>As acoes desta sessao serao salvas para a visualizacao de analise.</p>
+            <p>As ações desta sessão serão salvas para a visualização de analise.</p>
 
             <div className={styles.confirmActions}>
               <button

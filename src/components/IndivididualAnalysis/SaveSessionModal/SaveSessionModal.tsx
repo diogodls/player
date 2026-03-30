@@ -129,7 +129,7 @@ const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "creat
               <label className={styles.label}>Adversário *</label>
               <input
                 className={styles.input}
-                placeholder="Ex: Atlantico, ACBF..."
+                placeholder="Ex: Atlântico, ACBF..."
                 value={opponent}
                 onChange={(e) => setOpponent(e.target.value)}
               />
