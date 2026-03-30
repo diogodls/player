@@ -88,6 +88,7 @@ const SessionView = () => {
       />
 
       <SaveSessionModal
+        key={sessionBeingEdited ? `edit-${sessionBeingEdited.id}` : `create-${isSaveModalOpen ? "open" : "closed"}`}
         isOpen={isSaveModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleSubmit}

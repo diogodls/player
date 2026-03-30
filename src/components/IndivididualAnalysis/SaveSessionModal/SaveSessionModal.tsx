@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
 import type { SessionMeta, SessionType } from "../../../pages/SessionView";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -29,31 +29,33 @@ function toInputDate(value?: string) {
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
+function getInitialFormState(initialMeta?: SessionMeta | null) {
+  if (!initialMeta) {
+    return {
+      type: "Treino" as SessionType,
+      date: todayISO(),
+      local: "",
+      description: "",
+      opponent: "",
+    };
+  }
+
+  return {
+    type: initialMeta.type,
+    date: toInputDate(initialMeta.date),
+    local: initialMeta.local ?? "",
+    description: initialMeta.description ?? "",
+    opponent: initialMeta.opponent ?? "",
+  };
+}
+
 const SaveSessionModal = ({isOpen, onClose, onSubmit, initialMeta, mode = "create"}: SaveSessionModal) => {
-  const [type, setType] = useState<SessionType>("Treino");
-  const [date, setDate] = useState<string>(todayISO());
-  const [local, setLocal] = useState("");
-  const [description, setDescription] = useState("");
-  const [opponent, setOpponent] = useState("");
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    if (initialMeta) {
-      setType(initialMeta.type);
-      setDate(toInputDate(initialMeta.date));
-      setLocal(initialMeta.local ?? "");
-      setDescription(initialMeta.description ?? "");
-      setOpponent(initialMeta.opponent ?? "");
-      return;
-    }
-
-    setType("Treino");
-    setDate(todayISO());
-    setLocal("");
-    setDescription("");
-    setOpponent("");
-  }, [isOpen, initialMeta]);
+  const [initialState] = useState(() => getInitialFormState(initialMeta));
+  const [type, setType] = useState<SessionType>(initialState.type);
+  const [date, setDate] = useState<string>(initialState.date);
+  const [local, setLocal] = useState(initialState.local);
+  const [description, setDescription] = useState(initialState.description);
+  const [opponent, setOpponent] = useState(initialState.opponent);
 
   const canSubmit = useMemo(() => {
     if (!date.trim() || !local.trim()) return false;
