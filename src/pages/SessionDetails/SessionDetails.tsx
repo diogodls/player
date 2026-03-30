@@ -235,7 +235,7 @@ const SessionDetails = () => {
             <section className={styles.emptyState}>
               <h3>
                 {hasBaseAnalysisForView
-                  ? "Nenhuma acao encontrada com os filtros atuais."
+                  ? "Nenhuma ação encontrada com os filtros atuais."
                   : "Esta sessão ainda não possui ações para esta visualização."}
               </h3>
               {hasActiveFilters && (
