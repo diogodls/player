@@ -20,7 +20,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.1",
     "@mui/material": "^7.3.7",
-    "@mui/x-charts": "^8.24.0",
+    "@mui/x-charts": "^8.28.0",
     "axios": "^1.13.5",
     "rc-select": "^14.16.8",
     "react": "^19.2.0",
