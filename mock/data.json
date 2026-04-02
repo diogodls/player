@@ -1,4 +1,4 @@
-﻿{
+{
   "coach-dashboard": {
     "averageTeamCards": [
       {
@@ -202,7 +202,7 @@
     "players": [
       {
         "id": 1,
-        "name": "JoÃ£o",
+        "name": "João",
         "overall": 98,
         "position": "Goleiro",
         "minutes": 31,
@@ -390,7 +390,7 @@
       },
       {
         "key": "ASS",
-        "label": "AssistÃªncia",
+        "label": "Assistência",
         "category": "Ações ofensivas",
         "goodAction": true
       },
@@ -432,7 +432,7 @@
       },
       {
         "key": "DIA",
-        "label": "Desarme, interceptaÃ§Ã£o e antecipaÃ§Ã£o",
+        "label": "Desarme, interceptação e antecipação",
         "category": "AÇÕES DEFENSIVAS",
         "goodAction": true
       }
@@ -452,7 +452,7 @@
         "type": "Jogo",
         "date": "19/02/2026",
         "local": "Farrezao",
-        "opponent": "Atlantico"
+        "opponent": "Atlântico"
       }
     ]
   },
@@ -475,7 +475,7 @@
             {
               "time": "01:03",
               "key": "DIA",
-              "label": "Desarme, interceptacao e antecipacao",
+              "label": "Desarme, interceptacao e antecipação",
               "type": "positive"
             },
             {
@@ -517,7 +517,7 @@
             {
               "time": "06:02",
               "key": "DIA",
-              "label": "Desarme, interceptacao e antecipacao",
+              "label": "Desarme, interceptação e antecipação",
               "type": "positive"
             }
           ]

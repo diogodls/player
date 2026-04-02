@@ -19,7 +19,7 @@ function toSessionMeta(session: Session): SessionMeta {
 }
 
 const SessionView = () => {
-  const { data, isLoading } = useApi<SessionData>("sessions");
+  const { data } = useApi<SessionData>("sessions");
   const sessions = data?.sessions ?? [];
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [sessionBeingEdited, setSessionBeingEdited] = useState<Session | null>(null);
@@ -60,7 +60,6 @@ const SessionView = () => {
         sessions={sessions}
         onEditSession={handleEditSession}
         onDeleteSession={handleDeleteSession}
-        isLoading={isLoading}
       />
 
       <SaveSessionModal

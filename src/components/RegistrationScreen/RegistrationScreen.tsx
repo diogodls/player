@@ -13,14 +13,12 @@ type RegistrationScreenProps = {
   sessions: Session[];
   onEditSession: (session: Session) => void;
   onDeleteSession: (session: Session) => void;
-  isLoading?: boolean;
 };
 
 const RegistrationScreen = ({
                               sessions,
                               onEditSession,
                               onDeleteSession,
-                              isLoading = false,
                             }: RegistrationScreenProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -49,15 +47,7 @@ const RegistrationScreen = ({
           </div>
         </div>
 
-        {isLoading ? (
-          <div className={styles.emptyState}>
-            <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
-            <span className={styles.emptyTitle}>Carregando registros</span>
-            <span className={styles.emptySub}>
-              Buscando treinos e jogos salvos
-            </span>
-          </div>
-        ) : total === 0 ? (
+        {total === 0 ? (
           <div className={styles.emptyState}>
             <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
             <span className={styles.emptyTitle}>Nenhum registro encontrado</span>
