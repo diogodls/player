@@ -12,6 +12,8 @@ import {
 import { CreateSessionActionsDto } from './dto/create-session-actions.dto';
 import { TaggedActionsService } from './tagged-actions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/authenticated-user.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller('sessions/:sessionId/actions')
@@ -20,18 +22,39 @@ export class TaggedActionsController {
 
   @Post()
   createForSession(
-    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
-    @Body() dto: CreateSessionActionsDto,
+    @CurrentUser() userOrSessionId: AuthenticatedUser | string,
+    @Param('sessionId', new ParseUUIDPipe())
+    sessionIdOrDto: string | CreateSessionActionsDto,
+    @Body() maybeDto?: CreateSessionActionsDto,
   ) {
-    return this.taggedActionsService.createForSession(sessionId, dto);
+    return typeof userOrSessionId === 'string'
+      ? this.taggedActionsService.createForSession(
+          userOrSessionId,
+          sessionIdOrDto as CreateSessionActionsDto,
+        )
+      : this.taggedActionsService.createForSession(
+          userOrSessionId.equipeId,
+          sessionIdOrDto as string,
+          maybeDto as CreateSessionActionsDto,
+        );
   }
 
   @Delete(':actionId')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeFromSession(
-    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
-    @Param('actionId', new ParseUUIDPipe()) actionId: string,
+    @CurrentUser() userOrSessionId: AuthenticatedUser | string,
+    @Param('sessionId', new ParseUUIDPipe()) sessionIdOrActionId: string,
+    @Param('actionId', new ParseUUIDPipe()) maybeActionId?: string,
   ) {
-    return this.taggedActionsService.removeFromSession(sessionId, actionId);
+    return typeof userOrSessionId === 'string'
+      ? this.taggedActionsService.removeFromSession(
+          userOrSessionId,
+          sessionIdOrActionId,
+        )
+      : this.taggedActionsService.removeFromSession(
+          userOrSessionId.equipeId,
+          sessionIdOrActionId,
+          maybeActionId as string,
+        );
   }
 }

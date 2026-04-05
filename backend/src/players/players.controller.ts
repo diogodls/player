@@ -16,6 +16,8 @@ import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
 import { CoachDashboardFiltersDto } from '../coach-dashboard/dto/coach-dashboard-filters.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/authenticated-user.interface';
 
 @UseGuards(JwtAuthGuard)
 @Controller('players')
@@ -23,8 +25,11 @@ export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
   @Get()
-  findAll(@Query() filters: PlayerFiltersDto) {
-    return this.playersService.findAll(filters);
+  findAll(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() filters: PlayerFiltersDto,
+  ) {
+    return this.playersService.findAll(user.equipeId, filters);
   }
 
   @Get('rankings')
@@ -34,30 +39,41 @@ export class PlayersController {
 
   @Get('rankings/:indexKey')
   findRanking(
+    @CurrentUser() user: AuthenticatedUser,
     @Param('indexKey') indexKey: string,
     @Query() filters: CoachDashboardFiltersDto,
   ) {
-    return this.playersService.findRanking(indexKey, filters);
+    return this.playersService.findRanking(user.equipeId, indexKey, filters);
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.playersService.findOne(id);
+  findOne(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.playersService.findOne(user.equipeId, id);
   }
 
   @Post()
-  create(@Body() dto: PlayerDto) {
-    return this.playersService.create(dto);
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: PlayerDto) {
+    return this.playersService.create(user.equipeId, dto);
   }
 
   @Put(':id')
-  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: PlayerDto) {
-    return this.playersService.update(id, dto);
+  update(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: PlayerDto,
+  ) {
+    return this.playersService.update(user.equipeId, id, dto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.playersService.remove(id);
+  remove(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.playersService.remove(user.equipeId, id);
   }
 }

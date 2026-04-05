@@ -72,9 +72,17 @@ export class SessionsService {
     private readonly playerSessionMinutesRepository: Repository<PlayerSessionMinutesEntity>,
   ) {}
 
-  async findAll(filters?: SessionFiltersDto): Promise<SessionListResponseDto> {
+  async findAll(
+    equipeIdOrFilters?: string | SessionFiltersDto,
+    maybeFilters?: SessionFiltersDto,
+  ): Promise<SessionListResponseDto> {
+    const equipeId =
+      typeof equipeIdOrFilters === 'string' ? equipeIdOrFilters : undefined;
+    const filters =
+      typeof equipeIdOrFilters === 'string' ? maybeFilters : equipeIdOrFilters;
     const limit = filters?.limit ?? 5;
     const where: FindOptionsWhere<SessionEntity> = {
+      ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
       ...(filters?.typeId ? { sessionTypeId: filters.typeId } : {}),
       ...(filters?.locationId ? { sessionLocationId: filters.locationId } : {}),
       ...(filters?.date ? { data: filters.date } : {}),
@@ -104,13 +112,24 @@ export class SessionsService {
     };
   }
 
-  async findOne(id: string): Promise<SessionResponseDto> {
-    return this.toResponse(await this.findEntity(id));
+  async findOne(
+    equipeIdOrId: string,
+    maybeId?: string,
+  ): Promise<SessionResponseDto> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    return this.toResponse(await this.findEntity(equipeId, id));
   }
 
   async compare(
-    filters: SessionComparisonFiltersDto,
+    equipeIdOrFilters: string | SessionComparisonFiltersDto,
+    maybeFilters?: SessionComparisonFiltersDto,
   ): Promise<SessionComparisonResponseDto> {
+    const equipeId =
+      typeof equipeIdOrFilters === 'string' ? equipeIdOrFilters : undefined;
+    const filters =
+      typeof equipeIdOrFilters === 'string' ? maybeFilters : equipeIdOrFilters;
+    if (!filters) throw new BadRequestException('Filtros não informados');
     if (filters.startDate >= filters.endDate) {
       throw new BadRequestException(
         'Data inicial deve ser anterior a data final',
@@ -119,6 +138,7 @@ export class SessionsService {
 
     const sessions = await this.sessionsRepository.find({
       where: {
+        ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
         data: Between(filters.startDate, filters.endDate),
         ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
       },
@@ -202,10 +222,14 @@ export class SessionsService {
   }
 
   async findRanking(
-    id: string,
-    indexKey: string,
+    equipeIdOrId: string,
+    idOrIndexKey: string,
+    maybeIndexKey?: string,
   ): Promise<PlayerRankingResponseDto> {
-    await this.findEntity(id);
+    const equipeId = maybeIndexKey ? equipeIdOrId : undefined;
+    const id = maybeIndexKey ? idOrIndexKey : equipeIdOrId;
+    const indexKey = maybeIndexKey ?? idOrIndexKey;
+    await this.findEntity(equipeId, id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: { jogador: { posicao: true } },
@@ -225,10 +249,15 @@ export class SessionsService {
   }
 
   async findView(
-    id: string,
-    filters: SessionViewFiltersDto = {},
+    equipeIdOrId: string,
+    idOrFilters?: string | SessionViewFiltersDto,
+    maybeFilters: SessionViewFiltersDto = {},
   ): Promise<SessionViewResponseDto> {
-    const session = await this.findEntity(id);
+    const equipeId = typeof idOrFilters === 'string' ? equipeIdOrId : undefined;
+    const id = typeof idOrFilters === 'string' ? idOrFilters : equipeIdOrId;
+    const filters =
+      typeof idOrFilters === 'string' ? maybeFilters : (idOrFilters ?? {});
+    const session = await this.findEntity(equipeId, id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: {
@@ -271,8 +300,12 @@ export class SessionsService {
   }
 
   async findViewFilters(
-    id: string,
+    equipeIdOrId: string,
+    maybeId?: string,
   ): Promise<Record<'individual' | 'team', SessionViewFilterOptionsDto>> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    await this.findEntity(equipeId, id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: {
@@ -300,12 +333,19 @@ export class SessionsService {
     };
   }
 
-  async create(dto: SessionDto): Promise<SessionResponseDto> {
+  async create(
+    equipeIdOrDto: string | SessionDto,
+    maybeDto?: SessionDto,
+  ): Promise<SessionResponseDto> {
+    const equipeId =
+      typeof equipeIdOrDto === 'string' ? equipeIdOrDto : undefined;
+    const dto = typeof equipeIdOrDto === 'string' ? maybeDto : equipeIdOrDto;
+    if (!dto) throw new BadRequestException('Dados da sessão não informados');
     if (dto.id !== null) {
       throw new BadRequestException('Id deve ser nulo ao criar uma sessão');
     }
 
-    const team = await this.findTeam();
+    const team = await this.findTeam(equipeId);
     const session = this.sessionsRepository.create({
       equipeId: team.id,
       sessionTypeId: dto.typeId,
@@ -316,18 +356,27 @@ export class SessionsService {
     });
 
     const savedSession = await this.sessionsRepository.save(session);
-    return this.findOne(savedSession.id);
+    return equipeId
+      ? this.findOne(equipeId, savedSession.id)
+      : this.findOne(savedSession.id);
   }
 
-  async update(id: string, dto: UpdateSessionDto): Promise<SessionResponseDto> {
+  async update(
+    equipeIdOrId: string,
+    idOrDto: string | UpdateSessionDto,
+    maybeDto?: UpdateSessionDto,
+  ): Promise<SessionResponseDto> {
+    const equipeId = maybeDto ? equipeIdOrId : undefined;
+    const id = maybeDto ? (idOrDto as string) : equipeIdOrId;
+    const dto = maybeDto ?? (idOrDto as UpdateSessionDto);
     if (dto.id !== id) {
       throw new BadRequestException(
         'Id da sessão deve ser igual ao identificador da rota',
       );
     }
 
-    await this.findEntity(id);
-    await this.sessionsRepository.update(id, {
+    await this.findEntity(equipeId, id);
+    const changes = {
       ...(dto.typeId !== undefined ? { sessionTypeId: dto.typeId } : {}),
       ...(dto.locationId !== undefined
         ? { sessionLocationId: dto.locationId }
@@ -337,17 +386,31 @@ export class SessionsService {
         : {}),
       ...(dto.date !== undefined ? { data: dto.date } : {}),
       ...(dto.description !== undefined ? { descricao: dto.description } : {}),
-    });
-    return this.findOne(id);
+    };
+    await this.sessionsRepository.update(
+      equipeId ? { id, equipeId } : id,
+      changes,
+    );
+    return equipeId ? this.findOne(equipeId, id) : this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.sessionsRepository.softRemove(await this.findEntity(id));
+  async remove(equipeIdOrId: string, maybeId?: string): Promise<void> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    await this.sessionsRepository.softRemove(
+      await this.findEntity(equipeId, id),
+    );
   }
 
-  private async findEntity(id: string): Promise<SessionEntity> {
+  private async findEntity(
+    equipeId: string | undefined,
+    id: string,
+  ): Promise<SessionEntity> {
     const session = await this.sessionsRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
+      },
       relations: {
         equipe: true,
         sessionType: true,
@@ -361,8 +424,11 @@ export class SessionsService {
     return session;
   }
 
-  private async findTeam(): Promise<TeamEntity> {
-    const [team] = await this.teamsRepository.find({ take: 1 });
+  private async findTeam(equipeId?: string): Promise<TeamEntity> {
+    const [team] = await this.teamsRepository.find({
+      ...(equipeId ? { where: { id: equipeId } } : {}),
+      take: 1,
+    });
 
     if (!team) {
       throw new BadRequestException('Equipe nao encontrada');
