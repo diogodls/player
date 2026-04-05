@@ -1,0 +1,138 @@
+.container {
+  min-height: 100svh;
+  background: var(--bg-dark);
+  padding: 40px 20px 56px;
+}
+
+.content {
+  width: min(100%, 960px);
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--selected-blue);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.description {
+  max-width: 620px;
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.openButton {
+  min-height: 46px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: var(--selected-blue);
+  color: var(--text-light);
+  padding: 0 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.emptyState,
+.card {
+  border: 1px solid var(--border-20);
+  border-radius: 18px;
+  background: rgba(31, 41, 55, 0.92);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+
+.emptyState {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0;
+  color: var(--text-light);
+  font-size: 1.35rem;
+}
+
+.emptyDescription {
+  margin: 10px auto 0;
+  max-width: 440px;
+  color: var(--text-muted);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 20px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.cardPosition {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--selected-blue);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cardAge {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cardMeta {
+  margin: 18px 0 0;
+  color: var(--text-muted);
+  word-break: break-word;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 28px 16px 40px;
+  }
+
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .openButton {
+    width: 100%;
+  }
+}
