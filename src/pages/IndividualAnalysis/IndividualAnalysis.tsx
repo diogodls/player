@@ -3,45 +3,29 @@ import VideoAnalysis from "../../components/elements/VideoAnalysis/VideoAnalysis
 import ActionLog from "../../components/IndivididualAnalysis/ActionLog/ActionLog.tsx";
 import PlayerSelector from "../../components/IndivididualAnalysis/PlayerSelector/PlayerSelector.tsx";
 import {useApi} from "../../hooks/useApi.ts";
-import {useContext, useEffect, useMemo, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import ActionsModal from "../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
-import {Navigate, useParams} from "react-router";
 import {ActionsContext} from "../../contexts/ActionsContext/ActionsContext";
-import SessionAnalysisHeader from "../../components/SessionAnalysis/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
-import SessionAnalysisDetails from "../../components/SessionAnalysis/SessionAnalysisDetails/SessionAnalysisDetails.tsx";
-import type { SessionData } from "../SessionView";
+import SessionAnalysisHeader from "../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
-  const { data: sessionsData } = useApi<SessionData>("sessions");
-  const sessions = sessionsData?.sessions ?? [];
+  //todo: refatorar pra isso vir junto da tela de individual analysis
   const { setActions, setSelectedPlayer } = useContext(ActionsContext);
-  const { id } = useParams<{ id: string }>();
+  // const { id } = useParams<{ id: string }>(); todo: usar para requisição futura
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
-
-  const selectedSession = useMemo(
-    () => sessions.find((session) => session.id === id),
-    [sessions, id]
-  );
 
   useEffect(() => {
     setActions([]);
     setSelectedPlayer(null);
-  }, [selectedSession?.id, setActions, setSelectedPlayer]);
+  }, [setActions, setSelectedPlayer]);
 
-  if (!id) {
-    return <Navigate to="/session-screen" replace />;
-  }
-
-  if (!selectedSession) {
-    return <Navigate to="/session-screen" replace />;
-  }
+  if (!data) return;
 
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader sessionId={selectedSession.id} />
-      <SessionAnalysisDetails session={selectedSession} />
+      <SessionAnalysisHeader session={data.session} />
 
       <div className={styles.content}>
         <div className={styles.leftContent}>
@@ -51,7 +35,7 @@ const IndividualAnalysis = () => {
           <VideoAnalysis />
         </div>
         <div className={styles.actionLog}>
-          <ActionLog session={selectedSession} />
+          <ActionLog session={data.session} />
         </div>
       </div>
       {actionsModalOpen && (

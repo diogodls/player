@@ -199,6 +199,13 @@
     }
   },
   "individual-analysis": {
+    "session":  {
+      "id": "1",
+      "type": "Treino",
+      "date": "15/02/2026",
+      "local": "UFSM",
+      "description": "Finalizacao e 1x1"
+    },
     "players": [
       {
         "id": 1,
