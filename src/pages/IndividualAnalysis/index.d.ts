@@ -1,4 +1,5 @@
 import type {Player} from "../CoachDashboard";
+import type {Session} from "../Sessions";
 
 export type ActionTagged = {
   id: string;
@@ -11,6 +12,7 @@ export type ActionTagged = {
 };
 
 export type IndividualAnalysisData = {
+  session: Session;
   players: Player[];
   actions: Action[];
 };

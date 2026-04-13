@@ -438,24 +438,22 @@
       }
     ]
   },
-  "sessions": {
-    "sessions": [
-      {
-        "id": "1",
-        "type": "Treino",
-        "date": "15/02/2026",
-        "local": "UFSM",
-        "description": "Finalizacao e 1x1"
-      },
-      {
-        "id": "2",
-        "type": "Jogo",
-        "date": "19/02/2026",
-        "local": "Farrezao",
-        "opponent": "Atlântico"
-      }
-    ]
-  },
+  "sessions": [
+    {
+      "id": "1",
+      "type": "Treino",
+      "date": "15/02/2026",
+      "local": "UFSM",
+      "description": "Finalizacao e 1x1"
+    },
+    {
+      "id": "2",
+      "type": "Jogo",
+      "date": "19/02/2026",
+      "local": "Farrezao",
+      "opponent": "Atlântico"
+    }
+  ],
   "session-analysis": {
     "1": {
       "players": [
@@ -1174,242 +1172,12 @@
       }
     }
   ],
-  "session-analysis-view": {
-    "1": {
-      "sessionId": "1",
-      "session": null,
-      "summary": {
-        "positives": 21,
-        "negatives": 9,
-        "positivePercentage": 70,
-        "negativePercentage": 30
-      },
-      "athletes": [
-        {
-          "id": "team",
-          "entityType": "team",
-          "title": "Equipe",
-          "variant": "yellow",
-          "defaultOpen": false,
-          "metrics": {
-            "overall": 11,
-            "overallLabel": "TOTAL",
-            "offensive": 7,
-            "defensive": 4,
-            "aproveitamento": 73
-          },
-          "counters": {
-            "positive": 8,
-            "negative": 3
-          },
-          "actions": [
-            {
-              "id": "team-0",
-              "title": "Gol transicao ofensiva",
-              "subtitle": "Gol TO",
-              "time": "00:45",
-              "type": "good"
-            },
-            {
-              "id": "team-1",
-              "title": "Gol sofrido transicao defensiva",
-              "subtitle": "GS TO",
-              "time": "01:20",
-              "type": "bad"
-            },
-            {
-              "id": "team-2",
-              "title": "Chance criada",
-              "subtitle": "CC",
-              "time": "01:58",
-              "type": "good"
-            },
-            {
-              "id": "team-3",
-              "title": "Assistencia",
-              "subtitle": "ASS",
-              "time": "02:31",
-              "type": "good"
-            },
-            {
-              "id": "team-4",
-              "title": "Perda de posse",
-              "subtitle": "PP",
-              "time": "03:06",
-              "type": "bad"
-            },
-            {
-              "id": "team-5",
-              "title": "Roubada de bola",
-              "subtitle": "RB",
-              "time": "03:52",
-              "type": "good"
-            },
-            {
-              "id": "team-6",
-              "title": "Desarme, interceptacao e antecipacao",
-              "subtitle": "DIA",
-              "time": "04:27",
-              "type": "good"
-            },
-            {
-              "id": "team-7",
-              "title": "Gol marcado",
-              "subtitle": "GM",
-              "time": "05:11",
-              "type": "good"
-            },
-            {
-              "id": "team-8",
-              "title": "Falha defensiva",
-              "subtitle": "FD",
-              "time": "05:54",
-              "type": "bad"
-            },
-            {
-              "id": "team-9",
-              "title": "Acao decisiva",
-              "subtitle": "AD",
-              "time": "06:33",
-              "type": "good"
-            },
-            {
-              "id": "team-10",
-              "title": "Gol organizacao ofensiva",
-              "subtitle": "Gol OO",
-              "time": "07:08",
-              "type": "good"
-            }
-          ]
-        }
-      ]
-    },
-    "2": {
-      "sessionId": "2",
-      "session": null,
-      "summary": {
-        "positives": 24,
-        "negatives": 8,
-        "positivePercentage": 75,
-        "negativePercentage": 25
-      },
-      "athletes": [
-        {
-          "id": "team",
-          "entityType": "team",
-          "title": "Equipe",
-          "variant": "yellow",
-          "defaultOpen": false,
-          "metrics": {
-            "overall": 13,
-            "overallLabel": "TOTAL",
-            "offensive": 9,
-            "defensive": 4,
-            "aproveitamento": 69
-          },
-          "counters": {
-            "positive": 9,
-            "negative": 4
-          },
-          "actions": [
-            {
-              "id": "team-0",
-              "title": "Gol marcado",
-              "subtitle": "GM",
-              "time": "00:39",
-              "type": "good"
-            },
-            {
-              "id": "team-1",
-              "title": "Assistencia",
-              "subtitle": "ASS",
-              "time": "01:14",
-              "type": "good"
-            },
-            {
-              "id": "team-2",
-              "title": "Gol sofrido organizacao defensiva",
-              "subtitle": "GS OO",
-              "time": "01:56",
-              "type": "bad"
-            },
-            {
-              "id": "team-3",
-              "title": "Chance criada",
-              "subtitle": "CC",
-              "time": "02:22",
-              "type": "good"
-            },
-            {
-              "id": "team-4",
-              "title": "Acao decisiva",
-              "subtitle": "AD",
-              "time": "03:10",
-              "type": "good"
-            },
-            {
-              "id": "team-5",
-              "title": "Perda de posse",
-              "subtitle": "PP",
-              "time": "03:45",
-              "type": "bad"
-            },
-            {
-              "id": "team-6",
-              "title": "Roubada de bola",
-              "subtitle": "RB",
-              "time": "04:19",
-              "type": "good"
-            },
-            {
-              "id": "team-7",
-              "title": "Desarme, interceptacao e antecipacao",
-              "subtitle": "DIA",
-              "time": "04:58",
-              "type": "good"
-            },
-            {
-              "id": "team-8",
-              "title": "Falha defensiva",
-              "subtitle": "FD",
-              "time": "05:27",
-              "type": "bad"
-            },
-            {
-              "id": "team-9",
-              "title": "Gol bola parada",
-              "subtitle": "Gol BP",
-              "time": "06:03",
-              "type": "good"
-            },
-            {
-              "id": "team-10",
-              "title": "Perda de posse",
-              "subtitle": "PP",
-              "time": "06:46",
-              "type": "bad"
-            },
-            {
-              "id": "team-11",
-              "title": "Gol marcado",
-              "subtitle": "GM",
-              "time": "07:18",
-              "type": "good"
-            },
-            {
-              "id": "team-12",
-              "title": "Gol goleiro linha",
-              "subtitle": "Gol GL",
-              "time": "07:55",
-              "type": "good"
-            }
-          ]
-        }
-      ]
-    }
-  },
   "session-details-view": {
     "1": {
+      "type": "Treino",
+      "date": "15/02/2026",
+      "local": "UFSM",
+      "description": "Finalizacao e 1x1",
       "individual": {
         "summary": {
           "positives": 21,
@@ -1903,6 +1671,10 @@
       }
     },
     "2": {
+      "type": "Jogo",
+      "date": "19/02/2026",
+      "local": "Farrezao",
+      "opponent": "Atlântico",
       "individual": {
         "summary": {
           "positives": 24,
