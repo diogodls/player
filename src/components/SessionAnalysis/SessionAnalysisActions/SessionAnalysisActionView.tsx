@@ -1,7 +1,7 @@
 import styles from "./SessionAnalysisActionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import type { SessionItemAction } from "../../../pages/SessionAnalysis";
+import type {SessionItemAction} from "../../../pages/SessionView";
 
 type Props = {
   actions: SessionItemAction[];
@@ -11,7 +11,7 @@ function iconByType(goodAction: SessionItemAction["goodAction"]) {
   return goodAction ? faCircleCheck : faCircleXmark;
 }
 
-export default function SessionAnalysisActionView({ actions }: Props) {
+const SessionAnalysisActionView = ({ actions }: Props) => {
   if (!actions.length) {
     return <div className={styles.empty}>Sem acoes para este item.</div>;
   }
@@ -37,3 +37,5 @@ export default function SessionAnalysisActionView({ actions }: Props) {
     </div>
   );
 }
+
+export default SessionAnalysisActionView;

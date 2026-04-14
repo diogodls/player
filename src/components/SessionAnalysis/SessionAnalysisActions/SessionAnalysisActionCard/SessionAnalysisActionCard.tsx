@@ -10,7 +10,7 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import SessionAnalysisActionView from "../SessionAnalysisActionView";
-import type { SessionAnalysisItem } from "../../../../pages/SessionAnalysis";
+import type {SessionAnalysisItem} from "../../../../pages/SessionView";
 
 type Props = {
   item: SessionAnalysisItem;
