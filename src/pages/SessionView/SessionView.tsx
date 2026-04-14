@@ -1,80 +1,115 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import styles from "./SessionView.module.scss";
-import HeaderSessionScreen from "../../components/RegistrationScreen/HeaderSessionScreen/HeaderSessionScreen";
-import RegistrationScreen from "../../components/RegistrationScreen/RegistrationScreen";
-import SaveSessionModal from "../../components/IndivididualAnalysis/SaveSessionModal/SaveSessionModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft, faPeopleGroup, faUser } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate, useParams } from "react-router";
+import SessionAnalysisDetails from "../../components/elements/SessionAnalysisDetails/SessionAnalysisDetails";
+import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary";
+import ActionLog from "../../components/SessionDetails/ActionLog/ActionLog";
 import { useApi } from "../../hooks/useApi";
-import type { Session, SessionData, SessionMeta } from "./index";
-import DeleteSessionModal from "../../components/RegistrationScreen/DeleteSessionModal/DeleteSessionModal.tsx";
+import type {SessionViewData, SessionViewRecordData} from "./index";
 
-function toSessionMeta(session: Session): SessionMeta {
-  return {
-    type: session.type,
-    date: session.date,
-    local: session.local,
-    ...(session.type === "Treino"
-      ? { description: session.description ?? "" }
-      : { opponent: session.opponent ?? "" }),
-  };
-}
+type ViewMode = "individual" | "team";
 
 const SessionView = () => {
-  const { data } = useApi<SessionData>("sessions");
-  const sessions = data?.sessions ?? [];
-  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-  const [sessionBeingEdited, setSessionBeingEdited] = useState<Session | null>(null);
-  const [sessionPendingDelete, setSessionPendingDelete] = useState<Session | null>(null);
+  const navigate = useNavigate();
+  const { id: sessionId } = useParams<{ id: string }>();
+  const { data: detailsData, isLoading: isSessionLoading } = useApi<SessionViewRecordData>("session-details-view");
+  const [viewMode, setViewMode] = useState<ViewMode>("individual");
 
-  const editingMeta = useMemo(
-    () => (sessionBeingEdited ? toSessionMeta(sessionBeingEdited) : null),
-    [sessionBeingEdited]
-  );
+  const sessionView: SessionViewData | undefined = sessionId ? detailsData?.[sessionId] : undefined; //todo: remover aqui quando fizer o back
+  const activeView = viewMode === "individual" ? sessionView?.individual : sessionView?.team;
 
-  const handleEditSession = (session: Session) => {
-    setSessionBeingEdited(session);
-    setIsSaveModalOpen(true);
-  };
-
-  const handleDeleteSession = (session: Session) => {
-    setSessionPendingDelete(session);
-  };
-
-  const handleOpenCreate = () => {
-    setSessionBeingEdited(null);
-    setIsSaveModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsSaveModalOpen(false);
-    setSessionBeingEdited(null);
-  };
-
-  const handleCloseDeleteModal = () => {
-    setSessionPendingDelete(null);
-  };
+  if (isSessionLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentWrap}>Carregando sessao...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
-      <HeaderSessionScreen onAddSession={handleOpenCreate} />
-      <RegistrationScreen
-        sessions={sessions}
-        onEditSession={handleEditSession}
-        onDeleteSession={handleDeleteSession}
-      />
+      <div className={styles.contentWrap}>
+        <header className={styles.sessionHeader}>
+          <div className={styles.headerLeft}>
+            <button className={styles.backButton} onClick={() => navigate("/session-screen")}>
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
 
-      <SaveSessionModal
-        key={sessionBeingEdited ? `edit-${sessionBeingEdited.id}` : `create-${isSaveModalOpen ? "open" : "closed"}`}
-        isOpen={isSaveModalOpen}
-        onClose={handleCloseModal}
-        initialMeta={editingMeta}
-        mode={sessionBeingEdited ? "edit" : "create"}
-      />
+            <div className={styles.headerText}>
+              <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
+              <h1 className={styles.title}>Detalhes da sessao</h1>
+              <p className={styles.subtitle}>Acesse o fluxo de analise e acompanhe os dados desta sessao.</p>
+            </div>
+          </div>
 
-      <DeleteSessionModal
-        isOpen={Boolean(sessionPendingDelete)}
-        session={sessionPendingDelete}
-        onClose={handleCloseDeleteModal}
-      />
+          <div className={styles.headerActions}>
+            <button
+              className={`${styles.actionButton} ${styles.individualButton}`}
+              onClick={() => navigate(`/sessions/${sessionId}/analysis/individual`)}
+            >
+              <div className={styles.actionIconWrap}>
+                <FontAwesomeIcon icon={faUser} />
+              </div>
+
+              <div className={styles.actionText}>
+                <strong>Fazer analise individual</strong>
+              </div>
+            </button>
+
+            <button className={`${styles.actionButton} ${styles.teamButton}`}>
+              <div className={styles.actionIconWrap}>
+                <FontAwesomeIcon icon={faPeopleGroup} />
+              </div>
+
+              <div className={styles.actionText}>
+                <strong>Fazer analise de equipe</strong>
+              </div>
+            </button>
+          </div>
+        </header>
+
+        <SessionAnalysisDetails session={sessionView} />
+
+        <section className={styles.viewerCard}>
+          <div className={styles.viewerSwitch}>
+            <button
+              type="button"
+              className={`${styles.switchButton} ${viewMode === "individual" ? styles.switchActive : ""}`}
+              onClick={() => setViewMode("individual")}
+            >
+              Ver analise individual
+            </button>
+            <button
+              type="button"
+              className={`${styles.switchButton} ${viewMode === "team" ? styles.switchActive : ""}`}
+              onClick={() => setViewMode("team")}
+            >
+              Ver analise de equipe
+            </button>
+          </div>
+
+          {activeView && (
+            <SessionAnalysisSummary
+              positives={activeView.summary.positives}
+              negatives={activeView.summary.negatives}
+              positivePercentage={activeView.summary.positivePercentage}
+              negativePercentage={activeView.summary.negativePercentage}
+            />
+          )}
+
+          <h3 className={styles.sectionTitle}>
+            {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
+          </h3>
+
+          <ActionLog
+            viewMode={viewMode}
+            view={activeView}
+            athleteOptions={sessionView?.individual.athleteOptions ?? []}
+          />
+        </section>
+      </div>
     </div>
   );
 };

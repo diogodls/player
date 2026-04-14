@@ -15,35 +15,79 @@ type PaginationProps = {
   size?: PaginationSize;
   showPrevNext?: boolean;
   showPageNumbers?: boolean;
+  siblingCount?: number;
+  boundaryCount?: number;
 };
 
+// Guarantees page numbers are always inside the valid [1..totalPages] range.
 function clampPage(page: number, totalPages: number) {
   if (totalPages <= 0) return 1;
   return Math.min(Math.max(page, 1), totalPages);
 }
 
-function buildPageItems(currentPage: number, totalPages: number): PaginationItem[] {
-  if (totalPages <= 5) {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
+function createRange(start: number, end: number): number[] {
+  if (end < start) return [];
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+}
+
+function buildPageItems(
+  currentPage: number,
+  totalPages: number,
+  siblingCount: number,
+  boundaryCount: number
+): PaginationItem[] {
+  // Small collections render all pages without ellipsis.
+  if (totalPages <= 0) return [];
+  const safeSiblingCount = Math.max(0, siblingCount);
+  const safeBoundaryCount = Math.max(1, boundaryCount);
+  const maxVisibleNumbers = safeBoundaryCount * 2 + safeSiblingCount * 2 + 1;
+
+  if (totalPages <= maxVisibleNumbers) {
+    return createRange(1, totalPages);
   }
 
-  if (currentPage <= 3) {
-    return [1, 2, 3, 4, "ellipsis-right", totalPages];
+  const firstPages = createRange(1, safeBoundaryCount);
+  const lastPages = createRange(totalPages - safeBoundaryCount + 1, totalPages);
+
+  // Center window around current page and then clamp it away from boundaries.
+  const minCenter = safeBoundaryCount + 1;
+  const maxCenter = totalPages - safeBoundaryCount;
+  let windowStart = Math.max(currentPage - safeSiblingCount, minCenter);
+  let windowEnd = Math.min(currentPage + safeSiblingCount, maxCenter);
+
+  // Keep window width stable near the edges for predictable UX.
+  const windowSize = safeSiblingCount * 2 + 1;
+  const currentWindowSize = windowEnd - windowStart + 1;
+  if (currentWindowSize < windowSize) {
+    const missing = windowSize - currentWindowSize;
+    const canGrowRight = maxCenter - windowEnd;
+    const growRight = Math.min(missing, canGrowRight);
+    const growLeft = missing - growRight;
+
+    windowStart = Math.max(minCenter, windowStart - growLeft);
+    windowEnd = Math.min(maxCenter, windowEnd + growRight);
   }
 
-  if (currentPage >= totalPages - 2) {
-    return [1, "ellipsis-left", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  const items: PaginationItem[] = [...firstPages];
+
+  // Left bridge between boundary and center window.
+  if (windowStart > minCenter + 1) {
+    items.push("ellipsis-left");
+  } else {
+    items.push(...createRange(minCenter, windowStart - 1));
   }
 
-  return [
-    1,
-    "ellipsis-left",
-    currentPage - 1,
-    currentPage,
-    currentPage + 1,
-    "ellipsis-right",
-    totalPages,
-  ];
+  items.push(...createRange(windowStart, windowEnd));
+
+  // Right bridge between center window and ending boundary.
+  if (windowEnd < maxCenter - 1) {
+    items.push("ellipsis-right");
+  } else {
+    items.push(...createRange(windowEnd + 1, maxCenter));
+  }
+
+  items.push(...lastPages);
+  return items;
 }
 
 const Pagination = ({
@@ -55,13 +99,18 @@ const Pagination = ({
   size = "md",
   showPrevNext = true,
   showPageNumbers = true,
+  siblingCount = 1,
+  boundaryCount = 1,
 }: PaginationProps) => {
+  // Normalize external values to keep rendering logic predictable.
   const safeTotalPages = Math.max(1, totalPages);
   const safeCurrentPage = clampPage(currentPage, safeTotalPages);
+  const safeSiblingCount = Math.max(0, siblingCount);
+  const safeBoundaryCount = Math.max(1, boundaryCount);
 
   const pageItems = useMemo(
-    () => buildPageItems(safeCurrentPage, safeTotalPages),
-    [safeCurrentPage, safeTotalPages]
+    () => buildPageItems(safeCurrentPage, safeTotalPages, safeSiblingCount, safeBoundaryCount),
+    [safeCurrentPage, safeTotalPages, safeSiblingCount, safeBoundaryCount]
   );
 
   const rootClassName = [
@@ -73,6 +122,7 @@ const Pagination = ({
     .filter(Boolean)
     .join(" ");
 
+  // Single entry-point for page transitions avoids duplicated checks in click handlers.
   const goToPage = (page: number) => {
     if (disabled) return;
 
@@ -81,7 +131,7 @@ const Pagination = ({
     onPageChange(nextPage);
   };
 
-  if (safeTotalPages <= 1) {
+  if (safeTotalPages <= 1 || (!showPrevNext && !showPageNumbers)) {
     return null;
   }
 

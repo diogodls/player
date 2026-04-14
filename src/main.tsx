@@ -22,7 +22,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path={"/"} element={<Home/>}/>
               <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
               <Route path={"/player/:id"} element={<PlayerView/>}/>
-              <Route path={"/session-screen"} element={<Sessions />}/>
+              <Route path={"/sessions"} element={<Sessions />}/>
               <Route path="/sessions/:id" element={<SessionView />} />
               <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
             </Route>

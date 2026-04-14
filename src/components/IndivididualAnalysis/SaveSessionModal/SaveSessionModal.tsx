@@ -1,6 +1,6 @@
 import {useMemo, useState} from "react";
 import styles from "./SaveSessionModal.module.scss";
-import type { SessionMeta, SessionType } from "../../../pages/SessionView";
+import type { SessionMeta, SessionType } from "../../../pages/Sessions";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faX} from "@fortawesome/free-solid-svg-icons";
 

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import SessionCard from "./SessionCard/SessionCard.tsx";
-import type { Session } from "../../pages/SessionView";
+import type { Session } from "../../pages/Sessions";
 import Pagination from "../elements/Pagination/Pagination.tsx";
 
 const ITEMS_PER_PAGE = 5;

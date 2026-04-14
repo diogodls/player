@@ -10,15 +10,17 @@ const HeaderSessionScreen = ({ onAddSession }: HeaderSessionScreenProps) => {
   return(
     <div className={styles.headerContainer}>
       <div className={styles.headerText}>
-        <div className={styles.titleRow}>
+        <div className={styles.icon}>
           <FontAwesomeIcon icon={faFutbol} className={styles.titleIcon} />
+        </div>
+        <div className={styles.text}>
           <span className={styles.title}>
             TREINOS & JOGOS
           </span>
+          <span className={styles.subtitle}>
+            Gerencie treinos e jogos
+          </span>
         </div>
-        <span className={styles.subtitle}>
-          Gerencie treinos e jogos
-        </span>
       </div>
 
       <button className={styles.addButton} onClick={onAddSession}>

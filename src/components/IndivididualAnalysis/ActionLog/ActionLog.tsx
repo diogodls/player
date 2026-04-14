@@ -5,10 +5,8 @@ import { useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
-import type { Session } from "../../../pages/SessionView";
-import type { ActionTagged } from "../../../pages/IndividualAnalysis";
+import type { Session } from "../../../pages/Sessions";
 import { useNavigate } from "react-router";
-import { useSWRConfig } from "swr";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
@@ -17,120 +15,10 @@ type ActionLogProps = {
   session: Session;
 };
 
-type SessionAnalysisRawAction = {
-  time: string;
-  key: string;
-  label: string;
-  type: "positive" | "negative";
-};
-
-type SessionAnalysisRawPlayer = {
-  playerId: string;
-  offensive: number;
-  defensive: number;
-  positive: number;
-  negative: number;
-  actions: SessionAnalysisRawAction[];
-};
-
-type SessionAnalysisRawTeam = {
-  offensive: number;
-  defensive: number;
-  positive: number;
-  negative: number;
-  actions: SessionAnalysisRawAction[];
-};
-
-type SessionAnalysisByIdData = {
-  players: SessionAnalysisRawPlayer[];
-  team: SessionAnalysisRawTeam;
-};
-
-type SessionAnalysisData = Record<string, SessionAnalysisByIdData>;
-
-function normalizeText(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
-
-function classifyMetricBucket(action: ActionTagged): "offensive" | "defensive" {
-  const normalizedCategory = normalizeText(action.category ?? "");
-  const hasDefensiveHint =
-    normalizedCategory.includes("defens") || normalizedCategory.includes("gols tomados");
-
-  return hasDefensiveHint ? "defensive" : "offensive";
-}
-
-function toRawAction(action: ActionTagged): SessionAnalysisRawAction {
-  return {
-    time: action.time,
-    key: action.key ?? action.title,
-    label: action.title,
-    type: action.goodAction ? "positive" : "negative",
-  };
-}
-
-function buildSessionAnalysisById(actions: ActionTagged[]): SessionAnalysisByIdData {
-  const playersById = new Map<string, SessionAnalysisRawPlayer>();
-  const teamActions: SessionAnalysisRawAction[] = [];
-
-  let teamOffensive = 0;
-  let teamDefensive = 0;
-  let teamPositive = 0;
-  let teamNegative = 0;
-
-  actions.forEach((action) => {
-    if (!action.player?.id) return;
-
-    const playerId = String(action.player.id);
-    const metricBucket = classifyMetricBucket(action);
-    const rawAction = toRawAction(action);
-
-    teamActions.push(rawAction);
-    if (metricBucket === "offensive") teamOffensive += 1;
-    if (metricBucket === "defensive") teamDefensive += 1;
-    if (rawAction.type === "positive") teamPositive += 1;
-    if (rawAction.type === "negative") teamNegative += 1;
-
-    const current = playersById.get(playerId) ?? {
-      playerId,
-      offensive: 0,
-      defensive: 0,
-      positive: 0,
-      negative: 0,
-      actions: [],
-    };
-
-    current.actions.push(rawAction);
-    if (metricBucket === "offensive") current.offensive += 1;
-    if (metricBucket === "defensive") current.defensive += 1;
-    if (rawAction.type === "positive") current.positive += 1;
-    if (rawAction.type === "negative") current.negative += 1;
-
-    playersById.set(playerId, current);
-  });
-
-  const team: SessionAnalysisRawTeam = {
-    offensive: teamOffensive,
-    defensive: teamDefensive,
-    positive: teamPositive,
-    negative: teamNegative,
-    actions: teamActions,
-  };
-
-  return {
-    players: Array.from(playersById.values()),
-    team,
-  };
-}
-
 const ActionLog = ({ session }: ActionLogProps) => {
   const { actions, setActions } = useContext(ActionsContext);
   const { success, info, error } = useContext(ToastContext);
   const navigate = useNavigate();
-  const { mutate } = useSWRConfig();
   const cookieKey = `${COOKIE_KEY_PREFIX}${session.id}`;
   const [cookies, setCookie, removeCookie] = useCookies([cookieKey]);
   const hasLoadedCookie = useRef(false);
@@ -191,19 +79,6 @@ const ActionLog = ({ session }: ActionLogProps) => {
     info("Acao removida");
   };
 
-  const persistSessionAnalysis = async (sessionId: string, currentActions: ActionTagged[]) => {
-    const sessionAnalysisById = buildSessionAnalysisById(currentActions);
-
-    await mutate<SessionAnalysisData>(
-      "session-analysis",
-      (currentData) => ({
-        ...(currentData ?? {}),
-        [sessionId]: sessionAnalysisById,
-      }),
-      false
-    );
-  };
-
   const showSuccessAndRedirect = (sessionId: string) => {
     success("Ações salvas com sucesso!");
     setActions([]);
@@ -233,7 +108,6 @@ const ActionLog = ({ session }: ActionLogProps) => {
     setIsSaving(true);
 
     try {
-      await persistSessionAnalysis(session.id, actions);
       showSuccessAndRedirect(session.id);
     } catch {
       setIsSaving(false);

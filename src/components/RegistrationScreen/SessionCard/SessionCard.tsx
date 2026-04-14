@@ -1,7 +1,7 @@
 import styles from "./SessionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCalendarDays, faLocationDot, faHandshake, faClipboardList, faPencil, faTrash} from "@fortawesome/free-solid-svg-icons";
-import type {Session} from "../../../pages/SessionView";
+import type {Session} from "../../../pages/Sessions";
 import {useNavigate} from "react-router";
 
 type SessionCardProps = {

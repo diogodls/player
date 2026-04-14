@@ -3,8 +3,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./ActionLog.module.scss";
 import SessionAnalysisActionCard from "../../SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard";
-import type { SessionAnalysisItem } from "../../../pages/SessionAnalysis";
-import type { SessionAnalysisAthlete, SessionDetailsViewSection, SessionOption } from "../../../pages/SessionDetails";
+import type {
+  SessionAnalysisAthlete,
+  SessionAnalysisItem,
+  SessionDetailsViewSection,
+  SessionOption
+} from "../../../pages/SessionView";
 
 type ViewMode = "individual" | "team";
 type ActionTypeFilter = "all" | "good" | "bad";

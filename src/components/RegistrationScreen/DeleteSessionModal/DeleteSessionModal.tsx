@@ -1,7 +1,7 @@
 import styles from "./DeleteSessionModal.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faXmark } from "@fortawesome/free-solid-svg-icons";
-import type { Session } from "../../../pages/SessionView";
+import type { Session } from "../../../pages/Sessions";
 
 type DeleteSessionModalProps = {
   isOpen: boolean;

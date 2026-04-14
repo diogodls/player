@@ -6,33 +6,37 @@
 
   .headerText {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
     align-items: center;
     text-align: center;
+    gap: 4px;
+    min-width: 0;
 
-    .subtitle{
-      font-size: 18px;
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+      gap: 4px;
+
+      .title {
+        font-weight: bold;
+        font-size: 25px;
+        line-height: 1.12;
+      }
+
+      .subtitle {
+        font-size: 18px;
+      }
     }
 
-    .titleRow {
+    .icon {
       display: flex;
       align-items: center;
-      gap: 8px;
-      min-width: 0;
 
       .titleIcon {
         color: var(--light-blue);
         font-size: 25px;
         flex: 0 0 auto;
       }
-    }
-
-    .title {
-      font-weight: bold;
-      font-size: 25px;
-      line-height: 1.12;
     }
   }
 

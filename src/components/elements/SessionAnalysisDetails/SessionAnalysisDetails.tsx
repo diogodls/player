@@ -1,12 +1,10 @@
-import styles from "./SessionAnalysisDetails.module.scss";
+import styles from './SessionAnalysisDetails.module.scss'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays, faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import type { Session } from "../../../pages/SessionAnalysis";
+import type {Session} from "../../../pages/Sessions";
 
-type SessionDetailsData = Pick<Session, "type" | "date" | "local" | "description" | "opponent">;
-
-type Props = {
-  session?: SessionDetailsData;
+type SessionAnalysisDetailsProps = {
+  session?: Session;
 };
 
 function formatDateBR(dateStr: string) {
@@ -15,8 +13,8 @@ function formatDateBR(dateStr: string) {
   if (!y || !m || !d) return dateStr;
   return `${d}/${m}/${y}`;
 }
-
-const SessionAnalysisDetails = ({ session }: Props) => {
+//todo: trocar nome
+const SessionAnalysisDetails = ({ session }: SessionAnalysisDetailsProps) => {
   if (!session) {
     return (
       <section className={styles.wrapper}>
