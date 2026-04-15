@@ -2,16 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./ActionLog.module.scss";
-import SessionAnalysisActionCard from "../../SessionAnalysis/SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard";
+import SessionAnalysisActionCard from "../SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard";
 import type {
-  SessionAnalysisAthlete,
+  ActionTypeFilter,
   SessionAnalysisItem,
-  SessionDetailsViewSection,
-  SessionOption
+  SessionDetailsViewSection, SessionEntity,
+  SessionOption, ViewMode
 } from "../../../pages/SessionView";
-
-type ViewMode = "individual" | "team";
-type ActionTypeFilter = "all" | "good" | "bad";
 
 type Props = {
   viewMode: ViewMode;
@@ -19,7 +16,7 @@ type Props = {
   athleteOptions?: SessionOption[];
 };
 
-function toSessionAnalysisItem(athlete: SessionAnalysisAthlete): SessionAnalysisItem {
+function toSessionAnalysisItem(athlete: SessionEntity): SessionAnalysisItem {
   return {
     name: athlete.title,
     totalOffensiveActions: athlete.metrics.offensive,
@@ -33,19 +30,13 @@ function toSessionAnalysisItem(athlete: SessionAnalysisAthlete): SessionAnalysis
     })),
   };
 }
-
+//todo: renomear esse componente ActionLog > SessionAnalysisActionCard > SessionAnalysisActionView
 const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
   const [actionTypeFilter, setActionTypeFilter] = useState<ActionTypeFilter>("all");
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const categoryOptions = view?.categoryOptions ?? [];
-
-  useEffect(() => {
-    setActionTypeFilter("all");
-    setSelectedCategory("all");
-    setSelectedAthleteId("all");
-  }, [viewMode]);
 
   useEffect(() => {
     if (selectedCategory === "all") return;
@@ -152,12 +143,12 @@ const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
 
       {hasAnalysisForView ? (
         <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
-          {visibleCards.map((athlete) => (
+          {visibleCards.map((athlete, index) => (
             <SessionAnalysisActionCard
               key={athlete.id}
               item={toSessionAnalysisItem(athlete)}
               entityType={athlete.entityType}
-              defaultOpen={athlete.defaultOpen}
+              defaultOpen={index === 0}
             />
           ))}
         </div>

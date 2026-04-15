@@ -1,6 +1,6 @@
 import styles from './SessionAnalysisHeader.module.scss';
 import type {Session} from "../../../pages/Sessions";
-import SessionAnalysisDetails from "../SessionAnalysisDetails/SessionAnalysisDetails.tsx";
+import SessionDetails from "../SessionDetails/SessionDetails.tsx";
 import SessionAnalysisTitle from "../SessionAnalysisTitle/SessionAnalysisTitle.tsx";
 
 type SessionAnalysisHeaderProps = {
@@ -11,7 +11,7 @@ const SessionAnalysisHeader = ({session}: SessionAnalysisHeaderProps) => {
   return (
     <div className={styles.header}>
       <SessionAnalysisTitle sessionId={session.id} />
-      <SessionAnalysisDetails session={session} />
+      <SessionDetails session={session} />
     </div>
   );
 };

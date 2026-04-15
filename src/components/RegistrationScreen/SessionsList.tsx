@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import styles from "./RegistrationScreen.module.scss";
+import styles from "./SessionsList.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
@@ -9,19 +9,18 @@ import Pagination from "../elements/Pagination/Pagination.tsx";
 
 const ITEMS_PER_PAGE = 5;
 
-type RegistrationScreenProps = {
+type SessionsListProps = {
   sessions: Session[];
   onEditSession: (session: Session) => void;
   onDeleteSession: (session: Session) => void;
 };
 
-const RegistrationScreen = ({
+const SessionsList = ({
                               sessions,
                               onEditSession,
                               onDeleteSession,
-                            }: RegistrationScreenProps) => {
+                            }: SessionsListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-
   const total = sessions.length;
   const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -81,4 +80,4 @@ const RegistrationScreen = ({
   );
 };
 
-export default RegistrationScreen;
+export default SessionsList;

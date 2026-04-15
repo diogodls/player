@@ -1,10 +1,10 @@
-import styles from './SessionAnalysisDetails.module.scss'
+import styles from './SessionDetails.module.scss'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import type {Session} from "../../../pages/Sessions";
 
-type SessionAnalysisDetailsProps = {
-  session?: Session;
+type SessionDetailsProps = {
+  session: Session;
 };
 
 function formatDateBR(dateStr: string) {
@@ -13,16 +13,8 @@ function formatDateBR(dateStr: string) {
   if (!y || !m || !d) return dateStr;
   return `${d}/${m}/${y}`;
 }
-//todo: trocar nome
-const SessionAnalysisDetails = ({ session }: SessionAnalysisDetailsProps) => {
-  if (!session) {
-    return (
-      <section className={styles.wrapper}>
-        <span className={styles.empty}>Sessao nao encontrada.</span>
-      </section>
-    );
-  }
 
+const SessionDetails = ({ session }: SessionDetailsProps) => {
   const isGame = session.type === "Jogo";
   const topTitle = isGame ? (session.opponent ?? "N/D") : (session.description ?? "Treino");
 
@@ -56,4 +48,4 @@ const SessionAnalysisDetails = ({ session }: SessionAnalysisDetailsProps) => {
   );
 };
 
-export default SessionAnalysisDetails;
+export default SessionDetails;

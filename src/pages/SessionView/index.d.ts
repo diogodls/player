@@ -1,13 +1,17 @@
 import type {Session} from "../Sessions";
 
-export type SessionAnalysisSummary = {
+export type ViewMode = "individual" | "team";
+export type ActionTypeFilter = "all" | "good" | "bad";
+export type EntityType = "player" | "team";
+
+export type SessionSummary = {
   positives: number;
   negatives: number;
   positivePercentage: number;
   negativePercentage: number;
 };
 
-export type SessionAnalysisAthleteAction = {
+export type SessionEntityAction = {
   id: string;
   title: string;
   subtitle?: string;
@@ -16,12 +20,10 @@ export type SessionAnalysisAthleteAction = {
   createdAt?: string;
 };
 
-export type SessionAnalysisAthlete = {
+export type SessionEntity = {
   id: string;
   entityType: "player" | "team";
   title: string;
-  variant?: "yellow" | "red";
-  defaultOpen?: boolean;
   metrics: {
     overall: number;
     overallLabel: string;
@@ -33,7 +35,7 @@ export type SessionAnalysisAthlete = {
     positive: number;
     negative: number;
   };
-  actions: SessionAnalysisAthleteAction[];
+  actions: SessionEntityAction[];
 };
 
 export type SessionOption = {
@@ -42,8 +44,8 @@ export type SessionOption = {
 };
 
 export type SessionDetailsViewSection = {
-  summary: SessionAnalysisSummary;
-  athletes: SessionAnalysisAthlete[];
+  summary: SessionSummary;
+  athletes: SessionEntity[];
   athleteOptions: SessionOption[];
   categoryOptions: SessionOption[];
 };
@@ -57,23 +59,7 @@ export interface SessionViewData extends Session, SessionDetails {}
 
 export type SessionViewRecordData = Record<string, SessionViewData>; //todo: remover isso daqui quando tiver back
 
-
-import type { SessionType } from "../SessionView";
-
-export type Session = {
-  id: number;
-  type: SessionType;
-  date: string;
-  local: string;
-  description?: string;
-  opponent?: string;
-  players: SessionAnalysisItem[];
-  totalIndividualPositiveActions: number;
-  totalIndividualNegativeActions: number;
-  team: SessionAnalysisItem;
-  totalTeamPositiveActions: number;
-  totalTeamNegativeActions: number;
-};
+//////////////////////////////////////////
 
 export interface SessionAnalysisItem extends Item {
   actions: SessionItemAction[];
@@ -92,5 +78,3 @@ export type Item = {
   totalOffensiveActions: number;
   totalDefensiveActions: number;
 };
-
-export type SessionAnalysisData = Record<string, Session>;

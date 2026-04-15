@@ -3,30 +3,23 @@ import styles from "./SessionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPeopleGroup, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useParams } from "react-router";
-import SessionAnalysisDetails from "../../components/elements/SessionAnalysisDetails/SessionAnalysisDetails";
-import SessionAnalysisSummary from "../../components/SessionAnalysis/SessionAnalysisSummary/SessionAnalysisSummary";
+import SessionAnalysisDetails from "../../components/elements/SessionDetails/SessionDetails.tsx";
+import SessionAnalysisSummary from "../../components/SessionDetails/SessionSummary/SessionSummary.tsx";
 import ActionLog from "../../components/SessionDetails/ActionLog/ActionLog";
 import { useApi } from "../../hooks/useApi";
-import type {SessionViewData, SessionViewRecordData} from "./index";
-
-type ViewMode = "individual" | "team";
+import type {SessionViewData, SessionViewRecordData, ViewMode} from "./index";
 
 const SessionView = () => {
   const navigate = useNavigate();
   const { id: sessionId } = useParams<{ id: string }>();
-  const { data: detailsData, isLoading: isSessionLoading } = useApi<SessionViewRecordData>("session-details-view");
+  const { data: detailsData } = useApi<SessionViewRecordData>("session-view");
   const [viewMode, setViewMode] = useState<ViewMode>("individual");
 
   const sessionView: SessionViewData | undefined = sessionId ? detailsData?.[sessionId] : undefined; //todo: remover aqui quando fizer o back
-  const activeView = viewMode === "individual" ? sessionView?.individual : sessionView?.team;
+  console.log(sessionId, sessionView, detailsData)
+  if (!sessionView) throw Error('sessão não encontrada');
 
-  if (isSessionLoading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.contentWrap}>Carregando sessao...</div>
-      </div>
-    );
-  }
+  const activeView = viewMode === "individual" ? sessionView?.individual : sessionView?.team;
 
   return (
     <div className={styles.container}>

@@ -1,4 +1,4 @@
-import styles from "../SessionAnalysisSummary/SessionAnalysisSummary.module.scss";
+import styles from "./SessionSummary.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChartColumn } from "@fortawesome/free-solid-svg-icons";
 
@@ -9,7 +9,7 @@ type Props = {
   negativePercentage: number;
 };
 
-const SessionAnalysisSummary = ({ positives, negatives, positivePercentage, negativePercentage }: Props) => {
+const SessionSummary = ({ positives, negatives, positivePercentage, negativePercentage }: Props) => {
   return (
     <section className={styles.wrapper}>
       <header className={styles.header}>
@@ -52,4 +52,4 @@ const SessionAnalysisSummary = ({ positives, negatives, positivePercentage, nega
   );
 };
 
-export default SessionAnalysisSummary;
+export default SessionSummary;

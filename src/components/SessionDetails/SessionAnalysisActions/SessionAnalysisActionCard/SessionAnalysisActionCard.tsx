@@ -9,7 +9,7 @@ import {
   faPeopleGroup,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import SessionAnalysisActionView from "../SessionAnalysisActionView";
+import SessionAnalysisActionView from "../SessionAnalysisActionView.tsx";
 import type {SessionAnalysisItem} from "../../../../pages/SessionView";
 
 type Props = {
