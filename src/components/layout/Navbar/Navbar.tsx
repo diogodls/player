@@ -23,7 +23,7 @@ const buttons = [
   {
     label: "Treinos e jogos",
     icon: faCalendar,
-    link: "/session-screen",
+    link: "/sessions",
   },
 ];
 

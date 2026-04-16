@@ -197,126 +197,6 @@
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
-
-      .filtersCard {
-        border: 1px solid var(--border-20);
-        border-radius: 12px;
-        background: rgba(17, 24, 39, 0.55);
-        padding: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        .filtersTitleRow {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-
-          svg {
-            font-size: 13px;
-            color: var(--text-muted);
-          }
-
-          h4 {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--text-light);
-          }
-        }
-
-        .filtersGrid {
-          display: grid;
-          grid-template-columns: 1.6fr 1fr 1fr;
-          gap: 10px;
-          align-items: end;
-
-          .filterBlock,
-          .filterField {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            min-width: 0;
-          }
-
-          .filterLabel {
-            font-size: 11px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 700;
-          }
-
-          .typeFilters {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-
-            .typeFilterButton {
-              height: 34px;
-              border-radius: 10px;
-              border: 1px solid var(--border-20);
-              background: rgba(255, 255, 255, 0.04);
-              color: var(--text-light);
-              font-size: 12px;
-              font-weight: 700;
-              padding: 0 12px;
-              cursor: pointer;
-              min-width: 0;
-
-              &.typeFilterActive {
-                background: rgba(37, 99, 235, 0.62);
-                border-color: rgba(147, 197, 253, 0.5);
-              }
-            }
-          }
-
-          .filterField {
-            select {
-              height: 34px;
-              border-radius: 10px;
-              border: 1px solid var(--border-20);
-              background: rgba(255, 255, 255, 0.04);
-              color: var(--text-light);
-              padding: 0 10px;
-              font-size: 12px;
-              font-weight: 600;
-              width: 100%;
-              min-width: 0;
-            }
-
-            option {
-              background: #111827;
-              color: var(--text-light);
-            }
-          }
-        }
-      }
-
-      .cardsList {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-
-        &.cardsGrid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 12px;
-        }
-      }
-
-      .emptyState {
-        border: 1px solid var(--border-20);
-        border-radius: 14px;
-        padding: 22px;
-        background: rgba(17, 24, 39, 0.45);
-        color: var(--text-light);
-
-        h3 {
-          margin: 0;
-          font-size: 18px;
-        }
-      }
     }
   }
 
@@ -342,19 +222,6 @@
         }
       }
 
-      .viewerCard {
-        .filtersCard {
-          .filtersGrid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .cardsList {
-          &.cardsGrid {
-            grid-template-columns: 1fr;
-          }
-        }
-      }
     }
   }
 
@@ -436,19 +303,6 @@
           }
         }
 
-        .filtersCard {
-          padding: 10px;
-
-          .filtersGrid {
-            .typeFilters {
-              gap: 6px;
-
-              .typeFilterButton {
-                flex: 1 1 calc(50% - 3px);
-              }
-            }
-          }
-        }
       }
     }
   }

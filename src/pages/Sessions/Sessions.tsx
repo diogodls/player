@@ -4,7 +4,7 @@ import HeaderSessionScreen from "../../components/RegistrationScreen/HeaderSessi
 import SessionsList from "../../components/RegistrationScreen/SessionsList";
 import SaveSessionModal from "../../components/IndivididualAnalysis/SaveSessionModal/SaveSessionModal";
 import { useApi } from "../../hooks/useApi";
-import type { Session, SessionData, SessionMeta } from "./index";
+import type {Session, SessionData, SessionMeta} from "./index";
 import DeleteSessionModal from "../../components/RegistrationScreen/DeleteSessionModal/DeleteSessionModal.tsx"; //todo: trocar nome da pasta para SessionsList
 
 function toSessionMeta(session: Session): SessionMeta {
@@ -52,7 +52,7 @@ const Sessions = () => {
   const handleCloseDeleteModal = () => {
     setSessionPendingDelete(null);
   };
-  //todo: ideal aqui é separar toda essa lógica de modais do componente de página também.
+  //todo: se achar um jeito de separar a lógica aqui dos modais desse componente ótimo, se não só apaga essa linha e bola pra frente
   return (
     <div className={styles.container}>
       <HeaderSessionScreen onAddSession={handleOpenCreate} />
