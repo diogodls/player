@@ -15,7 +15,7 @@ export type SessionEntityAction = {
   id: string;
   title: string;
   subtitle?: string;
-  time?: string;
+  time: string;
   type: "good" | "bad";
   createdAt?: string;
 };
@@ -58,23 +58,3 @@ export type SessionDetails = {
 export interface SessionViewData extends Session, SessionDetails {}
 
 export type SessionViewRecordData = Record<string, SessionViewData>; //todo: remover isso daqui quando tiver back
-
-//////////////////////////////////////////
-
-export interface SessionAnalysisItem extends Item {
-  actions: SessionItemAction[];
-}
-
-export type SessionItemAction = {
-  key: string;
-  label: string;
-  time: string;
-  category: string;
-  goodAction: boolean;
-};
-
-export type Item = {
-  name: string;
-  totalOffensiveActions: number;
-  totalDefensiveActions: number;
-};

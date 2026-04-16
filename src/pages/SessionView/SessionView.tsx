@@ -4,22 +4,35 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPeopleGroup, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useParams } from "react-router";
 import SessionAnalysisDetails from "../../components/elements/SessionDetails/SessionDetails.tsx";
-import SessionAnalysisSummary from "../../components/SessionDetails/SessionSummary/SessionSummary.tsx";
-import ActionLog from "../../components/SessionDetails/ActionLog/ActionLog";
+import SessionSummary from "../../components/SessionDetails/SessionSummary/SessionSummary.tsx";
+import SessionActionExplorer from "../../components/SessionDetails/SessionActions/SessionActions.tsx";
 import { useApi } from "../../hooks/useApi";
 import type {SessionViewData, SessionViewRecordData, ViewMode} from "./index";
 
 const SessionView = () => {
   const navigate = useNavigate();
   const { id: sessionId } = useParams<{ id: string }>();
-  const { data: detailsData } = useApi<SessionViewRecordData>("session-view");
+  const { data: detailsData, isLoading: isSessionLoading } = useApi<SessionViewRecordData>("session-view");
   const [viewMode, setViewMode] = useState<ViewMode>("individual");
 
   const sessionView: SessionViewData | undefined = sessionId ? detailsData?.[sessionId] : undefined; //todo: remover aqui quando fizer o back
-  console.log(sessionId, sessionView, detailsData)
-  if (!sessionView) throw Error('sessão não encontrada');
-
   const activeView = viewMode === "individual" ? sessionView?.individual : sessionView?.team;
+
+  if (isSessionLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentWrap}>Carregando sessao...</div>
+      </div>
+    );
+  }
+
+  if (!sessionView) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.contentWrap}>Sessao nao encontrada.</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -84,7 +97,7 @@ const SessionView = () => {
           </div>
 
           {activeView && (
-            <SessionAnalysisSummary
+            <SessionSummary
               positives={activeView.summary.positives}
               negatives={activeView.summary.negatives}
               positivePercentage={activeView.summary.positivePercentage}
@@ -96,10 +109,9 @@ const SessionView = () => {
             {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
           </h3>
 
-          <ActionLog
+          <SessionActionExplorer
             viewMode={viewMode}
             view={activeView}
-            athleteOptions={sessionView?.individual.athleteOptions ?? []}
           />
         </section>
       </div>

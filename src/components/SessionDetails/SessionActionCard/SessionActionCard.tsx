@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import styles from "./SessionAnalysisActionCard.module.scss";
+import styles from "./SessionActionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -9,23 +9,21 @@ import {
   faPeopleGroup,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import SessionAnalysisActionView from "../SessionAnalysisActionView.tsx";
-import type {SessionAnalysisItem} from "../../../../pages/SessionView";
+import SessionActionView from "./SessionEntityActions/SessionEntityActions.tsx";
+import type { SessionEntity } from "../../../pages/SessionView";
 
 type Props = {
-  item: SessionAnalysisItem;
-  entityType: "player" | "team";
-  defaultOpen?: boolean;
+  entity: SessionEntity;
 };
 
-const SessionAnalysisActionCard = ({ item, entityType, defaultOpen = false }: Props) => {
-  const [open, setOpen] = useState(defaultOpen);
-  const actionsCount = item.actions.length;
-  const isTeam = entityType === "team";
+const SessionActionCard = ({ entity }: Props) => {
+  const [open, setOpen] = useState(false);
+  const actionsCount = entity.actions.length;
+  const isTeam = entity.entityType === "team";
 
   const { positiveActions, negativeActions, aproveitamento } = useMemo(() => {
-    const positive = item.actions.filter((action) => action.goodAction).length;
-    const negative = actionsCount - positive;
+    const positive = entity.actions.filter((action) => action.type === "good").length;
+    const negative = entity.actions.filter((action) => action.type === "bad").length;
     const percentage = actionsCount === 0 ? 0 : Math.round((positive / actionsCount) * 100);
 
     return {
@@ -33,7 +31,7 @@ const SessionAnalysisActionCard = ({ item, entityType, defaultOpen = false }: Pr
       negativeActions: negative,
       aproveitamento: percentage,
     };
-  }, [actionsCount, item.actions]);
+  }, [actionsCount, entity.actions]);
 
   return (
     <article className={`${styles.card} ${styles.card_yellow}`}>
@@ -44,7 +42,7 @@ const SessionAnalysisActionCard = ({ item, entityType, defaultOpen = false }: Pr
           </div>
 
           <div className={styles.meta}>
-            <div className={styles.title}>{item.name}</div>
+            <div className={styles.title}>{entity.title}</div>
             <div className={styles.sub}>{actionsCount} acoes exibidas</div>
           </div>
         </div>
@@ -70,8 +68,8 @@ const SessionAnalysisActionCard = ({ item, entityType, defaultOpen = false }: Pr
       </div>
 
       <div className={styles.metrics}>
-        <MiniMetric label="OFENSIVO" value={item.totalOffensiveActions} tone="blue" />
-        <MiniMetric label="DEFENSIVO" value={item.totalDefensiveActions} tone="yellow" />
+        <MiniMetric label="OFENSIVO" value={entity.metrics.offensive} tone="blue" />
+        <MiniMetric label="DEFENSIVO" value={entity.metrics.defensive} tone="yellow" />
         <MiniMetric label="APROVEIT." value={aproveitamento} tone="green" />
       </div>
 
@@ -87,7 +85,7 @@ const SessionAnalysisActionCard = ({ item, entityType, defaultOpen = false }: Pr
 
       {open && (
         <div className={styles.expandArea}>
-          <SessionAnalysisActionView actions={item.actions} />
+          <SessionActionView actions={entity.actions} />
         </div>
       )}
     </article>
@@ -117,4 +115,4 @@ function MiniMetric({
   );
 }
 
-export default SessionAnalysisActionCard;
+export default SessionActionCard;

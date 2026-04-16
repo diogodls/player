@@ -1,75 +1,60 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
-import styles from "./ActionLog.module.scss";
-import SessionAnalysisActionCard from "../SessionAnalysisActions/SessionAnalysisActionCard/SessionAnalysisActionCard";
+import styles from "./SessionActions.module.scss";
+import SessionActionCard from "../SessionActionCard/SessionActionCard.tsx";
 import type {
   ActionTypeFilter,
-  SessionAnalysisItem,
-  SessionDetailsViewSection, SessionEntity,
-  SessionOption, ViewMode
+  SessionDetailsViewSection,
+  ViewMode,
 } from "../../../pages/SessionView";
 
 type Props = {
   viewMode: ViewMode;
   view?: SessionDetailsViewSection;
-  athleteOptions?: SessionOption[];
 };
 
-function toSessionAnalysisItem(athlete: SessionEntity): SessionAnalysisItem {
-  return {
-    name: athlete.title,
-    totalOffensiveActions: athlete.metrics.offensive,
-    totalDefensiveActions: athlete.metrics.defensive,
-    actions: athlete.actions.map((action) => ({
-      key: action.subtitle ?? action.title,
-      label: action.title,
-      time: action.time ?? "",
-      category: action.subtitle ?? "Sem categoria",
-      goodAction: action.type === "good",
-    })),
-  };
-}
-//todo: renomear esse componente ActionLog > SessionAnalysisActionCard > SessionAnalysisActionView
-const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
+const SessionActions = ({ viewMode, view }: Props) => {
   const [actionTypeFilter, setActionTypeFilter] = useState<ActionTypeFilter>("all");
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
+  const athleteOptions = view?.athleteOptions ?? [];
   const categoryOptions = view?.categoryOptions ?? [];
+  const sourceEntities = useMemo(() => view?.athletes ?? [], [view?.athletes]);
 
-  useEffect(() => {
-    if (selectedCategory === "all") return;
-    if (!categoryOptions.some((option) => option.value === selectedCategory)) {
-      setSelectedCategory("all");
-    }
-  }, [categoryOptions, selectedCategory]);
+  const activeAthleteId =
+    viewMode === "individual" && athleteOptions.some((option) => option.value === selectedAthleteId)
+      ? selectedAthleteId
+      : "all";
 
-  const visibleCards = useMemo(() => {
-    const sourceCards = view?.athletes ?? [];
-    const cardsByAthlete =
-      viewMode === "individual" && selectedAthleteId !== "all"
-        ? sourceCards.filter((athlete) => athlete.id === selectedAthleteId)
-        : sourceCards;
+  const activeCategory =
+    categoryOptions.some((option) => option.value === selectedCategory) ? selectedCategory : "all";
 
-    return cardsByAthlete
+  const visibleEntities = useMemo(() => {
+    const entitiesByAthlete =
+      viewMode === "individual" && activeAthleteId !== "all"
+        ? sourceEntities.filter((athlete) => athlete.id === activeAthleteId)
+        : sourceEntities;
+
+    return entitiesByAthlete
       .map((athlete) => ({
         ...athlete,
         actions: athlete.actions.filter((action) => {
           const matchesType = actionTypeFilter === "all" || action.type === actionTypeFilter;
-          const matchesCategory = selectedCategory === "all" || action.subtitle === selectedCategory;
+          const matchesCategory = activeCategory === "all" || action.subtitle === activeCategory;
           return matchesType && matchesCategory;
         }),
       }))
       .filter((athlete) => athlete.actions.length > 0);
-  }, [actionTypeFilter, selectedAthleteId, selectedCategory, view?.athletes, viewMode]);
+  }, [actionTypeFilter, activeAthleteId, activeCategory, sourceEntities, viewMode]);
 
-  const hasBaseAnalysisForView = (view?.athletes.length ?? 0) > 0;
-  const hasAnalysisForView = visibleCards.length > 0;
+  const hasBaseAnalysisForView = sourceEntities.length > 0;
+  const hasAnalysisForView = visibleEntities.length > 0;
   const hasActiveFilters =
     actionTypeFilter !== "all" ||
-    selectedCategory !== "all" ||
-    (viewMode === "individual" && selectedAthleteId !== "all");
+    activeCategory !== "all" ||
+    (viewMode === "individual" && activeAthleteId !== "all");
 
   const handleResetFilters = () => {
     setActionTypeFilter("all");
@@ -116,7 +101,7 @@ const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
           {viewMode === "individual" && (
             <label className={styles.filterField}>
               <span className={styles.filterLabel}>Atleta</span>
-              <select value={selectedAthleteId} onChange={(event) => setSelectedAthleteId(event.target.value)}>
+              <select value={activeAthleteId} onChange={(event) => setSelectedAthleteId(event.target.value)}>
                 <option value="all">Todos os atletas</option>
                 {athleteOptions.map((athlete) => (
                   <option key={athlete.value} value={athlete.value}>
@@ -129,7 +114,7 @@ const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
 
           <label className={styles.filterField}>
             <span className={styles.filterLabel}>Categoria</span>
-            <select value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}>
+            <select value={activeCategory} onChange={(event) => setSelectedCategory(event.target.value)}>
               <option value="all">Todas as categorias</option>
               {categoryOptions.map((category) => (
                 <option key={category.value} value={category.value}>
@@ -143,13 +128,8 @@ const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
 
       {hasAnalysisForView ? (
         <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
-          {visibleCards.map((athlete, index) => (
-            <SessionAnalysisActionCard
-              key={athlete.id}
-              item={toSessionAnalysisItem(athlete)}
-              entityType={athlete.entityType}
-              defaultOpen={index === 0}
-            />
+          {visibleEntities.map((athlete) => (
+            <SessionActionCard key={athlete.id} entity={athlete} />
           ))}
         </div>
       ) : (
@@ -170,4 +150,4 @@ const ActionLog = ({ viewMode, view, athleteOptions = [] }: Props) => {
   );
 };
 
-export default ActionLog;
+export default SessionActions;

@@ -4,7 +4,7 @@ import { faCalendarDays, faLocationDot } from "@fortawesome/free-solid-svg-icons
 import type {Session} from "../../../pages/Sessions";
 
 type SessionDetailsProps = {
-  session: Session;
+  session?: Session;
 };
 
 function formatDateBR(dateStr: string) {
@@ -15,6 +15,8 @@ function formatDateBR(dateStr: string) {
 }
 
 const SessionDetails = ({ session }: SessionDetailsProps) => {
+  if (!session) return null; //todo: retirar isso depois
+
   const isGame = session.type === "Jogo";
   const topTitle = isGame ? (session.opponent ?? "N/D") : (session.description ?? "Treino");
 
