@@ -7,8 +7,8 @@ type Props = {
   actions: SessionEntityAction[];
 };
 
-function iconByType(type: SessionEntityAction["type"]) {
-  return type === "good" ? faCircleCheck : faCircleXmark;
+function iconByType(outcome: SessionEntityAction["outcome"]) {
+  return outcome === "positive" ? faCircleCheck : faCircleXmark;
 }
 
 const SessionEntityActions = ({ actions }: Props) => {
@@ -20,13 +20,13 @@ const SessionEntityActions = ({ actions }: Props) => {
     <div className={styles.list}>
       {actions.map((action) => (
         <div key={action.id} className={styles.row}>
-          <div className={`${styles.icon} ${styles[`icon_${action.type}`]}`}>
-            <FontAwesomeIcon icon={iconByType(action.type)} />
+          <div className={`${styles.icon} ${styles[`icon_${action.outcome}`]}`}>
+            <FontAwesomeIcon icon={iconByType(action.outcome)} />
           </div>
 
           <div className={styles.main}>
             <div className={styles.title}>{action.title}</div>
-            <div className={styles.subtitle}>{action.subtitle}</div>
+            <div className={styles.subtitle}>{action.category.label}</div>
           </div>
 
           <div className={styles.meta}>

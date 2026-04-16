@@ -5,13 +5,13 @@ import styles from "./SessionActions.module.scss";
 import SessionActionCard from "../SessionActionCard/SessionActionCard.tsx";
 import type {
   ActionTypeFilter,
-  SessionDetailsViewSection,
+  SessionAnalysisSection,
   ViewMode,
 } from "../../../pages/SessionView";
 
 type Props = {
   viewMode: ViewMode;
-  view?: SessionDetailsViewSection;
+  view: SessionAnalysisSection;
 };
 
 const SessionActions = ({ viewMode, view }: Props) => {
@@ -19,9 +19,31 @@ const SessionActions = ({ viewMode, view }: Props) => {
   const [selectedAthleteId, setSelectedAthleteId] = useState<string>("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const athleteOptions = view?.athleteOptions ?? [];
-  const categoryOptions = view?.categoryOptions ?? [];
-  const sourceEntities = useMemo(() => view?.athletes ?? [], [view?.athletes]);
+  const sourceEntities = view.entities;
+
+  const athleteOptions = useMemo(
+    () =>
+      sourceEntities
+        .filter((entity) => entity.type === "player")
+        .map((entity) => ({ value: entity.id, label: entity.title })),
+    [sourceEntities]
+  );
+
+  const categoryOptions = useMemo(() => {
+    const seen = new Set<string>();
+
+    return sourceEntities.flatMap((entity) =>
+      entity.actions.flatMap((action) => {
+        if (seen.has(action.category.code)) return [];
+        seen.add(action.category.code);
+
+        return {
+          value: action.category.code,
+          label: action.category.label,
+        };
+      })
+    );
+  }, [sourceEntities]);
 
   const activeAthleteId =
     viewMode === "individual" && athleteOptions.some((option) => option.value === selectedAthleteId)
@@ -41,8 +63,8 @@ const SessionActions = ({ viewMode, view }: Props) => {
       .map((athlete) => ({
         ...athlete,
         actions: athlete.actions.filter((action) => {
-          const matchesType = actionTypeFilter === "all" || action.type === actionTypeFilter;
-          const matchesCategory = activeCategory === "all" || action.subtitle === activeCategory;
+          const matchesType = actionTypeFilter === "all" || action.outcome === actionTypeFilter;
+          const matchesCategory = activeCategory === "all" || action.category.code === activeCategory;
           return matchesType && matchesCategory;
         }),
       }))
@@ -83,15 +105,15 @@ const SessionActions = ({ viewMode, view }: Props) => {
               </button>
               <button
                 type="button"
-                className={`${styles.typeFilterButton} ${actionTypeFilter === "good" ? styles.typeFilterActive : ""}`}
-                onClick={() => setActionTypeFilter("good")}
+                className={`${styles.typeFilterButton} ${actionTypeFilter === "positive" ? styles.typeFilterActive : ""}`}
+                onClick={() => setActionTypeFilter("positive")}
               >
                 Positivas
               </button>
               <button
                 type="button"
-                className={`${styles.typeFilterButton} ${actionTypeFilter === "bad" ? styles.typeFilterActive : ""}`}
-                onClick={() => setActionTypeFilter("bad")}
+                className={`${styles.typeFilterButton} ${actionTypeFilter === "negative" ? styles.typeFilterActive : ""}`}
+                onClick={() => setActionTypeFilter("negative")}
               >
                 Negativas
               </button>

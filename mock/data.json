@@ -464,7 +464,7 @@
   "players": [
     {
       "id": 1,
-      "name": "JoÃ£o",
+      "name": "João",
       "overall": 98,
       "position": "Goleiro",
       "minutes": 31,
@@ -585,1005 +585,223 @@
   ],
   "session-view": {
     "1": {
-      "type": "Treino",
-      "date": "15/02/2026",
-      "local": "UFSM",
-      "description": "Finalizacao e 1x1",
-      "individual": {
-        "summary": {
-          "positives": 21,
-          "negatives": 9,
-          "positivePercentage": 70,
-          "negativePercentage": 30
-        },
-        "athletes": [
-          {
-            "id": "player-1",
-            "entityType": "player",
-            "title": "JoÃ£o",
-            "metrics": {
-              "overall": 9,
-              "overallLabel": "TOTAL",
-              "offensive": 1,
-              "defensive": 7,
-              "aproveitamento": 78
-            },
-            "counters": {
-              "positive": 7,
-              "negative": 2
-            },
-            "actions": [
-              {
-                "id": "player-1-0",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "00:24",
-                "type": "good"
-              },
-              {
-                "id": "player-1-1",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "01:03",
-                "type": "good"
-              },
-              {
-                "id": "player-1-2",
-                "title": "Gol sofrido organizacao defensiva",
-                "subtitle": "GS OO",
-                "time": "01:36",
-                "type": "bad"
-              },
-              {
-                "id": "player-1-3",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "02:07",
-                "type": "good"
-              },
-              {
-                "id": "player-1-4",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "03:10",
-                "type": "good"
-              },
-              {
-                "id": "player-1-5",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "04:01",
-                "type": "bad"
-              },
-              {
-                "id": "player-1-6",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "04:33",
-                "type": "good"
-              },
-              {
-                "id": "player-1-7",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "05:28",
-                "type": "good"
-              },
-              {
-                "id": "player-1-8",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "06:02",
-                "type": "good"
-              }
-            ]
-          },
-          {
-            "id": "player-3",
-            "entityType": "player",
-            "title": "Guedes",
-            "metrics": {
-              "overall": 11,
-              "overallLabel": "TOTAL",
-              "offensive": 6,
-              "defensive": 4,
-              "aproveitamento": 73
-            },
-            "counters": {
-              "positive": 8,
-              "negative": 3
-            },
-            "actions": [
-              {
-                "id": "player-3-0",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "00:41",
-                "type": "good"
-              },
-              {
-                "id": "player-3-1",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "01:19",
-                "type": "good"
-              },
-              {
-                "id": "player-3-2",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "01:58",
-                "type": "bad"
-              },
-              {
-                "id": "player-3-3",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "02:22",
-                "type": "good"
-              },
-              {
-                "id": "player-3-4",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "02:49",
-                "type": "good"
-              },
-              {
-                "id": "player-3-5",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "03:24",
-                "type": "bad"
-              },
-              {
-                "id": "player-3-6",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "03:57",
-                "type": "good"
-              },
-              {
-                "id": "player-3-7",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "04:40",
-                "type": "good"
-              },
-              {
-                "id": "player-3-8",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "05:12",
-                "type": "good"
-              },
-              {
-                "id": "player-3-9",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "05:49",
-                "type": "bad"
-              },
-              {
-                "id": "player-3-10",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "06:30",
-                "type": "good"
-              }
-            ]
-          },
-          {
-            "id": "player-5",
-            "entityType": "player",
-            "title": "Balk",
-            "metrics": {
-              "overall": 10,
-              "overallLabel": "TOTAL",
-              "offensive": 5,
-              "defensive": 5,
-              "aproveitamento": 60
-            },
-            "counters": {
-              "positive": 6,
-              "negative": 4
-            },
-            "actions": [
-              {
-                "id": "player-5-0",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "00:36",
-                "type": "good"
-              },
-              {
-                "id": "player-5-1",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "01:12",
-                "type": "bad"
-              },
-              {
-                "id": "player-5-2",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "01:44",
-                "type": "good"
-              },
-              {
-                "id": "player-5-3",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "02:28",
-                "type": "bad"
-              },
-              {
-                "id": "player-5-4",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "03:06",
-                "type": "good"
-              },
-              {
-                "id": "player-5-5",
-                "title": "Gol pago",
-                "subtitle": "GP",
-                "time": "03:51",
-                "type": "bad"
-              },
-              {
-                "id": "player-5-6",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "04:18",
-                "type": "good"
-              },
-              {
-                "id": "player-5-7",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "04:52",
-                "type": "bad"
-              },
-              {
-                "id": "player-5-8",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "05:31",
-                "type": "good"
-              },
-              {
-                "id": "player-5-9",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "06:09",
-                "type": "good"
-              }
-            ]
-          }
-        ],
-        "athleteOptions": [
-          {
-            "value": "player-1",
-            "label": "JoÃ£o"
-          },
-          {
-            "value": "player-3",
-            "label": "Guedes"
-          },
-          {
-            "value": "player-5",
-            "label": "Balk"
-          }
-        ],
-        "categoryOptions": [
-          {
-            "value": "RB",
-            "label": "RB"
-          },
-          {
-            "value": "DIA",
-            "label": "DIA"
-          },
-          {
-            "value": "GS OO",
-            "label": "GS OO"
-          },
-          {
-            "value": "GM",
-            "label": "GM"
-          },
-          {
-            "value": "FD",
-            "label": "FD"
-          },
-          {
-            "value": "CC",
-            "label": "CC"
-          },
-          {
-            "value": "ASS",
-            "label": "ASS"
-          },
-          {
-            "value": "PP",
-            "label": "PP"
-          },
-          {
-            "value": "AD",
-            "label": "AD"
-          },
-          {
-            "value": "GP",
-            "label": "GP"
-          }
-        ]
+      "session": {
+        "id": "1",
+        "type": "Treino",
+        "date": "15/02/2026",
+        "local": "UFSM",
+        "description": "Finalizacao e 1x1"
       },
-      "team": {
-        "summary": {
-          "positives": 8,
-          "negatives": 3,
-          "positivePercentage": 73,
-          "negativePercentage": 27
+      "analysis": {
+        "individual": {
+          "summary": {
+            "positives": 21,
+            "negatives": 9,
+            "positivePercentage": 70,
+            "negativePercentage": 30
+          },
+          "entities": [
+            {
+              "id": "player-1",
+              "type": "player",
+              "title": "João",
+              "metrics": { "overall": 9, "offensive": 1, "defensive": 7, "performance": 78 },
+              "stats": { "positive": 7, "negative": 2, "total": 9 },
+              "actions": [
+                { "id": "player-1-0", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "00:24", "outcome": "positive" },
+                { "id": "player-1-1", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "01:03", "outcome": "positive" },
+                { "id": "player-1-2", "title": "Gol sofrido organizacao defensiva", "category": { "code": "GS OO", "label": "GS OO" }, "time": "01:36", "outcome": "negative" },
+                { "id": "player-1-3", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "02:07", "outcome": "positive" },
+                { "id": "player-1-4", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "03:10", "outcome": "positive" },
+                { "id": "player-1-5", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "04:01", "outcome": "negative" },
+                { "id": "player-1-6", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "04:33", "outcome": "positive" },
+                { "id": "player-1-7", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "05:28", "outcome": "positive" },
+                { "id": "player-1-8", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "06:02", "outcome": "positive" }
+              ]
+            },
+            {
+              "id": "player-3",
+              "type": "player",
+              "title": "Guedes",
+              "metrics": { "overall": 11, "offensive": 6, "defensive": 4, "performance": 73 },
+              "stats": { "positive": 8, "negative": 3, "total": 11 },
+              "actions": [
+                { "id": "player-3-0", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "00:41", "outcome": "positive" },
+                { "id": "player-3-1", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "01:19", "outcome": "positive" },
+                { "id": "player-3-2", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "01:58", "outcome": "negative" },
+                { "id": "player-3-3", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "02:22", "outcome": "positive" },
+                { "id": "player-3-4", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "02:49", "outcome": "positive" },
+                { "id": "player-3-5", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "03:24", "outcome": "negative" },
+                { "id": "player-3-6", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "03:57", "outcome": "positive" },
+                { "id": "player-3-7", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "04:40", "outcome": "positive" },
+                { "id": "player-3-8", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "05:12", "outcome": "positive" },
+                { "id": "player-3-9", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "05:49", "outcome": "negative" },
+                { "id": "player-3-10", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "06:30", "outcome": "positive" }
+              ]
+            },
+            {
+              "id": "player-5",
+              "type": "player",
+              "title": "Balk",
+              "metrics": { "overall": 10, "offensive": 5, "defensive": 5, "performance": 60 },
+              "stats": { "positive": 6, "negative": 4, "total": 10 },
+              "actions": [
+                { "id": "player-5-0", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "00:36", "outcome": "positive" },
+                { "id": "player-5-1", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "01:12", "outcome": "negative" },
+                { "id": "player-5-2", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "01:44", "outcome": "positive" },
+                { "id": "player-5-3", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "02:28", "outcome": "negative" },
+                { "id": "player-5-4", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "03:06", "outcome": "positive" },
+                { "id": "player-5-5", "title": "Gol pago", "category": { "code": "GP", "label": "GP" }, "time": "03:51", "outcome": "negative" },
+                { "id": "player-5-6", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "04:18", "outcome": "positive" },
+                { "id": "player-5-7", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "04:52", "outcome": "negative" },
+                { "id": "player-5-8", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "05:31", "outcome": "positive" },
+                { "id": "player-5-9", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "06:09", "outcome": "positive" }
+              ]
+            }
+          ]
         },
-        "athletes": [
-          {
-            "id": "team",
-            "entityType": "team",
-            "title": "Equipe",
-            "metrics": {
-              "overall": 11,
-              "overallLabel": "TOTAL",
-              "offensive": 7,
-              "defensive": 4,
-              "aproveitamento": 73
-            },
-            "counters": {
-              "positive": 8,
-              "negative": 3
-            },
-            "actions": [
-              {
-                "id": "team-0",
-                "title": "Gol transicao ofensiva",
-                "subtitle": "Gol TO",
-                "time": "00:45",
-                "type": "good"
-              },
-              {
-                "id": "team-1",
-                "title": "Gol sofrido transicao defensiva",
-                "subtitle": "GS TO",
-                "time": "01:20",
-                "type": "bad"
-              },
-              {
-                "id": "team-2",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "01:58",
-                "type": "good"
-              },
-              {
-                "id": "team-3",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "02:31",
-                "type": "good"
-              },
-              {
-                "id": "team-4",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "03:06",
-                "type": "bad"
-              },
-              {
-                "id": "team-5",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "03:52",
-                "type": "good"
-              },
-              {
-                "id": "team-6",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "04:27",
-                "type": "good"
-              },
-              {
-                "id": "team-7",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "05:11",
-                "type": "good"
-              },
-              {
-                "id": "team-8",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "05:54",
-                "type": "bad"
-              },
-              {
-                "id": "team-9",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "06:33",
-                "type": "good"
-              },
-              {
-                "id": "team-10",
-                "title": "Gol organizacao ofensiva",
-                "subtitle": "Gol OO",
-                "time": "07:08",
-                "type": "good"
-              }
-            ]
-          }
-        ],
-        "athleteOptions": [
-        ],
-        "categoryOptions": [
-          {
-            "value": "Gol TO",
-            "label": "Gol TO"
+        "team": {
+          "summary": {
+            "positives": 8,
+            "negatives": 3,
+            "positivePercentage": 73,
+            "negativePercentage": 27
           },
-          {
-            "value": "GS TO",
-            "label": "GS TO"
-          },
-          {
-            "value": "CC",
-            "label": "CC"
-          },
-          {
-            "value": "ASS",
-            "label": "ASS"
-          },
-          {
-            "value": "PP",
-            "label": "PP"
-          },
-          {
-            "value": "RB",
-            "label": "RB"
-          },
-          {
-            "value": "DIA",
-            "label": "DIA"
-          },
-          {
-            "value": "GM",
-            "label": "GM"
-          },
-          {
-            "value": "FD",
-            "label": "FD"
-          },
-          {
-            "value": "AD",
-            "label": "AD"
-          },
-          {
-            "value": "Gol OO",
-            "label": "Gol OO"
-          }
-        ]
+          "entities": [
+            {
+              "id": "team",
+              "type": "team",
+              "title": "Equipe",
+              "metrics": { "overall": 11, "offensive": 7, "defensive": 4, "performance": 73 },
+              "stats": { "positive": 8, "negative": 3, "total": 11 },
+              "actions": [
+                { "id": "team-0", "title": "Gol transicao ofensiva", "category": { "code": "Gol TO", "label": "Gol TO" }, "time": "00:45", "outcome": "positive" },
+                { "id": "team-1", "title": "Gol sofrido transicao defensiva", "category": { "code": "GS TO", "label": "GS TO" }, "time": "01:20", "outcome": "negative" },
+                { "id": "team-2", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "01:58", "outcome": "positive" },
+                { "id": "team-3", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "02:31", "outcome": "positive" },
+                { "id": "team-4", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "03:06", "outcome": "negative" },
+                { "id": "team-5", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "03:52", "outcome": "positive" },
+                { "id": "team-6", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "04:27", "outcome": "positive" },
+                { "id": "team-7", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "05:11", "outcome": "positive" },
+                { "id": "team-8", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "05:54", "outcome": "negative" },
+                { "id": "team-9", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "06:33", "outcome": "positive" },
+                { "id": "team-10", "title": "Gol organizacao ofensiva", "category": { "code": "Gol OO", "label": "Gol OO" }, "time": "07:08", "outcome": "positive" }
+              ]
+            }
+          ]
+        }
       }
     },
     "2": {
-      "type": "Jogo",
-      "date": "19/02/2026",
-      "local": "Farrezao",
-      "opponent": "Atlântico",
-      "individual": {
-        "summary": {
-          "positives": 24,
-          "negatives": 8,
-          "positivePercentage": 75,
-          "negativePercentage": 25
-        },
-        "athletes": [
-          {
-            "id": "player-2",
-            "entityType": "player",
-            "title": "Guga",
-            "metrics": {
-              "overall": 12,
-              "overallLabel": "TOTAL",
-              "offensive": 8,
-              "defensive": 2,
-              "aproveitamento": 75
-            },
-            "counters": {
-              "positive": 9,
-              "negative": 3
-            },
-            "actions": [
-              {
-                "id": "player-2-0",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "00:32",
-                "type": "good"
-              },
-              {
-                "id": "player-2-1",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "01:18",
-                "type": "bad"
-              },
-              {
-                "id": "player-2-2",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "02:14",
-                "type": "good"
-              },
-              {
-                "id": "player-2-3",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "03:02",
-                "type": "good"
-              },
-              {
-                "id": "player-2-4",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "03:47",
-                "type": "good"
-              },
-              {
-                "id": "player-2-5",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "04:11",
-                "type": "good"
-              },
-              {
-                "id": "player-2-6",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "05:08",
-                "type": "bad"
-              },
-              {
-                "id": "player-2-7",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "05:36",
-                "type": "good"
-              },
-              {
-                "id": "player-2-8",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "06:20",
-                "type": "bad"
-              },
-              {
-                "id": "player-2-9",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "07:03",
-                "type": "good"
-              },
-              {
-                "id": "player-2-10",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "07:48",
-                "type": "good"
-              },
-              {
-                "id": "player-2-11",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "08:16",
-                "type": "good"
-              }
-            ]
-          },
-          {
-            "id": "player-4",
-            "entityType": "player",
-            "title": "Senna",
-            "metrics": {
-              "overall": 11,
-              "overallLabel": "TOTAL",
-              "offensive": 7,
-              "defensive": 3,
-              "aproveitamento": 73
-            },
-            "counters": {
-              "positive": 8,
-              "negative": 3
-            },
-            "actions": [
-              {
-                "id": "player-4-0",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "00:45",
-                "type": "good"
-              },
-              {
-                "id": "player-4-1",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "01:22",
-                "type": "good"
-              },
-              {
-                "id": "player-4-2",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "02:05",
-                "type": "bad"
-              },
-              {
-                "id": "player-4-3",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "02:58",
-                "type": "good"
-              },
-              {
-                "id": "player-4-4",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "03:21",
-                "type": "good"
-              },
-              {
-                "id": "player-4-5",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "04:06",
-                "type": "good"
-              },
-              {
-                "id": "player-4-6",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "04:53",
-                "type": "bad"
-              },
-              {
-                "id": "player-4-7",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "05:37",
-                "type": "good"
-              },
-              {
-                "id": "player-4-8",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "06:15",
-                "type": "bad"
-              },
-              {
-                "id": "player-4-9",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "07:09",
-                "type": "good"
-              },
-              {
-                "id": "player-4-10",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "08:02",
-                "type": "good"
-              }
-            ]
-          },
-          {
-            "id": "player-1",
-            "entityType": "player",
-            "title": "JoÃ£o",
-            "metrics": {
-              "overall": 9,
-              "overallLabel": "TOTAL",
-              "offensive": 1,
-              "defensive": 8,
-              "aproveitamento": 78
-            },
-            "counters": {
-              "positive": 7,
-              "negative": 2
-            },
-            "actions": [
-              {
-                "id": "player-1-0",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "00:38",
-                "type": "good"
-              },
-              {
-                "id": "player-1-1",
-                "title": "Gol sofrido transicao defensiva",
-                "subtitle": "GS TO",
-                "time": "01:41",
-                "type": "bad"
-              },
-              {
-                "id": "player-1-2",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "02:37",
-                "type": "good"
-              },
-              {
-                "id": "player-1-3",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "03:44",
-                "type": "good"
-              },
-              {
-                "id": "player-1-4",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "04:59",
-                "type": "good"
-              },
-              {
-                "id": "player-1-5",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "05:50",
-                "type": "bad"
-              },
-              {
-                "id": "player-1-6",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "06:34",
-                "type": "good"
-              },
-              {
-                "id": "player-1-7",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "07:18",
-                "type": "good"
-              },
-              {
-                "id": "player-1-8",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "08:09",
-                "type": "good"
-              }
-            ]
-          }
-        ],
-        "athleteOptions": [
-          {
-            "value": "player-2",
-            "label": "Guga"
-          },
-          {
-            "value": "player-4",
-            "label": "Senna"
-          },
-          {
-            "value": "player-1",
-            "label": "JoÃ£o"
-          }
-        ],
-        "categoryOptions": [
-          {
-            "value": "GM",
-            "label": "GM"
-          },
-          {
-            "value": "PP",
-            "label": "PP"
-          },
-          {
-            "value": "ASS",
-            "label": "ASS"
-          },
-          {
-            "value": "AD",
-            "label": "AD"
-          },
-          {
-            "value": "CC",
-            "label": "CC"
-          },
-          {
-            "value": "FD",
-            "label": "FD"
-          },
-          {
-            "value": "RB",
-            "label": "RB"
-          },
-          {
-            "value": "DIA",
-            "label": "DIA"
-          },
-          {
-            "value": "GS TO",
-            "label": "GS TO"
-          }
-        ]
+      "session": {
+        "id": "2",
+        "type": "Jogo",
+        "date": "19/02/2026",
+        "local": "Farrezao",
+        "opponent": "Atlântico"
       },
-      "team": {
-        "summary": {
-          "positives": 9,
-          "negatives": 4,
-          "positivePercentage": 69,
-          "negativePercentage": 31
+      "analysis": {
+        "individual": {
+          "summary": {
+            "positives": 24,
+            "negatives": 8,
+            "positivePercentage": 75,
+            "negativePercentage": 25
+          },
+          "entities": [
+            {
+              "id": "player-2",
+              "type": "player",
+              "title": "Guga",
+              "metrics": { "overall": 12, "offensive": 8, "defensive": 2, "performance": 75 },
+              "stats": { "positive": 9, "negative": 3, "total": 12 },
+              "actions": [
+                { "id": "player-2-0", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "00:32", "outcome": "positive" },
+                { "id": "player-2-1", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "01:18", "outcome": "negative" },
+                { "id": "player-2-2", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "02:14", "outcome": "positive" },
+                { "id": "player-2-3", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "03:02", "outcome": "positive" },
+                { "id": "player-2-4", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "03:47", "outcome": "positive" },
+                { "id": "player-2-5", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "04:11", "outcome": "positive" },
+                { "id": "player-2-6", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "05:08", "outcome": "negative" },
+                { "id": "player-2-7", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "05:36", "outcome": "positive" },
+                { "id": "player-2-8", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "06:20", "outcome": "negative" },
+                { "id": "player-2-9", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "07:03", "outcome": "positive" },
+                { "id": "player-2-10", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "07:48", "outcome": "positive" },
+                { "id": "player-2-11", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "08:16", "outcome": "positive" }
+              ]
+            },
+            {
+              "id": "player-4",
+              "type": "player",
+              "title": "Senna",
+              "metrics": { "overall": 11, "offensive": 7, "defensive": 3, "performance": 73 },
+              "stats": { "positive": 8, "negative": 3, "total": 11 },
+              "actions": [
+                { "id": "player-4-0", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "00:45", "outcome": "positive" },
+                { "id": "player-4-1", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "01:22", "outcome": "positive" },
+                { "id": "player-4-2", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "02:05", "outcome": "negative" },
+                { "id": "player-4-3", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "02:58", "outcome": "positive" },
+                { "id": "player-4-4", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "03:21", "outcome": "positive" },
+                { "id": "player-4-5", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "04:06", "outcome": "positive" },
+                { "id": "player-4-6", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "04:53", "outcome": "negative" },
+                { "id": "player-4-7", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "05:37", "outcome": "positive" },
+                { "id": "player-4-8", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "06:15", "outcome": "negative" },
+                { "id": "player-4-9", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "07:09", "outcome": "positive" },
+                { "id": "player-4-10", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "08:02", "outcome": "positive" }
+              ]
+            },
+            {
+              "id": "player-1",
+              "type": "player",
+              "title": "João",
+              "metrics": { "overall": 9, "offensive": 1, "defensive": 8, "performance": 78 },
+              "stats": { "positive": 7, "negative": 2, "total": 9 },
+              "actions": [
+                { "id": "player-1-0", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "00:38", "outcome": "positive" },
+                { "id": "player-1-1", "title": "Gol sofrido transicao defensiva", "category": { "code": "GS TO", "label": "GS TO" }, "time": "01:41", "outcome": "negative" },
+                { "id": "player-1-2", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "02:37", "outcome": "positive" },
+                { "id": "player-1-3", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "03:44", "outcome": "positive" },
+                { "id": "player-1-4", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "04:59", "outcome": "positive" },
+                { "id": "player-1-5", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "05:50", "outcome": "negative" },
+                { "id": "player-1-6", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "06:34", "outcome": "positive" },
+                { "id": "player-1-7", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "07:18", "outcome": "positive" },
+                { "id": "player-1-8", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "08:09", "outcome": "positive" }
+              ]
+            }
+          ]
         },
-        "athletes": [
-          {
-            "id": "team",
-            "entityType": "team",
-            "title": "Equipe",
-            "metrics": {
-              "overall": 13,
-              "overallLabel": "TOTAL",
-              "offensive": 9,
-              "defensive": 4,
-              "aproveitamento": 69
-            },
-            "counters": {
-              "positive": 9,
-              "negative": 4
-            },
-            "actions": [
-              {
-                "id": "team-0",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "00:39",
-                "type": "good"
-              },
-              {
-                "id": "team-1",
-                "title": "Assistencia",
-                "subtitle": "ASS",
-                "time": "01:14",
-                "type": "good"
-              },
-              {
-                "id": "team-2",
-                "title": "Gol sofrido organizacao defensiva",
-                "subtitle": "GS OO",
-                "time": "01:56",
-                "type": "bad"
-              },
-              {
-                "id": "team-3",
-                "title": "Chance criada",
-                "subtitle": "CC",
-                "time": "02:22",
-                "type": "good"
-              },
-              {
-                "id": "team-4",
-                "title": "Acao decisiva",
-                "subtitle": "AD",
-                "time": "03:10",
-                "type": "good"
-              },
-              {
-                "id": "team-5",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "03:45",
-                "type": "bad"
-              },
-              {
-                "id": "team-6",
-                "title": "Roubada de bola",
-                "subtitle": "RB",
-                "time": "04:19",
-                "type": "good"
-              },
-              {
-                "id": "team-7",
-                "title": "Desarme, interceptacao e antecipacao",
-                "subtitle": "DIA",
-                "time": "04:58",
-                "type": "good"
-              },
-              {
-                "id": "team-8",
-                "title": "Falha defensiva",
-                "subtitle": "FD",
-                "time": "05:27",
-                "type": "bad"
-              },
-              {
-                "id": "team-9",
-                "title": "Gol bola parada",
-                "subtitle": "Gol BP",
-                "time": "06:03",
-                "type": "good"
-              },
-              {
-                "id": "team-10",
-                "title": "Perda de posse",
-                "subtitle": "PP",
-                "time": "06:46",
-                "type": "bad"
-              },
-              {
-                "id": "team-11",
-                "title": "Gol marcado",
-                "subtitle": "GM",
-                "time": "07:18",
-                "type": "good"
-              },
-              {
-                "id": "team-12",
-                "title": "Gol goleiro linha",
-                "subtitle": "Gol GL",
-                "time": "07:55",
-                "type": "good"
-              }
-            ]
-          }
-        ],
-        "athleteOptions": [
-        ],
-        "categoryOptions": [
-          {
-            "value": "GM",
-            "label": "GM"
+        "team": {
+          "summary": {
+            "positives": 9,
+            "negatives": 4,
+            "positivePercentage": 69,
+            "negativePercentage": 31
           },
-          {
-            "value": "ASS",
-            "label": "ASS"
-          },
-          {
-            "value": "GS OO",
-            "label": "GS OO"
-          },
-          {
-            "value": "CC",
-            "label": "CC"
-          },
-          {
-            "value": "AD",
-            "label": "AD"
-          },
-          {
-            "value": "PP",
-            "label": "PP"
-          },
-          {
-            "value": "RB",
-            "label": "RB"
-          },
-          {
-            "value": "DIA",
-            "label": "DIA"
-          },
-          {
-            "value": "FD",
-            "label": "FD"
-          },
-          {
-            "value": "Gol BP",
-            "label": "Gol BP"
-          },
-          {
-            "value": "Gol GL",
-            "label": "Gol GL"
-          }
-        ]
+          "entities": [
+            {
+              "id": "team",
+              "type": "team",
+              "title": "Equipe",
+              "metrics": { "overall": 13, "offensive": 9, "defensive": 4, "performance": 69 },
+              "stats": { "positive": 9, "negative": 4, "total": 13 },
+              "actions": [
+                { "id": "team-0", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "00:39", "outcome": "positive" },
+                { "id": "team-1", "title": "Assistencia", "category": { "code": "ASS", "label": "ASS" }, "time": "01:14", "outcome": "positive" },
+                { "id": "team-2", "title": "Gol sofrido organizacao defensiva", "category": { "code": "GS OO", "label": "GS OO" }, "time": "01:56", "outcome": "negative" },
+                { "id": "team-3", "title": "Chance criada", "category": { "code": "CC", "label": "CC" }, "time": "02:22", "outcome": "positive" },
+                { "id": "team-4", "title": "Acao decisiva", "category": { "code": "AD", "label": "AD" }, "time": "03:10", "outcome": "positive" },
+                { "id": "team-5", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "03:45", "outcome": "negative" },
+                { "id": "team-6", "title": "Roubada de bola", "category": { "code": "RB", "label": "RB" }, "time": "04:19", "outcome": "positive" },
+                { "id": "team-7", "title": "Desarme, interceptacao e antecipacao", "category": { "code": "DIA", "label": "DIA" }, "time": "04:58", "outcome": "positive" },
+                { "id": "team-8", "title": "Falha defensiva", "category": { "code": "FD", "label": "FD" }, "time": "05:27", "outcome": "negative" },
+                { "id": "team-9", "title": "Gol bola parada", "category": { "code": "Gol BP", "label": "Gol BP" }, "time": "06:03", "outcome": "positive" },
+                { "id": "team-10", "title": "Perda de posse", "category": { "code": "PP", "label": "PP" }, "time": "06:46", "outcome": "negative" },
+                { "id": "team-11", "title": "Gol marcado", "category": { "code": "GM", "label": "GM" }, "time": "07:18", "outcome": "positive" },
+                { "id": "team-12", "title": "Gol goleiro linha", "category": { "code": "Gol GL", "label": "Gol GL" }, "time": "07:55", "outcome": "positive" }
+              ]
+            }
+          ]
+        }
       }
     }
   }

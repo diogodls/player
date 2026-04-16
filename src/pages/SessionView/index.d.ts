@@ -1,8 +1,13 @@
-import type {Session} from "../Sessions";
+import type { Session } from "../Sessions";
 
 export type ViewMode = "individual" | "team";
-export type ActionTypeFilter = "all" | "good" | "bad";
+export type ActionTypeFilter = "all" | "positive" | "negative";
 export type EntityType = "player" | "team";
+
+export type SessionActionCategory = {
+  code: string;
+  label: string;
+};
 
 export type SessionSummary = {
   positives: number;
@@ -14,47 +19,45 @@ export type SessionSummary = {
 export type SessionEntityAction = {
   id: string;
   title: string;
-  subtitle?: string;
+  category: SessionActionCategory;
   time: string;
-  type: "good" | "bad";
+  outcome: "positive" | "negative";
   createdAt?: string;
+};
+
+export type SessionEntityMetrics = {
+  overall: number;
+  offensive: number;
+  defensive: number;
+  performance: number;
+};
+
+export type SessionEntityStats = {
+  positive: number;
+  negative: number;
+  total: number;
 };
 
 export type SessionEntity = {
   id: string;
-  entityType: "player" | "team";
+  type: EntityType;
   title: string;
-  metrics: {
-    overall: number;
-    overallLabel: string;
-    offensive: number;
-    defensive: number;
-    performance: number;
-  };
-  counters: {
-    positive: number;
-    negative: number;
-  };
+  metrics: SessionEntityMetrics;
+  stats: SessionEntityStats;
   actions: SessionEntityAction[];
 };
 
-export type SessionOption = {
-  value: string;
-  label: string;
-};
-
-export type SessionDetailsViewSection = {
+export type SessionAnalysisSection = {
   summary: SessionSummary;
-  athletes: SessionEntity[];
-  athleteOptions: SessionOption[];
-  categoryOptions: SessionOption[];
+  entities: SessionEntity[];
 };
 
-export type SessionDetails = {
-  individual: SessionDetailsViewSection;
-  team: SessionDetailsViewSection;
+export type SessionViewData = {
+  session: Session;
+  analysis: {
+    individual: SessionAnalysisSection;
+    team: SessionAnalysisSection;
+  };
 };
-
-export interface SessionViewData extends Session, SessionDetails {}
 
 export type SessionViewRecordData = Record<string, SessionViewData>; //todo: remover isso daqui quando tiver back

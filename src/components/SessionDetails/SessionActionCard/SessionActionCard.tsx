@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import styles from "./SessionActionCard.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,20 +18,11 @@ type Props = {
 
 const SessionActionCard = ({ entity }: Props) => {
   const [open, setOpen] = useState(false);
-  const actionsCount = entity.actions.length;
-  const isTeam = entity.entityType === "team";
-
-  const { positiveActions, negativeActions, aproveitamento } = useMemo(() => {
-    const positive = entity.actions.filter((action) => action.type === "good").length;
-    const negative = entity.actions.filter((action) => action.type === "bad").length;
-    const percentage = actionsCount === 0 ? 0 : Math.round((positive / actionsCount) * 100);
-
-    return {
-      positiveActions: positive,
-      negativeActions: negative,
-      aproveitamento: percentage,
-    };
-  }, [actionsCount, entity.actions]);
+  const actionsCount = entity.stats.total;
+  const isTeam = entity.type === "team";
+  const positiveActions = entity.stats.positive;
+  const negativeActions = entity.stats.negative;
+  const performance = entity.metrics.performance;
 
   return (
     <article className={`${styles.card} ${styles.card_yellow}`}>
@@ -70,7 +61,7 @@ const SessionActionCard = ({ entity }: Props) => {
       <div className={styles.metrics}>
         <MiniMetric label="OFENSIVO" value={entity.metrics.offensive} tone="blue" />
         <MiniMetric label="DEFENSIVO" value={entity.metrics.defensive} tone="yellow" />
-        <MiniMetric label="APROVEIT." value={aproveitamento} tone="green" />
+        <MiniMetric label="PERFORMANCE" value={performance} tone="green" />
       </div>
 
       <button

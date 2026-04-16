@@ -22,7 +22,7 @@ const IndividualAnalysis = () => {
   }, [setActions, setSelectedPlayer]);
 
   if (!data) return;
-  console.log(data);
+
   return (
     <div className={styles.container}>
       <SessionAnalysisHeader session={data.session} />

@@ -3,11 +3,11 @@ import styles from "./SessionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPeopleGroup, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useParams } from "react-router";
-import SessionAnalysisDetails from "../../components/elements/SessionDetails/SessionDetails.tsx";
+import SessionDetails from "../../components/elements/SessionDetails/SessionDetails.tsx";
 import SessionSummary from "../../components/SessionDetails/SessionSummary/SessionSummary.tsx";
-import SessionActionExplorer from "../../components/SessionDetails/SessionActions/SessionActions.tsx";
+import SessionActions from "../../components/SessionDetails/SessionActions/SessionActions.tsx";
 import { useApi } from "../../hooks/useApi";
-import type {SessionViewData, SessionViewRecordData, ViewMode} from "./index";
+import type {SessionViewRecordData, SessionViewData, ViewMode} from "./index";
 
 const SessionView = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const SessionView = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("individual");
 
   const sessionView: SessionViewData | undefined = sessionId ? detailsData?.[sessionId] : undefined; //todo: remover aqui quando fizer o back
-  const activeView = viewMode === "individual" ? sessionView?.individual : sessionView?.team;
+  const activeView = sessionView?.analysis[viewMode];
 
   if (isSessionLoading) {
     return (
@@ -26,7 +26,7 @@ const SessionView = () => {
     );
   }
 
-  if (!sessionView) {
+  if (!sessionView || !activeView) {
     return (
       <div className={styles.container}>
         <div className={styles.contentWrap}>Sessao nao encontrada.</div>
@@ -39,7 +39,7 @@ const SessionView = () => {
       <div className={styles.contentWrap}>
         <header className={styles.sessionHeader}>
           <div className={styles.headerLeft}>
-            <button className={styles.backButton} onClick={() => navigate("/session-screen")}>
+            <button className={styles.backButton} onClick={() => navigate("/sessions")}>
               <FontAwesomeIcon icon={faArrowLeft} />
             </button>
 
@@ -76,7 +76,7 @@ const SessionView = () => {
           </div>
         </header>
 
-        <SessionAnalysisDetails session={sessionView} />
+        <SessionDetails session={sessionView.session} />
 
         <section className={styles.viewerCard}>
           <div className={styles.viewerSwitch}>
@@ -109,7 +109,7 @@ const SessionView = () => {
             {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
           </h3>
 
-          <SessionActionExplorer
+          <SessionActions
             viewMode={viewMode}
             view={activeView}
           />
