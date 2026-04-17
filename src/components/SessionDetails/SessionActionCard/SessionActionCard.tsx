@@ -34,7 +34,7 @@ const SessionActionCard = ({ entity }: Props) => {
 
           <div className={styles.meta}>
             <div className={styles.title}>{entity.title}</div>
-            <div className={styles.sub}>{actionsCount} acoes exibidas</div>
+            <div className={styles.sub}>{actionsCount} ações exibidas</div>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ const SessionActionCard = ({ entity }: Props) => {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
       >
-        <span className={styles.viewLink}>Ver acoes ({actionsCount})</span>
+        <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
         <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className={styles.chevron} />
       </button>
 
