@@ -7,6 +7,7 @@ import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import type { Session } from "../../../pages/Sessions";
 import { useNavigate } from "react-router";
+import ActionLogConfirmModal from "../ActionLog/ActionLogConfirmModal.tsx";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
@@ -76,7 +77,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
   const handleRemoveAction = (id: string) => {
     setActions((prev) => prev.filter((a) => a.id !== id));
-    info("Acao removida");
+    info("Ação removida");
   };
 
   const showSuccessAndRedirect = (sessionId: string) => {
@@ -91,7 +92,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
   const handleSaveActions = () => {
     if (actions.length === 0) {
-      info("Adicione ao menos uma acao antes de salvar");
+      info("Adicione ao menos uma ação antes de salvar");
       return;
     }
 
@@ -135,7 +136,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
 
       {actions.length === 0 ? (
         <div className={styles.emptyState}>
-          <span>Sem ações taggeadas. Comece a taggear ações e elas aparecerao aqui.</span>
+          <span>Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.</span>
         </div>
       ) : (
         <div className={styles.list}>
@@ -163,7 +164,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
                 <button
                   className={styles.removeBtn}
                   onClick={() => handleRemoveAction(action.id)}
-                  aria-label="Remover acao"
+                  aria-label="Remover ação"
                   title="Remover"
                   disabled={isSaving}
                 >
@@ -175,33 +176,12 @@ const ActionLog = ({ session }: ActionLogProps) => {
         </div>
       )}
 
-      {isConfirmModalOpen && (
-        <div className={styles.confirmOverlay} onMouseDown={handleCancelConfirmation}>
-          <div className={styles.confirmModal} onMouseDown={(event) => event.stopPropagation()}>
-            <h3>Deseja confirmar envio?</h3>
-            <p>As ações desta sessão serão salvas para a visualização de analise.</p>
-
-            <div className={styles.confirmActions}>
-              <button
-                type="button"
-                className={styles.confirmCancel}
-                onClick={handleCancelConfirmation}
-              >
-                Cancelar
-              </button>
-
-              <button
-                type="button"
-                className={styles.confirmSubmit}
-                onClick={handleConfirmSaveActions}
-                disabled={isSaving}
-              >
-                Confirmar envio
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ActionLogConfirmModal
+        isOpen={isConfirmModalOpen}
+        isSaving={isSaving}
+        onCancel={handleCancelConfirmation}
+        onConfirm={handleConfirmSaveActions}
+      />
     </div>
   );
 };
