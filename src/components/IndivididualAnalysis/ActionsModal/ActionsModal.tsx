@@ -36,11 +36,15 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
   }
 
   const handleActionClick = (action: Action) => {
+    if (!selectedPlayer) return;
+
     const actionTagged = {
       id: uid(),
       player: selectedPlayer,
       goodAction: action.goodAction,
       title: action.label,
+      key: action.key,
+      category: action.category,
       time: '12:41', //todo: pegar tempo do vídeo
     } as ActionTagged;
 
