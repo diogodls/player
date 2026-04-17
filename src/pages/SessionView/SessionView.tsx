@@ -21,7 +21,7 @@ const SessionView = () => {
   if (isSessionLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.contentWrap}>Carregando sessao...</div>
+        <div className={styles.contentWrap}>Carregando sessão...</div>
       </div>
     );
   }
@@ -29,7 +29,7 @@ const SessionView = () => {
   if (!sessionView || !activeView) {
     return (
       <div className={styles.container}>
-        <div className={styles.contentWrap}>Sessao nao encontrada.</div>
+        <div className={styles.contentWrap}>Sessão não encontrada.</div>
       </div>
     );
   }
@@ -45,8 +45,8 @@ const SessionView = () => {
 
             <div className={styles.headerText}>
               <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
-              <h1 className={styles.title}>Detalhes da sessao</h1>
-              <p className={styles.subtitle}>Acesse o fluxo de analise e acompanhe os dados desta sessao.</p>
+              <h1 className={styles.title}>Detalhes da Sessão</h1>
+              <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
             </div>
           </div>
 
@@ -70,7 +70,7 @@ const SessionView = () => {
               </div>
 
               <div className={styles.actionText}>
-                <strong>Fazer analise de equipe</strong>
+                <strong>Fazer análise de equipe</strong>
               </div>
             </button>
           </div>
@@ -92,7 +92,7 @@ const SessionView = () => {
               className={`${styles.switchButton} ${viewMode === "team" ? styles.switchActive : ""}`}
               onClick={() => setViewMode("team")}
             >
-              Ver analise de equipe
+              Ver análise de equipe
             </button>
           </div>
 

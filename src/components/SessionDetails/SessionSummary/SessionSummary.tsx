@@ -14,7 +14,7 @@ const SessionSummary = ({ positives, negatives, positivePercentage, negativePerc
     <section className={styles.wrapper}>
       <header className={styles.header}>
         <FontAwesomeIcon icon={faChartColumn} className={styles.headerIcon} />
-        <span className={styles.headerTitle}>Resumo Geral das acoes</span>
+        <span className={styles.headerTitle}>Resumo Geral das ações</span>
       </header>
 
       <div className={styles.cards}>
@@ -35,7 +35,7 @@ const SessionSummary = ({ positives, negatives, positivePercentage, negativePerc
           <span className={styles.metaRight}>{negativePercentage}% negativas</span>
         </div>
 
-        <div className={styles.progressTrack} aria-label="Distribuicao das acoes">
+        <div className={styles.progressTrack} aria-label="Distribuição das ações">
           <div
             className={`${styles.progressSeg} ${styles.segPositive}`}
             style={{ width: `${positivePercentage}%` }}

@@ -52,7 +52,7 @@ const Sessions = () => {
   const handleCloseDeleteModal = () => {
     setSessionPendingDelete(null);
   };
-  //todo: se achar um jeito de separar a lógica aqui dos modais desse componente ótimo, se não só apaga essa linha e bola pra frente
+
   return (
     <div className={styles.container}>
       <HeaderSessionScreen onAddSession={handleOpenCreate} />
