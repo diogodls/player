@@ -1,7 +1,7 @@
 import styles from "./ActionLog.module.scss";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
@@ -21,32 +21,38 @@ const ActionLog = ({ session }: ActionLogProps) => {
   const { success, info, error } = useContext(ToastContext);
   const navigate = useNavigate();
   const cookieKey = `${COOKIE_KEY_PREFIX}${session.id}`;
-  const [cookies, setCookie, removeCookie] = useCookies([cookieKey]);
-  const hasLoadedCookie = useRef(false);
+  const [, setCookie, removeCookie] = useCookies([cookieKey]);
+  const [loadedCookieKey, setLoadedCookieKey] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
-
   useEffect(() => {
-    const raw = cookies[cookieKey];
+    const cookieValue = new Cookies().get(cookieKey);
 
-    hasLoadedCookie.current = true;
-    if (!raw) {
+    if (!cookieValue) {
       setActions([]);
+      setLoadedCookieKey(cookieKey);
       return;
     }
 
     try {
-      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
-      if (Array.isArray(parsed)) setActions(parsed);
+      const parsed = typeof cookieValue === "string" ? JSON.parse(cookieValue) : cookieValue;
+      if (Array.isArray(parsed)) {
+        setActions(parsed);
+      } else {
+        removeCookie(cookieKey, { path: "/" });
+        setActions([]);
+      }
     } catch {
       removeCookie(cookieKey, { path: "/" });
       setActions([]);
+    } finally {
+      setLoadedCookieKey(cookieKey);
     }
-  }, [cookieKey, cookies, removeCookie, setActions]);
+  }, [cookieKey, removeCookie, setActions]);
 
   useEffect(() => {
-    if (!hasLoadedCookie.current) return;
+    if (loadedCookieKey !== cookieKey) return;
 
     if (actions.length === 0) {
       removeCookie(cookieKey, { path: "/" });
@@ -60,7 +66,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
       expires,
       sameSite: "lax",
     });
-  }, [actions, cookieKey, setCookie, removeCookie]);
+  }, [actions, cookieKey, loadedCookieKey, setCookie, removeCookie]);
 
   useEffect(() => {
     return () => {

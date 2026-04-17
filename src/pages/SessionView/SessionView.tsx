@@ -60,7 +60,7 @@ const SessionView = () => {
               </div>
 
               <div className={styles.actionText}>
-                <strong>Fazer analise individual</strong>
+                <strong>Fazer análise individual</strong>
               </div>
             </button>
 
@@ -85,7 +85,7 @@ const SessionView = () => {
               className={`${styles.switchButton} ${viewMode === "individual" ? styles.switchActive : ""}`}
               onClick={() => setViewMode("individual")}
             >
-              Ver analise individual
+              Ver análise individual
             </button>
             <button
               type="button"
@@ -106,7 +106,7 @@ const SessionView = () => {
           )}
 
           <h3 className={styles.sectionTitle}>
-            {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
+            {viewMode === "individual" ? "Ações Individuais" : "Ações da Equipe"}
           </h3>
 
           <SessionActions
