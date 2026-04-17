@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import styles from "./Sessions.module.scss";
-import HeaderSessionScreen from "../../components/RegistrationScreen/HeaderSessionScreen/HeaderSessionScreen";
-import SessionsList from "../../components/RegistrationScreen/SessionsList";
+import HeaderSessionScreen from "../../components/SessionsList/HeaderSessionScreen/HeaderSessionScreen";
+import SessionsList from "../../components/SessionsList/SessionsList";
 import SaveSessionModal from "../../components/IndivididualAnalysis/SaveSessionModal/SaveSessionModal";
 import { useApi } from "../../hooks/useApi";
 import type {Session, SessionData, SessionMeta} from "./index";
-import DeleteSessionModal from "../../components/RegistrationScreen/DeleteSessionModal/DeleteSessionModal.tsx"; //todo: trocar nome da pasta para SessionsList
+import DeleteSessionModal from "../../components/SessionsList/DeleteSessionModal/DeleteSessionModal.tsx";
 
 function toSessionMeta(session: Session): SessionMeta {
   return {
