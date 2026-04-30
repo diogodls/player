@@ -13,7 +13,7 @@ type ActionsModal = {
 };
 
 const ActionsModal = ({actions, closeModal}: ActionsModal) => {
-  const {selectedPlayer, setActions, currentVideoTime} = useContext(ActionsContext);
+  const {selectedPlayer, setIndividualActions, currentVideoTime} = useContext(ActionsContext);
 
   const handleActionClick = (action: Action) => {
     if (!selectedPlayer) return;
@@ -29,7 +29,7 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
       player: selectedPlayer,
     } as ActionTagged;
 
-    setActions((actions) => [...actions, actionTagged]);
+    setIndividualActions((actions) => [...actions, actionTagged]);
     closeModal();
   }
 

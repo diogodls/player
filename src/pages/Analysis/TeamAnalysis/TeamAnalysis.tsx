@@ -2,11 +2,13 @@ import VideoAnalysis from "../../../components/elements/VideoAnalysis/VideoAnaly
 import ActionLog from "../../../components/elements/ActionLog/ActionLog.tsx";
 import styles from "./TeamAnalysis.module.scss";
 import {useApi} from "../../../hooks/useApi.ts";
-import type {AnalysisData} from "../index";
+import type {TeamAnalysisData} from "../index";
 import TeamActions from "../../../components/TeamAnalysis/TeamActions/TeamActions.tsx";
 
 const TeamAnalysis = () => {
-  const {data} = useApi<AnalysisData>("team-analysis");
+  const {data} = useApi<TeamAnalysisData>("team-analysis");
+
+  if (!data) return;
 
   return (
     <div className={styles.container}>
@@ -18,7 +20,7 @@ const TeamAnalysis = () => {
           <VideoAnalysis/>
         </div>
         <div className={styles.actionLog}>
-          <ActionLog logType={'team'}/>
+          <ActionLog logType={'team'} session={data?.session}/>
         </div>
       </div>
     </div>

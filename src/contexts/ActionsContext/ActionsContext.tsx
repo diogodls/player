@@ -11,8 +11,10 @@ import type {ActionTagged} from "../../pages/Analysis";
 type ActionsContextValue = {
   selectedPlayer: Player | null;
   setSelectedPlayer: Dispatch<SetStateAction<Player | null>>;
-  actions: ActionTagged[];
-  setActions: Dispatch<SetStateAction<ActionTagged[]>>;
+  individualActions: ActionTagged[];
+  setIndividualActions: Dispatch<SetStateAction<ActionTagged[]>>;
+  teamActions: ActionTagged[];
+  setTeamActions: Dispatch<SetStateAction<ActionTagged[]>>;
   actionTagged: ActionTagged | null;
   setActionTagged: Dispatch<SetStateAction<ActionTagged | null>>;
   currentVideoTime: string;
@@ -29,7 +31,8 @@ const ActionsContext = createContext<ActionsContextValue>({} as ActionsContextVa
 
 const ActionsProvider = ({children}: ActionsProviderProps) => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [actions, setActions] = useState<ActionTagged[]>([]);
+  const [individualActions, setIndividualActions] = useState<ActionTagged[]>([]);
+  const [teamActions, setTeamActions] = useState<ActionTagged[]>([]);
   const [actionTagged, setActionTagged] = useState<ActionTagged | null>(null);
   const [currentVideoTime, setCurrentVideoTime] = useState('0');
   const [isTagging, setIsTagging] = useState(false);
@@ -38,8 +41,10 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
     () => ({
       selectedPlayer,
       setSelectedPlayer,
-      actions,
-      setActions,
+      individualActions,
+      setIndividualActions,
+      teamActions,
+      setTeamActions,
       actionTagged,
       setActionTagged,
       currentVideoTime,
@@ -47,7 +52,7 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
       isTagging,
       setIsTagging
     }),
-    [selectedPlayer, actions, actionTagged, currentVideoTime, isTagging]
+    [selectedPlayer, individualActions, teamActions, actionTagged, currentVideoTime, isTagging]
   );
 
   return (

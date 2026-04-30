@@ -1,6 +1,6 @@
 import type {Action} from "../pages/Analysis";
 
-export function agroupActions(actions: Action[]) {
+export function groupActions(actions: Action[]) {
   return actions.reduce((acc, action) => {
     const formattedAction = {
       label: action.label,

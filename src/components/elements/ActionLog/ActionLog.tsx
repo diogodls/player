@@ -12,32 +12,23 @@ import ActionLogConfirmModal from "../ActionLog/ActionLogConfirmModal.tsx";
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
 
-type ActionLogProps = {
+type ActionLog = {
+  logType: 'team' | 'individual';
   session: Session;
 };
 
-type ActionLog = {
-  logType: 'team' | 'individual';
-};
-
-const ActionLog = ({logType}: ActionLog) => {
-  const {actions, setActions} = useContext(ActionsContext);
-  const selectedActions = actions.filter((action) => action.type === logType);
-  const { actions, setActions } = useContext(ActionsContext);
-  const { success, info, error } = useContext(ToastContext);
+const ActionLog = ({logType, session}: ActionLog) => {
+  const {individualActions, teamActions, setIndividualActions, setTeamActions} = useContext(ActionsContext);
   const navigate = useNavigate();
-  const cookieKey = `${COOKIE_KEY_PREFIX}${session.id}`;
+  const cookieKey = `${COOKIE_KEY_PREFIX}${logType}${session.id}`;
   const [, setCookie, removeCookie] = useCookies([cookieKey]);
   const [loadedCookieKey, setLoadedCookieKey] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
-  const {actions, teamActions, setActions} = useContext(ActionsContext);
-  const selectedActions = logType === 'individual' ? actions : teamActions;
+  const selectedActions = logType === 'individual' ? individualActions : teamActions;
+  const setActions = logType === 'individual' ? setIndividualActions : setTeamActions;
   const {success, info, error} = useContext(ToastContext);
-  const [cookies, setCookie, removeCookie] = useCookies([COOKIE_KEY]);
-  const hasLoadedCookie = useRef(false);
-  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
 
   useEffect(() => {
     const cookieValue = new Cookies().get(cookieKey);
@@ -68,19 +59,19 @@ const ActionLog = ({logType}: ActionLog) => {
   useEffect(() => {
     if (loadedCookieKey !== cookieKey) return;
 
-    if (actions.length === 0) {
+    if (selectedActions.length === 0) {
       removeCookie(cookieKey, { path: "/" });
       return;
     }
 
     const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
-    setCookie(cookieKey, JSON.stringify(actions), {
+    setCookie(cookieKey, JSON.stringify(selectedActions), {
       path: "/",
       expires,
       sameSite: "lax",
     });
-  }, [actions, cookieKey, loadedCookieKey, setCookie, removeCookie]);
+  }, [selectedActions, cookieKey, loadedCookieKey, setCookie, removeCookie]);
 
   useEffect(() => {
     return () => {
@@ -111,7 +102,7 @@ const ActionLog = ({logType}: ActionLog) => {
   };
 
   const handleSaveActions = () => {
-    if (actions.length === 0) {
+    if (selectedActions.length === 0) {
       info("Adicione ao menos uma ação antes de salvar");
       return;
     }
@@ -141,7 +132,7 @@ const ActionLog = ({logType}: ActionLog) => {
       <div className={styles.header}>
         <div className={styles.title}>
           <span>Linha do tempo de ações</span>
-          <span className={styles.badge}>{actions.length}</span>
+          <span className={styles.badge}>{selectedActions.length}</span>
         </div>
 
         <div className={styles.actions}>

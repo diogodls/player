@@ -10,7 +10,7 @@ type TeamActions = {
 }
 
 const TeamActions = ({actions}: TeamActions) => {
-  const {setActions, currentVideoTime} = useContext(ActionsContext);
+  const {setTeamActions, currentVideoTime} = useContext(ActionsContext);
 
   const handleActionClick = (action: Action) => {
     const actionTagged = {
@@ -21,7 +21,7 @@ const TeamActions = ({actions}: TeamActions) => {
       type: 'team'
     } as ActionTagged;
 
-    setActions((actions) => [...actions, actionTagged]);
+    setTeamActions((actions) => [...actions, actionTagged]);
   }
 
   return (

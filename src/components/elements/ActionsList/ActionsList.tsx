@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBullseye, faMinus} from "@fortawesome/free-solid-svg-icons";
 import type {Action} from "../../../pages/Analysis";
 import {useMemo} from "react";
-import {agroupActions} from "../../../utils/agroupActions.ts";
+import {groupActions} from "../../../utils/groupActions.ts";
 
 type ActionsList = {
   actions: Action[];
@@ -11,7 +11,7 @@ type ActionsList = {
 }
 
 const ActionsList = ({actions, handleActionClick}: ActionsList) => {
-  const groupedActions = useMemo( () => agroupActions(actions), [actions]);
+  const groupedActions = useMemo( () => groupActions(actions), [actions]);
 
   return (
     <div className={styles.actions}>

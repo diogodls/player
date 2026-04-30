@@ -3,46 +3,39 @@ import VideoAnalysis from "../../../components/elements/VideoAnalysis/VideoAnaly
 import ActionLog from "../../../components/elements/ActionLog/ActionLog.tsx";
 import PlayerSelector from "../../../components/IndivididualAnalysis/PlayerSelector/PlayerSelector.tsx";
 import {useApi} from "../../../hooks/useApi.ts";
-import {useContext, useEffect, useState} from "react";
+import {useState} from "react";
 import ActionsModal from "../../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
-import type {AnalysisData} from "../index";
-import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
+import type {IndividualAnalysisData} from "../index";
+import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 
 const IndividualAnalysis = () => {
-  const {data} = useApi<AnalysisData>("individual-analysis");
-  const {setIsTagging} = useContext(ActionsContext);
+  const {data} = useApi<IndividualAnalysisData>("individual-analysis");
+  // const { id } = useParams<{ id: string }>(); todo: usar para requisição futura
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
 
-  useEffect(() => {
-    if (actionsModalOpen) {
-      setIsTagging(true);
-    }
-  }, [actionsModalOpen, setIsTagging]);
-
-  const handleCloseModal = () => {
-    setActionsModalOpen(false);
-    setIsTagging(false);
-  };
+  if (!data) return;
 
   return (
     <div className={styles.container}>
+      <SessionAnalysisHeader session={data.session} />
+
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
+          <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen} />
         </div>
         <div className={styles.videoAnalysis}>
-          <VideoAnalysis/>
+          <VideoAnalysis />
         </div>
         <div className={styles.actionLog}>
-          <ActionLog logType={'individual'}/>
+          <ActionLog logType={'individual'} session={data.session} />
         </div>
       </div>
-      {actionsModalOpen &&
+      {actionsModalOpen && (
         <ActionsModal
-          closeModal={handleCloseModal}
+          closeModal={() => setActionsModalOpen(false)}
           actions={data?.actions ?? []}
         />
-      }
+      )}
     </div>
   );
 };
