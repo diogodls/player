@@ -4,6 +4,7 @@ import styles from "./TeamAnalysis.module.scss";
 import {useApi} from "../../../hooks/useApi.ts";
 import type {TeamAnalysisData} from "../index";
 import TeamActions from "../../../components/TeamAnalysis/TeamActions/TeamActions.tsx";
+import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 
 const TeamAnalysis = () => {
   const {data} = useApi<TeamAnalysisData>("team-analysis");
@@ -12,6 +13,8 @@ const TeamAnalysis = () => {
 
   return (
     <div className={styles.container}>
+      <SessionAnalysisHeader session={data.session} />
+
       <div className={styles.content}>
         <div className={styles.leftContent}>
           <TeamActions actions={data?.actions ?? []} />

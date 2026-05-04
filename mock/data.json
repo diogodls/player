@@ -199,7 +199,7 @@
     }
   },
   "individual-analysis": {
-    "session":  {
+    "session": {
       "id": "1",
       "type": "Treino",
       "date": "15/02/2026",
@@ -805,7 +805,14 @@
       }
     }
   },
-  "team-analysis":{
+  "team-analysis": {
+    "session": {
+      "id": "1",
+      "type": "Treino",
+      "date": "15/02/2026",
+      "local": "UFSM",
+      "description": "Finalizacao e 1x1"
+    },
     "actions": [
       {
         "key": "BPSE",

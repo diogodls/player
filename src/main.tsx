@@ -11,6 +11,7 @@ import {ActionsProvider} from "./contexts/ActionsContext/ActionsContext.tsx";
 import Sessions from "./pages/Sessions/Sessions.tsx";
 import PlayerView from "./pages/PlayerView/PlayerView.tsx";
 import SessionView from "./pages/SessionView/SessionView.tsx";
+import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <CookiesProvider>
@@ -22,9 +23,10 @@ createRoot(document.getElementById('root')!).render(
               <Route path={"/"} element={<Home/>}/>
               <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
               <Route path={"/player/:id"} element={<PlayerView/>}/>
-              <Route path={"/sessions"} element={<Sessions />}/>
-              <Route path="/sessions/:id" element={<SessionView />} />
-              <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
+              <Route path={"/sessions"} element={<Sessions/>}/>
+              <Route path="/sessions/:id" element={<SessionView/>}/>
+              <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis/>}/>
+              <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis/>}/>
             </Route>
           </Routes>
         </BrowserRouter>
