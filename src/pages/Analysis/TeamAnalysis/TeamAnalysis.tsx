@@ -1,6 +1,6 @@
+import styles from "./TeamAnalysis.module.scss";
 import VideoAnalysis from "../../../components/elements/VideoAnalysis/VideoAnalysis.tsx";
 import ActionLog from "../../../components/elements/ActionLog/ActionLog.tsx";
-import styles from "./TeamAnalysis.module.scss";
 import {useApi} from "../../../hooks/useApi.ts";
 import type {TeamAnalysisData} from "../index";
 import TeamActions from "../../../components/TeamAnalysis/TeamActions/TeamActions.tsx";
