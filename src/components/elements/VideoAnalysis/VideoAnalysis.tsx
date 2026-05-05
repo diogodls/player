@@ -8,6 +8,7 @@ const VideoAnalysis = () => {
   const { setCurrentVideoTime, isTagging } = useContext(ActionsContext);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const wasPlayingBeforeTaggingRef = useRef(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   const handleTimeUpdate = () => {
@@ -28,9 +29,18 @@ const VideoAnalysis = () => {
   };
 
   useEffect(() => {
-    console.log('era pra chegar aq');
-    if (isTagging) videoRef.current?.pause();
-    videoRef.current?.play();
+    if (!videoRef.current) return;
+
+    if (isTagging) {
+      wasPlayingBeforeTaggingRef.current = !videoRef.current.paused;
+      videoRef.current.pause();
+      return;
+    }
+
+    if (wasPlayingBeforeTaggingRef.current) {
+      videoRef.current.play();
+      wasPlayingBeforeTaggingRef.current = false;
+    }
   }, [isTagging]);
 
   return (

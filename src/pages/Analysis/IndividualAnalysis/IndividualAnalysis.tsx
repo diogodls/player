@@ -16,12 +16,7 @@ const IndividualAnalysis = () => {
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log('abriu', actionsModalOpen);
-    if (actionsModalOpen) {
-      setIsTagging(true);
-    }
-
-    setIsTagging(false);
+    setIsTagging(actionsModalOpen);
   }, [actionsModalOpen, setIsTagging]);
 
   if (!data) return;
