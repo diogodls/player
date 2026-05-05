@@ -1,20 +1,19 @@
 .container {
   min-height: 100svh;
   background: var(--bg-dark);
-  padding: 40px 20px 56px;
+  padding: 15px 20px 56px;
 }
 
 .content {
-  width: min(100%, 960px);
-  margin: 0 auto;
+  width: 100%;
 }
 
 .header {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 28px;
+  margin: 30px 0 24px;
 }
 
 .eyebrow {
@@ -30,24 +29,24 @@
 .title {
   margin: 0;
   color: var(--text-primary);
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.05;
+  font-size: 25px;
+  line-height: 1.2;
 }
 
 .description {
   max-width: 620px;
-  margin: 12px 0 0;
+  margin: 4px 0 0;
   color: var(--text-muted);
   font-size: 1rem;
 }
 
 .openButton {
-  min-height: 46px;
+  min-height: 37px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   background: var(--selected-blue);
   color: var(--text-light);
-  padding: 0 18px;
+  padding: 0 14px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -55,7 +54,7 @@
 .emptyState,
 .card {
   border: 1px solid var(--border-20);
-  border-radius: 18px;
+  border-radius: var(--border-radius);
   background: rgba(31, 41, 55, 0.92);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
 }
@@ -79,12 +78,22 @@
 
 .list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
 }
 
 .card {
-  padding: 20px;
+  padding: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: rgba(37, 99, 235, 0.7);
+    background: rgba(31, 41, 55, 1);
+    transform: translateY(-1px);
+    outline: none;
+  }
 }
 
 .cardHeader {
@@ -97,34 +106,63 @@
 .cardTitle {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.1rem;
+  font-size: 1rem;
+  line-height: 1.25;
 }
 
 .cardPosition {
   display: inline-block;
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--selected-blue);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 600;
 }
 
 .cardAge {
   color: var(--text-light);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.cardMeta {
-  margin: 18px 0 0;
-  color: var(--text-muted);
-  word-break: break-word;
-  font-size: 0.85rem;
+.cardActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.secondaryAction,
+.dangerAction {
+  min-height: 32px;
+  border-radius: var(--border-radius);
+  padding: 0 10px;
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondaryAction {
+  border: 1px solid var(--border-20);
+  background: rgba(255, 255, 255, 0.04);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.dangerAction {
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.12);
+
+  &:hover {
+    background: rgba(220, 38, 38, 0.22);
+  }
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 28px 16px 40px;
+    padding: 15px 16px 40px;
   }
 
   .header {

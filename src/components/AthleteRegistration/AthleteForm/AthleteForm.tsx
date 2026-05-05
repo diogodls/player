@@ -9,34 +9,38 @@ import styles from "./AthleteForm.module.scss";
 
 type AthleteFormProps = {
   isOpen: boolean;
+  mode?: "create" | "edit";
+  initialValues?: AthleteFormValues;
   onClose: () => void;
-  onSubmit: (values: {
-    name: string;
-    age: number;
-    position: (typeof PLAYERS_POSITIONS)[number];
-  }) => void;
+  onSubmit: (values: AthleteFormValues) => void;
 };
 
-const AthleteForm = ({ isOpen, onClose, onSubmit }: AthleteFormProps) => {
-  const athletePositionOptions = PLAYERS_POSITIONS as [
-    (typeof PLAYERS_POSITIONS)[number],
-    ...(typeof PLAYERS_POSITIONS)[number][],
-  ];
+const athletePositionOptions = PLAYERS_POSITIONS as [
+  (typeof PLAYERS_POSITIONS)[number],
+  ...(typeof PLAYERS_POSITIONS)[number][],
+];
 
-  const athleteFormSchema = z.object({
-    name: z.string().trim().min(1, "Nome e obrigatorio"),
-    age: z.coerce
-      .number()
-      .int("Idade deve ser um numero inteiro")
-      .min(1, "Idade e obrigatoria"),
-    position: z.enum(athletePositionOptions, {
-      message: "Posicao e obrigatoria",
-    }),
-  });
+const athleteFormSchema = z.object({
+  name: z.string().trim().min(1, "Nome e obrigatorio"),
+  age: z.coerce
+    .number()
+    .int("Idade deve ser um numero inteiro")
+    .min(1, "Idade e obrigatoria"),
+  position: z.enum(athletePositionOptions, {
+    message: "Posicao e obrigatoria",
+  }),
+});
 
-  type AthleteFormInput = z.input<typeof athleteFormSchema>;
-  type AthleteFormValues = z.infer<typeof athleteFormSchema>;
+type AthleteFormInput = z.input<typeof athleteFormSchema>;
+export type AthleteFormValues = z.infer<typeof athleteFormSchema>;
 
+const emptyValues: AthleteFormInput = {
+  name: "",
+  age: undefined,
+  position: PLAYERS_POSITIONS[0],
+};
+
+const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit }: AthleteFormProps) => {
   const {
     register,
     handleSubmit,
@@ -44,32 +48,20 @@ const AthleteForm = ({ isOpen, onClose, onSubmit }: AthleteFormProps) => {
     formState: { errors, isSubmitting },
   } = useForm<AthleteFormInput, unknown, AthleteFormValues>({
     resolver: zodResolver(athleteFormSchema),
-    defaultValues: {
-      name: "",
-      age: undefined,
-      position: PLAYERS_POSITIONS[0],
-    },
+    defaultValues: emptyValues,
   });
 
   useEffect(() => {
     if (!isOpen) return;
 
-    reset({
-      name: "",
-      age: undefined,
-      position: PLAYERS_POSITIONS[0],
-    });
-  }, [isOpen, reset]);
+    reset(initialValues ?? emptyValues);
+  }, [initialValues, isOpen, reset]);
 
   if (!isOpen) return null;
 
   const submitForm = (values: AthleteFormValues) => {
     onSubmit(values);
-    reset({
-      name: "",
-      age: undefined,
-      position: PLAYERS_POSITIONS[0],
-    });
+    reset(emptyValues);
   };
 
   return (
@@ -77,8 +69,14 @@ const AthleteForm = ({ isOpen, onClose, onSubmit }: AthleteFormProps) => {
       <div className={styles.modal} onMouseDown={(event) => event.stopPropagation()}>
         <div className={styles.header}>
           <div>
-            <h2 className={styles.title}>Cadastrar atleta</h2>
-            <p className={styles.subtitle}>Preencha os dados principais para criar um novo atleta.</p>
+            <h2 className={styles.title}>
+              {mode === "edit" ? "Editar atleta" : "Cadastrar atleta"}
+            </h2>
+            <p className={styles.subtitle}>
+              {mode === "edit"
+                ? "Atualize os dados principais do atleta selecionado."
+                : "Preencha os dados principais para criar um novo atleta."}
+            </p>
           </div>
 
           <button className={styles.closeButton} type="button" onClick={onClose} aria-label="Fechar">
@@ -137,7 +135,7 @@ const AthleteForm = ({ isOpen, onClose, onSubmit }: AthleteFormProps) => {
               Cancelar
             </button>
             <button className={styles.primaryButton} type="submit" disabled={isSubmitting}>
-              Salvar atleta
+              {mode === "edit" ? "Salvar alteracoes" : "Salvar atleta"}
             </button>
           </div>
         </form>
