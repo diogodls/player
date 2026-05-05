@@ -3,6 +3,7 @@ import type {Session} from "../Sessions";
 
 export type ActionTagged = {
   id: string;
+  sessionId: string;
   time: string;
   title: string;
   key?: string;

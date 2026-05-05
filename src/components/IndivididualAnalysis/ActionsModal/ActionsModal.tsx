@@ -6,13 +6,15 @@ import {faUser, faX} from "@fortawesome/free-solid-svg-icons";
 import type {Action, ActionTagged} from "../../../pages/Analysis";
 import {uid} from "uid";
 import ActionsList from "../../elements/ActionsList/ActionsList.tsx";
+import type {Session} from "../../../pages/Sessions";
 
 type ActionsModal = {
   actions: Action[];
+  session: Session;
   closeModal: () => void;
 };
 
-const ActionsModal = ({actions, closeModal}: ActionsModal) => {
+const ActionsModal = ({actions, closeModal, session}: ActionsModal) => {
   const {selectedPlayer, setIndividualActions, currentVideoTime} = useContext(ActionsContext);
 
   const handleActionClick = (action: Action) => {
@@ -20,6 +22,7 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
 
     const actionTagged = {
       id: uid(),
+      sessionId: session.id,
       goodAction: action.goodAction,
       title: action.label,
       key: action.key,
@@ -54,7 +57,7 @@ const ActionsModal = ({actions, closeModal}: ActionsModal) => {
           <FontAwesomeIcon icon={faX} className={styles.exitIcon} onClick={closeModal}/>
         </div>
 
-        <ActionsList actions={actions} handleActionClick={handleActionClick}/>
+        <ActionsList actions={actions} handleActionClick={handleActionClick} className={styles.actionsListPadding}/>
       </div>
     </div>
   );

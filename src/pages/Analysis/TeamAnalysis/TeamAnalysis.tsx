@@ -17,7 +17,7 @@ const TeamAnalysis = () => {
 
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <TeamActions actions={data?.actions ?? []} />
+          <TeamActions actions={data?.actions ?? []} session={data.session}/>
         </div>
         <div className={styles.videoAnalysis}>
           <VideoAnalysis/>

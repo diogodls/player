@@ -5,7 +5,7 @@ import {useContext, useEffect, useRef, useState} from "react";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 
 const VideoAnalysis = () => {
-  const { setCurrentVideoTime, isTagging } = useContext(ActionsContext)!;
+  const { setCurrentVideoTime, isTagging } = useContext(ActionsContext);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -28,8 +28,9 @@ const VideoAnalysis = () => {
   };
 
   useEffect(() => {
+    console.log('era pra chegar aq');
     if (isTagging) videoRef.current?.pause();
-    else videoRef.current?.play();
+    videoRef.current?.play();
   }, [isTagging]);
 
   return (

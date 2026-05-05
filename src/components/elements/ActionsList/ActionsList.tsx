@@ -8,13 +8,14 @@ import {groupActions} from "../../../utils/groupActions.ts";
 type ActionsList = {
   actions: Action[];
   handleActionClick: (action: Action) => void;
+  className?: string;
 }
 
-const ActionsList = ({actions, handleActionClick}: ActionsList) => {
+const ActionsList = ({actions, handleActionClick, className}: ActionsList) => {
   const groupedActions = useMemo( () => groupActions(actions), [actions]);
 
   return (
-    <div className={styles.actions}>
+    <div className={`${styles.actions} ${className}`}>
       {Object.entries(groupedActions).map(([title, actions]) => (
         <div className={styles.actionsType} key={title}>
           <span className={styles.actionsTitle}>
