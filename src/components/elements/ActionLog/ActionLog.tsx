@@ -26,7 +26,7 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
-  const selectedActions = logType === 'individual' ? individualActions : teamActions;
+  const selectedActions = (logType === 'individual' ? individualActions : teamActions).filter((action) => action.sessionId === session.id);
   const setActions = logType === 'individual' ? setIndividualActions : setTeamActions;
   const {success, info, error} = useContext(ToastContext);
 

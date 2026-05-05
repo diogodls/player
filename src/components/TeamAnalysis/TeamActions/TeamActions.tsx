@@ -21,6 +21,8 @@ const TeamActions = ({actions, session}: TeamActions) => {
       sessionId: session.id,
       goodAction: action.goodAction,
       title: action.label,
+      key: action.key,
+      category: action.category,
       time: currentVideoTime,
       type: 'team'
     } as ActionTagged;
