@@ -17,13 +17,13 @@ const TeamAnalysis = () => {
 
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <TeamActions actions={data?.actions ?? []} session={data.session}/>
+          <TeamActions actions={data.actions} session={data.session}/>
         </div>
         <div className={styles.videoAnalysis}>
           <VideoAnalysis/>
         </div>
         <div className={styles.actionLog}>
-          <ActionLog logType={'team'} session={data?.session}/>
+          <ActionLog logType={'team'} session={data.session}/>
         </div>
       </div>
     </div>

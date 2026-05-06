@@ -6,6 +6,7 @@ import type {ActionTagged} from "../../../pages/Analysis";
 import { uid } from 'uid';
 import ActionsList from "../../elements/ActionsList/ActionsList.tsx";
 import type {Session} from "../../../pages/Sessions";
+import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 
 type TeamActions = {
   actions: Action[];
@@ -13,9 +14,15 @@ type TeamActions = {
 }
 
 const TeamActions = ({actions, session}: TeamActions) => {
-  const {setTeamActions, currentVideoTime} = useContext(ActionsContext);
+  const {setTeamActions, currentVideoTime, videoRef} = useContext(ActionsContext);
+  const {error} = useContext(ToastContext);
 
   const handleActionClick = (action: Action) => {
+    if (!videoRef.current) {
+      error("O vídeo precisa estar definido");
+      return;
+    }
+
     const actionTagged = {
       id: uid(),
       sessionId: session.id,

@@ -1,9 +1,10 @@
 import {
   createContext,
   useState,
+  useMemo,
   type Dispatch,
   type SetStateAction,
-  type ReactNode, useMemo,
+  type ReactNode, type RefObject, useRef,
 } from "react";
 import type {Player} from "../../pages/CoachDashboard";
 import type {ActionTagged} from "../../pages/Analysis";
@@ -21,6 +22,7 @@ type ActionsContextValue = {
   setCurrentVideoTime: Dispatch<SetStateAction<string>>;
   isTagging: boolean;
   setIsTagging: Dispatch<SetStateAction<boolean>>;
+  videoRef: RefObject<HTMLVideoElement | null>
 };
 
 type ActionsProviderProps = {
@@ -36,6 +38,7 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
   const [actionTagged, setActionTagged] = useState<ActionTagged | null>(null);
   const [currentVideoTime, setCurrentVideoTime] = useState('0');
   const [isTagging, setIsTagging] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const value = useMemo(
     () => ({
@@ -50,9 +53,18 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
       currentVideoTime,
       setCurrentVideoTime,
       isTagging,
-      setIsTagging
+      setIsTagging,
+      videoRef
     }),
-    [selectedPlayer, individualActions, teamActions, actionTagged, currentVideoTime, isTagging]
+    [
+      selectedPlayer,
+      individualActions,
+      teamActions,
+      actionTagged,
+      currentVideoTime,
+      isTagging,
+      videoRef,
+    ]
   );
 
   return (

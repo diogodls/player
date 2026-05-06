@@ -1,9 +1,12 @@
 import type {Player, Team} from "../CoachDashboard";
 import type {Session} from "../Sessions";
 
+type ActionType = 'team' | 'individual';
+
 export type ActionTagged = {
   id: string;
   sessionId: string;
+  type: ActionType;
   time: string;
   title: string;
   key?: string;
@@ -30,5 +33,3 @@ export type Action = {
   category: string,
   goodAction: boolean,
 };
-
-type ActionType = 'team' | 'individual';

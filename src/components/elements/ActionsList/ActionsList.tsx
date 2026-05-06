@@ -29,7 +29,8 @@ const ActionsList = ({actions, handleActionClick, className}: ActionsList) => {
               };
 
               return (
-                <span
+                <button
+                  type={"button"}
                   className={`${styles.action} ${action.goodAction ? styles.goodAction : styles.badAction}`}
                   title={action.key}
                   key={action.key}
@@ -37,7 +38,7 @@ const ActionsList = ({actions, handleActionClick, className}: ActionsList) => {
                 >
                   <FontAwesomeIcon icon={action.goodAction ? faBullseye : faMinus}/>
                   <span>{action.label}</span>
-                </span>
+                </button>
               )
             })}
           </div>

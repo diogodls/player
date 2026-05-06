@@ -1,7 +1,7 @@
 import styles from "./ActionLog.module.scss";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
-import { Cookies, useCookies } from "react-cookie";
+import { Cookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
@@ -21,8 +21,7 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const {individualActions, teamActions, setIndividualActions, setTeamActions} = useContext(ActionsContext);
   const navigate = useNavigate();
   const cookieKey = `${COOKIE_KEY_PREFIX}${logType}${session.id}`;
-  const [, setCookie, removeCookie] = useCookies([cookieKey]);
-  const [loadedCookieKey, setLoadedCookieKey] = useState<string | null>(null);
+  const cookiesRef = useRef(new Cookies());
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
@@ -31,47 +30,45 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const {success, info, error} = useContext(ToastContext);
 
   useEffect(() => {
-    const cookieValue = new Cookies().get(cookieKey);
+    const cookieValue = cookiesRef.current.get(cookieKey);
 
     if (!cookieValue) {
       setActions([]);
-      setLoadedCookieKey(cookieKey);
       return;
     }
 
     try {
       const parsed = typeof cookieValue === "string" ? JSON.parse(cookieValue) : cookieValue;
       if (Array.isArray(parsed)) {
-        setActions(parsed);
+        const isSameAsCurrent = JSON.stringify(parsed) === JSON.stringify(selectedActions);
+        if (!isSameAsCurrent) {
+          setActions(parsed);
+        }
       } else {
-        removeCookie(cookieKey, { path: "/" });
+        cookiesRef.current.remove(cookieKey, { path: "/" });
         setActions([]);
       }
     } catch {
-      removeCookie(cookieKey, { path: "/" });
+      cookiesRef.current.remove(cookieKey, { path: "/" });
       setActions([]);
-    } finally {
-      setLoadedCookieKey(cookieKey);
     }
-  }, [cookieKey, removeCookie, setActions]);
+  }, [cookieKey, selectedActions, setActions]);
 
-  // Save actions to cookie whenever they change
+  // Persist actions by session and log type.
   useEffect(() => {
-    if (loadedCookieKey !== cookieKey) return;
-
     if (selectedActions.length === 0) {
-      removeCookie(cookieKey, { path: "/" });
+      cookiesRef.current.remove(cookieKey, { path: "/" });
       return;
     }
 
     const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
-    setCookie(cookieKey, JSON.stringify(selectedActions), {
+    cookiesRef.current.set(cookieKey, JSON.stringify(selectedActions), {
       path: "/",
       expires,
       sameSite: "lax",
     });
-  }, [selectedActions, cookieKey, loadedCookieKey, setCookie, removeCookie]);
+  }, [selectedActions, cookieKey]);
 
   useEffect(() => {
     return () => {
@@ -94,7 +91,7 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const showSuccessAndRedirect = (sessionId: string) => {
     success("Ações salvas com sucesso!");
     setActions([]);
-    removeCookie(cookieKey, { path: "/" });
+    cookiesRef.current.remove(cookieKey, { path: "/" });
 
     redirectTimeoutRef.current = window.setTimeout(() => {
       navigate(`/sessions/${sessionId}`);

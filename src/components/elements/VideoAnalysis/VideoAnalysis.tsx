@@ -5,9 +5,8 @@ import {useContext, useEffect, useRef, useState} from "react";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 
 const VideoAnalysis = () => {
-  const { setCurrentVideoTime, isTagging } = useContext(ActionsContext);
+  const { setCurrentVideoTime, isTagging, videoRef } = useContext(ActionsContext);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const wasPlayingBeforeTaggingRef = useRef(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
@@ -29,6 +28,14 @@ const VideoAnalysis = () => {
   };
 
   useEffect(() => {
+    if (!videoUrl) return;
+
+    return () => {
+      URL.revokeObjectURL(videoUrl);
+    };
+  }, [videoUrl]);
+
+  useEffect(() => {
     if (!videoRef.current) return;
 
     if (isTagging) {
@@ -38,10 +45,15 @@ const VideoAnalysis = () => {
     }
 
     if (wasPlayingBeforeTaggingRef.current) {
-      videoRef.current.play();
+      const playPromise = videoRef.current.play();
+      if (playPromise) {
+        void playPromise.catch(() => {
+          // Ignore autoplay/policy errors when resuming playback.
+        });
+      }
       wasPlayingBeforeTaggingRef.current = false;
     }
-  }, [isTagging]);
+  }, [isTagging, videoRef]);
 
   return (
     <div className={styles.screen}>

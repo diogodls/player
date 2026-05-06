@@ -7,6 +7,7 @@ import type {Action, ActionTagged} from "../../../pages/Analysis";
 import {uid} from "uid";
 import ActionsList from "../../elements/ActionsList/ActionsList.tsx";
 import type {Session} from "../../../pages/Sessions";
+import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 
 type ActionsModal = {
   actions: Action[];
@@ -15,10 +16,16 @@ type ActionsModal = {
 };
 
 const ActionsModal = ({actions, closeModal, session}: ActionsModal) => {
-  const {selectedPlayer, setIndividualActions, currentVideoTime} = useContext(ActionsContext);
+  const {selectedPlayer, setIndividualActions, currentVideoTime, videoRef} = useContext(ActionsContext);
+  const {error} = useContext(ToastContext);
 
   const handleActionClick = (action: Action) => {
-    if (!selectedPlayer) return;
+    console.log(videoRef);
+    if (!videoRef.current) {
+      error("O vídeo precisa estar definido");
+      closeModal();
+      return;
+    }
 
     const actionTagged = {
       id: uid(),
