@@ -6,9 +6,17 @@
   padding: 32px 24px 48px;
 }
 
-.hero {
+.header {
+  align-items: flex-start;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
   margin: 0 auto 28px;
   max-width: 1440px;
+}
+
+.hero {
+  max-width: 720px;
 
   h1 {
     color: var(--text-primary);
@@ -23,6 +31,52 @@
   }
 }
 
+.filter {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 280px;
+
+  label {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  select {
+    appearance: none;
+    background:
+      linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+      linear-gradient(135deg, var(--text-muted) 50%, transparent 50%),
+      linear-gradient(180deg, var(--surface), var(--bg-dark));
+    background-position:
+      calc(100% - 18px) 50%,
+      calc(100% - 12px) 50%,
+      0 0;
+    background-repeat: no-repeat;
+    background-size:
+      6px 6px,
+      6px 6px,
+      100% 100%;
+    border: 1px solid var(--border-20);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font: inherit;
+    min-height: 46px;
+    outline: none;
+    padding: 0 42px 0 14px;
+    width: 100%;
+
+    &:focus {
+      border-color: var(--light-blue);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+    }
+  }
+}
+
 .eyebrow {
   color: var(--accent-orange);
   font-size: 0.78rem;
@@ -31,15 +85,13 @@
   text-transform: uppercase;
 }
 
-.grid {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+.rankingContent {
   margin: 0 auto;
-  max-width: 1440px;
+  max-width: 980px;
 }
 
-.feedback {
+.feedback,
+.emptyState {
   align-items: center;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-20);
@@ -52,10 +104,11 @@
   min-height: 240px;
 }
 
-@media (max-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.emptyState {
+  border-style: dashed;
+  font-size: 1rem;
+  min-height: 360px;
+  text-align: center;
 }
 
 @media (max-width: 640px) {
@@ -63,7 +116,12 @@
     padding: 24px 16px 36px;
   }
 
-  .grid {
-    grid-template-columns: minmax(0, 1fr);
+  .header {
+    flex-direction: column;
+  }
+
+  .filter {
+    min-width: 0;
+    width: 100%;
   }
 }
