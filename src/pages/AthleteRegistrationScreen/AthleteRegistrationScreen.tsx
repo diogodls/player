@@ -87,7 +87,6 @@ const AthleteRegistrationScreen = () => {
       <div className={styles.content}>
         <div className={styles.header}>
           <div>
-            <span className={styles.eyebrow}>Cadastro</span>
             <h1 className={styles.title}>Atletas</h1>
             <p className={styles.description}>
               Cadastre novos atletas
