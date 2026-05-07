@@ -1,0 +1,102 @@
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  .headerText {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    min-width: 0;
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: baseline;
+      gap: 4px;
+
+      .title {
+        font-weight: bold;
+        font-size: 25px;
+        line-height: 1.12;
+      }
+
+      .subtitle {
+        font-size: 18px;
+      }
+    }
+
+    .icon {
+      display: flex;
+      align-items: center;
+
+      .titleIcon {
+        color: var(--light-blue);
+        font-size: 25px;
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+  .addButton {
+    background: var(--green);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+
+    &:hover {
+      background: color-mix(in srgb, var(--green) 80%, white);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .headerText {
+      .titleRow {
+        .titleIcon {
+          font-size: 18px;
+        }
+      }
+
+      .title {
+        font-size: 22px;
+      }
+    }
+
+    .addButton {
+      width: 100%;
+      text-align: center;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .headerText {
+      .titleRow {
+        gap: 6px;
+
+        .titleIcon {
+          font-size: 17px;
+        }
+      }
+
+      .title {
+        font-size: 20px;
+      }
+    }
+
+    .addButton {
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import {useApi} from "../../hooks/useApi.ts";
-import IndividualPlayer from "../../components/IndividualPlayer/IndividualPlayer.tsx";
+import IndividualPlayer from "../../components/PlayerView/IndividualPlayer.tsx";
 import type {PlayerViewData} from "./index";
 import styles from './PlayerView.module.scss';
 

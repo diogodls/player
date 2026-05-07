@@ -72,6 +72,10 @@
     margin-top: 12px;
   }
 
+  .pagination {
+    margin-top: 14px;
+  }
+
   .emptySub {
     color: var(--text-muted);
     opacity: 0.6;
@@ -114,6 +118,10 @@
       margin-top: 10px;
     }
 
+    .pagination {
+      margin-top: 12px;
+    }
+
     .emptyState {
       padding: 16px;
       gap: 6px;
@@ -130,6 +138,14 @@
 
     .emptySub {
       font-size: 11px;
+    }
+  }
+}
+
+@media (max-width: 420px) {
+  .card {
+    .pagination {
+      margin-top: 12px;
     }
   }
 }

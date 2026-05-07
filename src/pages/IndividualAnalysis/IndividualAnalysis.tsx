@@ -6,27 +6,36 @@ import {useApi} from "../../hooks/useApi.ts";
 import {useState} from "react";
 import ActionsModal from "../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
 import type {IndividualAnalysisData} from "./index";
+import SessionAnalysisHeader from "../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 
 const IndividualAnalysis = () => {
   const {data} = useApi<IndividualAnalysisData>("individual-analysis");
+  // const { id } = useParams<{ id: string }>(); todo: usar para requisição futura
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
+
+  if (!data) return;
 
   return (
     <div className={styles.container}>
+      <SessionAnalysisHeader session={data.session} />
+
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen}/>
+          <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen} />
         </div>
         <div className={styles.videoAnalysis}>
-          <VideoAnalysis/>
+          <VideoAnalysis />
         </div>
         <div className={styles.actionLog}>
-          <ActionLog/>
+          <ActionLog session={data.session} />
         </div>
       </div>
-      {actionsModalOpen && <ActionsModal
-        closeModal={() => setActionsModalOpen(false)}
-        actions={data?.actions ?? []}/>}
+      {actionsModalOpen && (
+        <ActionsModal
+          closeModal={() => setActionsModalOpen(false)}
+          actions={data?.actions ?? []}
+        />
+      )}
     </div>
   );
 };

@@ -2,15 +2,24 @@
   width: 100%;
   background: var(--bg-dark);
   border-radius: 14px;
-  padding: 12px 14px;
   color: var(--text-light);
   border: 1px solid var(--border-20);
-  cursor: pointer;
   transition: 0.2s all ease-in-out;
+  overflow: hidden;
 
   &:hover {
     transform: scale(1.02);
     background: var(--bg-dark);
+  }
+
+  .openArea {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    padding: 12px 14px 10px;
   }
 
   .topRow {
@@ -65,7 +74,68 @@
 
       .text {
         font-weight: 500;
+        word-break: break-word;
       }
+    }
+  }
+
+  .cardActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 14px 12px;
+    border-top: 1px solid var(--border-20);
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .editBtn {
+      background: color-mix(in srgb, var(--light-blue) 20%, transparent);
+      color: var(--light-blue);
+    }
+
+    .deleteBtn {
+      background: color-mix(in srgb, var(--deep-orange) 20%, transparent);
+      color: #fca5a5;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .openArea {
+      padding: 12px 12px 10px;
+    }
+
+    .info {
+      .row {
+        align-items: flex-start;
+      }
+    }
+
+    .cardActions {
+      justify-content: stretch;
+      gap: 8px;
+      padding: 10px 12px 12px;
+
+      button {
+        flex: 1;
+        justify-content: center;
+        min-height: 36px;
+      }
+    }
+  }
+
+  @media (max-width: 420px) {
+    .cardActions {
+      flex-direction: column;
     }
   }
 }
