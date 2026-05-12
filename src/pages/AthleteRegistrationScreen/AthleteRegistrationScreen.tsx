@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import AthleteForm, { type AthleteFormValues } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
@@ -18,23 +18,35 @@ const AthleteRegistrationScreen = () => {
   const navigate = useNavigate();
   const { data } = useApi<CoachDashboardData>("coach-dashboard");
   const [athletes, setAthletes] = useState<Athlete[]>([]);
-  const [hasLoadedMockAthletes, setHasLoadedMockAthletes] = useState(false);
+  const [hasLocalAthleteChanges, setHasLocalAthleteChanges] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
 
-  useEffect(() => {
-    if (hasLoadedMockAthletes || !data?.players) return;
-
-    setAthletes(
-      data.players.map((player) => ({
+  const mockAthletes = useMemo<Athlete[]>(
+    () =>
+      data?.players.map((player) => ({
         id: String(player.id),
         name: player.name,
+        age: player.age,
         position: player.position as (typeof PLAYERS_POSITIONS)[number],
-      })),
-    );
-    setHasLoadedMockAthletes(true);
-  }, [data?.players, hasLoadedMockAthletes]);
+      })) ?? [],
+    [data?.players],
+  );
+
+  const displayedAthletes = hasLocalAthleteChanges ? athletes : mockAthletes;
+
+  const formInitialValues = useMemo<AthleteFormValues | undefined>(
+    () =>
+      editingAthlete
+        ? {
+            name: editingAthlete.name,
+            age: editingAthlete.age ?? 1,
+            position: editingAthlete.position,
+          }
+        : undefined,
+    [editingAthlete],
+  );
 
   const handleOpenCreateModal = () => {
     setEditingAthlete(null);
@@ -43,21 +55,22 @@ const AthleteRegistrationScreen = () => {
 
   const handleSubmitAthlete = (values: AthleteFormValues) => {
     if (editingAthlete) {
-      setAthletes((currentAthletes) =>
-        currentAthletes.map((athlete) =>
+      setAthletes(
+        displayedAthletes.map((athlete) =>
           athlete.id === editingAthlete.id ? { ...athlete, ...values } : athlete,
         ),
       );
     } else {
-      setAthletes((currentAthletes) => [
+      setAthletes([
         {
           id: crypto.randomUUID(),
           ...values,
         },
-        ...currentAthletes,
+        ...displayedAthletes,
       ]);
     }
 
+    setHasLocalAthleteChanges(true);
     setIsModalOpen(false);
     setEditingAthlete(null);
   };
@@ -70,17 +83,10 @@ const AthleteRegistrationScreen = () => {
   const handleConfirmDelete = () => {
     if (!athleteToDelete) return;
 
-    setAthletes((currentAthletes) =>
-      currentAthletes.filter((athlete) => athlete.id !== athleteToDelete.id),
-    );
+    setAthletes(displayedAthletes.filter((athlete) => athlete.id !== athleteToDelete.id));
+    setHasLocalAthleteChanges(true);
     setAthleteToDelete(null);
   };
-
-  const getFormInitialValues = (athlete: Athlete): AthleteFormValues => ({
-    name: athlete.name,
-    age: athlete.age ?? 1,
-    position: athlete.position,
-  });
 
   return (
     <section className={styles.container}>
@@ -98,7 +104,7 @@ const AthleteRegistrationScreen = () => {
           </button>
         </div>
 
-        {athletes.length === 0 ? (
+        {displayedAthletes.length === 0 ? (
           <div className={styles.emptyState}>
             <h2 className={styles.emptyTitle}>Nenhum atleta cadastrado</h2>
             <p className={styles.emptyDescription}>
@@ -107,7 +113,7 @@ const AthleteRegistrationScreen = () => {
           </div>
         ) : (
           <div className={styles.list}>
-            {athletes.map((athlete) => (
+            {displayedAthletes.map((athlete) => (
               <article
                 key={athlete.id}
                 className={styles.card}
@@ -127,7 +133,7 @@ const AthleteRegistrationScreen = () => {
                     <span className={styles.cardPosition}>{athlete.position}</span>
                   </div>
                   <span className={styles.cardAge}>
-                    {athlete.age ? `${athlete.age} anos` : "Idade nao informada"}
+                    {typeof athlete.age === "number" ? `${athlete.age} anos` : "Idade nao informada"}
                   </span>
                 </div>
                 <div className={styles.cardActions}>
@@ -162,7 +168,7 @@ const AthleteRegistrationScreen = () => {
       <AthleteForm
         isOpen={isModalOpen}
         mode={editingAthlete ? "edit" : "create"}
-        initialValues={editingAthlete ? getFormInitialValues(editingAthlete) : undefined}
+        initialValues={formInitialValues}
         onClose={handleCloseForm}
         onSubmit={handleSubmitAthlete}
       />

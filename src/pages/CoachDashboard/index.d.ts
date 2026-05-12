@@ -14,6 +14,7 @@ export type AverageCard = {
 export type Player = {
   id: number;
   name: string;
+  age?: number;
   overall: number;
   position: string;
   //todo: separar metricas

@@ -1,11 +1,23 @@
 import { useEffect } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { PLAYERS_POSITIONS } from "../../../constants/players";
 import styles from "./AthleteForm.module.scss";
+
+const requiredAgeMessage = "Idade deve ser um numero inteiro maior que zero";
+
+const athleteFormSchema = z.object({
+  name: z.string().trim().min(1, "Nome e obrigatorio"),
+  age: z.number().int(requiredAgeMessage).min(1, requiredAgeMessage),
+  position: z
+    .string()
+    .refine((value) => PLAYERS_POSITIONS.includes(value), "Posicao e obrigatoria"),
+});
+
+export type AthleteFormValues = z.infer<typeof athleteFormSchema>;
 
 type AthleteFormProps = {
   isOpen: boolean;
@@ -15,38 +27,25 @@ type AthleteFormProps = {
   onSubmit: (values: AthleteFormValues) => void;
 };
 
-const athletePositionOptions = PLAYERS_POSITIONS as [
-  (typeof PLAYERS_POSITIONS)[number],
-  ...(typeof PLAYERS_POSITIONS)[number][],
-];
-
-const athleteFormSchema = z.object({
-  name: z.string().trim().min(1, "Nome e obrigatorio"),
-  age: z.coerce
-    .number()
-    .int("Idade deve ser um numero inteiro")
-    .min(1, "Idade e obrigatoria"),
-  position: z.enum(athletePositionOptions, {
-    message: "Posicao e obrigatoria",
-  }),
-});
-
-type AthleteFormInput = z.input<typeof athleteFormSchema>;
-export type AthleteFormValues = z.infer<typeof athleteFormSchema>;
-
-const emptyValues: AthleteFormInput = {
+const emptyValues: AthleteFormValues = {
   name: "",
-  age: undefined,
+  age: 1,
   position: PLAYERS_POSITIONS[0],
 };
 
-const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit }: AthleteFormProps) => {
+const AthleteForm = ({
+  isOpen,
+  mode = "create",
+  initialValues,
+  onClose,
+  onSubmit,
+}: AthleteFormProps) => {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
-  } = useForm<AthleteFormInput, unknown, AthleteFormValues>({
+    formState: { errors },
+  } = useForm<AthleteFormValues>({
     resolver: zodResolver(athleteFormSchema),
     defaultValues: emptyValues,
   });
@@ -59,10 +58,13 @@ const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit
 
   if (!isOpen) return null;
 
-  const submitForm = (values: AthleteFormValues) => {
-    onSubmit(values);
+  const submitForm = handleSubmit((values) => {
+    onSubmit({
+      ...values,
+      name: values.name.trim(),
+    });
     reset(emptyValues);
-  };
+  });
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>
@@ -84,7 +86,7 @@ const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit
           </button>
         </div>
 
-        <form className={styles.form} onSubmit={handleSubmit(submitForm)}>
+        <form className={styles.form} onSubmit={submitForm}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="name">
               Nome *
@@ -96,7 +98,7 @@ const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit
               placeholder="Ex: Matheus Silva"
               {...register("name")}
             />
-            {errors.name && <span className={styles.error}>{errors.name.message}</span>}
+            {errors.name?.message && <span className={styles.error}>{errors.name.message}</span>}
           </div>
 
           <div className={styles.fieldGroup}>
@@ -110,23 +112,27 @@ const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit
                 type="number"
                 min="1"
                 placeholder="Ex: 19"
-                {...register("age")}
+                {...register("age", { valueAsNumber: true })}
               />
-              {errors.age && <span className={styles.error}>{errors.age.message}</span>}
+              {errors.age?.message && <span className={styles.error}>{errors.age.message}</span>}
             </div>
 
             <div className={styles.field}>
               <label className={styles.label} htmlFor="position">
                 Posicao *
               </label>
-              <select id="position" className={styles.select} {...register("position")}>
+              <select
+                id="position"
+                className={styles.select}
+                {...register("position")}
+              >
                 {PLAYERS_POSITIONS.map((position) => (
                   <option key={position} value={position}>
                     {position}
                   </option>
                 ))}
               </select>
-              {errors.position && <span className={styles.error}>{errors.position.message}</span>}
+              {errors.position?.message && <span className={styles.error}>{errors.position.message}</span>}
             </div>
           </div>
 
@@ -134,7 +140,7 @@ const AthleteForm = ({ isOpen, mode = "create", initialValues, onClose, onSubmit
             <button className={styles.secondaryButton} type="button" onClick={onClose}>
               Cancelar
             </button>
-            <button className={styles.primaryButton} type="submit" disabled={isSubmitting}>
+            <button className={styles.primaryButton} type="submit">
               {mode === "edit" ? "Salvar alteracoes" : "Salvar atleta"}
             </button>
           </div>
