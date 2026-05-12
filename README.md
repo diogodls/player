@@ -1,7 +1,4 @@
 # README.md (English)
-
-# Player
-
 # Player
 
 Web platform for athlete and futsal session performance analysis, developed in partnership with the UFSM Futsal team.<br>
