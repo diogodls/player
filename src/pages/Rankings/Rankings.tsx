@@ -3,6 +3,7 @@ import RankingSection from "../../components/elements/RankingSection/RankingSect
 import {buildRankingPlayers, rankingConfigs} from "../../constants/rankings.ts";
 import {useApi} from "../../hooks/useApi.ts";
 import type {CoachDashboardData} from "../CoachDashboard";
+import sessionActionStyles from "../../components/SessionDetails/SessionActions/SessionActions.module.scss";
 import styles from "./Rankings.module.scss";
 
 const Rankings = () => {
@@ -31,8 +32,8 @@ const Rankings = () => {
           </p>
         </div>
 
-        <div className={styles.filter}>
-          <label htmlFor="ranking-filter">Ranking</label>
+        <label className={`${sessionActionStyles.filterField} ${styles.filter}`} htmlFor="ranking-filter">
+          <span className={sessionActionStyles.filterLabel}>Ranking</span>
           <select
             id="ranking-filter"
             value={selectedRankingKey}
@@ -45,7 +46,7 @@ const Rankings = () => {
               </option>
             ))}
           </select>
-        </div>
+        </label>
       </section>
 
       {isLoading ? (
