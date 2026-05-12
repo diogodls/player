@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import AthleteForm, { type AthleteFormValues } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
+import PlayerCard from "../../components/CoachDashboard/PlayersSection/PlayerCard/PlayerCard";
+import Pagination from "../../components/elements/Pagination/Pagination";
 import { PLAYERS_POSITIONS } from "../../constants/players";
 import { useApi } from "../../hooks/useApi";
 import type { CoachDashboardData } from "../CoachDashboard";
@@ -14,6 +16,8 @@ type Athlete = {
   position: (typeof PLAYERS_POSITIONS)[number];
 };
 
+const ATHLETES_PER_PAGE = 8;
+
 const AthleteRegistrationScreen = () => {
   const navigate = useNavigate();
   const { data } = useApi<CoachDashboardData>("coach-dashboard");
@@ -22,6 +26,7 @@ const AthleteRegistrationScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const mockAthletes = useMemo<Athlete[]>(
     () =>
@@ -35,6 +40,12 @@ const AthleteRegistrationScreen = () => {
   );
 
   const displayedAthletes = hasLocalAthleteChanges ? athletes : mockAthletes;
+  const totalPages = Math.max(1, Math.ceil(displayedAthletes.length / ATHLETES_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const pagedAthletes = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * ATHLETES_PER_PAGE;
+    return displayedAthletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
+  }, [displayedAthletes, safeCurrentPage]);
 
   const formInitialValues = useMemo<AthleteFormValues | undefined>(
     () =>
@@ -68,6 +79,7 @@ const AthleteRegistrationScreen = () => {
         },
         ...displayedAthletes,
       ]);
+      setCurrentPage(1);
     }
 
     setHasLocalAthleteChanges(true);
@@ -113,12 +125,15 @@ const AthleteRegistrationScreen = () => {
           </div>
         ) : (
           <div className={styles.list}>
-            {displayedAthletes.map((athlete) => (
-              <article
+            {pagedAthletes.map((athlete) => (
+              <PlayerCard
                 key={athlete.id}
-                className={styles.card}
-                role="button"
-                tabIndex={0}
+                size="compact"
+                player={{
+                  id: athlete.id,
+                  name: athlete.position,
+                  position: typeof athlete.age === "number" ? `${athlete.age} anos` : "Idade nao informada",
+                }}
                 onClick={() => navigate(`/player/${athlete.id}`)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") {
@@ -127,13 +142,9 @@ const AthleteRegistrationScreen = () => {
                   }
                 }}
               >
-                <div className={styles.cardHeader}>
-                  <div>
-                    <h2 className={styles.cardTitle}>{athlete.name}</h2>
-                    <span className={styles.cardPosition}>{athlete.position}</span>
-                  </div>
-                  <span className={styles.cardAge}>
-                    {typeof athlete.age === "number" ? `${athlete.age} anos` : "Idade nao informada"}
+                <div className={styles.cardInfo}>
+                  <span className={styles.cardName}>
+                    {athlete.name}
                   </span>
                 </div>
                 <div className={styles.cardActions}>
@@ -159,8 +170,15 @@ const AthleteRegistrationScreen = () => {
                     Excluir
                   </button>
                 </div>
-              </article>
+              </PlayerCard>
             ))}
+            <Pagination
+              className={styles.pagination}
+              currentPage={safeCurrentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              size="sm"
+            />
           </div>
         )}
       </div>

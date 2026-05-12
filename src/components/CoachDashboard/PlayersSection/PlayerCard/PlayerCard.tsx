@@ -1,14 +1,35 @@
 import styles from "./PlayerCard.module.scss";
 import type {Player} from "../../../../pages/CoachDashboard";
 import {Link} from "react-router";
+import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 
 type PlayerCardProps = {
-  player: Player;
+  player: Omit<Pick<Player, "id" | "name" | "position">, "id"> &
+    { id: string | number } &
+    Partial<Pick<Player, "overall" | "offensiveActions" | "defensiveActions">>;
+  to?: string;
+  children?: ReactNode;
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
+  onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
+  size?: "default" | "compact";
 };
 
-const PlayerCard = ({player}: PlayerCardProps) => {
+const PlayerCardContent = ({ player, children }: PlayerCardProps) => {
+  if (children) {
+    return (
+      <>
+        <div className={styles.header}>
+          <h3>{player.name}</h3>
+          <span>{player.position}</span>
+        </div>
+
+        {children}
+      </>
+    );
+  }
+
   return (
-    <Link to={`/player/${player.id}`} className={styles.card}>
+    <>
       <div className={styles.header}>
         <h3>{player.name}</h3>
         <span>{player.position}</span>
@@ -32,6 +53,44 @@ const PlayerCard = ({player}: PlayerCardProps) => {
           <span>{player.defensiveActions}</span>
         </div>
       </div>
+    </>
+  );
+};
+
+const PlayerCard = ({
+  player,
+  to = `/player/${player.id}`,
+  children,
+  onClick,
+  onKeyDown,
+  size = "default",
+}: PlayerCardProps) => {
+  const cardClassName = [
+    styles.card,
+    size === "compact" ? styles.compact : "",
+  ].filter(Boolean).join(" ");
+
+  if (onClick || onKeyDown) {
+    return (
+      <article
+        className={cardClassName}
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+      >
+        <PlayerCardContent player={player}>
+          {children}
+        </PlayerCardContent>
+      </article>
+    );
+  }
+
+  return (
+    <Link to={to} className={cardClassName}>
+      <PlayerCardContent player={player}>
+        {children}
+      </PlayerCardContent>
     </Link>
   );
 };
