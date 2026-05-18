@@ -7,14 +7,14 @@ import { z } from "zod";
 import { PLAYERS_POSITIONS } from "../../../constants/players";
 import styles from "./AthleteForm.module.scss";
 
-const requiredAgeMessage = "Idade deve ser um numero inteiro maior que zero";
+const requiredAgeMessage = "Idade deve ser um número inteiro maior que zero";
 
 const athleteFormSchema = z.object({
-  name: z.string().trim().min(1, "Nome e obrigatorio"),
+  name: z.string().trim().min(1, "Nome é obrigatório"),
   age: z.number().int(requiredAgeMessage).min(1, requiredAgeMessage),
   position: z
     .string()
-    .refine((value) => PLAYERS_POSITIONS.includes(value), "Posicao e obrigatoria"),
+    .refine((value) => PLAYERS_POSITIONS.includes(value), "Posição é obrigatoria"),
 });
 
 export type AthleteFormValues = z.infer<typeof athleteFormSchema>;
@@ -119,7 +119,7 @@ const AthleteForm = ({
 
             <div className={styles.field}>
               <label className={styles.label} htmlFor="position">
-                Posicao *
+                Posição *
               </label>
               <select
                 id="position"

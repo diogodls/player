@@ -125,7 +125,7 @@ const AthleteRegistrationScreen = () => {
           <div className={styles.emptyState}>
             <h2 className={styles.emptyTitle}>Nenhum atleta cadastrado</h2>
             <p className={styles.emptyDescription}>
-              Abra o modal para salvar o primeiro atleta e comecar a montar a lista local.
+              Abra o modal para salvar o primeiro atleta e começar a montar a lista local.
             </p>
           </div>
         ) : (
