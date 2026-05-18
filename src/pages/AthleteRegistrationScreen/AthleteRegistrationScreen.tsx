@@ -14,6 +14,7 @@ type Athlete = {
   name: string;
   age: Player["age"];
   position: (typeof PLAYERS_POSITIONS)[number];
+  isPersisted: boolean;
 };
 
 const ATHLETES_PER_PAGE = 8;
@@ -35,6 +36,7 @@ const AthleteRegistrationScreen = () => {
         name: player.name,
         age: player.age,
         position: player.position as (typeof PLAYERS_POSITIONS)[number],
+        isPersisted: true,
       })) ?? [],
     [data?.players],
   );
@@ -68,7 +70,9 @@ const AthleteRegistrationScreen = () => {
     if (editingAthlete) {
       setAthletes(
         displayedAthletes.map((athlete) =>
-          athlete.id === editingAthlete.id ? { ...athlete, ...values } : athlete,
+          athlete.id === editingAthlete.id
+            ? { ...athlete, ...values, isPersisted: false }
+            : athlete,
         ),
       );
     } else {
@@ -76,6 +80,7 @@ const AthleteRegistrationScreen = () => {
         {
           id: crypto.randomUUID(),
           ...values,
+          isPersisted: false,
         },
         ...displayedAthletes,
       ]);
@@ -125,53 +130,63 @@ const AthleteRegistrationScreen = () => {
           </div>
         ) : (
           <div className={styles.list}>
-            {pagedAthletes.map((athlete) => (
-              <PlayerCard
-                key={athlete.id}
-                size="compact"
-                player={{
-                  id: athlete.id,
-                  name: athlete.position,
-                  position: `${athlete.age} anos`,
-                }}
-                onClick={() => navigate(`/player/${athlete.id}`)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    navigate(`/player/${athlete.id}`);
-                  }
-                }}
-              >
-                <div className={styles.cardInfo}>
-                  <span className={styles.cardName}>
-                    {athlete.name}
-                  </span>
-                </div>
-                <div className={styles.cardActions}>
-                  <button
-                    className={styles.secondaryAction}
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setEditingAthlete(athlete);
-                      setIsModalOpen(true);
-                    }}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className={styles.dangerAction}
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setAthleteToDelete(athlete);
-                    }}
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </PlayerCard>
-            ))}
+            {pagedAthletes.map((athlete) => {
+              const playerPath = `/player/${athlete.id}`;
+              const handleOpenPlayer = () => {
+                if (athlete.isPersisted) {
+                  navigate(playerPath);
+                }
+              };
+
+              return (
+                <PlayerCard
+                  key={athlete.id}
+                  size="compact"
+                  disabled={!athlete.isPersisted}
+                  player={{
+                    id: athlete.id,
+                    name: athlete.position,
+                    position: `${athlete.age} anos`,
+                  }}
+                  onClick={athlete.isPersisted ? handleOpenPlayer : undefined}
+                  onKeyDown={athlete.isPersisted ? (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleOpenPlayer();
+                    }
+                  } : undefined}
+                >
+                  <div className={styles.cardInfo}>
+                    <span className={styles.cardName}>
+                      {athlete.name}
+                    </span>
+                  </div>
+                  <div className={styles.cardActions}>
+                    <button
+                      className={styles.secondaryAction}
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setEditingAthlete(athlete);
+                        setIsModalOpen(true);
+                      }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      className={styles.dangerAction}
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setAthleteToDelete(athlete);
+                      }}
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </PlayerCard>
+              );
+            })}
             <Pagination
               className={styles.pagination}
               currentPage={safeCurrentPage}

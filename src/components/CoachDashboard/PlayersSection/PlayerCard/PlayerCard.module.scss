@@ -92,3 +92,11 @@
   min-height: 260px;
   padding: 18px;
 }
+
+.disabled {
+  cursor: default;
+
+  &:hover {
+    transform: none;
+  }
+}

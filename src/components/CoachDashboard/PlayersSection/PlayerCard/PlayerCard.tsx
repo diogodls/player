@@ -12,6 +12,7 @@ type PlayerCardProps = {
   onClick?: (event: MouseEvent<HTMLElement>) => void;
   onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
   size?: "default" | "compact";
+  disabled?: boolean;
 };
 
 const PlayerCardContent = ({ player, children }: PlayerCardProps) => {
@@ -64,11 +65,23 @@ const PlayerCard = ({
   onClick,
   onKeyDown,
   size = "default",
+  disabled = false,
 }: PlayerCardProps) => {
   const cardClassName = [
     styles.card,
     size === "compact" ? styles.compact : "",
+    disabled ? styles.disabled : "",
   ].filter(Boolean).join(" ");
+
+  if (disabled) {
+    return (
+      <article className={cardClassName}>
+        <PlayerCardContent player={player}>
+          {children}
+        </PlayerCardContent>
+      </article>
+    );
+  }
 
   if (onClick || onKeyDown) {
     return (
