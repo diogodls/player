@@ -6,13 +6,13 @@ import PlayerCard from "../../components/CoachDashboard/PlayersSection/PlayerCar
 import Pagination from "../../components/elements/Pagination/Pagination";
 import { PLAYERS_POSITIONS } from "../../constants/players";
 import { useApi } from "../../hooks/useApi";
-import type { CoachDashboardData } from "../CoachDashboard";
+import type { CoachDashboardData, Player } from "../CoachDashboard";
 import styles from "./AthleteRegistrationScreen.module.scss";
 
 type Athlete = {
   id: string;
   name: string;
-  age?: number;
+  age: Player["age"];
   position: (typeof PLAYERS_POSITIONS)[number];
 };
 
@@ -52,7 +52,7 @@ const AthleteRegistrationScreen = () => {
       editingAthlete
         ? {
             name: editingAthlete.name,
-            age: editingAthlete.age ?? 1,
+            age: editingAthlete.age,
             position: editingAthlete.position,
           }
         : undefined,
@@ -132,7 +132,7 @@ const AthleteRegistrationScreen = () => {
                 player={{
                   id: athlete.id,
                   name: athlete.position,
-                  position: typeof athlete.age === "number" ? `${athlete.age} anos` : "Idade nao informada",
+                  position: `${athlete.age} anos`,
                 }}
                 onClick={() => navigate(`/player/${athlete.id}`)}
                 onKeyDown={(event) => {
