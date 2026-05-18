@@ -22,6 +22,7 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const navigate = useNavigate();
   const cookieKey = `${COOKIE_KEY_PREFIX}${logType}${session.id}`;
   const cookiesRef = useRef(new Cookies());
+  const isInitialMount = useRef(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
@@ -30,31 +31,22 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const {success, info, error} = useContext(ToastContext);
 
   useEffect(() => {
-    const cookieValue = cookiesRef.current.get(cookieKey);
+    if (!isInitialMount.current) return;
+    isInitialMount.current = false;
 
-    if (!cookieValue) {
-      setActions([]);
-      return;
-    }
-
-    try {
-      const parsed = typeof cookieValue === "string" ? JSON.parse(cookieValue) : cookieValue;
-      if (Array.isArray(parsed)) {
-        const isSameAsCurrent = JSON.stringify(parsed) === JSON.stringify(selectedActions);
-        if (!isSameAsCurrent) {
+    const saved = cookiesRef.current.get(cookieKey);
+    if (saved) {
+      try {
+        const parsed = typeof saved === "string" ? JSON.parse(saved) : saved;
+        if (Array.isArray(parsed)) {
           setActions(parsed);
         }
-      } else {
-        cookiesRef.current.remove(cookieKey, { path: "/" });
-        setActions([]);
+      } catch {
+        // Invalid cookie, ignore silently
       }
-    } catch {
-      cookiesRef.current.remove(cookieKey, { path: "/" });
-      setActions([]);
     }
-  }, [cookieKey, selectedActions, setActions]);
+  }, [cookieKey, setActions]);
 
-  // Persist actions by session and log type.
   useEffect(() => {
     if (selectedActions.length === 0) {
       cookiesRef.current.remove(cookieKey, { path: "/" });

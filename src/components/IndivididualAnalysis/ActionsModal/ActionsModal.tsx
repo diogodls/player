@@ -20,7 +20,6 @@ const ActionsModal = ({actions, closeModal, session}: ActionsModal) => {
   const {error} = useContext(ToastContext);
 
   const handleActionClick = (action: Action) => {
-    console.log(videoRef);
     if (!videoRef.current) {
       error("O vídeo precisa estar definido");
       closeModal();
