@@ -141,7 +141,7 @@ const AthleteForm = ({
               Cancelar
             </button>
             <button className={styles.primaryButton} type="submit">
-              {mode === "edit" ? "Salvar alteracoes" : "Salvar atleta"}
+              {mode === "edit" ? "Salvar alterações" : "Salvar atleta"}
             </button>
           </div>
         </form>
