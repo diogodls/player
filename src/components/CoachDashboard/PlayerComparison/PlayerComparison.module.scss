@@ -19,7 +19,7 @@
       margin-right: 3px;
     }
 
-      .addPlayer {
+    .addPlayer {
       padding: 10px;
       color: white;
       background: var(--green);
@@ -28,7 +28,7 @@
       cursor: pointer;
       transition: .2s all ease-in-out;
 
-      &:hover{
+      &:hover {
         background: #18de65;
       }
     }
@@ -38,50 +38,11 @@
     display: flex;
     gap: 10px;
 
-    .dropdown {
-      background-color: blue;
-    }
-
     .player {
       width: 50%;
       display: flex;
       flex-direction: column;
       gap: 10px;
-
-      .dropdown {
-        background-color: blue;
-      }
-
-      .placeholder {
-        font-size: 1rem;
-        color: white;
-      }
-
-      .select {
-        width: 100%;
-        background-color: #374151;
-        border: 1px solid #DDDDDD20;
-        padding: 10px;
-        border-radius: var(--border-radius);
-        color: white;
-        overflow: hidden;
-
-        .dropdown {
-          background-color: blue;
-        }
-
-        :global {
-          .rc-select-selector {
-            border: none;
-            color: white;
-          }
-
-          .rc-select-selection-placeholder {
-            top: -3px;
-            left: 0;
-          }
-        }
-      }
     }
 
     .selectedPlayer {

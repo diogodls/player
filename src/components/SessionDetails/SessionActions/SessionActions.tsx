@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SessionActions.module.scss";
 import SessionActionCard from "../SessionActionCard/SessionActionCard.tsx";
+import Select from "../../../elements/Select";
 import type {
   ActionTypeFilter,
   SessionAnalysisSection,
@@ -121,30 +122,22 @@ const SessionActions = ({ viewMode, view }: Props) => {
           </div>
 
           {viewMode === "individual" && (
-            <label className={styles.filterField}>
-              <span className={styles.filterLabel}>Atleta</span>
-              <select value={activeAthleteId} onChange={(event) => setSelectedAthleteId(event.target.value)}>
-                <option value="all">Todos os atletas</option>
-                {athleteOptions.map((athlete) => (
-                  <option key={athlete.value} value={athlete.value}>
-                    {athlete.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Select
+              label="Atleta"
+              name="athlete-filter"
+              value={activeAthleteId}
+              options={[{ value: "all", label: "Todos os atletas" }, ...athleteOptions]}
+              onChange={(value) => setSelectedAthleteId(value)}
+            />
           )}
 
-          <label className={styles.filterField}>
-            <span className={styles.filterLabel}>Categoria</span>
-            <select value={activeCategory} onChange={(event) => setSelectedCategory(event.target.value)}>
-              <option value="all">Todas as categorias</option>
-              {categoryOptions.map((category) => (
-                <option key={category.value} value={category.value}>
-                  {category.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label="Categoria"
+            name="category-filter"
+            value={activeCategory}
+            options={[{ value: "all", label: "Todas as categorias" }, ...categoryOptions]}
+            onChange={(value) => setSelectedCategory(value)}
+          />
         </div>
       </section>
 
