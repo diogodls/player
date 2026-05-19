@@ -44,8 +44,8 @@ const Navbar = () => {
       <div className={styles.buttons}>
         {buttons.map((btn) => {
           const isActive =
-            btn.link === "/sessions"
-              ? location.pathname.startsWith("/sessions")
+            btn.link === "/session-screen"
+              ? location.pathname.startsWith("/session")
               : location.pathname === btn.link;
 
           return (

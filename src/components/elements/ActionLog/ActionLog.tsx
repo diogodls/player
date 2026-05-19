@@ -1,7 +1,7 @@
 import styles from "./ActionLog.module.scss";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
-import { Cookies, useCookies } from "react-cookie";
+import { Cookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
@@ -12,61 +12,55 @@ import ActionLogConfirmModal from "../ActionLog/ActionLogConfirmModal.tsx";
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
 
-type ActionLogProps = {
+type ActionLog = {
+  logType: 'team' | 'individual';
   session: Session;
 };
 
-const ActionLog = ({ session }: ActionLogProps) => {
-  const { actions, setActions } = useContext(ActionsContext);
-  const { success, info, error } = useContext(ToastContext);
+const ActionLog = ({logType, session}: ActionLog) => {
+  const {individualActions, teamActions, setIndividualActions, setTeamActions} = useContext(ActionsContext);
   const navigate = useNavigate();
-  const cookieKey = `${COOKIE_KEY_PREFIX}${session.id}`;
-  const [, setCookie, removeCookie] = useCookies([cookieKey]);
-  const [loadedCookieKey, setLoadedCookieKey] = useState<string | null>(null);
+  const cookieKey = `${COOKIE_KEY_PREFIX}${logType}${session.id}`;
+  const cookiesRef = useRef(new Cookies());
+  const isInitialMount = useRef(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
+  const selectedActions = (logType === 'individual' ? individualActions : teamActions).filter((action) => action.sessionId === session.id);
+  const setActions = logType === 'individual' ? setIndividualActions : setTeamActions;
+  const {success, info, error} = useContext(ToastContext);
+
   useEffect(() => {
-    const cookieValue = new Cookies().get(cookieKey);
+    if (!isInitialMount.current) return;
+    isInitialMount.current = false;
 
-    if (!cookieValue) {
-      setActions([]);
-      setLoadedCookieKey(cookieKey);
-      return;
-    }
-
-    try {
-      const parsed = typeof cookieValue === "string" ? JSON.parse(cookieValue) : cookieValue;
-      if (Array.isArray(parsed)) {
-        setActions(parsed);
-      } else {
-        removeCookie(cookieKey, { path: "/" });
-        setActions([]);
+    const saved = cookiesRef.current.get(cookieKey);
+    if (saved) {
+      try {
+        const parsed = typeof saved === "string" ? JSON.parse(saved) : saved;
+        if (Array.isArray(parsed)) {
+          setActions(parsed);
+        }
+      } catch {
+        // Invalid cookie, ignore silently
       }
-    } catch {
-      removeCookie(cookieKey, { path: "/" });
-      setActions([]);
-    } finally {
-      setLoadedCookieKey(cookieKey);
     }
-  }, [cookieKey, removeCookie, setActions]);
+  }, [cookieKey, setActions]);
 
   useEffect(() => {
-    if (loadedCookieKey !== cookieKey) return;
-
-    if (actions.length === 0) {
-      removeCookie(cookieKey, { path: "/" });
+    if (selectedActions.length === 0) {
+      cookiesRef.current.remove(cookieKey, { path: "/" });
       return;
     }
 
     const expires = new Date(Date.now() + 12 * 60 * 60 * 1000);
 
-    setCookie(cookieKey, JSON.stringify(actions), {
+    cookiesRef.current.set(cookieKey, JSON.stringify(selectedActions), {
       path: "/",
       expires,
       sameSite: "lax",
     });
-  }, [actions, cookieKey, loadedCookieKey, setCookie, removeCookie]);
+  }, [selectedActions, cookieKey]);
 
   useEffect(() => {
     return () => {
@@ -89,7 +83,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
   const showSuccessAndRedirect = (sessionId: string) => {
     success("Ações salvas com sucesso!");
     setActions([]);
-    removeCookie(cookieKey, { path: "/" });
+    cookiesRef.current.remove(cookieKey, { path: "/" });
 
     redirectTimeoutRef.current = window.setTimeout(() => {
       navigate(`/sessions/${sessionId}`);
@@ -97,7 +91,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
   };
 
   const handleSaveActions = () => {
-    if (actions.length === 0) {
+    if (selectedActions.length === 0) {
       info("Adicione ao menos uma ação antes de salvar");
       return;
     }
@@ -127,7 +121,7 @@ const ActionLog = ({ session }: ActionLogProps) => {
       <div className={styles.header}>
         <div className={styles.title}>
           <span>Linha do tempo de ações</span>
-          <span className={styles.badge}>{actions.length}</span>
+          <span className={styles.badge}>{selectedActions.length}</span>
         </div>
 
         <div className={styles.actions}>
@@ -140,13 +134,13 @@ const ActionLog = ({ session }: ActionLogProps) => {
         </div>
       </div>
 
-      {actions.length === 0 ? (
+      {selectedActions.length === 0 ? (
         <div className={styles.emptyState}>
           <span>Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.</span>
         </div>
       ) : (
         <div className={styles.list}>
-          {actions.map((action) => (
+          {selectedActions.map((action) => (
             <div
               key={action.id}
               className={`${styles.item} ${action.goodAction ? styles.good : styles.bad}`}

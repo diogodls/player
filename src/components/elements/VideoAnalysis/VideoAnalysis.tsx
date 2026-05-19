@@ -1,10 +1,20 @@
 import styles from "./VideoAnalysis.module.scss"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUpload, faPlay, faTrash} from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import {useContext, useEffect, useRef, useState} from "react";
+import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 
 const VideoAnalysis = () => {
+  const { setCurrentVideoTime, isTagging, videoRef } = useContext(ActionsContext);
+
+  const wasPlayingBeforeTaggingRef = useRef(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+
+    setCurrentVideoTime(videoRef.current.currentTime.toFixed(2));
+  };
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -16,6 +26,34 @@ const VideoAnalysis = () => {
   const handleRemoveVideo = () => {
     setVideoUrl(null);
   };
+
+  useEffect(() => {
+    if (!videoUrl) return;
+
+    return () => {
+      URL.revokeObjectURL(videoUrl);
+    };
+  }, [videoUrl]);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    if (isTagging) {
+      wasPlayingBeforeTaggingRef.current = !videoRef.current.paused;
+      videoRef.current.pause();
+      return;
+    }
+
+    if (wasPlayingBeforeTaggingRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise) {
+        void playPromise.catch(() => {
+          // Ignore autoplay/policy errors when resuming playback.
+        });
+      }
+      wasPlayingBeforeTaggingRef.current = false;
+    }
+  }, [isTagging, videoRef]);
 
   return (
     <div className={styles.screen}>
@@ -50,6 +88,8 @@ const VideoAnalysis = () => {
 
       {videoUrl ? (
           <video
+            ref={videoRef}
+            onTimeUpdate={handleTimeUpdate}
             className={styles.video}
             src={videoUrl}
             controls

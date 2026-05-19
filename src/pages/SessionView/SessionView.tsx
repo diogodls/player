@@ -64,7 +64,10 @@ const SessionView = () => {
               </div>
             </button>
 
-            <button className={`${styles.actionButton} ${styles.teamButton}`}>
+            <button
+              className={`${styles.actionButton} ${styles.teamButton}`}
+              onClick={() => navigate(`/sessions/${sessionId}/analysis/team`)}
+            >
               <div className={styles.actionIconWrap}>
                 <FontAwesomeIcon icon={faPeopleGroup} />
               </div>
