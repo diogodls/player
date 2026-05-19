@@ -34,12 +34,12 @@ const emptyValues: AthleteFormValues = {
 };
 
 const AthleteForm = ({
-  isOpen,
-  mode = "create",
-  initialValues,
-  onClose,
-  onSubmit,
-}: AthleteFormProps) => {
+   isOpen,
+   mode = "create",
+   initialValues,
+   onClose,
+   onSubmit,
+ }: AthleteFormProps) => {
   const {
     register,
     handleSubmit,
