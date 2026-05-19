@@ -54,9 +54,9 @@ const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
     <div className={styles.playerView}>
       <div className={styles.header}>
         <div className={styles.playerName}>
-          <span className={styles.icon} onClick={() => navigate('/coach-dashboard')}>
+          <button className={styles.icon} type="button" onClick={() => navigate(-1)} aria-label="Voltar">
             <FontAwesomeIcon icon={faArrowLeft} />
-          </span>
+          </button>
           <div className={styles.player}>
             <span className={styles.name}>{player.name}</span>
             <span>{player.position}</span>

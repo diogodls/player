@@ -34,10 +34,61 @@
   min-height: 37px;
   border: 1px solid transparent;
   border-radius: var(--border-radius);
-  background: var(--selected-blue);
+  background: var(--green);
   color: var(--text-light);
   padding: 0 14px;
   font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+
+  &:hover {
+    background: color-mix(in srgb, var(--green) 80%, white);
+  }
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) minmax(180px, 260px);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--border-20);
+  border-radius: var(--border-radius);
+  background: var(--surface);
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.filterLabel {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.input,
+.select {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--border-20);
+  border-radius: var(--border-radius);
+  background: var(--surface-dark);
+  color: var(--text-primary);
+  padding: 0 12px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  &:focus {
+    border-color: var(--selected-blue);
+    background: var(--bg-dark);
+  }
+}
+
+.select {
   cursor: pointer;
 }
 
@@ -46,9 +97,6 @@
   border-radius: var(--border-radius);
   background: rgba(31, 41, 55, 0.92);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
-}
-
-.emptyState {
   padding: 32px 24px;
   text-align: center;
 }
@@ -138,6 +186,10 @@
 
   .openButton {
     width: 100%;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
   }
 
   .list {

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import AthleteForm, { type AthleteFormValues } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
@@ -18,6 +18,7 @@ type Athlete = {
 };
 
 const ATHLETES_PER_PAGE = 8;
+type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 const AthleteRegistrationScreen = () => {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ const AthleteRegistrationScreen = () => {
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [nameFilter, setNameFilter] = useState("");
+  const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
 
   const mockAthletes = useMemo<Athlete[]>(
     () =>
@@ -42,12 +45,28 @@ const AthleteRegistrationScreen = () => {
   );
 
   const displayedAthletes = hasLocalAthleteChanges ? athletes : mockAthletes;
-  const totalPages = Math.max(1, Math.ceil(displayedAthletes.length / ATHLETES_PER_PAGE));
+  const filteredAthletes = useMemo(() => {
+    const normalizedName = nameFilter.trim().toLocaleLowerCase();
+
+    return displayedAthletes.filter((athlete) => {
+      const matchesName = athlete.name.toLocaleLowerCase().includes(normalizedName);
+      const matchesPosition =
+        positionFilter === "all" || athlete.position === positionFilter;
+
+      return matchesName && matchesPosition;
+    });
+  }, [displayedAthletes, nameFilter, positionFilter]);
+  const hasActiveFilters = Boolean(nameFilter.trim()) || positionFilter !== "all";
+  const totalPages = Math.max(1, Math.ceil(filteredAthletes.length / ATHLETES_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pagedAthletes = useMemo(() => {
     const startIndex = (safeCurrentPage - 1) * ATHLETES_PER_PAGE;
-    return displayedAthletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
-  }, [displayedAthletes, safeCurrentPage]);
+    return filteredAthletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
+  }, [filteredAthletes, safeCurrentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [nameFilter, positionFilter]);
 
   const formInitialValues = useMemo<AthleteFormValues | undefined>(
     () =>
@@ -121,9 +140,42 @@ const AthleteRegistrationScreen = () => {
           </button>
         </div>
 
-        {displayedAthletes.length === 0 ? (
+        <div className={styles.filters}>
+          <label className={styles.filterGroup} htmlFor="athlete-name-filter">
+            <span className={styles.filterLabel}>Nome</span>
+            <input
+              id="athlete-name-filter"
+              className={styles.input}
+              type="search"
+              value={nameFilter}
+              placeholder="Buscar atleta"
+              onChange={(event) => setNameFilter(event.target.value)}
+            />
+          </label>
+
+          <label className={styles.filterGroup} htmlFor="athlete-position-filter">
+            <span className={styles.filterLabel}>Posição</span>
+            <select
+              id="athlete-position-filter"
+              className={styles.select}
+              value={positionFilter}
+              onChange={(event) => setPositionFilter(event.target.value as PositionFilter)}
+            >
+              <option value="all">Todas</option>
+              {PLAYERS_POSITIONS.map((position) => (
+                <option key={position} value={position}>
+                  {position === "Pivo" ? "Pivô" : position}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {filteredAthletes.length === 0 ? (
           <div className={styles.emptyState}>
-            <h2 className={styles.emptyTitle}>Nenhum atleta cadastrado</h2>
+            <h2 className={styles.emptyTitle}>
+              {hasActiveFilters ? "Nenhum atleta encontrado" : "Nenhum atleta cadastrado"}
+            </h2>
             <p className={styles.emptyDescription}>
               Abra o modal para salvar o primeiro atleta e começar a montar a lista local.
             </p>
