@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SessionActions.module.scss";
 import SessionActionCard from "../SessionActionCard/SessionActionCard.tsx";
-import Select from "../../elements/Select";
+import Select from "../../../elements/Select";
 import type {
   ActionTypeFilter,
   SessionAnalysisSection,
