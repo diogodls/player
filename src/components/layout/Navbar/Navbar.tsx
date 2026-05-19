@@ -32,9 +32,9 @@ const buttons = [
   {
     label: "Cadastro atletas",
     icon: faUserPlus,
-    link:'/athlete-registration',
+    link: "/athlete-registration",
   },
-]
+];
 
 const Navbar = () => {
   const navigate = useNavigate();
