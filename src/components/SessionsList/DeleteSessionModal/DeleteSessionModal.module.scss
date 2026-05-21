@@ -1,10 +1,7 @@
 .overlay {
+  box-sizing: border-box;
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100vw;
+  inset: 0;
   height: 100dvh;
   margin: 0 !important;
   z-index: 9999;
@@ -16,6 +13,7 @@
   backdrop-filter: blur(4px);
 
   .modal {
+    box-sizing: border-box;
     width: 460px;
     max-width: 100%;
     border-radius: 20px;

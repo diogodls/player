@@ -1,4 +1,6 @@
 .wrapper {
+  box-sizing: border-box;
+  min-width: 0;
   width: 100%;
   max-width: 100%;
   padding: 14px 16px;
@@ -55,6 +57,7 @@
   }
 
   .infoCard {
+    min-width: 0;
     padding: 14px 16px;
     border-radius: 12px;
     background: var(--secondary-bg-dark);

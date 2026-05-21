@@ -3,6 +3,8 @@
   gap: 20px;
 
   .card {
+    box-sizing: border-box;
+    min-width: 0;
     width: 100%;
     padding: 20px;
     border-radius: var(--border-radius);
