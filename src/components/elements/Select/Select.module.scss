@@ -1,8 +1,10 @@
 .field {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  max-width: 100%;
   width: 100%;
 }
 
@@ -15,7 +17,9 @@
 }
 
 .select {
+  box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   height: 34px;
   border: 1px solid var(--border-20);

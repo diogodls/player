@@ -1,4 +1,6 @@
 .content {
+  box-sizing: border-box;
+  min-width: 0;
   background-color: #1F2937;
   border-radius: var(--border-radius);
   display: flex;
@@ -36,16 +38,21 @@
 
   .players {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
+    min-width: 0;
 
     .player {
-      width: 50%;
+      box-sizing: border-box;
+      flex: 1 1 calc(50% - 5px);
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
     .selectedPlayer {
+      min-width: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -55,10 +62,12 @@
       border: 1px solid #DDDDDD20;
 
       .infos {
+        min-width: 0;
         display: flex;
         flex-direction: column;
 
         .name {
+          min-width: 0;
           display: flex;
           gap: 5px;
           align-items: center;
@@ -96,6 +105,14 @@
       font-weight: bold;
       font-size: 18px;
       color: #4B5563;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .players {
+      .player {
+        flex-basis: 100%;
+      }
     }
   }
 }
