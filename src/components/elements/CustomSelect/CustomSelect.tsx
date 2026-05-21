@@ -1,6 +1,6 @@
 import React, { type SetStateAction, useState } from "react";
 import type { Player } from "../../../pages/CoachDashboard";
-import Select from "../../../elements/Select";
+import Select from "../Select";
 
 type CustomSelect = {
   playersList: Player[];
