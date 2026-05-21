@@ -3,7 +3,7 @@ import styles from "./SaveSessionModal.module.scss";
 import type { SessionMeta, SessionType } from "../../../pages/Sessions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
-import Select from "../../../elements/Select";
+import Select from "../../elements/Select";
 
 type SaveSessionModal = {
   isOpen: boolean;

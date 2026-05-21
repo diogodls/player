@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle, faPlus, faUserGroup, faX } from "@fortawesome/free-solid-svg-icons";
 import type { Player } from "../../../pages/CoachDashboard";
-import Select from "../../../elements/Select";
+import Select from "../../elements/Select";
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
 import { PLAYER_COLORS } from "../../../constants/metrics.ts";
 import PlayerRadarChart from "../../elements/PlayerRadarChart/PlayerRadarChart.tsx";

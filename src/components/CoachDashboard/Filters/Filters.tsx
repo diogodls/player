@@ -1,6 +1,6 @@
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Select from "../../../elements/Select";
+import Select from "../../elements/Select";
 import { PLAYERS_POSITIONS } from "../../../constants/players.ts";
 import styles from "./Filters.module.scss";
 
