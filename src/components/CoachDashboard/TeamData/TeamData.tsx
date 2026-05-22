@@ -26,14 +26,8 @@ const TeamData = ({ teamRelevantIndexes }: TeamAnalysisProps) => {
   if (!teamRelevantIndexes.length) {
     return (
       <section className={styles.wrapper}>
-        <div className={styles.heading}>
-          <div>
-            <span className={styles.eyebrow}>Team analysis</span>
-            <h2 className={styles.title}>Índices relevantes da equipe</h2>
-          </div>
-        </div>
         <div className={styles.emptyState}>
-          Nenhum índice relevante disponível para a equipe.
+          Nenhum índice disponível para a equipe.
         </div>
       </section>
     );
@@ -55,7 +49,7 @@ const TeamData = ({ teamRelevantIndexes }: TeamAnalysisProps) => {
             type="button"
             className={styles.controlButton}
             onClick={() => handleScroll("right")}
-            aria-label="Ver próximos cards"
+            aria-label="Ver proximos cards"
           >
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
@@ -67,10 +61,12 @@ const TeamData = ({ teamRelevantIndexes }: TeamAnalysisProps) => {
         className={styles.carousel}
       >
         {teamRelevantIndexes.map((index) => (
-          <TeamIndexCard
+          <div
             key={index.id}
-            index={index}
-          />
+            className={styles.cardSlot}
+          >
+            <TeamIndexCard index={index} />
+          </div>
         ))}
       </div>
     </section>
