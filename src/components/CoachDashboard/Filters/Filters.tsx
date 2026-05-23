@@ -1,8 +1,8 @@
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Select from "../../elements/Select";
 import { PLAYERS_POSITIONS } from "../../../constants/players.ts";
 import styles from "./Filters.module.scss";
+import Select from "../../elements/Select/Select.tsx";
 
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
