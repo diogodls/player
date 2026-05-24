@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import AthleteForm, { type AthleteFormValues } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
+import AthleteRegistrationCard from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
-import PlayerCard from "../../components/CoachDashboard/PlayersSection/PlayerCard/PlayerCard";
 import Pagination from "../../components/elements/Pagination/Pagination";
 import { PLAYERS_POSITIONS } from "../../constants/players";
 import { useApi } from "../../hooks/useApi";
@@ -63,10 +63,6 @@ const AthleteRegistrationScreen = () => {
     const startIndex = (safeCurrentPage - 1) * ATHLETES_PER_PAGE;
     return filteredAthletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
   }, [filteredAthletes, safeCurrentPage]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [nameFilter, positionFilter]);
 
   const formInitialValues = useMemo<AthleteFormValues | undefined>(
     () =>
@@ -149,7 +145,10 @@ const AthleteRegistrationScreen = () => {
               type="search"
               value={nameFilter}
               placeholder="Buscar atleta"
-              onChange={(event) => setNameFilter(event.target.value)}
+              onChange={(event) => {
+                setNameFilter(event.target.value);
+                setCurrentPage(1);
+              }}
             />
           </label>
 
@@ -159,7 +158,10 @@ const AthleteRegistrationScreen = () => {
               id="athlete-position-filter"
               className={styles.select}
               value={positionFilter}
-              onChange={(event) => setPositionFilter(event.target.value as PositionFilter)}
+              onChange={(event) => {
+                setPositionFilter(event.target.value as PositionFilter);
+                setCurrentPage(1);
+              }}
             >
               <option value="all">Todas</option>
               {PLAYERS_POSITIONS.map((position) => (
@@ -191,52 +193,26 @@ const AthleteRegistrationScreen = () => {
               };
 
               return (
-                <PlayerCard
+                <AthleteRegistrationCard
                   key={athlete.id}
-                  size="compact"
-                  disabled={!athlete.isPersisted}
-                  player={{
-                    id: athlete.id,
-                    name: athlete.position,
-                    position: `${athlete.age} anos`,
-                  }}
-                  onClick={athlete.isPersisted ? handleOpenPlayer : undefined}
+                  athlete={athlete}
+                  onOpen={athlete.isPersisted ? handleOpenPlayer : undefined}
                   onKeyDown={athlete.isPersisted ? (event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
                       handleOpenPlayer();
                     }
                   } : undefined}
-                >
-                  <div className={styles.cardInfo}>
-                    <span className={styles.cardName}>
-                      {athlete.name}
-                    </span>
-                  </div>
-                  <div className={styles.cardActions}>
-                    <button
-                      className={styles.secondaryAction}
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setEditingAthlete(athlete);
-                        setIsModalOpen(true);
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className={styles.dangerAction}
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setAthleteToDelete(athlete);
-                      }}
-                    >
-                      Excluir
-                    </button>
-                  </div>
-                </PlayerCard>
+                  onEdit={(event) => {
+                    event.stopPropagation();
+                    setEditingAthlete(athlete);
+                    setIsModalOpen(true);
+                  }}
+                  onDelete={(event) => {
+                    event.stopPropagation();
+                    setAthleteToDelete(athlete);
+                  }}
+                />
               );
             })}
             <Pagination
