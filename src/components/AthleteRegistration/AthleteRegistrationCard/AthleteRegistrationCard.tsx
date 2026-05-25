@@ -1,5 +1,7 @@
-import type { KeyboardEvent, MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import styles from "./AthleteRegistrationCard.module.scss";
+import {useNavigate} from "react-router";
+import {classNames} from "../../../utils/classNames.ts";
 
 type AthleteRegistrationCardProps = {
   athlete: {
@@ -7,30 +9,25 @@ type AthleteRegistrationCardProps = {
     name: string;
     age: number;
     position: string;
-    isPersisted: boolean;
   };
-  onOpen?: (event: MouseEvent<HTMLElement>) => void;
-  onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
   onEdit: (event: MouseEvent<HTMLButtonElement>) => void;
   onDelete: (event: MouseEvent<HTMLButtonElement>) => void;
 };
 
 const AthleteRegistrationCard = ({
   athlete,
-  onOpen,
-  onKeyDown,
   onEdit,
   onDelete,
 }: AthleteRegistrationCardProps) => {
-  const isInteractive = athlete.isPersisted && (onOpen || onKeyDown);
-  const cardClassName = [
-    styles.card,
-    athlete.isPersisted ? "" : styles.draft,
-    isInteractive ? styles.interactive : "",
-  ].filter(Boolean).join(" ");
+  const navigate = useNavigate();
 
-  const content = (
-    <>
+  return (
+    <article
+      className={classNames([styles.card, styles.interactive])}
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate(`/player/${athlete.id}`)}
+    >
       <div className={styles.topRow}>
         <span className={styles.position}>{athlete.position}</span>
         <span className={styles.age}>{athlete.age} anos</span>
@@ -48,24 +45,8 @@ const AthleteRegistrationCard = ({
           Excluir
         </button>
       </div>
-    </>
+    </article>
   );
-
-  if (isInteractive) {
-    return (
-      <article
-        className={cardClassName}
-        role="button"
-        tabIndex={0}
-        onClick={onOpen}
-        onKeyDown={onKeyDown}
-      >
-        {content}
-      </article>
-    );
-  }
-
-  return <article className={cardClassName}>{content}</article>;
 };
 
 export default AthleteRegistrationCard;

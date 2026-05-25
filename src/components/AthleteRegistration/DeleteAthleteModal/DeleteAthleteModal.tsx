@@ -4,18 +4,15 @@ import styles from "./DeleteAthleteModal.module.scss";
 
 type DeleteAthleteModalProps = {
   athleteName?: string;
-  isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
 };
 
 const DeleteAthleteModal = ({
   athleteName,
-  isOpen,
   onClose,
   onConfirm,
 }: DeleteAthleteModalProps) => {
-  if (!isOpen) return null;
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>

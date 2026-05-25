@@ -20,7 +20,6 @@ const athleteFormSchema = z.object({
 export type AthleteFormValues = z.infer<typeof athleteFormSchema>;
 
 type AthleteFormProps = {
-  isOpen: boolean;
   mode?: "create" | "edit";
   initialValues?: AthleteFormValues;
   onClose: () => void;
@@ -34,7 +33,6 @@ const emptyValues: AthleteFormValues = {
 };
 
 const AthleteForm = ({
-  isOpen,
   mode = "create",
   initialValues,
   onClose,
@@ -51,12 +49,9 @@ const AthleteForm = ({
   });
 
   useEffect(() => {
-    if (!isOpen) return;
-
     reset(initialValues ?? emptyValues);
-  }, [initialValues, isOpen, reset]);
+  }, [initialValues, reset]);
 
-  if (!isOpen) return null;
 
   const submitForm = handleSubmit((values) => {
     onSubmit({

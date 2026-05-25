@@ -1,50 +1,46 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
-import AthleteForm, { type AthleteFormValues } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
-import AthleteRegistrationCard from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
+import {useContext, useMemo, useState} from "react";
+import AthleteForm, {type AthleteFormValues} from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
+import AthleteRegistrationCard
+  from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
 import Pagination from "../../components/elements/Pagination/Pagination";
-import { PLAYERS_POSITIONS } from "../../constants/players";
-import { useApi } from "../../hooks/useApi";
-import type { CoachDashboardData, Player } from "../CoachDashboard";
+import {PLAYERS_POSITIONS} from "../../constants/players";
+import {useApi} from "../../hooks/useApi";
+import type {CoachDashboardData, Player} from "../CoachDashboard";
 import styles from "./AthleteRegistrationScreen.module.scss";
+import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
 
 type Athlete = {
   id: string;
   name: string;
   age: Player["age"];
   position: (typeof PLAYERS_POSITIONS)[number];
-  isPersisted: boolean;
 };
 
 const ATHLETES_PER_PAGE = 8;
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 const AthleteRegistrationScreen = () => {
-  const navigate = useNavigate();
-  const { data } = useApi<CoachDashboardData>("coach-dashboard");
-  const [athletes, setAthletes] = useState<Athlete[]>([]);
-  const [hasLocalAthleteChanges, setHasLocalAthleteChanges] = useState(false);
+  const { data } = useApi<CoachDashboardData>("coach-dashboard"); //todo: mudar para quando vir do back | usar endpoint proprio de atletas
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
+  const {success, info} = useContext(ToastContext);
 
-  const mockAthletes = useMemo<Athlete[]>(
+  const displayedAthletes = useMemo<Athlete[]>(
     () =>
       data?.players.map((player) => ({
         id: String(player.id),
         name: player.name,
         age: player.age,
         position: player.position as (typeof PLAYERS_POSITIONS)[number],
-        isPersisted: true,
       })) ?? [],
     [data?.players],
   );
 
-  const displayedAthletes = hasLocalAthleteChanges ? athletes : mockAthletes;
   const filteredAthletes = useMemo(() => {
     const normalizedName = nameFilter.trim().toLocaleLowerCase();
 
@@ -56,6 +52,7 @@ const AthleteRegistrationScreen = () => {
       return matchesName && matchesPosition;
     });
   }, [displayedAthletes, nameFilter, positionFilter]);
+
   const hasActiveFilters = Boolean(nameFilter.trim()) || positionFilter !== "all";
   const totalPages = Math.max(1, Math.ceil(filteredAthletes.length / ATHLETES_PER_PAGE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -81,43 +78,20 @@ const AthleteRegistrationScreen = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitAthlete = (values: AthleteFormValues) => {
-    if (editingAthlete) {
-      setAthletes(
-        displayedAthletes.map((athlete) =>
-          athlete.id === editingAthlete.id
-            ? { ...athlete, ...values, isPersisted: false }
-            : athlete,
-        ),
-      );
-    } else {
-      setAthletes([
-        {
-          id: crypto.randomUUID(),
-          ...values,
-          isPersisted: false,
-        },
-        ...displayedAthletes,
-      ]);
-      setCurrentPage(1);
-    }
+  const handleSubmitAthlete = (_values: AthleteFormValues) => {
+    setCurrentPage(1);
 
-    setHasLocalAthleteChanges(true);
-    setIsModalOpen(false);
-    setEditingAthlete(null);
+    success(`Atleta ${editingAthlete ? 'editado' : 'criado'}!`);
+    setIsModalOpen(false); //todo: enviar req pro back aqui depois
   };
 
   const handleCloseForm = () => {
     setIsModalOpen(false);
-    setEditingAthlete(null);
   };
 
   const handleConfirmDelete = () => {
-    if (!athleteToDelete) return;
-
-    setAthletes(displayedAthletes.filter((athlete) => athlete.id !== athleteToDelete.id));
-    setHasLocalAthleteChanges(true);
     setAthleteToDelete(null);
+    info("Atleta deletado!"); //todo: enviar req pro back aqui depois
   };
 
   return (
@@ -184,37 +158,21 @@ const AthleteRegistrationScreen = () => {
           </div>
         ) : (
           <div className={styles.list}>
-            {pagedAthletes.map((athlete) => {
-              const playerPath = `/player/${athlete.id}`;
-              const handleOpenPlayer = () => {
-                if (athlete.isPersisted) {
-                  navigate(playerPath);
-                }
-              };
-
-              return (
-                <AthleteRegistrationCard
-                  key={athlete.id}
-                  athlete={athlete}
-                  onOpen={athlete.isPersisted ? handleOpenPlayer : undefined}
-                  onKeyDown={athlete.isPersisted ? (event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      handleOpenPlayer();
-                    }
-                  } : undefined}
-                  onEdit={(event) => {
-                    event.stopPropagation();
-                    setEditingAthlete(athlete);
-                    setIsModalOpen(true);
-                  }}
-                  onDelete={(event) => {
-                    event.stopPropagation();
-                    setAthleteToDelete(athlete);
-                  }}
-                />
-              );
-            })}
+            {pagedAthletes.map((athlete) => (
+              <AthleteRegistrationCard
+                key={athlete.id}
+                athlete={athlete}
+                onEdit={(event) => {
+                  event.stopPropagation();
+                  setEditingAthlete(athlete);
+                  setIsModalOpen(true);
+                }}
+                onDelete={(event) => {
+                  event.stopPropagation();
+                  setAthleteToDelete(athlete);
+                }}
+              />
+            ))}
             <Pagination
               className={styles.pagination}
               currentPage={safeCurrentPage}
@@ -226,20 +184,22 @@ const AthleteRegistrationScreen = () => {
         )}
       </div>
 
-      <AthleteForm
-        isOpen={isModalOpen}
-        mode={editingAthlete ? "edit" : "create"}
-        initialValues={formInitialValues}
-        onClose={handleCloseForm}
-        onSubmit={handleSubmitAthlete}
-      />
+      {isModalOpen &&
+        <AthleteForm
+          mode={editingAthlete ? "edit" : "create"}
+          initialValues={formInitialValues}
+          onClose={handleCloseForm}
+          onSubmit={handleSubmitAthlete}
+        />
+      }
 
-      <DeleteAthleteModal
-        athleteName={athleteToDelete?.name}
-        isOpen={Boolean(athleteToDelete)}
-        onClose={() => setAthleteToDelete(null)}
-        onConfirm={handleConfirmDelete}
-      />
+      {Boolean(athleteToDelete) &&
+        <DeleteAthleteModal
+          athleteName={athleteToDelete?.name}
+          onClose={() => setAthleteToDelete(null)}
+          onConfirm={handleConfirmDelete}
+        />
+      }
     </section>
   );
 };
