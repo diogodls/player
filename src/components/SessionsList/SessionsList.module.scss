@@ -49,6 +49,54 @@
     opacity: 0.8;
   }
 
+  .filters {
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .filterField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+
+    span {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    select,
+    input {
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border-20);
+      background: var(--bg-dark);
+      color: var(--text-light);
+      padding: 0 12px;
+    }
+  }
+
+  .resetButton {
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid color-mix(in srgb, var(--selected-blue) 30%, transparent);
+    background: color-mix(in srgb, var(--selected-blue) 12%, var(--surface));
+    color: var(--light-blue);
+    padding: 0 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease;
+
+    &:hover {
+      background: color-mix(in srgb, var(--selected-blue) 20%, var(--surface));
+      color: #bfdbfe;
+    }
+  }
+
   .emptyState {
     position: absolute;
     inset: 0;
@@ -122,6 +170,16 @@
     .headerSub {
       font-size: 11px;
       line-height: 1.2;
+    }
+
+    .filters {
+      margin-top: 14px;
+      gap: 10px;
+    }
+
+    .filterField,
+    .resetButton {
+      width: 100%;
     }
 
     .list {

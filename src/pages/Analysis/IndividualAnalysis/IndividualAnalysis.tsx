@@ -8,6 +8,8 @@ import ActionsModal from "../../../components/IndivididualAnalysis/ActionsModal/
 import type {IndividualAnalysisData} from "../index";
 import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
+import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
+import AnalysisExitModal from "../../../components/elements/AnalysisExitModal/AnalysisExitModal.tsx";
 
 const IndividualAnalysis = () => {
   const { setIsTagging } = useContext(ActionsContext);
@@ -19,11 +21,16 @@ const IndividualAnalysis = () => {
     setIsTagging(actionsModalOpen);
   }, [actionsModalOpen, setIsTagging]);
 
+  const exitGuard = useSessionExitGuard({
+    logType: "individual",
+    sessionId: data!.session.id,
+  });
+
   if (!data) return;
 
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader session={data.session} />
+      <SessionAnalysisHeader session={data.session} onBack={exitGuard.requestExit} />
 
       <div className={styles.content}>
         <div className={styles.leftContent}>
@@ -43,6 +50,14 @@ const IndividualAnalysis = () => {
           session={data.session}
         />
       )}
+
+      {exitGuard.isExitModalOpen &&
+        <AnalysisExitModal
+          onCancel={exitGuard.closeExitModal}
+          onDiscard={exitGuard.handleExitWithoutSaving}
+          onSave={exitGuard.handleSaveAndExit}
+        />
+      }
     </div>
   );
 };

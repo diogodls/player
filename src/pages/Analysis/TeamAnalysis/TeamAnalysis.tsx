@@ -33,12 +33,13 @@ const TeamAnalysis = () => {
           <ActionLog logType={'team'} session={data.session}/>
         </div>
       </div>
-      <AnalysisExitModal
-        isOpen={exitGuard.isExitModalOpen}
-        onCancel={exitGuard.closeExitModal}
-        onDiscard={exitGuard.handleExitWithoutSaving}
-        onSave={exitGuard.handleSaveAndExit}
-      />
+      {exitGuard.isExitModalOpen &&
+        <AnalysisExitModal
+          onCancel={exitGuard.closeExitModal}
+          onDiscard={exitGuard.handleExitWithoutSaving}
+          onSave={exitGuard.handleSaveAndExit}
+        />
+      }
     </div>
   );
 };
