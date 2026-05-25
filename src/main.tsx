@@ -13,7 +13,6 @@ import PlayerView from "./pages/PlayerView/PlayerView.tsx";
 import SessionView from "./pages/SessionView/SessionView.tsx";
 import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 import AthleteRegistrationScreen from "./pages/AthleteRegistrationScreen/AthleteRegistrationScreen.tsx";
-import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <CookiesProvider>
