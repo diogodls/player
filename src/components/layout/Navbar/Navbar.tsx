@@ -7,6 +7,7 @@ import {
   faChartColumn,
   faHouse,
   faXmark,
+  faUserPlus
 } from "@fortawesome/free-solid-svg-icons";
 import { classNames } from "../../../utils/classNames.ts";
 import { useLocation, useNavigate } from "react-router";
@@ -27,6 +28,11 @@ const buttons = [
     label: "Treinos e jogos",
     icon: faCalendar,
     link: "/sessions",
+  },
+  {
+    label: "Cadastro atletas",
+    icon: faUserPlus,
+    link: "/athlete-registration",
   },
 ];
 
