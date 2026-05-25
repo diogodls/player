@@ -52,19 +52,19 @@
     }
 
     .clearPlayers {
-      color: #fecaca;
-      background: rgba(239, 68, 68, 0.14);
-      border: 1px solid rgba(248, 113, 113, 0.22);
+      color: #dbeafe;
+      background: color-mix(in srgb, var(--selected-blue) 14%, var(--surface));
+      border: 1px solid color-mix(in srgb, var(--selected-blue) 24%, transparent);
+      transition: background-color 0.18s ease, transform 0.18s ease;
 
       &:hover {
-        background: rgba(239, 68, 68, 0.22);
+        background: color-mix(in srgb, var(--selected-blue) 22%, var(--surface));
       }
     }
   }
 
   .players {
     display: flex;
-    flex-wrap: wrap;
     gap: 10px;
     min-width: 0;
 
@@ -154,6 +154,15 @@
         flex: 1;
         justify-content: center;
       }
+    }
+  }
+
+  .players {
+    flex-wrap: wrap;
+
+    .player {
+      flex: 1 1 calc(50% - 5px);
+      min-width: 220px;
     }
   }
 }

@@ -41,6 +41,11 @@
     border: 1px solid var(--selected-blue);
     color: var(--text-primary);
     background: var(--selected-blue);
+    transition: background-color 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      background: var(--selected-blue-hover);
+    }
   }
 
   .mobileMenuButton {
