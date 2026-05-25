@@ -1,1 +1,1 @@
-export const PLAYERS_POSITIONS = ['Fixo', 'Ala', 'Pivo'];
+export const PLAYERS_POSITIONS = ['Goleiro', 'Fixo', 'Ala', 'Pivo'];

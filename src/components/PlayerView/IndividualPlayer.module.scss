@@ -18,7 +18,9 @@
       .icon {
         cursor: pointer;
         background: var(--surface);
+        border: 0;
         border-radius: 4px;
+        color: var(--text-primary);
         padding: 8px;
         font-size: 1em;
         height: fit-content;
