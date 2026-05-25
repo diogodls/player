@@ -78,7 +78,8 @@ const AthleteRegistrationScreen = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitAthlete = (_values: AthleteFormValues) => {
+  const handleSubmitAthlete = (values: AthleteFormValues) => {
+    void values;
     setCurrentPage(1);
 
     success(`Atleta ${editingAthlete ? 'editado' : 'criado'}!`);

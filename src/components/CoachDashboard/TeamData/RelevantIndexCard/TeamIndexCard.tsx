@@ -1,8 +1,8 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-  faArrowRightArrowLeft,
   faArrowTrendDown,
-  faArrowTrendUp
+  faArrowTrendUp,
+  faMinus
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./TeamIndexCard.module.scss";
 import type {TeamIndex} from "../../../../pages/CoachDashboard";
@@ -19,7 +19,7 @@ const phaseMap: Record<TeamIndex["phase"], { label: string; className: string }>
 
 const trendMap: Record<TeamIndex["trend"], { icon: typeof faArrowTrendUp; color: string; label: string }> = {
   up: { icon: faArrowTrendUp, color: "#86efac", label: "Indice acima da media esperada" },
-  stable: { icon: faArrowRightArrowLeft, color: "#facc15", label: "Indice estavel" },
+  stable: { icon: faMinus, color: "#facc15", label: "Indice estavel" },
   down: { icon: faArrowTrendDown, color: "#dc2626", label: "Indice abaixo da media esperada" },
 };
 
