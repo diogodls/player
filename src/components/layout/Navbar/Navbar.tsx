@@ -73,7 +73,7 @@ const Navbar = () => {
       <button
         type="button"
         className={styles.mobileMenuButton}
-        aria-label="Abrir menu"
+        aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
         aria-expanded={isMobileMenuOpen}
         onClick={() => setIsMobileMenuOpen((current) => !current)}
       >
