@@ -38,15 +38,20 @@
     color: var(--green);
   }
 
-  .button{
+  .button {
     padding: 10px 16px;
     border-radius: var(--border-radius);
     background-color:  var(--selected-blue);
-    color: var(--text-primary);
+    color: #fff;
     font-size: 14px;
     font-weight: 500;
     border: none;
     cursor: pointer;
+    transition: background-color 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      background: var(--selected-blue-hover);
+    }
   }
 
   .video{
@@ -129,6 +134,7 @@
       width: 100%;
       display: flex;
       justify-content: center;
+      align-items: center;
       padding: 12px;
       font-size: 14px;
     }

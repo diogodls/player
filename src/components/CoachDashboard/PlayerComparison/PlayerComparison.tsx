@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle, faPlus, faUserGroup, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCircle, faPlus, faRotateLeft, faUserGroup, faX } from "@fortawesome/free-solid-svg-icons";
 import type { Player } from "../../../pages/CoachDashboard";
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
 import { PLAYER_COLORS } from "../../../constants/metrics.ts";
@@ -41,6 +41,11 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
     setPlayersCount(playersCount <= 2 ? playersCount : playersCount - 1);
   };
 
+  const handleClearComparison = () => {
+    setSelectedPlayers([]);
+    setPlayersCount(2);
+  };
+
   return (
     <div className={styles.content}>
       <h3 className={styles.title}>
@@ -49,14 +54,29 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
           Comparação de atletas
         </span>
 
-        {playersCount < 4 &&
-          <button
-            className={styles.addPlayer}
-            onClick={() => setPlayersCount(playersCount + 1)}
-          >
-            <FontAwesomeIcon icon={faPlus} />
-          </button>
-        }
+        <div className={styles.headerActions}>
+          {selectedPlayers.filter(Boolean).length > 0 && (
+            <button
+              type="button"
+              className={styles.clearPlayers}
+              onClick={handleClearComparison}
+            >
+              <FontAwesomeIcon icon={faRotateLeft}/>
+              Limpar
+            </button>
+          )}
+
+          {playersCount < 4 &&
+            <button
+              type="button"
+              className={styles.addPlayer}
+              onClick={() => setPlayersCount(playersCount + 1)}
+            >
+              <FontAwesomeIcon icon={faPlus}/>
+              Adicionar atleta
+            </button>
+          }
+        </div>
       </h3>
 
       <div className={styles.players}>

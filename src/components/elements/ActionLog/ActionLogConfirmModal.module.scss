@@ -74,10 +74,10 @@
 .confirmSubmit {
   border: 1px solid color-mix(in srgb, var(--selected-blue) 38%, transparent);
   background: var(--selected-blue);
-  color: var(--text-primary);
+  color: #fff;
 
   &:hover:not(:disabled) {
-    filter: brightness(1.08);
+    background: var(--selected-blue-hover);
   }
 }
 

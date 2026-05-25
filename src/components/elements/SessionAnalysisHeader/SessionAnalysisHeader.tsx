@@ -5,12 +5,13 @@ import SessionAnalysisTitle from "../SessionAnalysisTitle/SessionAnalysisTitle.t
 
 type SessionAnalysisHeaderProps = {
   session: Session;
+  onBack?: () => void;
 }
 
-const SessionAnalysisHeader = ({session}: SessionAnalysisHeaderProps) => {
+const SessionAnalysisHeader = ({session, onBack}: SessionAnalysisHeaderProps) => {
   return (
     <div className={styles.header}>
-      <SessionAnalysisTitle sessionId={session.id} />
+      <SessionAnalysisTitle sessionId={session.id} onBack={onBack} />
       <SessionDetails session={session} />
     </div>
   );
