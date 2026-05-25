@@ -1,15 +1,19 @@
 .container {
+  box-sizing: border-box;
   background-color: var(--surface);
   border-radius: 12px;
   padding: 16px 20px;
   color: var(--text-primary);
   width: 100%;
+  min-width: 0;
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 14px;
+    min-width: 0;
 
     .title {
       display: flex;
@@ -17,6 +21,7 @@
       gap: 8px;
       font-size: 14px;
       font-weight: 500;
+      min-width: 0;
 
       .badge {
         background-color: var(--selected-blue);
@@ -31,6 +36,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-shrink: 0;
 
       .save {
         background-color: var(--selected-blue);
@@ -91,12 +97,14 @@
     }
 
     .item {
+      box-sizing: border-box;
       display: grid;
       grid-template-columns: 64px 1fr;
       gap: 12px;
       padding: 12px;
       border-radius: 12px;
       align-items: center;
+      min-width: 0;
 
       .removeBtn {
         display: grid;
@@ -134,7 +142,7 @@
 
     .itemBody {
       display: grid;
-      grid-template-columns: 1fr auto auto;
+      grid-template-columns: minmax(0, 1fr) auto auto;
       align-items: center;
       column-gap: 14px;
       min-width: 0;
@@ -148,6 +156,10 @@
 
       .playerTag {
         color: var(--text-primary);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
@@ -188,5 +200,6 @@
 
   .playerTag {
     font-size: 12px;
+    white-space: normal;
   }
 }

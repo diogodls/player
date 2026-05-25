@@ -1,4 +1,7 @@
 .headerContainer {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -16,15 +19,18 @@
       flex-direction: column;
       align-items: baseline;
       gap: 4px;
+      min-width: 0;
 
       .title {
         font-weight: bold;
         font-size: 25px;
         line-height: 1.12;
+        overflow-wrap: anywhere;
       }
 
       .subtitle {
         font-size: 18px;
+        overflow-wrap: anywhere;
       }
     }
 
@@ -41,6 +47,7 @@
   }
 
   .addButton {
+    flex-shrink: 0;
     background: var(--green);
     color: var(--text-primary);
     border: none;

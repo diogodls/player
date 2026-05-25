@@ -14,7 +14,10 @@
   }
 
   .table {
+    box-sizing: border-box;
+    width: 100%;
     min-width: 0;
+    border-collapse: collapse;
 
     .tableHead {
       box-sizing: border-box;
@@ -33,6 +36,7 @@
         box-sizing: border-box;
         flex: 0 0 50%;
         min-width: 0;
+        overflow-wrap: anywhere;
       }
 
       .players {
@@ -47,6 +51,7 @@
         > * {
           flex: 1 1 0;
           min-width: 0;
+          overflow-wrap: anywhere;
         }
       }
     }
@@ -78,6 +83,7 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
+        overflow-wrap: anywhere;
 
         .title {
           font-weight: 500;

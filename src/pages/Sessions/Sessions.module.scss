@@ -3,11 +3,25 @@
   min-height: 100svh;
   width: 100%;
   background-color: var(--bg-dark);
-  padding: 15px 10px;
+  padding: 24px 16px 40px;
   overflow-x: clip;
 
-  > :nth-child(1),
+  > :first-child,
   > :nth-child(2) {
-    margin-top: 30px;
+    width: min(1100px, 100%);
+    margin-inline: auto;
+    min-width: 0;
+  }
+
+  > :nth-child(2) {
+    margin-top: 16px;
+  }
+
+  @media (max-width: 720px) {
+    padding: 18px 12px 28px;
+  }
+
+  @media (max-width: 420px) {
+    padding: 14px 10px 24px;
   }
 }
