@@ -4,7 +4,16 @@ export type RankingMetricPlayer = Player & {
   rankingValue: number;
 };
 
-type PlayerRankingKey = keyof Pick<Player, "overall" | "offensiveActions" | "defensiveActions" | "minutes" | "goals" | "goalsTaken">;
+const PLAYER_METRIC_KEYS = [
+  "overall",
+  "offensiveActions",
+  "defensiveActions",
+  "minutes",
+  "goals",
+  "goalsTaken",
+] as const;
+
+type PlayerRankingKey = (typeof PLAYER_METRIC_KEYS)[number];
 type IndexRankingKey = keyof Player["indexes"];
 
 export type RankingConfig = {
@@ -27,14 +36,7 @@ export const rankingConfigs: RankingConfig[] = [
   {title: "Ranking IC", key: "ic"},
 ];
 
-const playerRankingKeys = new Set<PlayerRankingKey>([
-  "overall",
-  "offensiveActions",
-  "defensiveActions",
-  "minutes",
-  "goals",
-  "goalsTaken",
-]);
+const playerRankingKeys = new Set(PLAYER_METRIC_KEYS);
 
 const isPlayerMetricKey = (
   key: RankingConfig["key"],

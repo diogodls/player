@@ -1,11 +1,11 @@
 import {useMemo} from "react";
 import styles from "./RankingSection.module.scss";
-import type {NumericKeys, RankingPlayerBase} from "../../../types/ranking.ts";
+import type {RankingMetric, RankingPlayerBase} from "../../../pages/Rankings";
 
-type RankingSectionProps<T extends RankingPlayerBase> = {
+type RankingSectionProps = {
   title: string;
-  players: T[];
-  metricKey: NumericKeys<T>;
+  players: RankingPlayerBase[];
+  metricKey: RankingMetric;
   limit?: number;
   highlightTop3?: boolean;
 };
@@ -16,13 +16,13 @@ const formatMetricLabel = (metricKey: string) => metricKey
   .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
   .replace(/^\w/, (character) => character.toUpperCase());
 
-const RankingSection = <T extends RankingPlayerBase>({
+const RankingSection = ({
   title,
   players,
   metricKey,
   limit,
   highlightTop3 = true,
-}: RankingSectionProps<T>) => {
+}: RankingSectionProps) => {
   const rankedPlayers = useMemo(() => {
     const sortedPlayers = [...players].sort((currentPlayer, nextPlayer) => {
       const currentValue = currentPlayer[metricKey] as number;
