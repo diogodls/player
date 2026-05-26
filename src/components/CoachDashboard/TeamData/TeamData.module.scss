@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+
   .heading {
     display: flex;
     align-items: flex-end;
@@ -48,6 +49,7 @@
       flex: 0 0 calc((100% - 48px) / 4);
       min-width: calc((100% - 48px) / 4);
       display: flex;
+      scroll-snap-align: start;
     }
   }
 
@@ -62,20 +64,28 @@
 }
 
 @media (max-width: 1024px) {
-  .cardSlot {
-    flex-basis: calc((100% - 16px) / 2);
-    min-width: calc((100% - 16px) / 2);
+  .wrapper {
+    .carousel {
+      .cardSlot {
+        flex-basis: calc((100% - 16px) / 2);
+        min-width: calc((100% - 16px) / 2);
+      }
+    }
   }
 }
 
 @media (max-width: 768px) {
-  .heading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
+  .wrapper {
+    .heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
 
-  .cardSlot {
-    flex-basis: 86vw;
-    min-width: 86vw;
+    .carousel {
+      .cardSlot {
+        flex-basis: 86vw;
+        min-width: 86vw;
+      }
+    }
   }
 }

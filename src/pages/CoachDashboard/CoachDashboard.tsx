@@ -17,7 +17,7 @@ const CoachDashboard = () => {
   const { data } = useApi<CoachDashboardData>("coach-dashboard");
   const [viewMode, setViewMode] = useState<ViewMode>('team');
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
-  console.log(data);
+
   const filteredPlayers = (data?.players ?? []).filter((player) => {
     if (positionFilter === "all") return true;
     return player.position === positionFilter;

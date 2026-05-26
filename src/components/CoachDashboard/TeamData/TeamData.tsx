@@ -19,7 +19,11 @@ const TeamData = ({ teamRelevantIndexes }: TeamAnalysisProps) => {
       return;
     }
 
-    const amount = direction === "left" ? -340 : 340;
+    const firstCard = container.querySelector<HTMLElement>(`.${styles.cardSlot}`);
+    const gap = Number.parseFloat(window.getComputedStyle(container).gap || "0");
+    const cardWidth = firstCard?.getBoundingClientRect().width ?? 0;
+    const amount = (cardWidth + gap) * (direction === "left" ? -1 : 1);
+
     container.scrollBy({ left: amount, behavior: "smooth" });
   };
 
