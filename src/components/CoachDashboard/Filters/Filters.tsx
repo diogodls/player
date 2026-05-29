@@ -1,9 +1,8 @@
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Select, { Option } from "rc-select";
-import "rc-select/assets/index.css";
-import styles from "./Filters.module.scss";
 import { PLAYERS_POSITIONS } from "../../../constants/players.ts";
+import styles from "./Filters.module.scss";
+import Select from "../../elements/Select/Select.tsx";
 
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
@@ -21,26 +20,24 @@ const Filters = ({ position, onChangePosition }: Props) => {
       </div>
 
       <div className={styles.content}>
-        <div className={styles.group}>
-          <span className={styles.groupLabel}>Filtrar por posição</span>
-          <Select
-            value={position}
-            onChange={(value) => onChangePosition(value as PositionFilter)}
-            className={styles.select}
-            dropdownMatchSelectWidth
-          >
-            <Option value="all">Todas as posições</Option>
-            {PLAYERS_POSITIONS.map((playerPosition) => (
-              <Option key={playerPosition} value={playerPosition}>
-                {playerPosition}
-              </Option>
-            ))}
-          </Select>
-        </div>
+        <Select<PositionFilter>
+          label="Filtrar por posição"
+          name="position-filter"
+          value={position}
+          options={[
+            { value: "all", label: "Todas as posições" },
+            ...PLAYERS_POSITIONS.map((playerPosition) => ({
+              value: playerPosition,
+              label: playerPosition,
+            })),
+          ]}
+          onChange={(value) => {
+            if (value) onChangePosition(value);
+          }}
+        />
       </div>
     </div>
   );
 };
 
 export default Filters;
-

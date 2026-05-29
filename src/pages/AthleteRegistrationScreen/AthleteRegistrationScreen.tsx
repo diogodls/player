@@ -9,6 +9,7 @@ import {useApi} from "../../hooks/useApi";
 import type {CoachDashboardData, Player} from "../CoachDashboard";
 import styles from "./AthleteRegistrationScreen.module.scss";
 import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
+import Select from "../../components/elements/Select/Select.tsx";
 
 type Athlete = {
   id: string;
@@ -78,8 +79,7 @@ const AthleteRegistrationScreen = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitAthlete = (values: AthleteFormValues) => {
-    void values;
+  const handleSubmitAthlete = () => {
     setCurrentPage(1);
 
     success(`Atleta ${editingAthlete ? 'editado' : 'criado'}!`);
@@ -127,25 +127,25 @@ const AthleteRegistrationScreen = () => {
             />
           </label>
 
-          <label className={styles.filterGroup} htmlFor="athlete-position-filter">
-            <span className={styles.filterLabel}>Posição</span>
-            <select
-              id="athlete-position-filter"
-              className={styles.select}
-              value={positionFilter}
-              onChange={(event) => {
-                setPositionFilter(event.target.value as PositionFilter);
+          <Select<PositionFilter>
+            className={styles.filterGroup}
+            label="Posição"
+            name="athlete-position-filter"
+            value={positionFilter}
+            options={[
+              { value: "all", label: "Todas" },
+              ...PLAYERS_POSITIONS.map((position) => ({
+                value: position,
+                label: position === "Pivo" ? "Pivô" : position,
+              })),
+            ]}
+            onChange={(value) => {
+              if (value) {
+                setPositionFilter(value);
                 setCurrentPage(1);
-              }}
-            >
-              <option value="all">Todas</option>
-              {PLAYERS_POSITIONS.map((position) => (
-                <option key={position} value={position}>
-                  {position === "Pivo" ? "Pivô" : position}
-                </option>
-              ))}
-            </select>
-          </label>
+              }
+            }}
+          />
         </div>
 
         {filteredAthletes.length === 0 ? (

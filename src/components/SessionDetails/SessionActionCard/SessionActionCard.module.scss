@@ -1,4 +1,6 @@
 .card {
+  box-sizing: border-box;
+  min-width: 0;
   width: 100%;
   background: rgba(17, 24, 39, 0.55);
   border: 1px solid var(--border-20);

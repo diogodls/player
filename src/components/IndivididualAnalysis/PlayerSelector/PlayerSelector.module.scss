@@ -1,6 +1,9 @@
 .tagPlayer {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
   padding: 20px;
   position: sticky;
   top: 20px;
@@ -39,10 +42,12 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+    min-width: 0;
 
     .position {
       display: flex;
       width: 100%;
+      min-width: 0;
       flex-direction: column;
       gap: 5px;
 
@@ -54,6 +59,9 @@
       }
 
       .player {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         background: #374151;
@@ -75,10 +83,12 @@
           color: rgb(209 213 219 / 1);
           font-weight: 700;
           font-size: 1.1em;
+          overflow-wrap: anywhere;
         }
 
         .description {
           color: #8a929e;
+          overflow-wrap: anywhere;
         }
       }
 
@@ -93,6 +103,14 @@
           background: #213B6D;
         }
       }
+    }
+  }
+
+  @media (max-width: 520px) {
+    padding: 14px;
+
+    .positions {
+      grid-template-columns: 1fr;
     }
   }
 }

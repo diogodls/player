@@ -1,4 +1,6 @@
 .filtersCard {
+  box-sizing: border-box;
+  min-width: 0;
   border: 1px solid var(--border-20);
   border-radius: 12px;
   background: rgba(17, 24, 39, 0.55);
@@ -31,10 +33,13 @@
   grid-template-columns: 1.6fr 1fr 1fr;
   gap: 10px;
   align-items: end;
+
+  > * {
+    min-width: 0;
+  }
 }
 
-.filterBlock,
-.filterField {
+.filterBlock {
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -71,26 +76,6 @@
 .typeFilterActive {
   background: rgba(37, 99, 235, 0.62);
   border-color: rgba(147, 197, 253, 0.5);
-}
-
-.filterField {
-  select {
-    height: 34px;
-    border-radius: 10px;
-    border: 1px solid var(--border-20);
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text-light);
-    padding: 0 10px;
-    font-size: 12px;
-    font-weight: 600;
-    width: 100%;
-    min-width: 0;
-  }
-
-  option {
-    background: #111827;
-    color: var(--text-light);
-  }
 }
 
 .cardsList {

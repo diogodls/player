@@ -1,8 +1,9 @@
-import {useMemo, useState} from "react";
+import { useMemo, useState } from "react";
 import styles from "./SaveSessionModal.module.scss";
 import type { SessionMeta, SessionType } from "../../../pages/Sessions";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faX} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faX } from "@fortawesome/free-solid-svg-icons";
+import Select from "../../elements/Select/Select.tsx";
 
 type SaveSessionModal = {
   isOpen: boolean;
@@ -48,7 +49,7 @@ function getInitialFormState(initialMeta?: SessionMeta | null) {
   };
 }
 
-const SaveSessionModal = ({isOpen, onClose, initialMeta, mode = "create"}: SaveSessionModal) => {
+const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: SaveSessionModal) => {
   const [initialState] = useState(() => getInitialFormState(initialMeta));
   const [type, setType] = useState<SessionType>(initialState.type);
   const [date, setDate] = useState<string>(initialState.date);
@@ -75,17 +76,19 @@ const SaveSessionModal = ({isOpen, onClose, initialMeta, mode = "create"}: SaveS
         </div>
 
         <div className={styles.form}>
-          <div className={styles.field}>
-            <label className={styles.label}>Tipo *</label>
-            <select
-              className={styles.select}
-              value={type}
-              onChange={(e) => setType(e.target.value as SessionType)}
-            >
-              <option value="Treino">Treino</option>
-              <option value="Jogo">Jogo</option>
-            </select>
-          </div>
+          <Select<SessionType>
+            className={styles.field}
+            label="Tipo *"
+            name="session-type"
+            value={type}
+            options={[
+              { value: "Treino", label: "Treino" },
+              { value: "Jogo", label: "Jogo" },
+            ]}
+            onChange={(value) => {
+              if (value) setType(value);
+            }}
+          />
 
           <div className={styles.field}>
             <label className={styles.label}>Data *</label>

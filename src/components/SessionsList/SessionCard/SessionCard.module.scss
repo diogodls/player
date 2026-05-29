@@ -1,4 +1,6 @@
 .card {
+  box-sizing: border-box;
+  min-width: 0;
   width: 100%;
   background: var(--bg-dark);
   border-radius: 14px;
@@ -13,6 +15,7 @@
   }
 
   .openArea {
+    box-sizing: border-box;
     width: 100%;
     border: none;
     background: transparent;

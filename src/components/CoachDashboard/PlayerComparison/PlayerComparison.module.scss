@@ -1,4 +1,6 @@
 .content {
+  box-sizing: border-box;
+  min-width: 0;
   background-color: #1F2937;
   border-radius: var(--border-radius);
   display: flex;
@@ -19,7 +21,7 @@
       margin-right: 3px;
     }
 
-      .addPlayer {
+    .addPlayer {
       padding: 10px;
       color: white;
       background: var(--green);
@@ -28,7 +30,7 @@
       cursor: pointer;
       transition: .2s all ease-in-out;
 
-      &:hover{
+      &:hover {
         background: #18de65;
       }
     }
@@ -36,55 +38,21 @@
 
   .players {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-
-    .dropdown {
-      background-color: blue;
-    }
+    min-width: 0;
 
     .player {
-      width: 50%;
+      box-sizing: border-box;
+      flex: 1 1 0;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       gap: 10px;
-
-      .dropdown {
-        background-color: blue;
-      }
-
-      .placeholder {
-        font-size: 1rem;
-        color: white;
-      }
-
-      .select {
-        width: 100%;
-        background-color: #374151;
-        border: 1px solid #DDDDDD20;
-        padding: 10px;
-        border-radius: var(--border-radius);
-        color: white;
-        overflow: hidden;
-
-        .dropdown {
-          background-color: blue;
-        }
-
-        :global {
-          .rc-select-selector {
-            border: none;
-            color: white;
-          }
-
-          .rc-select-selection-placeholder {
-            top: -3px;
-            left: 0;
-          }
-        }
-      }
     }
 
     .selectedPlayer {
+      min-width: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -94,10 +62,12 @@
       border: 1px solid #DDDDDD20;
 
       .infos {
+        min-width: 0;
         display: flex;
         flex-direction: column;
 
         .name {
+          min-width: 0;
           display: flex;
           gap: 5px;
           align-items: center;
@@ -110,6 +80,7 @@
       }
 
       .exitIcon {
+        flex: 0 0 auto;
         cursor: pointer;
         font-size: 20px;
         color: #e5e7eb;
@@ -136,5 +107,13 @@
       font-size: 18px;
       color: #4B5563;
     }
+  }
+
+  .comparisonResults {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
   }
 }

@@ -1,4 +1,6 @@
 .detailedInfos {
+  box-sizing: border-box;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--surface-dark);
@@ -12,9 +14,16 @@
   }
 
   .table {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+
     .tableHead {
+      box-sizing: border-box;
       display: flex;
       width: 100%;
+      min-width: 0;
       border-bottom: 1px solid var(--border-20);
       text-align: left;
 
@@ -24,24 +33,31 @@
 
       .metric {
         font-weight: 500;
-        width: 50%;
+        box-sizing: border-box;
+        flex: 0 0 50%;
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
 
       .players {
+        box-sizing: border-box;
         display: flex;
         text-align: center;
-        width: 50%;
+        flex: 1 1 50%;
+        min-width: 0;
         font-weight: 500;
         gap: 10px;
 
         > * {
-          width: 100%;
-          max-width: 25%;
+          flex: 1 1 0;
+          min-width: 0;
+          overflow-wrap: anywhere;
         }
       }
     }
 
     .tableRow {
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       padding-block: 10px;
@@ -62,9 +78,12 @@
       }
 
       .metric {
-        width: 50%;
+        box-sizing: border-box;
+        flex: 0 0 50%;
+        min-width: 0;
         display: flex;
         flex-direction: column;
+        overflow-wrap: anywhere;
 
         .title {
           font-weight: 500;
@@ -73,15 +92,17 @@
       }
 
       .players {
+        box-sizing: border-box;
         display: flex;
-        width: 50%;
+        flex: 1 1 50%;
+        min-width: 0;
         gap: 10px;
 
         .data {
           display: flex;
           gap: 5px;
-          max-width: 25%;
-          width: 100%;
+          flex: 1 1 0;
+          min-width: 0;
           align-items: center;
           position: relative;
 
