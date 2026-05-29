@@ -2,6 +2,7 @@ export type CoachDashboardData = {
   averageTeamCards: AverageCard[];
   players: Player[];
   metrics: string[];
+  teamIndexes: TeamIndex[];
 };
 
 export type AverageCard = {
@@ -36,6 +37,19 @@ export type Metrics = { //todo: aplicar em jogador em nova task
 
 export type Team = {
   indexes: Indexes;
+};
+
+export type TeamIndexPhase = 'offensive' | 'defensive' | 'set-piece';
+
+export type TeamIndexTrend = 'up' | 'stable' | 'down';
+
+export type TeamIndex = {
+  id: string;
+  title: string;
+  phase: TeamIndexPhase;
+  value: number;
+  maxValue: number;
+  trend: TeamIndexTrend;
 };
 
 export interface Indexes extends GeneralIndexes, OffensiveIndexes, DeffensiveIndexes {}

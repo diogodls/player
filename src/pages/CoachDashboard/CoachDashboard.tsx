@@ -8,6 +8,7 @@ import PlayerComparison from "../../components/CoachDashboard/PlayerComparison/P
 import PlayersSection from "../../components/CoachDashboard/PlayersSection/PlayersSection.tsx";
 import Filters from "../../components/CoachDashboard/Filters/Filters.tsx";
 import {PLAYERS_POSITIONS} from "../../constants/players.ts";
+import TeamData from "../../components/CoachDashboard/TeamData/TeamData.tsx";
 
 type ViewMode = 'team' | 'individual' | 'compare';
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
@@ -29,16 +30,16 @@ const CoachDashboard = () => {
         viewMode={viewMode}
         onChangeView={setViewMode}
       />
-      {/*{viewMode === 'team' && <TeamAnalysis />}*/}
-        {viewMode === 'individual' &&
-          <>
-              <Filters
-                position={positionFilter}
-                onChangePosition={setPositionFilter}
-              />
-              <PlayersSection players={filteredPlayers} />
-          </>
-        }
+      {viewMode === 'team' && <TeamData teamRelevantIndexes={data?.teamIndexes ?? []} />}
+      {viewMode === 'individual' &&
+        <>
+            <Filters
+              position={positionFilter}
+              onChangePosition={setPositionFilter}
+            />
+            <PlayersSection players={filteredPlayers} />
+        </>
+      }
       {viewMode === 'compare' && <PlayerComparison players={data?.players} metrics={data?.metrics} />}
     </div>
   );
