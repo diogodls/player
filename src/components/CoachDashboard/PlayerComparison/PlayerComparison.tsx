@@ -113,7 +113,7 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
       }
 
       {selectedPlayers.filter(Boolean).length > 1 &&
-        <div className={styles.comparisonResults}>
+        <div>
           <PlayerRadarChart players={selectedPlayers} showButtons metrics={metrics ?? []} />
           <ComparativePlayerInfos selectedPlayers={selectedPlayers} metrics={metrics} />
         </div>

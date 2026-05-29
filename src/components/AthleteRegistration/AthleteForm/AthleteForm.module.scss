@@ -79,8 +79,7 @@
   font-weight: 600;
 }
 
-.input,
-.select {
+.input {
   width: 100%;
   min-height: 42px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -99,10 +98,6 @@
     border-color: var(--selected-blue);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
   }
-}
-
-.select {
-  appearance: none;
 }
 
 .error {

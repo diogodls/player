@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { PLAYERS_POSITIONS } from "../../../constants/players";
+import Select from "../../elements/Select";
 import styles from "./AthleteForm.module.scss";
 
 const requiredAgeMessage = "Idade deve ser um número inteiro maior que zero";
@@ -40,6 +41,7 @@ const AthleteForm = ({
 }: AthleteFormProps) => {
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -116,17 +118,23 @@ const AthleteForm = ({
               <label className={styles.label} htmlFor="position">
                 Posição *
               </label>
-              <select
-                id="position"
-                className={styles.select}
-                {...register("position")}
-              >
-                {PLAYERS_POSITIONS.map((position) => (
-                  <option key={position} value={position}>
-                    {position}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="position"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    id="position"
+                    name={field.name}
+                    value={field.value}
+                    options={PLAYERS_POSITIONS.map((position) => ({
+                      value: position,
+                      label: position,
+                    }))}
+                    onChange={(value) => field.onChange(value)}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
               {errors.position?.message && <span className={styles.error}>{errors.position.message}</span>}
             </div>
           </div>

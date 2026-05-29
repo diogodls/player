@@ -3,6 +3,7 @@ import AthleteForm, {type AthleteFormValues} from "../../components/AthleteRegis
 import AthleteRegistrationCard
   from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
+import Select from "../../components/elements/Select";
 import Pagination from "../../components/elements/Pagination/Pagination";
 import {PLAYERS_POSITIONS} from "../../constants/players";
 import {useApi} from "../../hooks/useApi";
@@ -78,8 +79,7 @@ const AthleteRegistrationScreen = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitAthlete = (values: AthleteFormValues) => {
-    void values;
+  const handleSubmitAthlete = () => {
     setCurrentPage(1);
 
     success(`Atleta ${editingAthlete ? 'editado' : 'criado'}!`);
@@ -127,25 +127,25 @@ const AthleteRegistrationScreen = () => {
             />
           </label>
 
-          <label className={styles.filterGroup} htmlFor="athlete-position-filter">
-            <span className={styles.filterLabel}>Posição</span>
-            <select
-              id="athlete-position-filter"
-              className={styles.select}
-              value={positionFilter}
-              onChange={(event) => {
-                setPositionFilter(event.target.value as PositionFilter);
+          <Select<PositionFilter>
+            className={styles.filterGroup}
+            label="Posição"
+            name="athlete-position-filter"
+            value={positionFilter}
+            options={[
+              { value: "all", label: "Todas" },
+              ...PLAYERS_POSITIONS.map((position) => ({
+                value: position,
+                label: position === "Pivo" ? "Pivô" : position,
+              })),
+            ]}
+            onChange={(value) => {
+              if (value) {
+                setPositionFilter(value);
                 setCurrentPage(1);
-              }}
-            >
-              <option value="all">Todas</option>
-              {PLAYERS_POSITIONS.map((position) => (
-                <option key={position} value={position}>
-                  {position === "Pivo" ? "Pivô" : position}
-                </option>
-              ))}
-            </select>
-          </label>
+              }
+            }}
+          />
         </div>
 
         {filteredAthletes.length === 0 ? (

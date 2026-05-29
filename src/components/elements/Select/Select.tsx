@@ -23,8 +23,8 @@ const Select = <TValue extends SelectValue = string>({
   };
 
   return (
-    <label className={rootClassName} htmlFor={selectId}>
-      {label && <span className={styles.label}>{label}</span>}
+    <div className={rootClassName}>
+      {label && <label className={styles.label} htmlFor={selectId}>{label}</label>}
 
       <select
         {...selectProps}
@@ -42,7 +42,7 @@ const Select = <TValue extends SelectValue = string>({
           </option>
         ))}
       </select>
-    </label>
+    </div>
   );
 };
 
