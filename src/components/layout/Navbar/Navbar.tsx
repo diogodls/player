@@ -6,6 +6,7 @@ import {
   faCalendar,
   faChartColumn,
   faHouse,
+  faTrophy,
   faXmark,
   faUserPlus
 } from "@fortawesome/free-solid-svg-icons";
@@ -28,6 +29,11 @@ const buttons = [
     label: "Treinos e jogos",
     icon: faCalendar,
     link: "/sessions",
+  },
+  {
+    label: "Rankings",
+    icon: faTrophy,
+    link: "/rankings",
   },
   {
     label: "Cadastro atletas",
