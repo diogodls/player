@@ -5,6 +5,7 @@ import {useApi} from "../../hooks/useApi.ts";
 import type {CoachDashboardData} from "../CoachDashboard";
 import sessionActionStyles from "../../components/SessionDetails/SessionActions/SessionActions.module.scss";
 import styles from "./Rankings.module.scss";
+import Select from "../../components/elements/Select/Select.tsx";
 
 const Rankings = () => {
   const {data, isLoading} = useApi<CoachDashboardData>("coach-dashboard");
@@ -18,7 +19,7 @@ const Rankings = () => {
     if (!selectedRanking) return [];
 
     return buildRankingPlayers(data?.players ?? [], selectedRanking.key).filter((player) => {
-      return typeof player.rankingValue === "number" && Number.isFinite(player.rankingValue);
+      return Number.isFinite(player.rankingValue);
     });
   }, [data?.players, selectedRanking]);
 
@@ -32,21 +33,20 @@ const Rankings = () => {
           </p>
         </div>
 
-        <label className={`${sessionActionStyles.filterField} ${styles.filter}`} htmlFor="ranking-filter">
-          <span className={sessionActionStyles.filterLabel}>Ranking</span>
-          <select
-            id="ranking-filter"
-            value={selectedRankingKey}
-            onChange={(event) => setSelectedRankingKey(event.target.value)}
-          >
-            <option value="">Selecione um ranking</option>
-            {rankingConfigs.map((ranking) => (
-              <option key={ranking.key} value={ranking.key}>
-                {ranking.title}
-              </option>
-            ))}
-          </select>
-        </label>
+         <label className={`${sessionActionStyles.filterField} ${styles.filter}`} htmlFor="ranking-filter">
+           <span className={sessionActionStyles.filterLabel}>Ranking</span>
+           <Select
+             id="ranking-filter"
+             value={selectedRankingKey}
+             onChange={(value) => setSelectedRankingKey(value || "")}
+             options={[
+               ...rankingConfigs.map((item) => ({
+                 value: item.key,
+                 label: item.title,
+              })),
+             ]}
+           />
+         </label>
       </section>
 
       {isLoading ? (
