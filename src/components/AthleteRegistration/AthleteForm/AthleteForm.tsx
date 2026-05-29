@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { PLAYERS_POSITIONS } from "../../../constants/players";
-import Select from "../../elements/Select";
 import styles from "./AthleteForm.module.scss";
+import Select from "../../elements/Select/Select.tsx";
 
 const requiredAgeMessage = "Idade deve ser um número inteiro maior que zero";
 

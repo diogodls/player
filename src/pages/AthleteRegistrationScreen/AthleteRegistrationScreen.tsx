@@ -3,13 +3,13 @@ import AthleteForm, {type AthleteFormValues} from "../../components/AthleteRegis
 import AthleteRegistrationCard
   from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
-import Select from "../../components/elements/Select";
 import Pagination from "../../components/elements/Pagination/Pagination";
 import {PLAYERS_POSITIONS} from "../../constants/players";
 import {useApi} from "../../hooks/useApi";
 import type {CoachDashboardData, Player} from "../CoachDashboard";
 import styles from "./AthleteRegistrationScreen.module.scss";
 import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
+import Select from "../../components/elements/Select/Select.tsx";
 
 type Athlete = {
   id: string;
