@@ -13,7 +13,7 @@ const TeamAnalysis = () => {
 
   const exitGuard = useSessionExitGuard({
     logType: "team",
-    sessionId: data!.session.id,
+    sessionId: data?.session ? data.session.id : '0',
   });
 
   if (!data) return;

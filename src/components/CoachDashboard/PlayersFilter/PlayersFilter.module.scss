@@ -1,0 +1,73 @@
+.filter {
+  box-sizing: border-box;
+  min-width: 0;
+  background: var(--surface);
+  border-radius: var(--border-radius);
+  padding: 14px 18px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .icon {
+    color: var(--selected-blue);
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: minmax(220px, 360px) minmax(180px, 260px);
+    gap: 16px;
+    align-items: center;
+
+    > * {
+      min-width: 0;
+    }
+
+    .filterGroup {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .filterLabel {
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .input {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--border-20);
+      border-radius: var(--border-radius);
+      background: var(--surface-dark);
+      color: var(--text-primary);
+      padding: 0 12px;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease;
+
+      &:focus {
+        border-color: var(--selected-blue);
+        background: var(--bg-dark);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      margin-bottom: 10px;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .content {
+      grid-template-columns: 1fr;
+    }
+  }
+}

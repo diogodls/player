@@ -4,8 +4,9 @@ import {classNames} from "../../../utils/classNames.ts";
 import styles from './DescritiveText.module.scss';
 import {useNavigate} from "react-router";
 
-const DescritiveText = () => {
+const DescriptiveText = () => {
   const navigate = useNavigate();
+
   return (
     <div className={styles.content}>
       <div className={styles.texts}>
@@ -21,19 +22,19 @@ const DescritiveText = () => {
       <div className={styles.linkButtons}>
         <button
           className={classNames([styles.button, styles.actionButton])}
-          onClick={() => navigate('/coach')}
+          onClick={() => navigate('/coach-dashboard')}
           >
           Tela do treinador
         </button>
         <button
           className={styles.button}
-          onClick={() => navigate('/analise')}
+          onClick={() => navigate('/sessions')}
         >
-          Começar análise
+          Adicionar treino
         </button>
       </div>
     </div>
   );
 };
 
-export default DescritiveText;
+export default DescriptiveText;

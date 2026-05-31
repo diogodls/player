@@ -23,7 +23,7 @@ const IndividualAnalysis = () => {
 
   const exitGuard = useSessionExitGuard({
     logType: "individual",
-    sessionId: data!.session.id,
+    sessionId: data?.session ? data.session.id : '0',
   });
 
   if (!data) return;

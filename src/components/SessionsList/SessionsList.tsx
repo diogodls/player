@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import {useMemo, useState} from "react";
 import styles from "./SessionsList.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
@@ -92,9 +92,11 @@ const SessionsList = ({sessions, onEdit, onDelete}: SessionsListProps) => {
             />
           </label>
 
-          <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
-            Limpar filtros
-          </button>
+          {(typeFilter !== "all" || !!dateFilter) &&
+            <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
+              Limpar filtros
+            </button>
+          }
         </div>
 
         {total === 0 ? (
