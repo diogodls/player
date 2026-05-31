@@ -54,7 +54,7 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
           Comparação de atletas
         </span>
 
-        <div className={styles.headerActions}>
+        <span className={styles.headerActions}>
           {selectedPlayers.filter(Boolean).length > 0 && (
             <button
               type="button"
@@ -76,7 +76,7 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
               Adicionar atleta
             </button>
           }
-        </div>
+        </span>
       </h3>
 
       <div className={styles.players}>
