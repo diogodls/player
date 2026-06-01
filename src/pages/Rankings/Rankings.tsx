@@ -40,6 +40,10 @@ const Rankings = () => {
              value={selectedRankingKey}
              onChange={(value) => setSelectedRankingKey(value || "")}
              options={[
+               {
+                 value: "",
+                 label: "Selecione um ranking"
+               },
                ...rankingConfigs.map((item) => ({
                  value: item.key,
                  label: item.title,

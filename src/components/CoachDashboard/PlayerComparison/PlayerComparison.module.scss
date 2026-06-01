@@ -65,6 +65,7 @@
 
   .players {
     display: flex;
+    flex-wrap: nowrap;
     gap: 10px;
     min-width: 0;
 
@@ -155,14 +156,24 @@
         justify-content: center;
       }
     }
+
+    .players {
+      flex-wrap: wrap;
+
+      .player {
+        flex: 1 1 calc(50% - 5px);
+        min-width: 220px;
+      }
+    }
   }
 
-  .players {
-    flex-wrap: wrap;
-
-    .player {
-      flex: 1 1 calc(50% - 5px);
-      min-width: 220px;
+  @media (max-width: 560px) {
+    .players {
+      .player {
+        flex-basis: 100%;
+        min-width: 0;
+      }
     }
   }
 }
+
