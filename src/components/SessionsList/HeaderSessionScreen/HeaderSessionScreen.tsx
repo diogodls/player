@@ -15,10 +15,7 @@ const HeaderSessionScreen = ({ onAddSession }: HeaderSessionScreenProps) => {
         </div>
         <div className={styles.text}>
           <span className={styles.title}>
-            TREINOS & JOGOS
-          </span>
-          <span className={styles.subtitle}>
-            Gerencie treinos e jogos
+            TREINOS E JOGOS
           </span>
         </div>
       </div>

@@ -10,6 +10,7 @@
 }
 
 .modal {
+  box-sizing: border-box;
   width: 520px;
   max-width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -56,18 +57,22 @@
 }
 
 .form {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
 .fieldGroup {
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
 
 .field {
+  box-sizing: border-box;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -80,8 +85,10 @@
 }
 
 .input {
+  box-sizing: border-box;
   width: 100%;
   min-height: 42px;
+  min-width: 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--border-radius);
   background: var(--bg-dark);
@@ -106,6 +113,7 @@
 }
 
 .actions {
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -114,7 +122,9 @@
 
 .secondaryButton,
 .primaryButton {
+  box-sizing: border-box;
   flex: 1;
+  min-width: 0;
   min-height: 44px;
   border-radius: 12px;
   padding: 0 18px;

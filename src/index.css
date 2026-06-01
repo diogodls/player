@@ -13,6 +13,8 @@
   -moz-osx-font-smoothing: grayscale;
   
   --selected-blue: #2563EB;
+  --selected-blue-hover: #3b82f6;
+  --selected-blue-active: #1d4ed8;
   --light-blue: #60A5FA;
   --accent-orange: #fb923c;
   --deep-orange: #FA4F58;

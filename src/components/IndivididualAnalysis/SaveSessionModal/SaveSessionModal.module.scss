@@ -105,13 +105,18 @@
         height: 44px;
         border-radius: 12px;
         border: none;
-        background: #2563eb;
+        background: var(--selected-blue);
         color: #fff;
         font-weight: 700;
         cursor: pointer;
+        transition: background-color 0.18s ease, transform 0.18s ease;
+
+        &:hover:not(:disabled) {
+          background: var(--selected-blue-hover);
+        }
 
         &:disabled {
-          opacity: 0.1;
+          opacity: 0.35;
           cursor: not-allowed;
           transform: none;
         }

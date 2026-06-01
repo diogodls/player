@@ -58,8 +58,8 @@ const Sessions = () => {
       <HeaderSessionScreen onAddSession={handleOpenCreate} />
       <SessionsList
         sessions={sessions}
-        onEditSession={handleEditSession}
-        onDeleteSession={handleDeleteSession}
+        onEdit={handleEditSession}
+        onDelete={handleDeleteSession}
       />
 
       <SaveSessionModal

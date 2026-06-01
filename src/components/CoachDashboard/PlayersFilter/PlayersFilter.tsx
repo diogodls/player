@@ -1,7 +1,8 @@
+import type {Dispatch, SetStateAction} from "react";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PLAYERS_POSITIONS } from "../../../constants/players.ts";
-import styles from "./Filters.module.scss";
+import styles from "./PlayersFilter.module.scss";
 import Select from "../../elements/Select/Select.tsx";
 
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
@@ -9,9 +10,12 @@ type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 type Props = {
   position: PositionFilter;
   onChangePosition: (position: PositionFilter) => void;
+  nameFilter: string;
+  onNameChange: Dispatch<SetStateAction<string>>;
 };
 
-const Filters = ({ position, onChangePosition }: Props) => {
+const PlayersFilter = ({ position, onChangePosition, onNameChange, nameFilter }: Props) => {
+
   return (
     <div className={styles.filter}>
       <div className={styles.header}>
@@ -20,6 +24,20 @@ const Filters = ({ position, onChangePosition }: Props) => {
       </div>
 
       <div className={styles.content}>
+        <label className={styles.filterGroup} htmlFor="athlete-name-filter">
+          <span className={styles.filterLabel}>Nome</span>
+          <input
+            id="athlete-name-filter"
+            className={styles.input}
+            type="search"
+            value={nameFilter}
+            placeholder="Buscar atleta"
+            onChange={(event) => {
+              onNameChange(event.target.value);
+            }}
+          />
+        </label>
+
         <Select<PositionFilter>
           label="Filtrar por posição"
           name="position-filter"
@@ -40,4 +58,4 @@ const Filters = ({ position, onChangePosition }: Props) => {
   );
 };
 
-export default Filters;
+export default PlayersFilter;

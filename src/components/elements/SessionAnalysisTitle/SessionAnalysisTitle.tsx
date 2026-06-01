@@ -5,15 +5,24 @@ import {useNavigate} from "react-router";
 
 type Props = {
   sessionId: string;
+  onBack?: () => void;
 };
 
-const SessionAnalysisTitle = ({ sessionId }: Props) => {
+const SessionAnalysisTitle = ({ sessionId, onBack }: Props) => {
   const navigate = useNavigate();
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+      return;
+    }
+
+    navigate(`/sessions/${sessionId}`);
+  };
   
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <button className={styles.back} onClick={() => navigate(`/sessions/${sessionId}`)}>
+        <button className={styles.back} onClick={handleBack}>
           <FontAwesomeIcon icon={faArrowLeft} />
         </button>
         <h2 className={styles.title}>Análise da sessão</h2>

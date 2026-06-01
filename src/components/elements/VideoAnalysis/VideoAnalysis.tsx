@@ -63,9 +63,12 @@ const VideoAnalysis = () => {
           Análise de Vídeo
         </span>
         <div className={styles.actions}>
-          <label className={styles.button}>
+
+          {!videoUrl &&
+            <label className={styles.button}>
               <FontAwesomeIcon icon={faUpload}/>
               Upload Vídeo
+
               <input
                 type="file"
                 accept="video/*"
@@ -73,6 +76,7 @@ const VideoAnalysis = () => {
                 onChange={handleUpload}
               />
             </label>
+          }
 
             {videoUrl && (
               <button

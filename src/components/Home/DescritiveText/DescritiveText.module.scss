@@ -50,6 +50,11 @@
 
     .actionButton {
       background-color: var(--selected-blue);
+      transition: background-color 0.18s ease, transform 0.18s ease;
+
+      &:hover {
+        background-color: var(--selected-blue-hover);
+      }
     }
   }
 };

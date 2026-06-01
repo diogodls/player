@@ -41,11 +41,21 @@
   .active {
     color: var(--text-primary);
     background: var(--selected-blue);
+    transition: background-color 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      background: var(--selected-blue-hover);
+    }
   }
 
   .activePurple {
     background: var(--purple);
     color: var(--text-primary);
+    transition: background-color 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      background: #8f5bf6;
+    }
   }
 
   .export {
@@ -79,6 +89,66 @@
     align-items: stretch;
     gap: 10px;
     padding: 10px;
+    .text { //todo: refazer
+      font-size: 18px;
+    }
+
+    .buttonsFlex {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .button {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .buttons {
+      padding: 6px 10px;
+      font-size: 12px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .export {
+      width: 100%;
+      height: 36px;
+      font-size: 12px;
+    }
   }
 
+  @media (max-width: 480px) {
+    padding: 8px;
+    gap: 8px;
+
+    .text {
+      font-size: 16px;
+    }
+
+    > div:first-child {
+      margin-bottom: 4px;
+
+      span:last-child {
+        font-size: 12px;
+      }
+    }
+
+    .button {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .buttons {
+      padding: 8px 6px;
+      font-size: 11px;
+      flex-direction: column;
+      gap: 3px;
+      min-height: 50px;
+    }
+
+    .buttonsFlex {
+      gap: 6px;
+    }
+  }
 }
