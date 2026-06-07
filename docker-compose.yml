@@ -1,4 +1,23 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: player_postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=player
+      - POSTGRES_USER=player
+      - POSTGRES_PASSWORD=player
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend:/seed:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U player -d player"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   frontend:
     build:
       context: ./frontend
@@ -26,6 +45,14 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
       - PORT=3000
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=player
+      - DATABASE_USER=player
+      - DATABASE_PASSWORD=player
+    depends_on:
+      postgres:
+        condition: service_healthy
     command: sh -c "npm install && npm run start:dev"
 
   mock:
@@ -37,3 +64,6 @@ services:
     command: sh -c "npm install && npm run mock"
     ports:
       - "3001:3001"
+
+volumes:
+  postgres_data:
