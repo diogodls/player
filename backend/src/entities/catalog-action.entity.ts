@@ -31,10 +31,9 @@ export class CatalogActionEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 30 })
   sigla!: string;
 
-  @Column({ type: 'boolean', default: true })
-  ativa!: boolean;
-
-  @ManyToOne(() => ActionCategoryEntity, (category) => category.acoes, { nullable: false })
+  @ManyToOne(() => ActionCategoryEntity, (category) => category.acoes, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'categoria_acao_id' })
   categoriaAcao?: ActionCategoryEntity;
 

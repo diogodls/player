@@ -13,6 +13,7 @@ CREATE TABLE equipes (
   nome varchar(255) NOT NULL,
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
+  deleted_at timestamptz NULL,
   CONSTRAINT equipes_nome_unique UNIQUE (nome)
 );
 
@@ -28,6 +29,12 @@ CREATE TABLE session_locations (
   CONSTRAINT session_locations_nome_unique UNIQUE (nome)
 );
 
+CREATE TABLE session_court_sizes (
+  id smallint PRIMARY KEY,
+  nome varchar(50) NOT NULL,
+  CONSTRAINT session_court_sizes_nome_unique UNIQUE (nome)
+);
+
 CREATE TABLE posicoes (
   id smallint PRIMARY KEY,
   nome varchar(50) NOT NULL,
@@ -40,14 +47,6 @@ CREATE TABLE lados_preferenciais (
   CONSTRAINT lados_preferenciais_nome_unique UNIQUE (nome)
 );
 
-CREATE TABLE adversarios (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome varchar(255) NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT NOW(),
-  updated_at timestamptz NOT NULL DEFAULT NOW(),
-  CONSTRAINT adversarios_nome_unique UNIQUE (nome)
-);
-
 CREATE TABLE jogadores (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   equipe_id uuid NOT NULL REFERENCES equipes(id),
@@ -55,13 +54,13 @@ CREATE TABLE jogadores (
   lado_preferencial_id smallint NOT NULL REFERENCES lados_preferenciais(id),
   nome varchar(255) NOT NULL,
   idade integer NOT NULL CHECK (idade > 0),
-  ativo boolean NOT NULL DEFAULT TRUE,
   created_at timestamptz NOT NULL DEFAULT NOW(),
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  deleted_at timestamptz NULL
 );
 
-CREATE INDEX jogadores_equipe_ativo_idx
-  ON jogadores (equipe_id, ativo);
+CREATE INDEX jogadores_equipe_deleted_at_idx
+  ON jogadores (equipe_id, deleted_at);
 
 CREATE INDEX jogadores_nome_idx
   ON jogadores (nome);
@@ -71,15 +70,12 @@ CREATE TABLE sessoes (
   equipe_id uuid NOT NULL REFERENCES equipes(id),
   session_type_id smallint NOT NULL REFERENCES session_types(id),
   session_location_id smallint NOT NULL REFERENCES session_locations(id),
+  session_court_size_id smallint NOT NULL REFERENCES session_court_sizes(id),
   data date NOT NULL,
   descricao text NULL,
-  adversario_id uuid NULL REFERENCES adversarios(id),
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
-  CONSTRAINT sessoes_tipo_adversario_check CHECK (
-    (session_type_id = 1 AND adversario_id IS NULL) OR
-    (session_type_id = 2 AND adversario_id IS NOT NULL)
-  )
+  deleted_at timestamptz NULL
 );
 
 CREATE INDEX sessoes_equipe_data_idx
@@ -104,14 +100,14 @@ CREATE TABLE categorias_acao (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo_analise_id smallint NOT NULL REFERENCES tipos_analise(id),
   nome varchar(100) NOT NULL,
-  ativa boolean NOT NULL DEFAULT TRUE,
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
+  deleted_at timestamptz NULL,
   CONSTRAINT categorias_acao_tipo_nome_unique UNIQUE (tipo_analise_id, nome)
 );
 
-CREATE INDEX categorias_acao_tipo_ativa_idx
-  ON categorias_acao (tipo_analise_id, ativa);
+CREATE INDEX categorias_acao_tipo_deleted_at_idx
+  ON categorias_acao (tipo_analise_id, deleted_at);
 
 CREATE TABLE acoes_catalogo (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -119,15 +115,15 @@ CREATE TABLE acoes_catalogo (
   impacto_id smallint NOT NULL REFERENCES impactos(id),
   nome varchar(255) NOT NULL,
   sigla varchar(30) NOT NULL,
-  ativa boolean NOT NULL DEFAULT TRUE,
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
+  deleted_at timestamptz NULL,
   CONSTRAINT acoes_catalogo_categoria_nome_unique UNIQUE (categoria_acao_id, nome),
   CONSTRAINT acoes_catalogo_categoria_sigla_unique UNIQUE (categoria_acao_id, sigla)
 );
 
-CREATE INDEX acoes_catalogo_categoria_ativa_idx
-  ON acoes_catalogo (categoria_acao_id, ativa);
+CREATE INDEX acoes_catalogo_categoria_deleted_at_idx
+  ON acoes_catalogo (categoria_acao_id, deleted_at);
 
 CREATE TABLE acoes_taggeadas (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -135,9 +131,9 @@ CREATE TABLE acoes_taggeadas (
   acao_catalogo_id uuid NOT NULL REFERENCES acoes_catalogo(id),
   jogador_id uuid NULL REFERENCES jogadores(id),
   timestamp_segundos integer NOT NULL CHECK (timestamp_segundos >= 0),
-  observacao text NULL,
   created_at timestamptz NOT NULL DEFAULT NOW(),
-  updated_at timestamptz NOT NULL DEFAULT NOW()
+  updated_at timestamptz NOT NULL DEFAULT NOW(),
+  deleted_at timestamptz NULL
 );
 
 CREATE INDEX acoes_taggeadas_sessao_tempo_idx
@@ -151,11 +147,6 @@ CREATE INDEX acoes_taggeadas_acao_idx
 
 CREATE TRIGGER equipes_set_updated_at
 BEFORE UPDATE ON equipes
-FOR EACH ROW
-EXECUTE FUNCTION set_updated_at();
-
-CREATE TRIGGER adversarios_set_updated_at
-BEFORE UPDATE ON adversarios
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
 
@@ -189,6 +180,9 @@ COMMENT ON TABLE session_types IS
 
 COMMENT ON TABLE session_locations IS
 'Catalogo fixo para local da sessao. Esperado: 1 = Casa, 2 = Fora.';
+
+COMMENT ON TABLE session_court_sizes IS
+'Catalogo fixo para tamanho da quadra da sessao. Esperado: 1 = Pequena, 2 = Grande.';
 
 COMMENT ON TABLE posicoes IS
 'Catalogo fixo das posicoes dos jogadores.';

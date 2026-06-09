@@ -29,9 +29,6 @@ export class TaggedActionEntity extends BaseEntity {
   @Column({ name: 'timestamp_segundos', type: 'integer' })
   timestampSegundos!: number;
 
-  @Column({ type: 'text', nullable: true })
-  observacao!: string | null;
-
   @ManyToOne(() => SessionEntity, (session) => session.acoesTaggeadas, {
     nullable: false,
   })

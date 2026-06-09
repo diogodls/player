@@ -34,9 +34,6 @@ export class PlayerEntity extends BaseEntity {
   @Column({ type: 'integer' })
   idade!: number;
 
-  @Column({ type: 'boolean', default: true })
-  ativo!: boolean;
-
   @ManyToOne(() => TeamEntity, (team) => team.jogadores, { nullable: false })
   @JoinColumn({ name: 'equipe_id' })
   equipe?: TeamEntity;
