@@ -9,14 +9,28 @@ type ActionsList = {
   actions: Action[];
   handleActionClick: (action: Action) => void;
   className?: string;
+  groups?: ActionGroup[];
+  sticky?: boolean;
 }
 
-const ActionsList = ({actions, handleActionClick, className}: ActionsList) => {
+export type ActionGroup = {
+  title: string;
+  actions: Action[];
+};
+
+const ActionsList = ({actions, handleActionClick, className = '', groups, sticky = true}: ActionsList) => {
   const groupedActions = useMemo( () => groupActions(actions), [actions]);
+  const actionGroups = groups ?? Object.entries(groupedActions).map(([title, actions]) => ({
+    title,
+    actions: actions.map((action) => ({
+      ...action,
+      category: title,
+    })),
+  }));
 
   return (
-    <div className={`${styles.actions} ${className}`}>
-      {Object.entries(groupedActions).map(([title, actions]) => (
+    <div className={`${styles.actions} ${!sticky ? styles.staticActions : ''} ${className}`}>
+      {actionGroups.map(({title, actions}) => (
         <div className={styles.actionsType} key={title}>
           <span className={styles.actionsTitle}>
             {title}
@@ -25,7 +39,7 @@ const ActionsList = ({actions, handleActionClick, className}: ActionsList) => {
             {actions.map((action) => {
               const actionTag = {
                 ...action,
-                category: title
+                category: action.category
               };
 
               return (

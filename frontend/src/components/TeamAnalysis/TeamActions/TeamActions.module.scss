@@ -6,3 +6,45 @@
     padding: 0;
   }
 }
+
+.teamActions {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  position: sticky;
+  top: 20px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.categorySection {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.categoryTitle {
+  display: block;
+  color: var(--text-primary);
+  font-size: 1.2em;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-50);
+  padding-bottom: 5px;
+}
+
+.subcategoryList {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 720px) {
+  .teamActions {
+    position: static;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    max-height: none;
+    overflow: visible;
+  }
+}
