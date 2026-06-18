@@ -1,65 +1,74 @@
-import {useContext, useMemo, useState} from "react";
-import AthleteForm, {type AthleteFormValues} from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
-import AthleteRegistrationCard
-  from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
+import { useContext, useMemo, useState } from "react";
+import AthleteForm, {
+  type AthleteFormValues,
+} from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
+import AthleteRegistrationCard from "../../components/AthleteRegistration/AthleteRegistrationCard/AthleteRegistrationCard";
 import DeleteAthleteModal from "../../components/AthleteRegistration/DeleteAthleteModal/DeleteAthleteModal";
 import Pagination from "../../components/elements/Pagination/Pagination";
-import {PLAYERS_POSITIONS} from "../../constants/players";
-import {useApi} from "../../hooks/useApi";
-import type {CoachDashboardData, Player} from "../CoachDashboard";
-import styles from "./AthleteRegistrationScreen.module.scss";
-import {ToastContext} from "../../contexts/ToastContext/ToastContext.tsx";
 import Select from "../../components/elements/Select/Select.tsx";
+import { ToastContext } from "../../contexts/ToastContext/ToastContext.tsx";
+import {
+  PLAYERS_POSITIONS,
+  PREFERRED_SIDES,
+} from "../../constants/players";
+import { useApi } from "../../hooks/useApi.ts";
+import { backendApi } from "../../utils/api.ts";
+import styles from "./AthleteRegistrationScreen.module.scss";
 
 type Athlete = {
   id: string;
   name: string;
-  age: Player["age"];
+  age: number;
   position: (typeof PLAYERS_POSITIONS)[number];
+  preferredSide: (typeof PREFERRED_SIDES)[number];
 };
 
 const ATHLETES_PER_PAGE = 8;
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 const AthleteRegistrationScreen = () => {
-  const { data } = useApi<CoachDashboardData>("coach-dashboard"); //todo: mudar para quando vir do back | usar endpoint proprio de atletas
+  const {
+    data: athletes = [],
+    error: athletesError,
+    isLoading,
+    mutate,
+  } = useApi<Athlete[]>("/players");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
-  const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
-  const {success, info} = useContext(ToastContext);
-
-  const displayedAthletes = useMemo<Athlete[]>(
-    () =>
-      data?.players.map((player) => ({
-        id: String(player.id),
-        name: player.name,
-        age: player.age,
-        position: player.position as (typeof PLAYERS_POSITIONS)[number],
-      })) ?? [],
-    [data?.players],
-  );
+  const [positionFilter, setPositionFilter] =
+    useState<PositionFilter>("all");
+  const { success, info, error } = useContext(ToastContext);
 
   const filteredAthletes = useMemo(() => {
     const normalizedName = nameFilter.trim().toLocaleLowerCase();
 
-    return displayedAthletes.filter((athlete) => {
-      const matchesName = athlete.name.toLocaleLowerCase().includes(normalizedName);
+    return athletes.filter((athlete) => {
+      const matchesName = athlete.name
+        .toLocaleLowerCase()
+        .includes(normalizedName);
       const matchesPosition =
         positionFilter === "all" || athlete.position === positionFilter;
 
       return matchesName && matchesPosition;
     });
-  }, [displayedAthletes, nameFilter, positionFilter]);
+  }, [athletes, nameFilter, positionFilter]);
 
-  const hasActiveFilters = Boolean(nameFilter.trim()) || positionFilter !== "all";
-  const totalPages = Math.max(1, Math.ceil(filteredAthletes.length / ATHLETES_PER_PAGE));
+  const hasActiveFilters =
+    Boolean(nameFilter.trim()) || positionFilter !== "all";
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredAthletes.length / ATHLETES_PER_PAGE),
+  );
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pagedAthletes = useMemo(() => {
     const startIndex = (safeCurrentPage - 1) * ATHLETES_PER_PAGE;
-    return filteredAthletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
+    return filteredAthletes.slice(
+      startIndex,
+      startIndex + ATHLETES_PER_PAGE,
+    );
   }, [filteredAthletes, safeCurrentPage]);
 
   const formInitialValues = useMemo<AthleteFormValues | undefined>(
@@ -69,6 +78,7 @@ const AthleteRegistrationScreen = () => {
             name: editingAthlete.name,
             age: editingAthlete.age,
             position: editingAthlete.position,
+            preferredSide: editingAthlete.preferredSide,
           }
         : undefined,
     [editingAthlete],
@@ -79,20 +89,40 @@ const AthleteRegistrationScreen = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitAthlete = () => {
-    setCurrentPage(1);
+  const handleSubmitAthlete = async (values: AthleteFormValues) => {
+    try {
+      if (editingAthlete) {
+        await backendApi.patch(`/players/${editingAthlete.id}`, values);
+      } else {
+        await backendApi.post("/players", values);
+      }
 
-    success(`Atleta ${editingAthlete ? 'editado' : 'criado'}!`);
-    setIsModalOpen(false); //todo: enviar req pro back aqui depois
+      await mutate();
+      setCurrentPage(1);
+      success(`Atleta ${editingAthlete ? "editado" : "criado"}!`);
+      setIsModalOpen(false);
+      setEditingAthlete(null);
+    } catch {
+      error("Não foi possível salvar o atleta.");
+    }
   };
 
   const handleCloseForm = () => {
     setIsModalOpen(false);
+    setEditingAthlete(null);
   };
 
-  const handleConfirmDelete = () => {
-    setAthleteToDelete(null);
-    info("Atleta deletado!"); //todo: enviar req pro back aqui depois
+  const handleConfirmDelete = async () => {
+    if (!athleteToDelete) return;
+
+    try {
+      await backendApi.delete(`/players/${athleteToDelete.id}`);
+      await mutate();
+      setAthleteToDelete(null);
+      info("Atleta deletado!");
+    } catch {
+      error("Não foi possível excluir o atleta.");
+    }
   };
 
   return (
@@ -101,18 +131,23 @@ const AthleteRegistrationScreen = () => {
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>Atletas</h1>
-            <p className={styles.description}>
-              Cadastre novos atletas
-            </p>
+            <p className={styles.description}>Cadastre novos atletas</p>
           </div>
 
-          <button className={styles.openButton} type="button" onClick={handleOpenCreateModal}>
+          <button
+            className={styles.openButton}
+            type="button"
+            onClick={handleOpenCreateModal}
+          >
             Novo atleta
           </button>
         </div>
 
         <div className={styles.filters}>
-          <label className={styles.filterGroup} htmlFor="athlete-name-filter">
+          <label
+            className={styles.filterGroup}
+            htmlFor="athlete-name-filter"
+          >
             <span className={styles.filterLabel}>Nome</span>
             <input
               id="athlete-name-filter"
@@ -148,13 +183,29 @@ const AthleteRegistrationScreen = () => {
           />
         </div>
 
-        {filteredAthletes.length === 0 ? (
+        {isLoading ? (
+          <div className={styles.emptyState}>
+            <h2 className={styles.emptyTitle}>Carregando atletas...</h2>
+          </div>
+        ) : athletesError ? (
           <div className={styles.emptyState}>
             <h2 className={styles.emptyTitle}>
-              {hasActiveFilters ? "Nenhum atleta encontrado" : "Nenhum atleta cadastrado"}
+              Não foi possível carregar os atletas
             </h2>
             <p className={styles.emptyDescription}>
-              Abra o modal para salvar o primeiro atleta e começar a montar a lista local.
+              Verifique se o backend está disponível e tente novamente.
+            </p>
+          </div>
+        ) : filteredAthletes.length === 0 ? (
+          <div className={styles.emptyState}>
+            <h2 className={styles.emptyTitle}>
+              {hasActiveFilters
+                ? "Nenhum atleta encontrado"
+                : "Nenhum atleta cadastrado"}
+            </h2>
+            <p className={styles.emptyDescription}>
+              Abra o modal para salvar o primeiro atleta e começar a montar a
+              equipe.
             </p>
           </div>
         ) : (
@@ -185,22 +236,22 @@ const AthleteRegistrationScreen = () => {
         )}
       </div>
 
-      {isModalOpen &&
+      {isModalOpen && (
         <AthleteForm
           mode={editingAthlete ? "edit" : "create"}
           initialValues={formInitialValues}
           onClose={handleCloseForm}
           onSubmit={handleSubmitAthlete}
         />
-      }
+      )}
 
-      {Boolean(athleteToDelete) &&
+      {Boolean(athleteToDelete) && (
         <DeleteAthleteModal
           athleteName={athleteToDelete?.name}
           onClose={() => setAthleteToDelete(null)}
           onConfirm={handleConfirmDelete}
         />
-      }
+      )}
     </section>
   );
 };

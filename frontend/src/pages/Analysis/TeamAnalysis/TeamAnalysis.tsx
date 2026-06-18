@@ -7,9 +7,10 @@ import TeamActions from "../../../components/TeamAnalysis/TeamActions/TeamAction
 import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
 import AnalysisExitModal from "../../../components/elements/AnalysisExitModal/AnalysisExitModal.tsx";
+import {mockApi} from "../../../utils/api.ts";
 
 const TeamAnalysis = () => {
-  const {data} = useApi<TeamAnalysisData>("team-analysis");
+  const {data} = useApi<TeamAnalysisData>("team-analysis", { client: mockApi });
 
   const exitGuard = useSessionExitGuard({
     logType: "team",

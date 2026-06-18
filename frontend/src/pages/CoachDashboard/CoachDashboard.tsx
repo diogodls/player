@@ -9,12 +9,13 @@ import PlayersSection from "../../components/CoachDashboard/PlayersSection/Playe
 import {PLAYERS_POSITIONS} from "../../constants/players.ts";
 import TeamData from "../../components/CoachDashboard/TeamData/TeamData.tsx";
 import PlayersFilter from "../../components/CoachDashboard/PlayersFilter/PlayersFilter.tsx";
+import {mockApi} from "../../utils/api.ts";
 
 type ViewMode = 'team' | 'individual' | 'compare';
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 const CoachDashboard = () => {
-  const { data } = useApi<CoachDashboardData>("coach-dashboard");
+  const { data } = useApi<CoachDashboardData>("coach-dashboard", { client: mockApi });
   const [viewMode, setViewMode] = useState<ViewMode>('team');
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
   const [nameFilter, setNameFilter] = useState("");

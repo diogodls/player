@@ -4,7 +4,10 @@ import { faX } from "@fortawesome/free-solid-svg-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { PLAYERS_POSITIONS } from "../../../constants/players";
+import {
+  PLAYERS_POSITIONS,
+  PREFERRED_SIDES,
+} from "../../../constants/players";
 import styles from "./AthleteForm.module.scss";
 import Select from "../../elements/Select/Select.tsx";
 
@@ -13,9 +16,12 @@ const requiredAgeMessage = "Idade deve ser um número inteiro maior que zero";
 const athleteFormSchema = z.object({
   name: z.string().trim().min(1, "Nome é obrigatório"),
   age: z.number().int(requiredAgeMessage).min(1, requiredAgeMessage),
-  position: z
-    .string()
-    .refine((value) => PLAYERS_POSITIONS.includes(value), "Posição é obrigatoria"),
+  position: z.enum(PLAYERS_POSITIONS, {
+    error: "Posição é obrigatória",
+  }),
+  preferredSide: z.enum(PREFERRED_SIDES, {
+    error: "Lado preferencial é obrigatório",
+  }),
 });
 
 export type AthleteFormValues = z.infer<typeof athleteFormSchema>;
@@ -31,6 +37,7 @@ const emptyValues: AthleteFormValues = {
   name: "",
   age: 1,
   position: PLAYERS_POSITIONS[0],
+  preferredSide: PREFERRED_SIDES[0],
 };
 
 const AthleteForm = ({
@@ -137,6 +144,34 @@ const AthleteForm = ({
               />
               {errors.position?.message && <span className={styles.error}>{errors.position.message}</span>}
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="preferredSide">
+              Lado preferencial *
+            </label>
+            <Controller
+              name="preferredSide"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="preferredSide"
+                  name={field.name}
+                  value={field.value}
+                  options={PREFERRED_SIDES.map((side) => ({
+                    value: side,
+                    label: side,
+                  }))}
+                  onChange={(value) => field.onChange(value)}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+            {errors.preferredSide?.message && (
+              <span className={styles.error}>
+                {errors.preferredSide.message}
+              </span>
+            )}
           </div>
 
           <div className={styles.actions}>
