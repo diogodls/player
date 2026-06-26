@@ -1,6 +1,7 @@
 import styles from "./VideoAnalysis.module.scss"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowUpFromBracket, faLink, faPlay, faTrash, faUpload, faXmark} from "@fortawesome/free-solid-svg-icons";
+import {faYoutube} from "@fortawesome/free-brands-svg-icons";
 import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import {extractYoutubeVideoId} from "../../../utils/youtube.ts";
@@ -57,6 +58,7 @@ const VideoAnalysis = () => {
 
   const wasPlayingBeforeTaggingRef = useRef(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const youtubePlayerRef = useRef<YoutubePlayer | null>(null);
   const youtubeIntervalRef = useRef<number | null>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -74,6 +76,7 @@ const VideoAnalysis = () => {
 
   const hasValidLocalVideo = videoSourceType === "file" && Boolean(selectedFile) && Boolean(videoUrl);
   const hasValidYoutubeVideo = videoSourceType === "youtube" && Boolean(youtubeVideoId) && Boolean(youtubeEmbedUrl);
+  const hasSelectedVideo = hasValidLocalVideo || hasValidYoutubeVideo;
 
   const stopYoutubeTimer = useCallback(() => {
     if (!youtubeIntervalRef.current) return;
@@ -125,6 +128,10 @@ const VideoAnalysis = () => {
     setModalYoutubeUrl(videoSourceType === "youtube" ? youtubeUrl : "");
     setModalYoutubeError("");
     setIsUploadModalOpen(true);
+  };
+
+  const openFileExplorer = () => {
+    fileInputRef.current?.click();
   };
 
   const handleTimeUpdate = () => {
@@ -253,10 +260,27 @@ const VideoAnalysis = () => {
           Análise de Vídeo
         </span>
         <div className={styles.actions}>
-          <button className={styles.button} type="button" onClick={openUploadModal}>
-            <FontAwesomeIcon icon={faUpload}/>
-            Upload do vídeo
-          </button>
+          {!hasSelectedVideo && (
+            <>
+              <button className={styles.youtubeButton} type="button" onClick={openUploadModal}>
+                <FontAwesomeIcon icon={faYoutube}/>
+                Vídeo do YouTube
+              </button>
+
+              <button className={styles.button} type="button" onClick={openFileExplorer}>
+                <FontAwesomeIcon icon={faUpload}/>
+                Selecionar vídeo do PC
+              </button>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                hidden
+                onChange={handleUpload}
+              />
+            </>
+          )}
 
           {videoSourceType && (
             <button
@@ -337,18 +361,6 @@ const VideoAnalysis = () => {
               </button>
             </div>
             {modalYoutubeError && <span className={styles.inputError}>{modalYoutubeError}</span>}
-
-            <label className={styles.computerButton}>
-              <FontAwesomeIcon icon={faUpload}/>
-              Selecionar do computador
-
-              <input
-                type="file"
-                accept="video/*"
-                hidden
-                onChange={handleUpload}
-              />
-            </label>
           </div>
         </div>
       )}

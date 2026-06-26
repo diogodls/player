@@ -57,6 +57,15 @@
     }
   }
 
+  .youtubeButton {
+    @extend .button;
+    background-color: var(--action-red);
+
+    &:hover {
+      background: var(--deep-red);
+    }
+  }
+
   .youtubeField {
     box-sizing: border-box;
     width: 100%;
@@ -267,7 +276,8 @@
       font-size: 22px;
     }
 
-    .button {
+    .button,
+    .youtubeButton {
       width: 100%;
       display: flex;
       justify-content: center;
