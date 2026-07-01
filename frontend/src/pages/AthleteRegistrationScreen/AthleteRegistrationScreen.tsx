@@ -93,6 +93,7 @@ const AthleteRegistrationScreen = () => {
 
   const handleSubmitAthlete = async (values: AthleteFormValues) => {
     const payload = {
+      id: editingAthlete?.id ?? null,
       name: values.name,
       age: values.age,
       positionId: PLAYER_POSITION_IDS[values.position],
@@ -101,7 +102,7 @@ const AthleteRegistrationScreen = () => {
 
     try {
       if (editingAthlete) {
-        await backendApi.patch(`/players/${editingAthlete.id}`, payload);
+        await backendApi.put(`/players/${editingAthlete.id}`, payload);
       } else {
         await backendApi.post("/players", payload);
       }

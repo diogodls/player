@@ -6,11 +6,10 @@ import {
   HttpCode,
   Param,
   ParseUUIDPipe,
-  Patch,
   Post,
+  Put,
 } from '@nestjs/common';
-import { CreatePlayerDto } from './dto/create-player.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
+import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
 
 @Controller('players')
@@ -28,15 +27,12 @@ export class PlayersController {
   }
 
   @Post()
-  create(@Body() dto: CreatePlayerDto) {
+  create(@Body() dto: PlayerDto) {
     return this.playersService.create(dto);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() dto: UpdatePlayerDto,
-  ) {
+  @Put(':id')
+  update(@Param('id', new ParseUUIDPipe()) id: string, @Body() dto: PlayerDto) {
     return this.playersService.update(id, dto);
   }
 

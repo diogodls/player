@@ -1,11 +1,11 @@
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { CreatePlayerDto } from './create-player.dto';
-import { UpdatePlayerDto } from './update-player.dto';
+import { PlayerDto } from './player.dto';
 
-describe('Player DTOs', () => {
-  it('accepts and trims a valid player', async () => {
-    const dto = plainToInstance(CreatePlayerDto, {
+describe('PlayerDto', () => {
+  it('accepts a player with a null id and trims its name', async () => {
+    const dto = plainToInstance(PlayerDto, {
+      id: null,
       name: '  Ana Silva  ',
       age: 21,
       positionId: 3,
@@ -16,8 +16,20 @@ describe('Player DTOs', () => {
     expect(dto.name).toBe('Ana Silva');
   });
 
+  it('accepts a player with a UUID id', async () => {
+    const dto = plainToInstance(PlayerDto, {
+      id: '79fbbbe8-39b1-4b25-bd11-236a0f228cb0',
+      name: 'Ana Silva',
+      age: 21,
+      positionId: 3,
+      preferredSideId: 2,
+    });
+
+    await expect(validate(dto)).resolves.toHaveLength(0);
+  });
+
   it('rejects invalid required fields', async () => {
-    const dto = plainToInstance(CreatePlayerDto, {
+    const dto = plainToInstance(PlayerDto, {
       name: '   ',
       age: 0,
     });
@@ -25,12 +37,33 @@ describe('Player DTOs', () => {
     const errors = await validate(dto);
 
     expect(errors.map((error) => error.property)).toEqual(
-      expect.arrayContaining(['name', 'age', 'positionId', 'preferredSideId']),
+      expect.arrayContaining([
+        'id',
+        'name',
+        'age',
+        'positionId',
+        'preferredSideId',
+      ]),
     );
   });
 
+  it('rejects an invalid player id', async () => {
+    const dto = plainToInstance(PlayerDto, {
+      id: 'invalid-id',
+      name: 'Ana Silva',
+      age: 21,
+      positionId: 3,
+      preferredSideId: 2,
+    });
+
+    const errors = await validate(dto);
+
+    expect(errors.map((error) => error.property)).toContain('id');
+  });
+
   it('rejects goalkeeper as a player position', async () => {
-    const dto = plainToInstance(CreatePlayerDto, {
+    const dto = plainToInstance(PlayerDto, {
+      id: null,
       name: 'João',
       age: 20,
       positionId: 1,
@@ -40,16 +73,5 @@ describe('Player DTOs', () => {
     const errors = await validate(dto);
 
     expect(errors.map((error) => error.property)).toContain('positionId');
-  });
-
-  it('validates only fields supplied when updating', async () => {
-    const validDto = plainToInstance(UpdatePlayerDto, { name: 'Novo nome' });
-    const invalidDto = plainToInstance(UpdatePlayerDto, {
-      teamId: 'invalid-id',
-      preferredSideId: 9,
-    });
-
-    await expect(validate(validDto)).resolves.toHaveLength(0);
-    await expect(validate(invalidDto)).resolves.toHaveLength(2);
   });
 });

@@ -6,9 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
-import { CreatePlayerDto } from './dto/create-player.dto';
+import { PlayerDto } from './dto/player.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
 
 const DEFAULT_TEAM_NAME = 'Equipe Principal';
 
@@ -38,7 +37,11 @@ export class PlayersService {
     return this.toResponse(await this.findEntity(id));
   }
 
-  async create(dto: CreatePlayerDto): Promise<PlayerResponseDto> {
+  async create(dto: PlayerDto): Promise<PlayerResponseDto> {
+    if (dto.id !== null) {
+      throw new BadRequestException('Id deve ser nulo ao criar um jogador');
+    }
+
     const team = await this.findTeam();
 
     const player = this.playersRepository.create({
@@ -53,7 +56,13 @@ export class PlayersService {
     return this.findOne(savedPlayer.id);
   }
 
-  async update(id: string, dto: UpdatePlayerDto): Promise<PlayerResponseDto> {
+  async update(id: string, dto: PlayerDto): Promise<PlayerResponseDto> {
+    if (dto.id !== id) {
+      throw new BadRequestException(
+        'Id do jogador deve ser igual ao identificador da rota',
+      );
+    }
+
     await this.findEntity(id);
 
     const changes: Partial<PlayerEntity> = {};
