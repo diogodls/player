@@ -9,7 +9,9 @@ import Select from "../../components/elements/Select/Select.tsx";
 import { ToastContext } from "../../contexts/ToastContext/ToastContext.tsx";
 import {
   PLAYERS_POSITIONS,
+  PLAYER_POSITION_IDS,
   PREFERRED_SIDES,
+  PREFERRED_SIDE_IDS,
 } from "../../constants/players";
 import { useApi } from "../../hooks/useApi.ts";
 import { backendApi } from "../../utils/api.ts";
@@ -90,11 +92,18 @@ const AthleteRegistrationScreen = () => {
   };
 
   const handleSubmitAthlete = async (values: AthleteFormValues) => {
+    const payload = {
+      name: values.name,
+      age: values.age,
+      positionId: PLAYER_POSITION_IDS[values.position],
+      preferredSideId: PREFERRED_SIDE_IDS[values.preferredSide],
+    };
+
     try {
       if (editingAthlete) {
-        await backendApi.patch(`/players/${editingAthlete.id}`, values);
+        await backendApi.patch(`/players/${editingAthlete.id}`, payload);
       } else {
-        await backendApi.post("/players", values);
+        await backendApi.post("/players", payload);
       }
 
       await mutate();
