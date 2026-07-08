@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerFiltersDto } from './dto/player-filters.dto';
+import { PlayerListResponseDto } from './dto/player-list-response.dto';
 import { PlayerDto } from './dto/player.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
 
@@ -19,21 +20,34 @@ export class PlayersService {
     private readonly teamsRepository: Repository<TeamEntity>,
   ) {}
 
-  async findAll(filters: PlayerFiltersDto = {}): Promise<PlayerResponseDto[]> {
+  async findAll(filters?: PlayerFiltersDto): Promise<PlayerListResponseDto> {
+    const limit = filters?.limit ?? 8;
+    const where = {
+      ...(filters?.name ? { nome: ILike(`%${filters.name}%`) } : {}),
+      ...(filters?.positionId ? { posicaoId: filters.positionId } : {}),
+    };
+    const total = await this.playersRepository.count({ where });
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const page = Math.min(filters?.page ?? 1, totalPages);
     const players = await this.playersRepository.find({
-      where: {
-        ...(filters.name ? { nome: ILike(`%${filters.name}%`) } : {}),
-        ...(filters.positionId ? { posicaoId: filters.positionId } : {}),
-      },
+      where,
       relations: {
         equipe: true,
         posicao: true,
         ladoPreferencial: true,
       },
       order: { nome: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
 
-    return players.map((player) => this.toResponse(player));
+    return {
+      data: players.map((player) => this.toResponse(player)),
+      total,
+      page,
+      limit,
+      totalPages,
+    };
   }
 
   async findOne(id: string): Promise<PlayerResponseDto> {

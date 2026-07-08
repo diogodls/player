@@ -25,6 +25,14 @@ type Athlete = {
   preferredSide: (typeof PREFERRED_SIDES)[number];
 };
 
+type PaginatedAthletesResponse = {
+  data: Athlete[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
 const ATHLETES_PER_PAGE = 8;
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
@@ -48,29 +56,27 @@ const AthleteRegistrationScreen = () => {
         String(PLAYER_POSITION_IDS[positionFilter]),
       );
     }
+    searchParams.set("page", String(currentPage));
+    searchParams.set("limit", String(ATHLETES_PER_PAGE));
 
     const queryString = searchParams.toString();
     return queryString ? `/players?${queryString}` : "/players";
-  }, [nameFilter, positionFilter]);
+  }, [currentPage, nameFilter, positionFilter]);
 
   const {
-    data: athletes = [],
+    data: athletesResponse,
     error: athletesError,
     isLoading,
     mutate,
-  } = useApi<Athlete[]>(athletesEndpoint);
+  } = useApi<PaginatedAthletesResponse>(athletesEndpoint);
+  const athletes = athletesResponse?.data ?? [];
+  const totalPages = athletesResponse?.totalPages ?? 1;
+  const totalAthletes = athletesResponse?.total ?? 0;
 
   const hasActiveFilters =
     Boolean(nameFilter.trim()) || positionFilter !== "all";
-  const totalPages = Math.max(
-    1,
-    Math.ceil(athletes.length / ATHLETES_PER_PAGE),
-  );
-  const safeCurrentPage = Math.min(currentPage, totalPages);
-  const pagedAthletes = useMemo(() => {
-    const startIndex = (safeCurrentPage - 1) * ATHLETES_PER_PAGE;
-    return athletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
-  }, [athletes, safeCurrentPage]);
+  const safeCurrentPage =
+    athletesResponse?.page ?? Math.min(currentPage, totalPages);
 
   const formInitialValues = useMemo<AthleteFormValues | undefined>(
     () =>
@@ -209,7 +215,7 @@ const AthleteRegistrationScreen = () => {
               Verifique se o backend está disponível e tente novamente.
             </p>
           </div>
-        ) : athletes.length === 0 ? (
+        ) : totalAthletes === 0 ? (
           <div className={styles.emptyState}>
             <h2 className={styles.emptyTitle}>
               {hasActiveFilters
@@ -223,7 +229,7 @@ const AthleteRegistrationScreen = () => {
           </div>
         ) : (
           <div className={styles.list}>
-            {pagedAthletes.map((athlete) => (
+            {athletes.map((athlete) => (
               <AthleteRegistrationCard
                 key={athlete.id}
                 athlete={athlete}

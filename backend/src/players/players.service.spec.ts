@@ -69,8 +69,11 @@ describe('PlayersService id validation', () => {
     );
   });
 
-  it('filters players by name and position when listing players', async () => {
+  it('filters and paginates players when listing players', async () => {
     let receivedFindOptions: Parameters<Repository<PlayerEntity>['find']>[0];
+    const countPlayers = jest
+      .fn<Repository<PlayerEntity>['count']>()
+      .mockResolvedValue(17);
     const findPlayers = jest
       .fn<Repository<PlayerEntity>['find']>()
       .mockImplementation(
@@ -80,6 +83,7 @@ describe('PlayersService id validation', () => {
         },
       );
     const playersRepository = {
+      count: countPlayers,
       find: findPlayers,
     } as unknown as Repository<PlayerEntity>;
     const playersService = new PlayersService(
@@ -87,11 +91,51 @@ describe('PlayersService id validation', () => {
       {} as Repository<TeamEntity>,
     );
 
-    await playersService.findAll({ name: 'Ana', positionId: 3 });
+    const response = await playersService.findAll({
+      name: 'Ana',
+      positionId: 3,
+      page: 2,
+      limit: 8,
+    });
 
+    expect(countPlayers).toHaveBeenCalledTimes(1);
     expect(findPlayers).toHaveBeenCalledTimes(1);
     const where = receivedFindOptions?.where as FindOptionsWhere<PlayerEntity>;
     expect(where.nome).toBeDefined();
     expect(where.posicaoId).toBe(3);
+    expect(receivedFindOptions?.skip).toBe(8);
+    expect(receivedFindOptions?.take).toBe(8);
+    expect(response).toEqual({
+      data: [],
+      total: 17,
+      page: 2,
+      limit: 8,
+      totalPages: 3,
+    });
+  });
+
+  it('uses the last available page when the requested page is too high', async () => {
+    let receivedFindOptions: Parameters<Repository<PlayerEntity>['find']>[0];
+    const playersRepository = {
+      count: jest.fn<Repository<PlayerEntity>['count']>().mockResolvedValue(9),
+      find: jest
+        .fn<Repository<PlayerEntity>['find']>()
+        .mockImplementation(
+          (findOptions: Parameters<Repository<PlayerEntity>['find']>[0]) => {
+            receivedFindOptions = findOptions;
+            return Promise.resolve([]);
+          },
+        ),
+    } as unknown as Repository<PlayerEntity>;
+    const playersService = new PlayersService(
+      playersRepository,
+      {} as Repository<TeamEntity>,
+    );
+
+    const response = await playersService.findAll({ page: 4, limit: 8 });
+
+    expect(receivedFindOptions?.skip).toBe(8);
+    expect(response.page).toBe(2);
+    expect(response.totalPages).toBe(2);
   });
 });
