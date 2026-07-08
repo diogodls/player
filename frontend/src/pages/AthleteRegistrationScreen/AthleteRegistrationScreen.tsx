@@ -29,49 +29,48 @@ const ATHLETES_PER_PAGE = 8;
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
 const AthleteRegistrationScreen = () => {
-  const {
-    data: athletes = [],
-    error: athletesError,
-    isLoading,
-    mutate,
-  } = useApi<Athlete[]>("/players");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
   const [athleteToDelete, setAthleteToDelete] = useState<Athlete | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
-  const [positionFilter, setPositionFilter] =
-    useState<PositionFilter>("all");
+  const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
   const { success, info, error } = useContext(ToastContext);
 
-  const filteredAthletes = useMemo(() => {
-    const normalizedName = nameFilter.trim().toLocaleLowerCase();
+  const athletesEndpoint = useMemo(() => {
+    const searchParams = new URLSearchParams();
+    const normalizedName = nameFilter.trim();
 
-    return athletes.filter((athlete) => {
-      const matchesName = athlete.name
-        .toLocaleLowerCase()
-        .includes(normalizedName);
-      const matchesPosition =
-        positionFilter === "all" || athlete.position === positionFilter;
+    if (normalizedName) searchParams.set("name", normalizedName);
+    if (positionFilter !== "all") {
+      searchParams.set(
+        "positionId",
+        String(PLAYER_POSITION_IDS[positionFilter]),
+      );
+    }
 
-      return matchesName && matchesPosition;
-    });
-  }, [athletes, nameFilter, positionFilter]);
+    const queryString = searchParams.toString();
+    return queryString ? `/players?${queryString}` : "/players";
+  }, [nameFilter, positionFilter]);
+
+  const {
+    data: athletes = [],
+    error: athletesError,
+    isLoading,
+    mutate,
+  } = useApi<Athlete[]>(athletesEndpoint);
 
   const hasActiveFilters =
     Boolean(nameFilter.trim()) || positionFilter !== "all";
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredAthletes.length / ATHLETES_PER_PAGE),
+    Math.ceil(athletes.length / ATHLETES_PER_PAGE),
   );
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pagedAthletes = useMemo(() => {
     const startIndex = (safeCurrentPage - 1) * ATHLETES_PER_PAGE;
-    return filteredAthletes.slice(
-      startIndex,
-      startIndex + ATHLETES_PER_PAGE,
-    );
-  }, [filteredAthletes, safeCurrentPage]);
+    return athletes.slice(startIndex, startIndex + ATHLETES_PER_PAGE);
+  }, [athletes, safeCurrentPage]);
 
   const formInitialValues = useMemo<AthleteFormValues | undefined>(
     () =>
@@ -102,19 +101,22 @@ const AthleteRegistrationScreen = () => {
 
     try {
       if (editingAthlete) {
-        await backendApi.put(`/players/${editingAthlete.id}`, payload);
+        await backendApi.put<Athlete>(`/players/${editingAthlete.id}`, payload);
       } else {
-        await backendApi.post("/players", payload);
+        await backendApi.post<Athlete>("/players", payload);
       }
-
-      await mutate();
-      setCurrentPage(1);
-      success(`Atleta ${editingAthlete ? "editado" : "criado"}!`);
-      setIsModalOpen(false);
-      setEditingAthlete(null);
     } catch {
       error("Não foi possível salvar o atleta.");
+      return;
     }
+
+    void mutate().catch(() => {
+      error("Não foi possível atualizar a lista de atletas.");
+    });
+    setCurrentPage(1);
+    success(`Atleta ${editingAthlete ? "editado" : "criado"}!`);
+    setIsModalOpen(false);
+    setEditingAthlete(null);
   };
 
   const handleCloseForm = () => {
@@ -127,12 +129,16 @@ const AthleteRegistrationScreen = () => {
 
     try {
       await backendApi.delete(`/players/${athleteToDelete.id}`);
-      await mutate();
-      setAthleteToDelete(null);
-      info("Atleta deletado!");
     } catch {
       error("Não foi possível excluir o atleta.");
+      return;
     }
+
+    void mutate().catch(() => {
+      error("Não foi possível atualizar a lista de atletas.");
+    });
+    setAthleteToDelete(null);
+    info("Atleta deletado!");
   };
 
   return (
@@ -154,10 +160,7 @@ const AthleteRegistrationScreen = () => {
         </div>
 
         <div className={styles.filters}>
-          <label
-            className={styles.filterGroup}
-            htmlFor="athlete-name-filter"
-          >
+          <label className={styles.filterGroup} htmlFor="athlete-name-filter">
             <span className={styles.filterLabel}>Nome</span>
             <input
               id="athlete-name-filter"
@@ -206,7 +209,7 @@ const AthleteRegistrationScreen = () => {
               Verifique se o backend está disponível e tente novamente.
             </p>
           </div>
-        ) : filteredAthletes.length === 0 ? (
+        ) : athletes.length === 0 ? (
           <div className={styles.emptyState}>
             <h2 className={styles.emptyTitle}>
               {hasActiveFilters

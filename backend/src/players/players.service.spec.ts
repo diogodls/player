@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
@@ -67,5 +67,31 @@ describe('PlayersService id validation', () => {
     expect(createPlayer).toHaveBeenCalledWith(
       expect.objectContaining({ equipeId: TEAM_ID }),
     );
+  });
+
+  it('filters players by name and position when listing players', async () => {
+    let receivedFindOptions: Parameters<Repository<PlayerEntity>['find']>[0];
+    const findPlayers = jest
+      .fn<Repository<PlayerEntity>['find']>()
+      .mockImplementation(
+        (findOptions: Parameters<Repository<PlayerEntity>['find']>[0]) => {
+          receivedFindOptions = findOptions;
+          return Promise.resolve([]);
+        },
+      );
+    const playersRepository = {
+      find: findPlayers,
+    } as unknown as Repository<PlayerEntity>;
+    const playersService = new PlayersService(
+      playersRepository,
+      {} as Repository<TeamEntity>,
+    );
+
+    await playersService.findAll({ name: 'Ana', positionId: 3 });
+
+    expect(findPlayers).toHaveBeenCalledTimes(1);
+    const where = receivedFindOptions?.where as FindOptionsWhere<PlayerEntity>;
+    expect(where.nome).toBeDefined();
+    expect(where.posicaoId).toBe(3);
   });
 });

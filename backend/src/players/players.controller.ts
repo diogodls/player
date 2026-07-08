@@ -7,8 +7,10 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Put,
 } from '@nestjs/common';
+import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
 
@@ -17,8 +19,8 @@ export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
   @Get()
-  findAll() {
-    return this.playersService.findAll();
+  findAll(@Query() filters: PlayerFiltersDto) {
+    return this.playersService.findAll(filters);
   }
 
   @Get(':id')

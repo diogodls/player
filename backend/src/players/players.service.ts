@@ -4,8 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
+import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerDto } from './dto/player.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
 
@@ -18,8 +19,12 @@ export class PlayersService {
     private readonly teamsRepository: Repository<TeamEntity>,
   ) {}
 
-  async findAll(): Promise<PlayerResponseDto[]> {
+  async findAll(filters: PlayerFiltersDto = {}): Promise<PlayerResponseDto[]> {
     const players = await this.playersRepository.find({
+      where: {
+        ...(filters.name ? { nome: ILike(`%${filters.name}%`) } : {}),
+        ...(filters.positionId ? { posicaoId: filters.positionId } : {}),
+      },
       relations: {
         equipe: true,
         posicao: true,
