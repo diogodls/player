@@ -14,6 +14,7 @@ import {
   PREFERRED_SIDE_IDS,
 } from "../../constants/players";
 import { useApi } from "../../hooks/useApi.ts";
+  import { useDebouncedValue } from "../../hooks/useDebouncedValue.ts";
 import { backendApi } from "../../utils/api.ts";
 import styles from "./AthleteRegistrationScreen.module.scss";
 
@@ -44,10 +45,11 @@ const AthleteRegistrationScreen = () => {
   const [nameFilter, setNameFilter] = useState("");
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
   const { success, info, error } = useContext(ToastContext);
+  const debouncedNameFilter = useDebouncedValue(nameFilter, 300);
 
   const athletesEndpoint = useMemo(() => {
     const searchParams = new URLSearchParams();
-    const normalizedName = nameFilter.trim();
+    const normalizedName = debouncedNameFilter.trim();
 
     if (normalizedName) searchParams.set("name", normalizedName);
     if (positionFilter !== "all") {
@@ -61,7 +63,7 @@ const AthleteRegistrationScreen = () => {
 
     const queryString = searchParams.toString();
     return queryString ? `/players?${queryString}` : "/players";
-  }, [currentPage, nameFilter, positionFilter]);
+  }, [currentPage, debouncedNameFilter, positionFilter]);
 
   const {
     data: athletesResponse,
