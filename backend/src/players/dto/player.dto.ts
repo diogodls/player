@@ -4,7 +4,6 @@ import {
   IsIn,
   IsInt,
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsUUID,
   MaxLength,
@@ -35,12 +34,6 @@ export class PlayerDto {
   @IsInt({ message: 'Identificador da posição deve ser um número inteiro' })
   @IsIn(PLAYER_POSITION_IDS, { message: 'Posição inválida' })
   positionId!: number;
-
-  @IsOptional()
-  @IsUUID(undefined, {
-    message: 'Identificador da equipe deve ser um UUID válido',
-  })
-  teamId?: string;
 
   @IsInt({
     message: 'Identificador do lado preferencial deve ser um número inteiro',

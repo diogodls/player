@@ -6,6 +6,5 @@ export class PlayerResponseDto {
   position!: string;
   preferredSideId!: number;
   preferredSide!: string;
-  teamId!: string;
   teamName!: string;
 }

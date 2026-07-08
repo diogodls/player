@@ -9,8 +9,6 @@ import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerDto } from './dto/player.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
 
-const DEFAULT_TEAM_NAME = 'Equipe Principal';
-
 @Injectable()
 export class PlayersService {
   constructor(
@@ -72,11 +70,6 @@ export class PlayersService {
     if (dto.preferredSideId !== undefined) {
       changes.ladoPreferencialId = dto.preferredSideId;
     }
-    if (dto.teamId !== undefined) {
-      const team = await this.findTeam();
-      changes.equipeId = team.id;
-    }
-
     if (Object.keys(changes).length > 0) {
       await this.playersRepository.update(id, changes);
     }
@@ -103,12 +96,10 @@ export class PlayersService {
   }
 
   private async findTeam(): Promise<TeamEntity> {
-    const team = await this.teamsRepository.findOneBy({
-      nome: DEFAULT_TEAM_NAME,
-    });
+    const [team] = await this.teamsRepository.find({ take: 1 });
 
     if (!team) {
-      throw new BadRequestException('Equipe principal não encontrada');
+      throw new BadRequestException('Equipe não encontrada');
     }
 
     return team;
@@ -127,7 +118,6 @@ export class PlayersService {
       position: player.posicao.nome,
       preferredSideId: player.ladoPreferencialId,
       preferredSide: player.ladoPreferencial.nome,
-      teamId: player.equipeId,
       teamName: player.equipe.nome,
     };
   }

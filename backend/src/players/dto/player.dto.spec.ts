@@ -61,6 +61,24 @@ describe('PlayerDto', () => {
     expect(errors.map((error) => error.property)).toContain('id');
   });
 
+  it('rejects teamId because the player always uses the only team', async () => {
+    const dto = plainToInstance(PlayerDto, {
+      id: null,
+      name: 'Ana Silva',
+      age: 21,
+      positionId: 3,
+      preferredSideId: 2,
+      teamId: 'd62ec1e1-f762-45bd-a1e9-09ba8ef8d461',
+    });
+
+    const errors = await validate(dto, {
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    });
+
+    expect(errors.map((error) => error.property)).toContain('teamId');
+  });
+
   it('rejects goalkeeper as a player position', async () => {
     const dto = plainToInstance(PlayerDto, {
       id: null,
