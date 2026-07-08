@@ -1,15 +1,27 @@
+import type { AxiosInstance } from "axios";
 import useSWR from "swr";
-import { fetcher } from "../utils/api.ts";
+import { backendApi } from "../utils/api.ts";
 
-export function useApi<T>(endpoint: string | null) {
-  const { data, error, isLoading } = useSWR<T>(
+type UseApiOptions = {
+  client?: AxiosInstance;
+};
+
+export function useApi<T>(
+  endpoint: string | null,
+  { client = backendApi }: UseApiOptions = {},
+) {
+  const { data, error, isLoading, mutate } = useSWR<T>(
     endpoint,
-    endpoint ? fetcher : null
+    endpoint
+      ? (url: string) => client.get<T>(url).then((response) => response.data)
+      : null,
   );
 
   return {
     data,
+    error,
     isLoading,
     isError: error,
+    mutate,
   };
 }

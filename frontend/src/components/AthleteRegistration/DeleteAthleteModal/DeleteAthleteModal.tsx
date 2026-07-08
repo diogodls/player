@@ -24,7 +24,7 @@ const DeleteAthleteModal = ({
             </span>
             <div>
               <h2 className={styles.title}>Excluir atleta</h2>
-              <p className={styles.subtitle}>Essa ação remove o jogador da lista local.</p>
+              <p className={styles.subtitle}>Essa ação remove o jogador.</p>
             </div>
           </div>
 
