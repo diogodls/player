@@ -4,6 +4,7 @@ import HeaderSessionScreen from "../../components/SessionsList/HeaderSessionScre
 import SessionsList from "../../components/SessionsList/SessionsList";
 import SaveSessionModal from "../../components/IndivididualAnalysis/SaveSessionModal/SaveSessionModal";
 import { useApi } from "../../hooks/useApi";
+import { mockApi } from "../../utils/api.ts";
 import type {Session, SessionData, SessionMeta} from "./index";
 import DeleteSessionModal from "../../components/SessionsList/DeleteSessionModal/DeleteSessionModal.tsx";
 
@@ -19,7 +20,7 @@ function toSessionMeta(session: Session): SessionMeta {
 }
 
 const Sessions = () => {
-  const { data } = useApi<SessionData>("sessions");
+  const { data } = useApi<SessionData>("sessions", { client: mockApi });
   const sessions = data ?? [];
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [sessionBeingEdited, setSessionBeingEdited] = useState<Session | null>(null);
