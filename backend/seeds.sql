@@ -16,11 +16,17 @@ INSERT INTO session_court_sizes (id, nome) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO posicoes (id, nome) VALUES
-  (1, 'Goleiro'),
   (2, 'Fixo'),
   (3, 'Ala'),
   (4, 'Pivo')
 ON CONFLICT (id) DO NOTHING;
+
+UPDATE jogadores
+SET posicao_id = 2
+WHERE posicao_id = 1;
+
+DELETE FROM posicoes
+WHERE id = 1 OR nome = 'Goleiro';
 
 INSERT INTO lados_preferenciais (id, nome) VALUES
   (1, 'Destro'),
@@ -42,7 +48,7 @@ INSERT INTO equipes (id, nome) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO jogadores (id, equipe_id, posicao_id, lado_preferencial_id, nome, idade) VALUES
-  ('00000000-0000-0000-0000-000000000201', '00000000-0000-0000-0000-000000000001', 1, 1, 'Joao', 20),
+  ('00000000-0000-0000-0000-000000000201', '00000000-0000-0000-0000-000000000001', 2, 1, 'Joao', 20),
   ('00000000-0000-0000-0000-000000000202', '00000000-0000-0000-0000-000000000001', 4, 1, 'Guga', 20),
   ('00000000-0000-0000-0000-000000000203', '00000000-0000-0000-0000-000000000001', 3, 1, 'Guedes', 20),
   ('00000000-0000-0000-0000-000000000204', '00000000-0000-0000-0000-000000000001', 3, 1, 'Senna', 20),

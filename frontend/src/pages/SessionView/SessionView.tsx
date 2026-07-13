@@ -7,12 +7,14 @@ import SessionDetails from "../../components/elements/SessionDetails/SessionDeta
 import SessionSummary from "../../components/SessionDetails/SessionSummary/SessionSummary.tsx";
 import SessionActions from "../../components/SessionDetails/SessionActions/SessionActions.tsx";
 import { useApi } from "../../hooks/useApi";
+import { mockApi } from "../../utils/api.ts";
 import type {SessionViewRecordData, SessionViewData, ViewMode} from "./index";
 
 const SessionView = () => {
   const navigate = useNavigate();
   const { id: sessionId } = useParams<{ id: string }>();
-  const { data: detailsData, isLoading: isSessionLoading } = useApi<SessionViewRecordData>("session-view");
+  const { data: detailsData, isLoading: isSessionLoading } =
+    useApi<SessionViewRecordData>("session-view", { client: mockApi });
   const [viewMode, setViewMode] = useState<ViewMode>("individual");
 
   const sessionView: SessionViewData | undefined = sessionId ? detailsData?.[sessionId] : undefined; //todo: remover aqui quando fizer o back

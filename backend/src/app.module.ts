@@ -17,6 +17,7 @@ import {
   TaggedActionEntity,
   TeamEntity,
 } from './entities';
+import { PlayersModule } from './players/players.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import {
       synchronize: false,
       logging: false,
     }),
+    PlayersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

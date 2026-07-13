@@ -10,10 +10,11 @@ import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisH
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
 import AnalysisExitModal from "../../../components/elements/AnalysisExitModal/AnalysisExitModal.tsx";
+import {mockApi} from "../../../utils/api.ts";
 
 const IndividualAnalysis = () => {
   const { setIsTagging } = useContext(ActionsContext);
-  const {data} = useApi<IndividualAnalysisData>("individual-analysis");
+  const {data} = useApi<IndividualAnalysisData>("individual-analysis", { client: mockApi });
   // const { id } = useParams<{ id: string }>(); todo: usar para requisição futura
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
 

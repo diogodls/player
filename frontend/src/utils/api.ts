@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL:"http://localhost:3001" });
-
-export const fetcher = (url: string) =>
-  api.get(url).then((res) => res.data);
+export const mockApi = axios.create({ baseURL: "http://localhost:3001" });
+export const backendApi = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL ?? "http://localhost:3000",
+});

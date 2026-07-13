@@ -2,10 +2,11 @@ import {useApi} from "../../hooks/useApi.ts";
 import IndividualPlayer from "../../components/PlayerView/IndividualPlayer.tsx";
 import type {PlayerViewData} from "./index";
 import styles from './PlayerView.module.scss';
+import {mockApi} from "../../utils/api.ts";
 
 const PlayerView = () => {
   // const { id } = useParams<{ id: string }>(); //todo: usar depois pra req do back
-  const { data } = useApi<PlayerViewData>("player-view");
+  const { data } = useApi<PlayerViewData>("player-view", { client: mockApi });
 
   if (!data) {
     return (

@@ -6,9 +6,10 @@ import type {CoachDashboardData} from "../CoachDashboard";
 import sessionActionStyles from "../../components/SessionDetails/SessionActions/SessionActions.module.scss";
 import styles from "./Rankings.module.scss";
 import Select from "../../components/elements/Select/Select.tsx";
+import {mockApi} from "../../utils/api.ts";
 
 const Rankings = () => {
-  const {data, isLoading} = useApi<CoachDashboardData>("coach-dashboard");
+  const {data, isLoading} = useApi<CoachDashboardData>("coach-dashboard", { client: mockApi });
   const [selectedRankingKey, setSelectedRankingKey] = useState("");
 
   const selectedRanking = useMemo(() => {
