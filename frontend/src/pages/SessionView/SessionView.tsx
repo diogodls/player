@@ -40,8 +40,8 @@ const SessionView = () => {
   const { data: sessionView, error: sessionViewError, isLoading: isSessionLoading } =
     useApi<SessionViewData>(sessionViewEndpoint);
 
-  const activeView = sessionView?.analysis[viewMode];
-  const activeFilterOptions = sessionView?.filters[viewMode] ?? {
+  const activeView = sessionView?.analysis?.[viewMode];
+  const activeFilterOptions = sessionView?.filters?.[viewMode] ?? {
     athletes: [],
     categories: [],
   };

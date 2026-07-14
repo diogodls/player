@@ -73,7 +73,7 @@ export type SessionViewData = {
     individual: SessionAnalysisSection;
     team: SessionAnalysisSection;
   };
-  filters: {
+  filters?: {
     individual: SessionViewFilterOptions;
     team: SessionViewFilterOptions;
   };

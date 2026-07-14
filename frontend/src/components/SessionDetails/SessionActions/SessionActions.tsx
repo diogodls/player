@@ -45,7 +45,7 @@ const SessionActions = ({
       <section className={styles.filtersCard}>
         <div className={styles.filtersTitleRow}>
           <FontAwesomeIcon icon={faFilter} />
-          <h4>Filtros de acoes</h4>
+          <h4>Filtros de ações</h4>
         </div>
 
         <div className={styles.filtersGrid}>
@@ -106,8 +106,8 @@ const SessionActions = ({
         <section className={styles.emptyState}>
           <h3>
             {hasActiveFilters
-              ? "Nenhuma acao encontrada com os filtros atuais."
-              : "Esta sessao ainda nao possui acoes para esta visualizacao."}
+              ? "Nenhuma ação encontrada com os filtros atuais."
+              : "Esta sessão ainda não possui ações para esta visualização."}
           </h3>
           {hasActiveFilters && (
             <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
