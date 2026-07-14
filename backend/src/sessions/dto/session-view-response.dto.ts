@@ -46,6 +46,16 @@ export class SessionViewEntityDto {
   actions!: SessionViewActionDto[];
 }
 
+export class SessionViewFilterOptionDto {
+  value!: string;
+  label!: string;
+}
+
+export class SessionViewFilterOptionsDto {
+  athletes!: SessionViewFilterOptionDto[];
+  categories!: SessionViewFilterOptionDto[];
+}
+
 export class SessionViewAnalysisSectionDto {
   summary!: SessionViewSummaryDto;
   entities!: SessionViewEntityDto[];
@@ -54,4 +64,5 @@ export class SessionViewAnalysisSectionDto {
 export class SessionViewResponseDto {
   session!: SessionResponseDto;
   analysis!: Record<SessionViewMode, SessionViewAnalysisSectionDto>;
+  filters!: Record<SessionViewMode, SessionViewFilterOptionsDto>;
 }

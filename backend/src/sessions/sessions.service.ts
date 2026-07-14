@@ -11,6 +11,7 @@ import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionListResponseDto } from './dto/session-list-response.dto';
 import { SessionDto } from './dto/session.dto';
 import { SessionResponseDto } from './dto/session-response.dto';
+import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import {
   SessionViewActionDto,
   SessionViewAnalysisSectionDto,
@@ -70,7 +71,10 @@ export class SessionsService {
     return this.toResponse(await this.findEntity(id));
   }
 
-  async findView(id: string): Promise<SessionViewResponseDto> {
+  async findView(
+    id: string,
+    filters: SessionViewFiltersDto = {},
+  ): Promise<SessionViewResponseDto> {
     const session = await this.findEntity(id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
@@ -85,12 +89,25 @@ export class SessionsService {
     });
 
     const individualActions = actions.filter((action) => action.jogador);
+    const filteredIndividualActions = this.applyViewFilters(
+      individualActions,
+      filters,
+      true,
+    );
+    const filteredTeamActions = this.applyViewFilters(actions, filters, false);
 
     return {
       session: this.toResponse(session),
       analysis: {
-        individual: this.buildAnalysisSection(individualActions, 'player'),
-        team: this.buildAnalysisSection(actions, 'team'),
+        individual: this.buildAnalysisSection(
+          filteredIndividualActions,
+          'player',
+        ),
+        team: this.buildAnalysisSection(filteredTeamActions, 'team'),
+      },
+      filters: {
+        individual: this.buildFilterOptions(individualActions),
+        team: this.buildFilterOptions(actions),
       },
     };
   }
@@ -339,6 +356,50 @@ export class SessionsService {
 
   private isPositive(action: TaggedActionEntity) {
     return action.acaoCatalogo?.impactoId === POSITIVE_IMPACT_ID;
+  }
+
+  private applyViewFilters(
+    actions: TaggedActionEntity[],
+    filters: SessionViewFiltersDto,
+    shouldFilterPlayer: boolean,
+  ) {
+    return actions.filter((action) => {
+      const matchesOutcome =
+        !filters.outcome ||
+        (filters.outcome === 'positive') === this.isPositive(action);
+      const matchesPlayer =
+        !shouldFilterPlayer ||
+        !filters.playerId ||
+        action.jogadorId === filters.playerId;
+      const matchesCategory =
+        !filters.categoryCode ||
+        action.acaoCatalogo?.sigla === filters.categoryCode;
+
+      return matchesOutcome && matchesPlayer && matchesCategory;
+    });
+  }
+
+  private buildFilterOptions(actions: TaggedActionEntity[]) {
+    const athletes = new Map<string, string>();
+    const categories = new Map<string, string>();
+
+    actions.forEach((action) => {
+      if (action.jogador) athletes.set(action.jogador.id, action.jogador.nome);
+      if (action.acaoCatalogo) {
+        categories.set(action.acaoCatalogo.sigla, action.acaoCatalogo.sigla);
+      }
+    });
+
+    return {
+      athletes: Array.from(athletes.entries()).map(([value, label]) => ({
+        value,
+        label,
+      })),
+      categories: Array.from(categories.entries()).map(([value, label]) => ({
+        value,
+        label,
+      })),
+    };
   }
 
   private calculatePercentage(value: number, total: number) {

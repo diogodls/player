@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./SessionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPeopleGroup, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -7,21 +7,57 @@ import SessionDetails from "../../components/elements/SessionDetails/SessionDeta
 import SessionSummary from "../../components/SessionDetails/SessionSummary/SessionSummary.tsx";
 import SessionActions from "../../components/SessionDetails/SessionActions/SessionActions.tsx";
 import { useApi } from "../../hooks/useApi";
-import type { SessionViewData, ViewMode } from "./index";
+import type { SessionViewData, SessionViewFilters, ViewMode } from "./index";
+
+const emptyFilters: SessionViewFilters = {
+  outcome: "all",
+  athleteId: "all",
+  categoryCode: "all",
+};
 
 const SessionView = () => {
   const navigate = useNavigate();
   const { id: sessionId } = useParams<{ id: string }>();
-  const { data: sessionView, error: sessionViewError, isLoading: isSessionLoading } =
-    useApi<SessionViewData>(sessionId ? `/sessions/${sessionId}/view` : null);
   const [viewMode, setViewMode] = useState<ViewMode>("individual");
+  const [filters, setFilters] = useState<SessionViewFilters>(emptyFilters);
+
+  const sessionViewEndpoint = useMemo(() => {
+    if (!sessionId) return null;
+
+    const searchParams = new URLSearchParams();
+    if (filters.outcome !== "all") searchParams.set("outcome", filters.outcome);
+    if (viewMode === "individual" && filters.athleteId !== "all") {
+      searchParams.set("playerId", filters.athleteId);
+    }
+    if (filters.categoryCode !== "all") {
+      searchParams.set("categoryCode", filters.categoryCode);
+    }
+
+    const queryString = searchParams.toString();
+    return `/sessions/${sessionId}/view${queryString ? `?${queryString}` : ""}`;
+  }, [filters, sessionId, viewMode]);
+
+  const { data: sessionView, error: sessionViewError, isLoading: isSessionLoading } =
+    useApi<SessionViewData>(sessionViewEndpoint);
 
   const activeView = sessionView?.analysis[viewMode];
+  const activeFilterOptions = sessionView?.filters[viewMode] ?? {
+    athletes: [],
+    categories: [],
+  };
+
+  const handleChangeViewMode = (nextViewMode: ViewMode) => {
+    setViewMode(nextViewMode);
+    setFilters((currentFilters) => ({
+      ...currentFilters,
+      athleteId: "all",
+    }));
+  };
 
   if (isSessionLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.contentWrap}>Carregando sessão...</div>
+        <div className={styles.contentWrap}>Carregando sessao...</div>
       </div>
     );
   }
@@ -29,7 +65,7 @@ const SessionView = () => {
   if (sessionViewError || !sessionView || !activeView) {
     return (
       <div className={styles.container}>
-        <div className={styles.contentWrap}>Sessão não encontrada.</div>
+        <div className={styles.contentWrap}>Sessao nao encontrada.</div>
       </div>
     );
   }
@@ -45,8 +81,8 @@ const SessionView = () => {
 
             <div className={styles.headerText}>
               <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
-              <h1 className={styles.title}>Detalhes da Sessão</h1>
-              <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
+              <h1 className={styles.title}>Detalhes da Sessao</h1>
+              <p className={styles.subtitle}>Acesse o fluxo de analise e acompanhe os dados desta sessao.</p>
             </div>
           </div>
 
@@ -60,7 +96,7 @@ const SessionView = () => {
               </div>
 
               <div className={styles.actionText}>
-                <strong>Fazer análise individual</strong>
+                <strong>Fazer analise individual</strong>
               </div>
             </button>
 
@@ -73,7 +109,7 @@ const SessionView = () => {
               </div>
 
               <div className={styles.actionText}>
-                <strong>Fazer análise de equipe</strong>
+                <strong>Fazer analise de equipe</strong>
               </div>
             </button>
           </div>
@@ -86,35 +122,36 @@ const SessionView = () => {
             <button
               type="button"
               className={`${styles.switchButton} ${viewMode === "individual" ? styles.switchActive : ""}`}
-              onClick={() => setViewMode("individual")}
+              onClick={() => handleChangeViewMode("individual")}
             >
-              Ver análise individual
+              Ver analise individual
             </button>
             <button
               type="button"
               className={`${styles.switchButton} ${viewMode === "team" ? styles.switchActive : ""}`}
-              onClick={() => setViewMode("team")}
+              onClick={() => handleChangeViewMode("team")}
             >
-              Ver análise de equipe
+              Ver analise de equipe
             </button>
           </div>
 
-          {activeView && (
-            <SessionSummary
-              positives={activeView.summary.positives}
-              negatives={activeView.summary.negatives}
-              positivePercentage={activeView.summary.positivePercentage}
-              negativePercentage={activeView.summary.negativePercentage}
-            />
-          )}
+          <SessionSummary
+            positives={activeView.summary.positives}
+            negatives={activeView.summary.negatives}
+            positivePercentage={activeView.summary.positivePercentage}
+            negativePercentage={activeView.summary.negativePercentage}
+          />
 
           <h3 className={styles.sectionTitle}>
-            {viewMode === "individual" ? "Ações Individuais" : "Ações da Equipe"}
+            {viewMode === "individual" ? "Acoes Individuais" : "Acoes da Equipe"}
           </h3>
 
           <SessionActions
             viewMode={viewMode}
             view={activeView}
+            filters={filters}
+            filterOptions={activeFilterOptions}
+            onFiltersChange={setFilters}
           />
         </section>
       </div>

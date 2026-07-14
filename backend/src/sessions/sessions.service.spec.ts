@@ -364,5 +364,95 @@ describe('SessionsService id validation', () => {
       }),
     );
     expect(response.analysis.team.entities[0].actions[3].time).toBe('61:01');
+    expect(response.filters.individual).toEqual({
+      athletes: [
+        { value: 'player-1', label: 'Ana' },
+        { value: 'player-2', label: 'Bia' },
+      ],
+      categories: [
+        { value: 'RB', label: 'RB' },
+        { value: 'FD', label: 'FD' },
+        { value: 'ASS', label: 'ASS' },
+      ],
+    });
+    expect(response.filters.team.categories).toEqual([
+      { value: 'RB', label: 'RB' },
+      { value: 'FD', label: 'FD' },
+      { value: 'ASS', label: 'ASS' },
+      { value: 'BPSE', label: 'BPSE' },
+    ]);
+  });
+
+  it('filters session view actions by outcome, player and category', async () => {
+    const session = buildSession();
+    const actions = [
+      buildTaggedAction({
+        id: 'action-1',
+        playerId: 'player-1',
+        playerName: 'Ana',
+        title: 'Roubada de bola',
+        categoryName: 'Acoes defensivas',
+        acronym: 'RB',
+        impactId: 1,
+        seconds: 24,
+      }),
+      buildTaggedAction({
+        id: 'action-2',
+        playerId: 'player-1',
+        playerName: 'Ana',
+        title: 'Falha defensiva',
+        categoryName: 'Acoes defensivas',
+        acronym: 'FD',
+        impactId: 2,
+        seconds: 63,
+      }),
+      buildTaggedAction({
+        id: 'action-3',
+        playerId: 'player-2',
+        playerName: 'Bia',
+        title: 'Assistencia',
+        categoryName: 'Acoes ofensivas',
+        acronym: 'ASS',
+        impactId: 1,
+        seconds: 125,
+      }),
+    ];
+    const sessionsRepository = {
+      findOne: jest.fn().mockResolvedValue(session),
+    } as unknown as Repository<SessionEntity>;
+    const taggedActionsRepository = {
+      find: jest.fn().mockResolvedValue(actions),
+    } as unknown as Repository<TaggedActionEntity>;
+    const sessionsService = new SessionsService(
+      sessionsRepository,
+      {} as Repository<TeamEntity>,
+      taggedActionsRepository,
+    );
+
+    const response = await sessionsService.findView(SESSION_ID, {
+      outcome: 'positive',
+      playerId: 'player-2',
+      categoryCode: 'ASS',
+    });
+
+    expect(response.analysis.individual.summary).toEqual({
+      positives: 1,
+      negatives: 0,
+      positivePercentage: 100,
+      negativePercentage: 0,
+    });
+    expect(response.analysis.individual.entities).toHaveLength(1);
+    expect(response.analysis.individual.entities[0].id).toBe('player-2');
+    expect(response.analysis.individual.entities[0].actions).toHaveLength(1);
+    expect(response.analysis.individual.entities[0].actions[0].id).toBe(
+      'action-3',
+    );
+    expect(response.analysis.team.entities).toHaveLength(1);
+    expect(response.analysis.team.entities[0].actions).toHaveLength(1);
+    expect(response.analysis.team.entities[0].actions[0].id).toBe('action-3');
+    expect(response.filters.individual.athletes).toEqual([
+      { value: 'player-1', label: 'Ana' },
+      { value: 'player-2', label: 'Bia' },
+    ]);
   });
 });

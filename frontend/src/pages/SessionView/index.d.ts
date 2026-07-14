@@ -51,10 +51,30 @@ export type SessionAnalysisSection = {
   entities: SessionEntity[];
 };
 
+export type SessionViewFilterOption = {
+  value: string;
+  label: string;
+};
+
+export type SessionViewFilterOptions = {
+  athletes: SessionViewFilterOption[];
+  categories: SessionViewFilterOption[];
+};
+
+export type SessionViewFilters = {
+  outcome: ActionTypeFilter;
+  athleteId: string;
+  categoryCode: string;
+};
+
 export type SessionViewData = {
   session: Session;
   analysis: {
     individual: SessionAnalysisSection;
     team: SessionAnalysisSection;
+  };
+  filters: {
+    individual: SessionViewFilterOptions;
+    team: SessionViewFilterOptions;
   };
 };

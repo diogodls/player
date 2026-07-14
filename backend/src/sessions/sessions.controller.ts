@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SessionFiltersDto } from './dto/session-filters.dto';
+import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import { SessionDto } from './dto/session.dto';
 import { SessionsService } from './sessions.service';
 
@@ -24,8 +25,11 @@ export class SessionsController {
   }
 
   @Get(':id/view')
-  findView(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.sessionsService.findView(id);
+  findView(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Query() filters: SessionViewFiltersDto,
+  ) {
+    return this.sessionsService.findView(id, filters);
   }
 
   @Get(':id')
