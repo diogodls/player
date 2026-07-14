@@ -16,11 +16,24 @@ type YoutubePlayer = {
   destroy: () => void;
 };
 
+type YoutubePlayerReadyEvent = {
+  target: YoutubePlayer;
+};
+
+type YoutubePlayerErrorEvent = {
+  target: YoutubePlayer;
+};
+
 type YoutubeWindow = Window & {
   YT?: {
     Player: new (
       element: HTMLIFrameElement,
-      options: { events: { onReady: () => void } }
+      options: {
+        events: {
+          onReady: (event: YoutubePlayerReadyEvent) => void;
+          onError: (event: YoutubePlayerErrorEvent) => void;
+        };
+      }
     ) => YoutubePlayer;
     PlayerState: {
       PLAYING: number;
@@ -61,11 +74,15 @@ const VideoAnalysis = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const youtubePlayerRef = useRef<YoutubePlayer | null>(null);
   const youtubeIntervalRef = useRef<number | null>(null);
+  const youtubePlayerGenerationRef = useRef(0);
+  const activeYoutubeVideoIdRef = useRef<string | null>(null);
+  const isTaggingRef = useRef(isTagging);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [videoSourceType, setVideoSourceType] = useState<VideoSourceType>(null);
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeVideoId, setYoutubeVideoId] = useState<string | null>(null);
+  const [isYoutubePlayerReady, setIsYoutubePlayerReady] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [modalYoutubeUrl, setModalYoutubeUrl] = useState("");
   const [modalYoutubeError, setModalYoutubeError] = useState("");
@@ -85,19 +102,68 @@ const VideoAnalysis = () => {
     youtubeIntervalRef.current = null;
   }, []);
 
-  const resetYoutubePlayer = useCallback(() => {
+  const resetYoutubePlayerState = useCallback(() => {
+    youtubePlayerGenerationRef.current += 1;
+    activeYoutubeVideoIdRef.current = null;
     stopYoutubeTimer();
 
-    if (!youtubePlayerRef.current) return;
+    const player = youtubePlayerRef.current;
+    youtubePlayerRef.current = null;
+
+    setIsYoutubePlayerReady(false);
+    setIsVideoLoaded(false);
+    setCurrentVideoTime("0");
+
+    if (!player) return;
 
     try {
-      youtubePlayerRef.current.pauseVideo();
+      player.pauseVideo();
     } catch {
-      // The iframe may already be gone while React is swapping sources.
-    } finally {
-      youtubePlayerRef.current = null;
+      // The iframe may already have been removed while React is swapping sources.
     }
-  }, [stopYoutubeTimer]);
+  }, [setCurrentVideoTime, setIsVideoLoaded, stopYoutubeTimer]);
+
+  const syncYoutubeTime = useCallback((player: YoutubePlayer) => {
+    try {
+      const currentTime = player.getCurrentTime();
+      if (!Number.isFinite(currentTime) || currentTime < 0) return false;
+
+      setCurrentVideoTime(currentTime.toFixed(2));
+      return true;
+    } catch {
+      return false;
+    }
+  }, [setCurrentVideoTime]);
+
+  const markYoutubePlayerUnavailable = useCallback(() => {
+    stopYoutubeTimer();
+    setIsYoutubePlayerReady(false);
+    setIsVideoLoaded(false);
+  }, [setIsVideoLoaded, stopYoutubeTimer]);
+
+  const startYoutubeTimeTracking = useCallback((
+    player: YoutubePlayer,
+    generation: number,
+    videoId: string,
+  ) => {
+    stopYoutubeTimer();
+
+    youtubeIntervalRef.current = window.setInterval(() => {
+      const isCurrentPlayer =
+        youtubePlayerGenerationRef.current === generation &&
+        activeYoutubeVideoIdRef.current === videoId &&
+        youtubePlayerRef.current === player;
+
+      if (!isCurrentPlayer) {
+        stopYoutubeTimer();
+        return;
+      }
+
+      if (!syncYoutubeTime(player)) {
+        markYoutubePlayerUnavailable();
+      }
+    }, 500);
+  }, [markYoutubePlayerUnavailable, stopYoutubeTimer, syncYoutubeTime]);
 
   const clearLocalVideo = useCallback(() => {
     setVideoUrl((currentUrl) => {
@@ -107,7 +173,7 @@ const VideoAnalysis = () => {
   }, []);
 
   const clearVideo = useCallback(() => {
-    resetYoutubePlayer();
+    resetYoutubePlayerState();
     clearLocalVideo();
     setSelectedFile(null);
     setVideoSourceType(null);
@@ -117,7 +183,7 @@ const VideoAnalysis = () => {
     setIsVideoLoaded(false);
     setCurrentVideoTime("0");
     wasPlayingBeforeTaggingRef.current = false;
-  }, [clearLocalVideo, resetYoutubePlayer, setCurrentVideoTime, setIsVideoLoaded]);
+  }, [clearLocalVideo, resetYoutubePlayerState, setCurrentVideoTime, setIsVideoLoaded]);
 
   const closeUploadModal = () => {
     setIsUploadModalOpen(false);
@@ -173,49 +239,103 @@ const VideoAnalysis = () => {
     setYoutubeUrl(nextYoutubeUrl);
     setYoutubeVideoId(videoId);
     setVideoSourceType("youtube");
-    setIsVideoLoaded(true);
     closeUploadModal();
   };
 
   useEffect(() => {
     return () => {
-      resetYoutubePlayer();
+      resetYoutubePlayerState();
       clearLocalVideo();
     };
-  }, [clearLocalVideo, resetYoutubePlayer]);
+  }, [clearLocalVideo, resetYoutubePlayerState]);
 
   useEffect(() => {
-    setIsVideoLoaded(hasValidLocalVideo || hasValidYoutubeVideo);
-  }, [hasValidLocalVideo, hasValidYoutubeVideo, setIsVideoLoaded]);
+    setIsVideoLoaded(hasValidLocalVideo);
+  }, [hasValidLocalVideo, setIsVideoLoaded]);
+
+  useEffect(() => {
+    isTaggingRef.current = isTagging;
+  }, [isTagging]);
 
   useEffect(() => {
     if (!hasValidYoutubeVideo || !youtubeVideoId || !iframeRef.current) return;
 
     let isActive = true;
+    const generation = youtubePlayerGenerationRef.current + 1;
+    youtubePlayerGenerationRef.current = generation;
+    activeYoutubeVideoIdRef.current = youtubeVideoId;
 
     loadYoutubeApi(() => {
-      if (!isActive || !iframeRef.current) return;
+      const iframe = iframeRef.current;
+      const isCurrentVideo = () =>
+        isActive &&
+        youtubePlayerGenerationRef.current === generation &&
+        activeYoutubeVideoIdRef.current === youtubeVideoId;
 
-      resetYoutubePlayer();
-      youtubePlayerRef.current = new (window as YoutubeWindow).YT!.Player(iframeRef.current, {
-        events: {
-          onReady: () => {
-            stopYoutubeTimer();
+      if (!isCurrentVideo() || !iframe) return;
 
-            youtubeIntervalRef.current = window.setInterval(() => {
-              const currentTime = youtubePlayerRef.current?.getCurrentTime() ?? 0;
-              setCurrentVideoTime(currentTime.toFixed(2));
-            }, 500);
+      try {
+        youtubePlayerRef.current = new (window as YoutubeWindow).YT!.Player(iframe, {
+          events: {
+            onReady: (event) => {
+              if (!isCurrentVideo()) {
+                try {
+                  event.target.pauseVideo();
+                } catch {
+                  // A stale player may already be unavailable.
+                }
+                return;
+              }
+
+              youtubePlayerRef.current = event.target;
+              if (!syncYoutubeTime(event.target)) {
+                setIsYoutubePlayerReady(false);
+                setIsVideoLoaded(false);
+                return;
+              }
+
+              setIsYoutubePlayerReady(true);
+              setIsVideoLoaded(true);
+              startYoutubeTimeTracking(event.target, generation, youtubeVideoId);
+
+              if (isTaggingRef.current) {
+                try {
+                  event.target.pauseVideo();
+                } catch {
+                  setIsYoutubePlayerReady(false);
+                  setIsVideoLoaded(false);
+                  stopYoutubeTimer();
+                }
+              }
+            },
+            onError: (event) => {
+              if (!isCurrentVideo() || youtubePlayerRef.current !== event.target) return;
+
+              stopYoutubeTimer();
+              setIsYoutubePlayerReady(false);
+              setIsVideoLoaded(false);
+              setCurrentVideoTime("0");
+            },
           },
-        },
-      });
+        });
+      } catch {
+        if (!isCurrentVideo()) return;
+
+        youtubePlayerRef.current = null;
+        stopYoutubeTimer();
+        setIsYoutubePlayerReady(false);
+        setIsVideoLoaded(false);
+        setCurrentVideoTime("0");
+      }
     });
 
     return () => {
       isActive = false;
-      resetYoutubePlayer();
+      if (youtubePlayerGenerationRef.current === generation) {
+        resetYoutubePlayerState();
+      }
     };
-  }, [hasValidYoutubeVideo, resetYoutubePlayer, setCurrentVideoTime, stopYoutubeTimer, youtubeVideoId]);
+  }, [hasValidYoutubeVideo, resetYoutubePlayerState, setCurrentVideoTime, setIsVideoLoaded, startYoutubeTimeTracking, stopYoutubeTimer, syncYoutubeTime, youtubeVideoId]);
 
   useEffect(() => {
     if (hasValidLocalVideo && videoRef.current) {
@@ -236,21 +356,39 @@ const VideoAnalysis = () => {
       }
     }
 
-    if (hasValidYoutubeVideo && youtubePlayerRef.current) {
+    if (hasValidYoutubeVideo && isYoutubePlayerReady && youtubePlayerRef.current) {
       const youtubeWindow = window as YoutubeWindow;
-      if (isTagging) {
-        wasPlayingBeforeTaggingRef.current =
-          youtubePlayerRef.current.getPlayerState() === youtubeWindow.YT?.PlayerState.PLAYING;
-        youtubePlayerRef.current.pauseVideo();
-        return;
-      }
+      const player = youtubePlayerRef.current;
+      try {
+        if (isTagging) {
+          if (!syncYoutubeTime(player)) {
+            queueMicrotask(() => {
+              if (youtubePlayerRef.current === player) {
+                markYoutubePlayerUnavailable();
+              }
+            });
+            return;
+          }
 
-      if (wasPlayingBeforeTaggingRef.current) {
-        youtubePlayerRef.current.playVideo();
-        wasPlayingBeforeTaggingRef.current = false;
+          wasPlayingBeforeTaggingRef.current =
+            player.getPlayerState() === youtubeWindow.YT?.PlayerState.PLAYING;
+          player.pauseVideo();
+          return;
+        }
+
+        if (wasPlayingBeforeTaggingRef.current) {
+          player.playVideo();
+          wasPlayingBeforeTaggingRef.current = false;
+        }
+      } catch {
+        queueMicrotask(() => {
+          if (youtubePlayerRef.current === player) {
+            markYoutubePlayerUnavailable();
+          }
+        });
       }
     }
-  }, [hasValidLocalVideo, hasValidYoutubeVideo, isTagging, videoRef]);
+  }, [hasValidLocalVideo, hasValidYoutubeVideo, isTagging, isYoutubePlayerReady, markYoutubePlayerUnavailable, syncYoutubeTime, videoRef]);
 
   return (
     <div className={styles.screen}>
