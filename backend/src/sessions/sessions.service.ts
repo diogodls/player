@@ -5,12 +5,23 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { SessionEntity, TeamEntity } from '../entities';
+import { SessionEntity, TaggedActionEntity, TeamEntity } from '../entities';
 import { SESSION_TYPES } from './sessions.constants';
 import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionListResponseDto } from './dto/session-list-response.dto';
 import { SessionDto } from './dto/session.dto';
 import { SessionResponseDto } from './dto/session-response.dto';
+import {
+  SessionViewActionDto,
+  SessionViewAnalysisSectionDto,
+  SessionViewEntityDto,
+  SessionViewEntityType,
+  SessionViewResponseDto,
+} from './dto/session-view-response.dto';
+
+const POSITIVE_IMPACT_ID = 1;
+const TEAM_ENTITY_ID = 'team';
+const TEAM_ENTITY_TITLE = 'Equipe';
 
 @Injectable()
 export class SessionsService {
@@ -19,6 +30,8 @@ export class SessionsService {
     private readonly sessionsRepository: Repository<SessionEntity>,
     @InjectRepository(TeamEntity)
     private readonly teamsRepository: Repository<TeamEntity>,
+    @InjectRepository(TaggedActionEntity)
+    private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
   ) {}
 
   async findAll(filters?: SessionFiltersDto): Promise<SessionListResponseDto> {
@@ -55,6 +68,31 @@ export class SessionsService {
 
   async findOne(id: string): Promise<SessionResponseDto> {
     return this.toResponse(await this.findEntity(id));
+  }
+
+  async findView(id: string): Promise<SessionViewResponseDto> {
+    const session = await this.findEntity(id);
+    const actions = await this.taggedActionsRepository.find({
+      where: { sessaoId: id },
+      relations: {
+        acaoCatalogo: {
+          categoriaAcao: true,
+          impacto: true,
+        },
+        jogador: true,
+      },
+      order: { timestampSegundos: 'ASC' },
+    });
+
+    const individualActions = actions.filter((action) => action.jogador);
+
+    return {
+      session: this.toResponse(session),
+      analysis: {
+        individual: this.buildAnalysisSection(individualActions, 'player'),
+        team: this.buildAnalysisSection(actions, 'team'),
+      },
+    };
   }
 
   async create(dto: SessionDto): Promise<SessionResponseDto> {
@@ -157,5 +195,163 @@ export class SessionsService {
   private formatDate(date: Date | string): string {
     if (typeof date === 'string') return date.slice(0, 10);
     return date.toISOString().slice(0, 10);
+  }
+
+  private buildAnalysisSection(
+    actions: TaggedActionEntity[],
+    entityType: SessionViewEntityType,
+  ): SessionViewAnalysisSectionDto {
+    return {
+      summary: this.buildSummary(actions),
+      entities:
+        entityType === 'team'
+          ? this.buildTeamEntities(actions)
+          : this.buildPlayerEntities(actions),
+    };
+  }
+
+  private buildTeamEntities(
+    actions: TaggedActionEntity[],
+  ): SessionViewEntityDto[] {
+    if (actions.length === 0) return [];
+
+    return [
+      this.buildEntity({
+        id: TEAM_ENTITY_ID,
+        type: 'team',
+        title: TEAM_ENTITY_TITLE,
+        actions,
+      }),
+    ];
+  }
+
+  private buildPlayerEntities(
+    actions: TaggedActionEntity[],
+  ): SessionViewEntityDto[] {
+    const groupedActions = new Map<string, TaggedActionEntity[]>();
+
+    actions.forEach((action) => {
+      if (!action.jogador) return;
+      const current = groupedActions.get(action.jogador.id) ?? [];
+      current.push(action);
+      groupedActions.set(action.jogador.id, current);
+    });
+
+    return Array.from(groupedActions.values()).map((playerActions) => {
+      const [firstAction] = playerActions;
+      if (!firstAction?.jogador) {
+        throw new Error('Acao individual sem jogador carregado');
+      }
+
+      return this.buildEntity({
+        id: firstAction.jogador.id,
+        type: 'player',
+        title: firstAction.jogador.nome,
+        actions: playerActions,
+      });
+    });
+  }
+
+  private buildEntity({
+    id,
+    type,
+    title,
+    actions,
+  }: {
+    id: string;
+    type: SessionViewEntityType;
+    title: string;
+    actions: TaggedActionEntity[];
+  }): SessionViewEntityDto {
+    const stats = this.buildStats(actions);
+
+    return {
+      id,
+      type,
+      title,
+      stats,
+      metrics: {
+        overall: stats.total,
+        offensive: this.countOffensiveActions(actions),
+        defensive: this.countDefensiveActions(actions),
+        performance: this.calculatePercentage(stats.positive, stats.total),
+      },
+      actions: actions.map((action) => this.toViewAction(action)),
+    };
+  }
+
+  private buildSummary(actions: TaggedActionEntity[]) {
+    const stats = this.buildStats(actions);
+
+    return {
+      positives: stats.positive,
+      negatives: stats.negative,
+      positivePercentage: this.calculatePercentage(stats.positive, stats.total),
+      negativePercentage: this.calculatePercentage(stats.negative, stats.total),
+    };
+  }
+
+  private buildStats(actions: TaggedActionEntity[]) {
+    const positive = actions.filter((action) => this.isPositive(action)).length;
+    const total = actions.length;
+
+    return {
+      positive,
+      negative: total - positive,
+      total,
+    };
+  }
+
+  private toViewAction(action: TaggedActionEntity): SessionViewActionDto {
+    if (!action.acaoCatalogo || !action.acaoCatalogo.categoriaAcao) {
+      throw new Error('Relacoes da acao taggeada nao foram carregadas');
+    }
+
+    return {
+      id: action.id,
+      title: action.acaoCatalogo.nome,
+      category: {
+        code: action.acaoCatalogo.sigla,
+        label: action.acaoCatalogo.sigla,
+      },
+      time: this.formatTimestamp(action.timestampSegundos),
+      outcome: this.isPositive(action) ? 'positive' : 'negative',
+    };
+  }
+
+  private countOffensiveActions(actions: TaggedActionEntity[]) {
+    return this.countByCategory(actions, ['ofens', 'gols em quadra']);
+  }
+
+  private countDefensiveActions(actions: TaggedActionEntity[]) {
+    return this.countByCategory(actions, ['defens', 'gols tomados']);
+  }
+
+  private countByCategory(actions: TaggedActionEntity[], needles: string[]) {
+    return actions.filter((action) =>
+      needles.some((needle) =>
+        action.acaoCatalogo?.categoriaAcao?.nome
+          .toLocaleLowerCase()
+          .includes(needle),
+      ),
+    ).length;
+  }
+
+  private isPositive(action: TaggedActionEntity) {
+    return action.acaoCatalogo?.impactoId === POSITIVE_IMPACT_ID;
+  }
+
+  private calculatePercentage(value: number, total: number) {
+    if (total === 0) return 0;
+    return Math.round((value / total) * 100);
+  }
+
+  private formatTimestamp(seconds: number) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${String(minutes).padStart(2, '0')}:${String(
+      remainingSeconds,
+    ).padStart(2, '0')}`;
   }
 }

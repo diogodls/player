@@ -22,7 +22,6 @@ export type SessionEntityAction = {
   category: SessionActionCategory;
   time: string;
   outcome: "positive" | "negative";
-  createdAt?: string;
 };
 
 export type SessionEntityMetrics = {
@@ -59,5 +58,3 @@ export type SessionViewData = {
     team: SessionAnalysisSection;
   };
 };
-
-export type SessionViewRecordData = Record<string, SessionViewData>; //todo: remover isso daqui quando tiver back

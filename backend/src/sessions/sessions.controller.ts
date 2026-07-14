@@ -23,6 +23,11 @@ export class SessionsController {
     return this.sessionsService.findAll(filters);
   }
 
+  @Get(':id/view')
+  findView(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.sessionsService.findView(id);
+  }
+
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sessionsService.findOne(id);
