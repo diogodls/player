@@ -24,6 +24,11 @@ export class SessionsController {
     return this.sessionsService.findAll(filters);
   }
 
+  @Get(':id/view/filters')
+  findViewFilters(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.sessionsService.findViewFilters(id);
+  }
+
   @Get(':id/view')
   findView(
     @Param('id', new ParseUUIDPipe()) id: string,

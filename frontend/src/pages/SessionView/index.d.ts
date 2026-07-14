@@ -78,3 +78,8 @@ export type SessionViewData = {
     team: SessionViewFilterOptions;
   };
 };
+
+export type SessionViewFilterOptionsResponse = {
+  individual: SessionViewFilterOptions;
+  team: SessionViewFilterOptions;
+};

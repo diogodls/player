@@ -17,6 +17,7 @@ import {
   SessionViewAnalysisSectionDto,
   SessionViewEntityDto,
   SessionViewEntityType,
+  SessionViewFilterOptionsDto,
   SessionViewResponseDto,
 } from './dto/session-view-response.dto';
 
@@ -105,10 +106,26 @@ export class SessionsService {
         ),
         team: this.buildAnalysisSection(filteredTeamActions, 'team'),
       },
-      filters: {
-        individual: this.buildFilterOptions(individualActions),
-        team: this.buildFilterOptions(actions),
+      filters: await this.findViewFilters(id),
+    };
+  }
+
+  async findViewFilters(
+    id: string,
+  ): Promise<Record<'individual' | 'team', SessionViewFilterOptionsDto>> {
+    const actions = await this.taggedActionsRepository.find({
+      where: { sessaoId: id },
+      relations: {
+        acaoCatalogo: true,
+        jogador: true,
       },
+      order: { timestampSegundos: 'ASC' },
+    });
+    const individualActions = actions.filter((action) => action.jogador);
+
+    return {
+      individual: this.buildFilterOptions(individualActions),
+      team: this.buildFilterOptions(actions),
     };
   }
 
@@ -137,8 +154,6 @@ export class SessionsService {
         'Id da sessão deve ser igual ao identificador da rota',
       );
     }
-
-    await this.findEntity(id);
 
     await this.sessionsRepository.update(id, {
       sessionTypeId: dto.typeId,
@@ -187,7 +202,7 @@ export class SessionsService {
       !session.sessionLocation ||
       !session.sessionCourtSize
     ) {
-      throw new Error('Relacoes da sessão não foram carregadas');
+      throw new Error('Relações da sessão não foram carregadas');
     }
 
     const description = session.descricao ?? null;
@@ -321,7 +336,7 @@ export class SessionsService {
 
   private toViewAction(action: TaggedActionEntity): SessionViewActionDto {
     if (!action.acaoCatalogo || !action.acaoCatalogo.categoriaAcao) {
-      throw new Error('Relacoes da acao taggeada nao foram carregadas');
+      throw new Error('Relações da acao taggeada nao foram carregadas');
     }
 
     return {
@@ -370,7 +385,8 @@ export class SessionsService {
       const matchesPlayer =
         !shouldFilterPlayer ||
         !filters.playerId ||
-        action.jogadorId === filters.playerId;
+        action.jogadorId === filters.playerId ||
+        action.jogador?.id === filters.playerId;
       const matchesCategory =
         !filters.categoryCode ||
         action.acaoCatalogo?.sigla === filters.categoryCode;
