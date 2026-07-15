@@ -5,7 +5,7 @@ import PlayerSelector from "../../../components/IndivididualAnalysis/PlayerSelec
 import {useApi} from "../../../hooks/useApi.ts";
 import {useContext, useEffect, useState} from "react";
 import ActionsModal from "../../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
-import type {IndividualAnalysisData} from "../index";
+import type {IndividualAnalysisData, IndividualCatalog} from "../index";
 import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
@@ -14,7 +14,13 @@ import {mockApi} from "../../../utils/api.ts";
 
 const IndividualAnalysis = () => {
   const { setIsTagging } = useContext(ActionsContext);
-  const {data} = useApi<IndividualAnalysisData>("individual-analysis", { client: mockApi });
+  const {data, isLoading: isAnalysisLoading, isError: analysisError} =
+    useApi<IndividualAnalysisData>("individual-analysis", { client: mockApi });
+  const {
+    data: catalog,
+    isLoading: isCatalogLoading,
+    isError: catalogError,
+  } = useApi<IndividualCatalog>("catalog/actions/individual");
   // const { id } = useParams<{ id: string }>(); todo: usar para requisição futura
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
 
@@ -27,7 +33,13 @@ const IndividualAnalysis = () => {
     sessionId: data?.session ? data.session.id : '0',
   });
 
-  if (!data) return;
+  if (isAnalysisLoading || isCatalogLoading) {
+    return <div className={styles.feedback}>Carregando análise individual...</div>;
+  }
+
+  if (analysisError || catalogError || !data || !catalog) {
+    return <div className={styles.feedback}>Não foi possível carregar a análise individual.</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -47,7 +59,7 @@ const IndividualAnalysis = () => {
       {actionsModalOpen && (
         <ActionsModal
           closeModal={() => setActionsModalOpen(false)}
-          actions={data?.actions ?? []}
+          groups={catalog.groups}
           session={data.session}
         />
       )}

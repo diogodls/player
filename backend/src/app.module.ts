@@ -18,6 +18,7 @@ import {
   TeamEntity,
 } from './entities';
 import { PlayersModule } from './players/players.module';
+import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
@@ -44,9 +45,12 @@ import { PlayersModule } from './players/players.module';
         TaggedActionEntity,
       ],
       synchronize: false,
+      migrations: [__dirname + '/migrations/*{.ts,.js}'],
+      migrationsRun: true,
       logging: false,
     }),
     PlayersModule,
+    CatalogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

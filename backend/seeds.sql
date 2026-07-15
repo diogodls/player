@@ -60,13 +60,13 @@ INSERT INTO sessoes (id, equipe_id, session_type_id, session_location_id, sessio
   ('00000000-0000-0000-0000-000000000102', '00000000-0000-0000-0000-000000000001', 2, 2, 2, DATE '2026-02-19', NULL)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO categorias_acao (id, tipo_analise_id, nome) VALUES
-  ('00000000-0000-0000-0000-000000000301', 1, 'Acoes ofensivas'),
-  ('00000000-0000-0000-0000-000000000302', 1, 'Acoes defensivas'),
-  ('00000000-0000-0000-0000-000000000303', 1, 'Gols em quadra'),
-  ('00000000-0000-0000-0000-000000000304', 1, 'Gols tomados em quadra'),
-  ('00000000-0000-0000-0000-000000000305', 2, 'Acoes ofensivas'),
-  ('00000000-0000-0000-0000-000000000306', 2, 'Acoes defensivas')
+INSERT INTO categorias_acao (id, tipo_analise_id, nome, chave, ordem) VALUES
+  ('00000000-0000-0000-0000-000000000301', 1, 'Ações ofensivas', 'OFFENSIVE_ACTIONS', 1),
+  ('00000000-0000-0000-0000-000000000302', 1, 'Ações defensivas', 'DEFENSIVE_ACTIONS', 2),
+  ('00000000-0000-0000-0000-000000000303', 1, 'Gols em quadra', 'COURT_GOALS', 3),
+  ('00000000-0000-0000-0000-000000000304', 1, 'Gols tomados em quadra', 'COURT_GOALS_CONCEDED', 4),
+  ('00000000-0000-0000-0000-000000000305', 2, 'Acoes ofensivas', NULL, NULL),
+  ('00000000-0000-0000-0000-000000000306', 2, 'Acoes defensivas', NULL, NULL)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALUES
@@ -77,7 +77,7 @@ INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALU
   ('00000000-0000-0000-0000-000000000405', '00000000-0000-0000-0000-000000000303', 2, 'Gol marcacao de goleiro linha', 'Gol MGL'),
   ('00000000-0000-0000-0000-000000000406', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido transicao defensiva', 'GS TO'),
   ('00000000-0000-0000-0000-000000000407', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido organizacao defensiva', 'GS OO'),
-  ('00000000-0000-0000-0000-000000000408', '00000000-0000-0000-0000-000000000304', 1, 'Gol sofrido bola parada', 'GS BP'),
+  ('00000000-0000-0000-0000-000000000408', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido bola parada', 'GS BP'),
   ('00000000-0000-0000-0000-000000000409', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido goleiro linha adversario', 'GS GLA'),
   ('00000000-0000-0000-0000-000000000410', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido usando goleiro linha ofensivo', 'GS GLO'),
   ('00000000-0000-0000-0000-000000000411', '00000000-0000-0000-0000-000000000301', 1, 'Gol marcado', 'GM'),
@@ -110,6 +110,40 @@ INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALU
   ('00000000-0000-0000-0000-000000000438', '00000000-0000-0000-0000-000000000306', 1, 'Marcacao transicao recupera a bola', 'TRP'),
   ('00000000-0000-0000-0000-000000000439', '00000000-0000-0000-0000-000000000306', 2, 'Marcacao transicao gol tomado', 'TGT')
 ON CONFLICT (id) DO NOTHING;
+
+-- Mantem instalacoes ja populadas alinhadas ao catalogo atual, sem recriar acoes.
+UPDATE categorias_acao AS categoria
+SET nome = metadata.nome,
+    chave = metadata.chave,
+    ordem = metadata.ordem
+FROM (VALUES
+  ('00000000-0000-0000-0000-000000000301'::uuid, 'Ações ofensivas', 'OFFENSIVE_ACTIONS', 1),
+  ('00000000-0000-0000-0000-000000000302'::uuid, 'Ações defensivas', 'DEFENSIVE_ACTIONS', 2),
+  ('00000000-0000-0000-0000-000000000303'::uuid, 'Gols em quadra', 'COURT_GOALS', 3),
+  ('00000000-0000-0000-0000-000000000304'::uuid, 'Gols tomados em quadra', 'COURT_GOALS_CONCEDED', 4)
+) AS metadata(id, nome, chave, ordem)
+WHERE categoria.id = metadata.id;
+
+UPDATE acoes_catalogo AS acao
+SET nome = metadata.nome,
+    ordem = metadata.ordem,
+    impacto_id = CASE WHEN acao.sigla = 'GS BP' THEN 2 ELSE acao.impacto_id END
+FROM (VALUES
+  ('GM', 'Gol marcado', 1), ('ASS', 'Assistência', 2), ('AD', 'Ação decisiva', 3),
+  ('CC', 'Chance criada', 4), ('PP', 'Perda de posse', 5),
+  ('GP', 'Gol pago', 1), ('FD', 'Falha defensiva', 2), ('RB', 'Roubada de bola', 3),
+  ('DIA', 'Desarme, interceptação e antecipação', 4),
+  ('Gol TO', 'Gol transição ofensiva', 1), ('Gol OO', 'Gol organização ofensiva', 2),
+  ('Gol BP', 'Gol bola parada', 3), ('Gol GL', 'Gol goleiro linha', 4),
+  ('Gol MGL', 'Gol marcação de goleiro linha', 5),
+  ('GS TO', 'Gol sofrido transição defensiva', 1),
+  ('GS OO', 'Gol sofrido organização defensiva', 2), ('GS BP', 'Gol sofrido bola parada', 3),
+  ('GS GLA', 'Gol sofrido goleiro linha adversário', 4),
+  ('GS GLO', 'Gol sofrido usando goleiro linha ofensivo', 5)
+) AS metadata(sigla, nome, ordem), categorias_acao categoria
+WHERE acao.sigla = metadata.sigla
+  AND categoria.id = acao.categoria_acao_id
+  AND categoria.tipo_analise_id = 1;
 
 INSERT INTO acoes_taggeadas (id, sessao_id, acao_catalogo_id, jogador_id, timestamp_segundos) VALUES
   ('00000000-0000-0000-0000-000000000501', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000418', '00000000-0000-0000-0000-000000000201', 24),

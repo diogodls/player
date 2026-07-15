@@ -476,7 +476,7 @@
         "key": "GS BP",
         "label": "Gol sofrido bola parada",
         "category": "Gols tomados em quadra",
-        "goodAction": true
+        "goodAction": false
       },
       {
         "key": "GS GLA",

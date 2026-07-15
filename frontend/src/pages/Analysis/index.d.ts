@@ -18,7 +18,28 @@ export type ActionTagged = {
 export type IndividualAnalysisData = {
   session: Session;
   players: Player[];
-  actions: Action[];
+};
+
+export type CatalogImpact = 'POSITIVE' | 'NEGATIVE';
+
+export type IndividualCatalogAction = {
+  id: string;
+  key: string;
+  name: string;
+  impact: CatalogImpact;
+  order: number;
+};
+
+export type IndividualCatalogGroup = {
+  key: string;
+  title: string;
+  order: number;
+  actions: IndividualCatalogAction[];
+};
+
+export type IndividualCatalog = {
+  analysisType: 'INDIVIDUAL';
+  groups: IndividualCatalogGroup[];
 };
 
 export type TeamAnalysisData = {
