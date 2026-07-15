@@ -458,7 +458,7 @@
         "key": "Gol MGL",
         "label": "Gol marcação de goleiro linha",
         "category": "Gols em quadra",
-        "goodAction": false
+        "goodAction": true
       },
       {
         "key": "GS TO",

@@ -18,7 +18,9 @@ describe('CatalogService', () => {
       category('DEFENSIVE_ACTIONS', 'Ações defensivas', 2, [
         action('GP', 'Gol pago', 'Negativa', 1),
       ]),
-      category('COURT_GOALS', 'Gols em quadra', 3, []),
+      category('COURT_GOALS', 'Gols em quadra', 3, [
+        action('Gol MGL', 'Gol marcação de goleiro linha', 'Positiva', 5),
+      ]),
       category('COURT_GOALS_CONCEDED', 'Gols tomados em quadra', 4, [
         action('GS BP', 'Gol sofrido bola parada', 'Negativa', 3),
       ]),
@@ -40,7 +42,8 @@ describe('CatalogService', () => {
       result.groups
         .flatMap((group) => group.actions)
         .map((action) => action.key),
-    ).toEqual(['GM', 'GP', 'GS BP']);
+    ).toEqual(['GM', 'GP', 'Gol MGL', 'GS BP']);
+    expect(result.groups[2].actions[0].impact).toBe('POSITIVE');
     expect(result.groups[3].actions[0].impact).toBe('NEGATIVE');
   });
 

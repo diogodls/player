@@ -74,7 +74,7 @@ INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALU
   ('00000000-0000-0000-0000-000000000402', '00000000-0000-0000-0000-000000000303', 1, 'Gol organizacao ofensiva', 'Gol OO'),
   ('00000000-0000-0000-0000-000000000403', '00000000-0000-0000-0000-000000000303', 1, 'Gol bola parada', 'Gol BP'),
   ('00000000-0000-0000-0000-000000000404', '00000000-0000-0000-0000-000000000303', 1, 'Gol goleiro linha', 'Gol GL'),
-  ('00000000-0000-0000-0000-000000000405', '00000000-0000-0000-0000-000000000303', 2, 'Gol marcacao de goleiro linha', 'Gol MGL'),
+  ('00000000-0000-0000-0000-000000000405', '00000000-0000-0000-0000-000000000303', 1, 'Gol marcacao de goleiro linha', 'Gol MGL'),
   ('00000000-0000-0000-0000-000000000406', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido transicao defensiva', 'GS TO'),
   ('00000000-0000-0000-0000-000000000407', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido organizacao defensiva', 'GS OO'),
   ('00000000-0000-0000-0000-000000000408', '00000000-0000-0000-0000-000000000304', 2, 'Gol sofrido bola parada', 'GS BP'),
@@ -127,7 +127,11 @@ WHERE categoria.id = metadata.id;
 UPDATE acoes_catalogo AS acao
 SET nome = metadata.nome,
     ordem = metadata.ordem,
-    impacto_id = CASE WHEN acao.sigla = 'GS BP' THEN 2 ELSE acao.impacto_id END
+    impacto_id = CASE
+      WHEN acao.sigla = 'GS BP' THEN 2
+      WHEN acao.sigla = 'Gol MGL' THEN 1
+      ELSE acao.impacto_id
+    END
 FROM (VALUES
   ('GM', 'Gol marcado', 1), ('ASS', 'Assistência', 2), ('AD', 'Ação decisiva', 3),
   ('CC', 'Chance criada', 4), ('PP', 'Perda de posse', 5),
