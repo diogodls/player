@@ -6,6 +6,7 @@ type ActionType = 'team' | 'individual';
 export type ActionTagged = {
   id: string;
   sessionId: string;
+  catalogActionId?: string;
   type: ActionType;
   time: string;
   title: string;
@@ -45,12 +46,9 @@ export type IndividualCatalog = {
 export type TeamAnalysisData = {
   session: Session;
   team: Team;
-  actions: Action[];
 };
 
-export type Action = {
-  key: string;
-  label: string,
-  category: string,
-  goodAction: boolean,
+export type TeamCatalog = {
+  analysisType: 'TEAM';
+  groups: IndividualCatalogGroup[];
 };

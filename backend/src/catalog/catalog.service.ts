@@ -2,10 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ActionCategoryEntity } from '../entities';
-import { IMPACT_NAMES, INDIVIDUAL_ANALYSIS_TYPE_ID } from './catalog.constants';
+import {
+  IMPACT_NAMES,
+  INDIVIDUAL_ANALYSIS_TYPE_ID,
+  TEAM_ANALYSIS_TYPE_ID,
+} from './catalog.constants';
 import {
   CatalogImpact,
   IndividualCatalogResponseDto,
+  TeamCatalogResponseDto,
 } from './dto/individual-catalog-response.dto';
 
 @Injectable()
@@ -16,8 +21,18 @@ export class CatalogService {
   ) {}
 
   async getIndividualCatalog(): Promise<IndividualCatalogResponseDto> {
+    const groups = await this.getCatalogGroups(INDIVIDUAL_ANALYSIS_TYPE_ID);
+    return { analysisType: 'INDIVIDUAL', groups };
+  }
+
+  async getTeamCatalog(): Promise<TeamCatalogResponseDto> {
+    const groups = await this.getCatalogGroups(TEAM_ANALYSIS_TYPE_ID);
+    return { analysisType: 'TEAM', groups };
+  }
+
+  private async getCatalogGroups(tipoAnaliseId: number) {
     const categories = await this.categoriesRepository.find({
-      where: { tipoAnaliseId: INDIVIDUAL_ANALYSIS_TYPE_ID },
+      where: { tipoAnaliseId },
       relations: { acoes: { impacto: true } },
       order: {
         ordem: 'ASC',
@@ -62,6 +77,6 @@ export class CatalogService {
       });
     }
 
-    return { analysisType: 'INDIVIDUAL', groups };
+    return groups;
   }
 }

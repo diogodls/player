@@ -1,6 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
-import { IndividualCatalogResponseDto } from './dto/individual-catalog-response.dto';
+import {
+  IndividualCatalogResponseDto,
+  TeamCatalogResponseDto,
+} from './dto/individual-catalog-response.dto';
 
 @Controller('catalog/actions')
 export class CatalogController {
@@ -9,5 +12,10 @@ export class CatalogController {
   @Get('individual')
   getIndividualCatalog(): Promise<IndividualCatalogResponseDto> {
     return this.catalogService.getIndividualCatalog();
+  }
+
+  @Get('team')
+  getTeamCatalog(): Promise<TeamCatalogResponseDto> {
+    return this.catalogService.getTeamCatalog();
   }
 }

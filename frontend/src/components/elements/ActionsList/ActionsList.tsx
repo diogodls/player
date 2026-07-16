@@ -1,43 +1,35 @@
 import styles from "./ActionsList.module.scss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBullseye, faMinus} from "@fortawesome/free-solid-svg-icons";
-import type {Action} from "../../../pages/Analysis";
-import {useMemo} from "react";
-import {groupActions} from "../../../utils/groupActions.ts";
+import type {IndividualCatalogAction, IndividualCatalogGroup} from "../../../pages/Analysis";
 
 type ActionsList = {
-  actions: Action[];
-  handleActionClick: (action: Action) => void;
+  groups: IndividualCatalogGroup[];
+  handleActionClick: (action: IndividualCatalogAction, category: string) => void;
   className?: string;
 }
 
-const ActionsList = ({actions, handleActionClick, className}: ActionsList) => {
-  const groupedActions = useMemo( () => groupActions(actions), [actions]);
-
+const ActionsList = ({groups, handleActionClick, className}: ActionsList) => {
   return (
     <div className={`${styles.actions} ${className}`}>
-      {Object.entries(groupedActions).map(([title, actions]) => (
-        <div className={styles.actionsType} key={title}>
+      {groups.map((group) => (
+        <div className={styles.actionsType} key={group.key}>
           <span className={styles.actionsTitle}>
-            {title}
+            {group.title}
           </span>
           <div className={styles.tagActions}>
-            {actions.map((action) => {
-              const actionTag = {
-                ...action,
-                category: title
-              };
-
+            {group.actions.map((action) => {
+              const isPositive = action.impact === 'POSITIVE';
               return (
                 <button
                   type={"button"}
-                  className={`${styles.action} ${action.goodAction ? styles.goodAction : styles.badAction}`}
+                  className={`${styles.action} ${isPositive ? styles.goodAction : styles.badAction}`}
                   title={action.key}
-                  key={action.key}
-                  onClick={() => handleActionClick(actionTag)}
+                  key={action.id}
+                  onClick={() => handleActionClick(action, group.title)}
                 >
-                  <FontAwesomeIcon icon={action.goodAction ? faBullseye : faMinus}/>
-                  <span>{action.label}</span>
+                  <FontAwesomeIcon icon={isPositive ? faBullseye : faMinus}/>
+                  <span>{action.name}</span>
                 </button>
               )
             })}

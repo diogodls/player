@@ -19,3 +19,8 @@ export class IndividualCatalogResponseDto {
   analysisType!: 'INDIVIDUAL';
   groups!: IndividualCatalogGroupDto[];
 }
+
+export class TeamCatalogResponseDto {
+  analysisType!: 'TEAM';
+  groups!: IndividualCatalogGroupDto[];
+}

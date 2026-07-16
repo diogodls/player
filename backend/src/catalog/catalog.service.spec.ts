@@ -61,6 +61,42 @@ describe('CatalogService', () => {
 
     expect(new Set(keys).size).toBe(keys.length);
   });
+
+  it('returns team groups directly from database metadata', async () => {
+    find.mockResolvedValue([
+      category('SET_PIECE', 'Bola parada', 1, [
+        action('BPSE', 'Bola parada sem execução', 'Negativa', 1),
+      ]),
+      category('OFFENSIVE_ORGANIZATION', 'Organização ofensiva', 2, [
+        action('GSP', 'Gol de saída de pressão', 'Positiva', 1),
+      ]),
+    ]);
+
+    const result = await service.getTeamCatalog();
+
+    expect(find).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { tipoAnaliseId: 2 } }),
+    );
+    expect(result).toEqual({
+      analysisType: 'TEAM',
+      groups: [
+        expect.objectContaining({
+          key: 'SET_PIECE',
+          title: 'Bola parada',
+          actions: [
+            expect.objectContaining({ key: 'BPSE', impact: 'NEGATIVE' }),
+          ],
+        }),
+        expect.objectContaining({
+          key: 'OFFENSIVE_ORGANIZATION',
+          title: 'Organização ofensiva',
+          actions: [
+            expect.objectContaining({ key: 'GSP', impact: 'POSITIVE' }),
+          ],
+        }),
+      ],
+    });
+  });
 });
 
 function category(
