@@ -18,7 +18,7 @@ const SessionView = () => {
   if (isSessionLoading) {
     return (
       <div className={styles.container}>
-        <div className={styles.contentWrap}>Carregando sessao...</div>
+        <div className={styles.contentWrap}>Carregando sessão...</div>
       </div>
     );
   }
@@ -26,7 +26,7 @@ const SessionView = () => {
   if (sessionViewError || !sessionView) {
     return (
       <div className={styles.container}>
-        <div className={styles.contentWrap}>Sessao nao encontrada.</div>
+        <div className={styles.contentWrap}>Sessão nao encontrada.</div>
       </div>
     );
   }
@@ -42,8 +42,8 @@ const SessionView = () => {
 
             <div className={styles.headerText}>
               <span className={styles.eyebrow}>Treino/Jogo selecionado</span>
-              <h1 className={styles.title}>Detalhes da Sessao</h1>
-              <p className={styles.subtitle}>Acesse o fluxo de analise e acompanhe os dados desta sessao.</p>
+              <h1 className={styles.title}>Detalhes da Sessão</h1>
+              <p className={styles.subtitle}>Acesse o fluxo de análise e acompanhe os dados desta sessão.</p>
             </div>
           </div>
 

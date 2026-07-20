@@ -119,8 +119,8 @@ const SessionsList = ({
         ) : isError ? (
           <div className={styles.emptyState}>
             <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
-            <span className={styles.emptyTitle}>Nao foi possivel carregar os registros</span>
-            <span className={styles.emptySub}>Verifique se o backend esta disponivel</span>
+            <span className={styles.emptyTitle}>Não foi possível carregar os registros</span>
+            <span className={styles.emptySub}>Verifique se o backend esta disponível</span>
           </div>
         ) : total === 0 ? (
           <div className={styles.emptyState}>

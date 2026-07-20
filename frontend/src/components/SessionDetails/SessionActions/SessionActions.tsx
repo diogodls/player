@@ -6,7 +6,6 @@ import SessionActionCard from "../SessionActionCard/SessionActionCard.tsx";
 import SessionSummary from "../SessionSummary/SessionSummary.tsx";
 import type {
   SessionViewData,
-  SessionViewFilterOptionsResponse,
   SessionViewFilters,
   ViewMode,
 } from "../../../pages/SessionView";
@@ -26,8 +25,6 @@ type Props = {
 
 const SessionActions = ({ sessionId, viewMode }: Props) => {
   const [filters, setFilters] = useState<SessionViewFilters>(emptyFilters);
-
-  const filterOptionsEndpoint = sessionId ? `/sessions/${sessionId}/view/filters` : null;
 
   const filteredSessionViewEndpoint = useMemo(() => {
     if (!sessionId) return null;
@@ -51,12 +48,9 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
     isLoading,
     isValidating,
   } = useApi<SessionViewData>(filteredSessionViewEndpoint);
-  const { data: filterOptionsResponse } =
-    useApi<SessionViewFilterOptionsResponse>(filterOptionsEndpoint);
 
   const view = filteredSessionView?.analysis?.[viewMode];
-  const filterOptions = filterOptionsResponse?.[viewMode] ??
-    filteredSessionView?.filters?.[viewMode] ?? {
+  const filterOptions = filteredSessionView?.filters?.[viewMode] ?? {
     athletes: [],
     categories: [],
   };
@@ -135,7 +129,7 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
         </section>
       ) : sessionViewError || !view ? (
         <section className={styles.emptyState}>
-          <h3>Não foi possivel carregar as ações desta sessão.</h3>
+          <h3>Não foi possível carregar as ações desta sessão.</h3>
         </section>
       ) : (
         <>
@@ -161,7 +155,7 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
               <h3>
                 {hasActiveFilters
                   ? "Nenhuma ação encontrada com os filtros atuais."
-                  : "Esta sessao ainda não possui ações para esta visualização."}
+                  : "Esta sessão ainda não possui ações para esta visualização."}
               </h3>
               {hasActiveFilters && (
                 <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
