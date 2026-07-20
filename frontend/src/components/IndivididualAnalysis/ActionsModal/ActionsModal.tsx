@@ -16,11 +16,11 @@ type ActionsModal = {
 };
 
 const ActionsModal = ({actions, closeModal, session}: ActionsModal) => {
-  const {selectedPlayer, setIndividualActions, currentVideoTime, videoRef} = useContext(ActionsContext);
+  const {selectedPlayer, setIndividualActions, currentVideoTime, isVideoLoaded} = useContext(ActionsContext);
   const {error} = useContext(ToastContext);
 
   const handleActionClick = (action: Action) => {
-    if (!videoRef.current) {
+    if (!isVideoLoaded) {
       error("O vídeo precisa estar definido");
       closeModal();
       return;
