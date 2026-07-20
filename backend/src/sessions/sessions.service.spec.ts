@@ -292,8 +292,9 @@ describe('SessionsService id validation', () => {
     const sessionsRepository = {
       findOne: jest.fn().mockResolvedValue(session),
     } as unknown as Repository<SessionEntity>;
+    const findMock = jest.fn().mockResolvedValue(actions);
     const taggedActionsRepository = {
-      find: jest.fn().mockResolvedValue(actions),
+      find: findMock,
     } as unknown as Repository<TaggedActionEntity>;
     const sessionsService = new SessionsService(
       sessionsRepository,
@@ -303,6 +304,7 @@ describe('SessionsService id validation', () => {
 
     const response = await sessionsService.findView(SESSION_ID);
 
+    expect(findMock).toHaveBeenCalledTimes(1);
     expect(response.analysis.individual.summary).toEqual({
       positives: 2,
       negatives: 1,

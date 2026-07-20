@@ -106,7 +106,7 @@ export class SessionsService {
         ),
         team: this.buildAnalysisSection(filteredTeamActions, 'team'),
       },
-      filters: await this.findViewFilters(id),
+      filters: this.buildViewFilters(actions),
     };
   }
 
@@ -121,6 +121,10 @@ export class SessionsService {
       },
       order: { timestampSegundos: 'ASC' },
     });
+    return this.buildViewFilters(actions);
+  }
+
+  private buildViewFilters(actions: TaggedActionEntity[]) {
     const individualActions = actions.filter((action) => action.jogador);
 
     return {
