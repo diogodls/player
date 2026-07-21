@@ -2,6 +2,7 @@ import styles from "./SessionEntityActions.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import type { SessionEntityAction } from "../../../../pages/SessionView";
+import {formatVideoTime} from "../../../../utils/videoTime.ts";
 
 type Props = {
   actions: SessionEntityAction[];
@@ -30,7 +31,7 @@ const SessionEntityActions = ({ actions }: Props) => {
           </div>
 
           <div className={styles.meta}>
-            <span className={styles.time}>{action.time}</span>
+            <span className={styles.time}>{formatVideoTime(action.time)}</span>
           </div>
         </div>
       ))}

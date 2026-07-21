@@ -39,6 +39,9 @@
   }
 
   .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 10px 16px;
     border-radius: var(--border-radius);
     background-color:  var(--selected-blue);
@@ -54,13 +57,87 @@
     }
   }
 
-  .video{
+  .youtubeButton {
+    @extend .button;
+    background-color: var(--action-red);
+
+    &:hover {
+      background: var(--deep-red);
+    }
+  }
+
+  .youtubeField {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-20);
+    border-radius: var(--border-radius);
+    background: var(--surface-dark);
+
+    input {
+      width: 100%;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 14px;
+
+      &::placeholder {
+        color: var(--text-muted);
+      }
+    }
+  }
+
+  .youtubeRow {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .youtubeSubmitButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    border: none;
+    border-radius: var(--border-radius);
+    background: var(--selected-blue);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.18s ease;
+
+    &:hover {
+      background: var(--selected-blue-hover);
+    }
+  }
+
+  .youtubeIcon {
+    color: var(--text-muted);
+    flex: 0 0 auto;
+  }
+
+  .inputError {
+    display: block;
+    margin: -6px 0 12px;
+    color: var(--action-red);
+    font-size: 13px;
+  }
+
+  .video {
     display: block;
     width: 100%;
     max-width: 100%;
     height: 520px;
     background: black;
     border-radius: var(--border-radius);
+    border: 0;
   }
 
   .emptyState {
@@ -80,7 +157,7 @@
 
   .emptyIcon {
     font-size: 32px;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     margin-bottom: 8px;
   }
 
@@ -91,11 +168,14 @@
   }
 
   .subtitle {
-    color: var(--text-secondary);
+    color: var(--text-muted);
     font-size: 13px;
   }
 
   .removeButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background: var(--deep-red);
     color: var(--text-primary);
     border: none;
@@ -103,6 +183,72 @@
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: 14px;
+  }
+
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+  }
+
+  .modal {
+    box-sizing: border-box;
+    width: min(460px, 100%);
+    padding: 20px;
+    border: 1px solid var(--border-20);
+    border-radius: var(--border-radius);
+    background: var(--surface);
+    color: var(--text-primary);
+  }
+
+  .modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .closeButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border-20);
+    border-radius: var(--border-radius);
+    background: var(--surface-dark);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .computerButton {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
+    background-color:  var(--selected-blue);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--selected-blue-hover);
+    }
   }
 
 }
@@ -130,13 +276,33 @@
       font-size: 22px;
     }
 
-    .button {
+    .button,
+    .youtubeButton {
       width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 12px;
       font-size: 14px;
+    }
+
+    .youtubeField {
+      padding: 10px;
+    }
+
+    .youtubeRow {
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    .youtubeSubmitButton {
+      width: 100%;
+      flex-basis: 42px;
+    }
+
+    .inputError {
+      margin-bottom: 10px;
+      font-size: 12px;
     }
 
     .video {
@@ -167,8 +333,19 @@
 
     .removeButton {
       width: 100%;
+      justify-content: center;
       padding: 12px;
       font-size: 14px;
+    }
+
+    .modalOverlay {
+      align-items: flex-start;
+      padding: 20px;
+    }
+
+    .modal {
+      margin-top: 40px;
+      padding: 16px;
     }
   }
 }

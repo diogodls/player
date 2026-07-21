@@ -14,11 +14,11 @@ type TeamActions = {
 }
 
 const TeamActions = ({groups, session}: TeamActions) => {
-  const {setTeamActions, currentVideoTime, videoRef} = useContext(ActionsContext);
+  const {setTeamActions, currentVideoTime, isVideoLoaded} = useContext(ActionsContext);
   const {error} = useContext(ToastContext);
 
   const handleActionClick = (action: IndividualCatalogAction, category: string) => {
-    if (!videoRef.current) {
+    if (!isVideoLoaded) {
       error("O vídeo precisa estar definido");
       return;
     }

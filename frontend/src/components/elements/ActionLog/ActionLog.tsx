@@ -8,7 +8,7 @@ import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.
 import type { Session } from "../../../pages/Sessions";
 import { useNavigate } from "react-router";
 import ActionLogConfirmModal from "../ActionLog/ActionLogConfirmModal.tsx";
-import { formatTeamActionTime } from "./formatTeamActionTime.ts";
+import {formatVideoTime} from "../../../utils/videoTime.ts";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
@@ -147,9 +147,7 @@ const ActionLog = ({logType, session}: ActionLog) => {
               className={`${styles.item} ${action.goodAction ? styles.good : styles.bad}`}
             >
               <div className={styles.itemLeft}>
-                <span className={styles.time}>
-                  {logType === 'team' ? formatTeamActionTime(action.time) : action.time}
-                </span>
+                <span className={styles.time}>{formatVideoTime(action.time)}</span>
               </div>
 
               <div className={styles.itemBody}>

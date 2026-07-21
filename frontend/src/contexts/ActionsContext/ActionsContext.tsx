@@ -22,6 +22,8 @@ type ActionsContextValue = {
   setCurrentVideoTime: Dispatch<SetStateAction<string>>;
   isTagging: boolean;
   setIsTagging: Dispatch<SetStateAction<boolean>>;
+  isVideoLoaded: boolean;
+  setIsVideoLoaded: Dispatch<SetStateAction<boolean>>;
   videoRef: RefObject<HTMLVideoElement | null>
 };
 
@@ -38,6 +40,7 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
   const [actionTagged, setActionTagged] = useState<ActionTagged | null>(null);
   const [currentVideoTime, setCurrentVideoTime] = useState('0');
   const [isTagging, setIsTagging] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const value = useMemo(
@@ -54,6 +57,8 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
       setCurrentVideoTime,
       isTagging,
       setIsTagging,
+      isVideoLoaded,
+      setIsVideoLoaded,
       videoRef
     }),
     [
@@ -63,6 +68,7 @@ const ActionsProvider = ({children}: ActionsProviderProps) => {
       actionTagged,
       currentVideoTime,
       isTagging,
+      isVideoLoaded,
       videoRef,
     ]
   );
