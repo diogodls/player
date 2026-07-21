@@ -12,6 +12,7 @@ export function createIndividualTaggedAction(
 ): ActionTagged {
   return {
     id: uid(),
+    catalogActionId: action.id,
     sessionId: session.id,
     goodAction: action.impact === 'POSITIVE',
     title: action.name,
