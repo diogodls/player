@@ -19,6 +19,7 @@ import {
 } from './entities';
 import { PlayersModule } from './players/players.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { CatalogModule } from './catalog/catalog.module';
     }),
     PlayersModule,
     CatalogModule,
+    TaggedActionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

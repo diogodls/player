@@ -13,7 +13,7 @@ export type AverageCard = {
 };
 
 export type Player = {
-  id: number;
+  id: string | number;
   name: string;
   age: number;
   overall: number;
