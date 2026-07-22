@@ -22,7 +22,6 @@ export type SessionEntityAction = {
   category: SessionActionCategory;
   time: string;
   outcome: "positive" | "negative";
-  createdAt?: string;
 };
 
 export type SessionEntityMetrics = {
@@ -52,12 +51,35 @@ export type SessionAnalysisSection = {
   entities: SessionEntity[];
 };
 
+export type SessionViewFilterOption = {
+  value: string;
+  label: string;
+};
+
+export type SessionViewFilterOptions = {
+  athletes: SessionViewFilterOption[];
+  categories: SessionViewFilterOption[];
+};
+
+export type SessionViewFilters = {
+  outcome: ActionTypeFilter;
+  athleteId: string;
+  categoryCode: string;
+};
+
 export type SessionViewData = {
   session: Session;
   analysis: {
     individual: SessionAnalysisSection;
     team: SessionAnalysisSection;
   };
+  filters?: {
+    individual: SessionViewFilterOptions;
+    team: SessionViewFilterOptions;
+  };
 };
 
-export type SessionViewRecordData = Record<string, SessionViewData>; //todo: remover isso daqui quando tiver back
+export type SessionViewFilterOptionsResponse = {
+  individual: SessionViewFilterOptions;
+  team: SessionViewFilterOptions;
+};

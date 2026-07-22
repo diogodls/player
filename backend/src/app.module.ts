@@ -18,6 +18,7 @@ import {
   TeamEntity,
 } from './entities';
 import { PlayersModule } from './players/players.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { PlayersModule } from './players/players.module';
       logging: false,
     }),
     PlayersModule,
+    SessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

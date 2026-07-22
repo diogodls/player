@@ -1,13 +1,24 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./SaveSessionModal.module.scss";
-import type { SessionMeta, SessionType } from "../../../pages/Sessions";
+import type {
+  SessionCourtSize,
+  SessionLocation,
+  SessionMeta,
+  SessionType,
+} from "../../../pages/Sessions";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import Select from "../../elements/Select/Select.tsx";
+import {
+  SESSION_COURT_SIZES,
+  SESSION_LOCATIONS,
+  SESSION_TYPES,
+} from "../../../constants/sessions.ts";
 
-type SaveSessionModal = {
+type SaveSessionModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: (values: SessionMeta) => Promise<void>;
   initialMeta?: SessionMeta | null;
   mode?: "create" | "edit";
 };
@@ -29,39 +40,74 @@ function toInputDate(value?: string) {
   return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 }
 
-function getInitialFormState(initialMeta?: SessionMeta | null) {
+function getInitialFormState(initialMeta?: SessionMeta | null): SessionMeta {
   if (!initialMeta) {
     return {
-      type: "Treino" as SessionType,
+      type: SESSION_TYPES[0],
       date: todayISO(),
-      local: "",
+      local: SESSION_LOCATIONS[0],
+      courtSize: SESSION_COURT_SIZES[0],
       description: "",
-      opponent: "",
     };
   }
 
   return {
     type: initialMeta.type,
     date: toInputDate(initialMeta.date),
-    local: initialMeta.local ?? "",
+    local: initialMeta.local,
+    courtSize: initialMeta.courtSize,
     description: initialMeta.description ?? "",
-    opponent: initialMeta.opponent ?? "",
   };
 }
 
-const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: SaveSessionModal) => {
-  const [initialState] = useState(() => getInitialFormState(initialMeta));
+const SaveSessionModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialMeta,
+  mode = "create",
+}: SaveSessionModalProps) => {
+  const initialState = useMemo(
+    () => getInitialFormState(initialMeta),
+    [initialMeta],
+  );
   const [type, setType] = useState<SessionType>(initialState.type);
   const [date, setDate] = useState<string>(initialState.date);
-  const [local, setLocal] = useState(initialState.local);
+  const [local, setLocal] = useState<SessionLocation>(initialState.local);
+  const [courtSize, setCourtSize] = useState<SessionCourtSize>(
+    initialState.courtSize,
+  );
   const [description, setDescription] = useState(initialState.description);
-  const [opponent, setOpponent] = useState(initialState.opponent);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setType(initialState.type);
+    setDate(initialState.date);
+    setLocal(initialState.local);
+    setCourtSize(initialState.courtSize);
+    setDescription(initialState.description);
+  }, [initialState, isOpen]);
 
   const canSubmit = useMemo(() => {
-    if (!date.trim() || !local.trim()) return false;
-    if (type === "Treino") return description.trim().length > 0;
-    return opponent.trim().length > 0;
-  }, [type, date, local, description, opponent]);
+    return Boolean(date.trim() && local && courtSize && description.trim());
+  }, [date, local, courtSize, description]);
+
+  const handleSubmit = async () => {
+    if (!canSubmit || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        type,
+        date,
+        local,
+        courtSize,
+        description: description.trim(),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -69,7 +115,9 @@ const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: Sav
     <div className={styles.overlay} onMouseDown={onClose}>
       <div className={styles.modal} onMouseDown={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{mode === "edit" ? "Editar Treino/Jogo" : "Novo Treino/Jogo"}</h2>
+          <h2 className={styles.title}>
+            {mode === "edit" ? "Editar Treino/Jogo" : "Novo Treino/Jogo"}
+          </h2>
           <button className={styles.close} onClick={onClose} aria-label="Fechar">
             <FontAwesomeIcon icon={faX} />
           </button>
@@ -81,10 +129,10 @@ const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: Sav
             label="Tipo *"
             name="session-type"
             value={type}
-            options={[
-              { value: "Treino", label: "Treino" },
-              { value: "Jogo", label: "Jogo" },
-            ]}
+            options={SESSION_TYPES.map((sessionType) => ({
+              value: sessionType,
+              label: sessionType,
+            }))}
             onChange={(value) => {
               if (value) setType(value);
             }}
@@ -100,35 +148,47 @@ const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: Sav
             />
           </div>
 
-          {type === "Treino" ? (
-            <div className={styles.field}>
-              <label className={styles.label}>Descrição do Treino *</label>
-              <input
-                className={styles.input}
-                placeholder="Ex: saída de pressão, bolas paradas..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-          ) : (
-            <div className={styles.field}>
-              <label className={styles.label}>Adversário *</label>
-              <input
-                className={styles.input}
-                placeholder="Ex: Atlântico, ACBF..."
-                value={opponent}
-                onChange={(e) => setOpponent(e.target.value)}
-              />
-            </div>
-          )}
+          <Select<SessionLocation>
+            className={styles.field}
+            label="Local *"
+            name="session-location"
+            value={local}
+            options={SESSION_LOCATIONS.map((sessionLocation) => ({
+              value: sessionLocation,
+              label: sessionLocation,
+            }))}
+            onChange={(value) => {
+              if (value) setLocal(value);
+            }}
+          />
+
+          <Select<SessionCourtSize>
+            className={styles.field}
+            label="Tamanho da quadra *"
+            name="session-court-size"
+            value={courtSize}
+            options={SESSION_COURT_SIZES.map((sessionCourtSize) => ({
+              value: sessionCourtSize,
+              label: sessionCourtSize,
+            }))}
+            onChange={(value) => {
+              if (value) setCourtSize(value);
+            }}
+          />
 
           <div className={styles.field}>
-            <label className={styles.label}>Local *</label>
+            <label className={styles.label}>
+              {type === "Treino" ? "Descricao do treino *" : "Adversario *"}
+            </label>
             <input
               className={styles.input}
-              placeholder="Ex: CEFD 1, CDM"
-              value={local}
-              onChange={(e) => setLocal(e.target.value)}
+              placeholder={
+                type === "Treino"
+                  ? "Ex: saida de pressao, bolas paradas..."
+                  : "Ex: Atlantico, ACBF..."
+              }
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
         </div>
@@ -139,8 +199,8 @@ const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: Sav
           </button>
           <button
             className={styles.primary}
-            onClick={onClose}
-            disabled={!canSubmit}
+            onClick={handleSubmit}
+            disabled={!canSubmit || isSubmitting}
           >
             {mode === "edit" ? "Salvar" : "Continuar"}
           </button>
@@ -148,6 +208,6 @@ const SaveSessionModal = ({ isOpen, onClose, initialMeta, mode = "create" }: Sav
       </div>
     </div>
   );
-}
+};
 
 export default SaveSessionModal;

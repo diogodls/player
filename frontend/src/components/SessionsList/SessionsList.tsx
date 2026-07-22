@@ -1,56 +1,44 @@
-import {useMemo, useState} from "react";
 import styles from "./SessionsList.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import { faCalendar } from "@fortawesome/free-solid-svg-icons";
 import SessionCard from "./SessionCard/SessionCard.tsx";
-import type { Session } from "../../pages/Sessions";
+import type { Session, SessionFilters } from "../../pages/Sessions";
 import Pagination from "../elements/Pagination/Pagination.tsx";
-
-const ITEMS_PER_PAGE = 5;
-
-function toInputDate(value: string) {
-  if (value.includes("-")) return value;
-
-  const [day, month, year] = value.split("/");
-  if (!day || !month || !year) return value;
-  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-}
+import { SESSION_LOCATIONS, SESSION_TYPES } from "../../constants/sessions.ts";
 
 type SessionsListProps = {
   sessions: Session[];
+  total: number;
+  currentPage: number;
+  totalPages: number;
+  isLoading?: boolean;
+  isError?: boolean;
+  filters: SessionFilters;
+  onFiltersChange: (filters: SessionFilters) => void;
+  onPageChange: (page: number) => void;
   onEdit: (session: Session) => void;
   onDelete: (session: Session) => void;
 };
 
-const SessionsList = ({sessions, onEdit, onDelete}: SessionsListProps) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [typeFilter, setTypeFilter] = useState<"all" | Session["type"]>("all");
-  const [dateFilter, setDateFilter] = useState("");
-  const filteredSessions = useMemo(() => {
-    return sessions.filter((session) => {
-      const matchesType = typeFilter === "all" || session.type === typeFilter;
-      const matchesDate = !dateFilter || toInputDate(session.date) === dateFilter;
-      return matchesType && matchesDate;
-    });
-  }, [dateFilter, sessions, typeFilter]);
-  const total = filteredSessions.length;
-  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
-  const safeCurrentPage = Math.min(currentPage, totalPages);
-
-  const pagedSessions = useMemo(() => {
-    const startIndex = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
-    return filteredSessions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredSessions, safeCurrentPage]);
-
-  const handlePageChange = (page: number) => {
-    const nextPage = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(nextPage);
-  };
+const SessionsList = ({
+  sessions,
+  total,
+  currentPage,
+  totalPages,
+  isLoading = false,
+  isError = false,
+  filters,
+  onFiltersChange,
+  onPageChange,
+  onEdit,
+  onDelete,
+}: SessionsListProps) => {
+  const hasActiveFilters =
+    filters.type !== "all" || Boolean(filters.date) || filters.local !== "all";
 
   const handleResetFilters = () => {
-    setTypeFilter("all");
-    setDateFilter("");
+    onFiltersChange({ type: "all", date: "", local: "all" });
   };
 
   return (
@@ -68,15 +56,20 @@ const SessionsList = ({sessions, onEdit, onDelete}: SessionsListProps) => {
           <label className={styles.filterField}>
             <span>Tipo</span>
             <select
-              value={typeFilter}
+              value={filters.type}
               onChange={(event) => {
-                setTypeFilter(event.target.value as "all" | Session["type"]);
-                setCurrentPage(1);
+                onFiltersChange({
+                  ...filters,
+                  type: event.target.value as SessionFilters["type"],
+                });
               }}
             >
               <option value="all">Todos</option>
-              <option value="Treino">Treino</option>
-              <option value="Jogo">Jogo</option>
+              {SESSION_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -84,22 +77,52 @@ const SessionsList = ({sessions, onEdit, onDelete}: SessionsListProps) => {
             <span>Data</span>
             <input
               type="date"
-              value={dateFilter}
+              value={filters.date}
               onChange={(event) => {
-                setDateFilter(event.target.value);
-                setCurrentPage(1);
+                onFiltersChange({ ...filters, date: event.target.value });
               }}
             />
           </label>
 
-          {(typeFilter !== "all" || !!dateFilter) &&
+          <label className={styles.filterField}>
+            <span>Local</span>
+            <select
+              value={filters.local}
+              onChange={(event) => {
+                onFiltersChange({
+                  ...filters,
+                  local: event.target.value as SessionFilters["local"],
+                });
+              }}
+            >
+              <option value="all">Todos</option>
+              {SESSION_LOCATIONS.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {hasActiveFilters && (
             <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
               Limpar filtros
             </button>
-          }
+          )}
         </div>
 
-        {total === 0 ? (
+        {isLoading ? (
+          <div className={styles.emptyState}>
+            <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
+            <span className={styles.emptyTitle}>Carregando registros...</span>
+          </div>
+        ) : isError ? (
+          <div className={styles.emptyState}>
+            <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
+            <span className={styles.emptyTitle}>Não foi possível carregar os registros</span>
+            <span className={styles.emptySub}>Verifique se o backend esta disponível</span>
+          </div>
+        ) : total === 0 ? (
           <div className={styles.emptyState}>
             <FontAwesomeIcon icon={faCalendar} className={styles.emptyIcon} />
             <span className={styles.emptyTitle}>Nenhum registro encontrado</span>
@@ -110,7 +133,7 @@ const SessionsList = ({sessions, onEdit, onDelete}: SessionsListProps) => {
         ) : (
           <>
             <div className={styles.list}>
-              {pagedSessions.map((session) => (
+              {sessions.map((session) => (
                 <SessionCard
                   key={session.id}
                   item={session}
@@ -121,9 +144,9 @@ const SessionsList = ({sessions, onEdit, onDelete}: SessionsListProps) => {
             </div>
 
             <Pagination
-              currentPage={safeCurrentPage}
+              currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={handlePageChange}
+              onPageChange={onPageChange}
               className={styles.pagination}
             />
           </>
