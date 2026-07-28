@@ -11,6 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { SessionFiltersDto } from './dto/session-filters.dto';
+import { SessionComparisonFiltersDto } from './dto/session-comparison-filters.dto';
 import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import { SessionDto } from './dto/session.dto';
 import { SessionsService } from './sessions.service';
@@ -22,6 +23,11 @@ export class SessionsController {
   @Get()
   findAll(@Query() filters: SessionFiltersDto) {
     return this.sessionsService.findAll(filters);
+  }
+
+  @Get('comparison')
+  compare(@Query() filters: SessionComparisonFiltersDto) {
+    return this.sessionsService.compare(filters);
   }
 
   @Get(':id/rankings/:indexKey')
