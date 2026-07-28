@@ -71,17 +71,13 @@ describe('PlayersService id validation', () => {
 
   it('filters and paginates players when listing players', async () => {
     let receivedFindOptions: Parameters<Repository<PlayerEntity>['find']>[0];
-    const countPlayers = jest
-      .fn<Repository<PlayerEntity>['count']>()
-      .mockResolvedValue(17);
-    const findPlayers = jest
-      .fn<Repository<PlayerEntity>['find']>()
-      .mockImplementation(
-        (findOptions: Parameters<Repository<PlayerEntity>['find']>[0]) => {
-          receivedFindOptions = findOptions;
-          return Promise.resolve([]);
-        },
-      );
+    const countPlayers = jest.fn().mockResolvedValue(17);
+    const findPlayers = jest.fn(
+      (findOptions: Parameters<Repository<PlayerEntity>['find']>[0]) => {
+        receivedFindOptions = findOptions;
+        return Promise.resolve([]);
+      },
+    );
     const playersRepository = {
       count: countPlayers,
       find: findPlayers,
@@ -117,15 +113,13 @@ describe('PlayersService id validation', () => {
   it('uses the last available page when the requested page is too high', async () => {
     let receivedFindOptions: Parameters<Repository<PlayerEntity>['find']>[0];
     const playersRepository = {
-      count: jest.fn<Repository<PlayerEntity>['count']>().mockResolvedValue(9),
-      find: jest
-        .fn<Repository<PlayerEntity>['find']>()
-        .mockImplementation(
-          (findOptions: Parameters<Repository<PlayerEntity>['find']>[0]) => {
-            receivedFindOptions = findOptions;
-            return Promise.resolve([]);
-          },
-        ),
+      count: jest.fn().mockResolvedValue(9),
+      find: jest.fn(
+        (findOptions: Parameters<Repository<PlayerEntity>['find']>[0]) => {
+          receivedFindOptions = findOptions;
+          return Promise.resolve([]);
+        },
+      ),
     } as unknown as Repository<PlayerEntity>;
     const playersService = new PlayersService(
       playersRepository,

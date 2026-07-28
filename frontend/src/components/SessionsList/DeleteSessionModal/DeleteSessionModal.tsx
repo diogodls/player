@@ -7,15 +7,21 @@ type DeleteSessionModalProps = {
   isOpen: boolean;
   session: Session | null;
   onClose: () => void;
+  onConfirm: () => Promise<void>;
 };
 
-const DeleteSessionModal = ({ isOpen, session, onClose }: DeleteSessionModalProps) => {
+const DeleteSessionModal = ({
+  isOpen,
+  session,
+  onClose,
+  onConfirm,
+}: DeleteSessionModalProps) => {
   if (!isOpen || !session) return null;
 
   const detail =
     session.type === "Treino"
       ? session.description
-      : session.opponent;
+      : session.opponent ?? session.description;
 
   return (
     <div className={styles.overlay} onMouseDown={onClose}>
@@ -56,7 +62,7 @@ const DeleteSessionModal = ({ isOpen, session, onClose }: DeleteSessionModalProp
             Cancelar
           </button>
 
-          <button className={styles.confirm} onClick={onClose}>
+          <button className={styles.confirm} onClick={onConfirm}>
             <FontAwesomeIcon icon={faTrashCan} />
             Confirmar exclusão
           </button>

@@ -18,6 +18,7 @@ import {
   TeamEntity,
 } from './entities';
 import { PlayersModule } from './players/players.module';
+import { SessionsModule } from './sessions/sessions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
 
@@ -51,6 +52,7 @@ import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
       logging: false,
     }),
     PlayersModule,
+    SessionsModule,
     CatalogModule,
     TaggedActionsModule,
   ],

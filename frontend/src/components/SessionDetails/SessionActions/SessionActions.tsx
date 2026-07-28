@@ -3,94 +3,76 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SessionActions.module.scss";
 import SessionActionCard from "../SessionActionCard/SessionActionCard.tsx";
+import SessionSummary from "../SessionSummary/SessionSummary.tsx";
 import type {
-  ActionTypeFilter,
-  SessionAnalysisSection,
+  SessionViewData,
+  SessionViewFilters,
   ViewMode,
 } from "../../../pages/SessionView";
 import Select from "../../elements/Select/Select.tsx";
+import { useApi } from "../../../hooks/useApi.ts";
 
-type Props = {
-  viewMode: ViewMode;
-  view: SessionAnalysisSection;
+const emptyFilters: SessionViewFilters = {
+  outcome: "all",
+  athleteId: "all",
+  categoryCode: "all",
 };
 
-const SessionActions = ({ viewMode, view }: Props) => {
-  const [actionTypeFilter, setActionTypeFilter] = useState<ActionTypeFilter>("all");
-  const [selectedAthleteId, setSelectedAthleteId] = useState<string>("all");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+type Props = {
+  sessionId?: string;
+  viewMode: ViewMode;
+};
 
-  const sourceEntities = view.entities;
+const SessionActions = ({ sessionId, viewMode }: Props) => {
+  const [filters, setFilters] = useState<SessionViewFilters>(emptyFilters);
 
-  const athleteOptions = useMemo(
-    () =>
-      sourceEntities
-        .filter((entity) => entity.type === "player")
-        .map((entity) => ({ value: entity.id, label: entity.title })),
-    [sourceEntities]
-  );
+  const filteredSessionViewEndpoint = useMemo(() => {
+    if (!sessionId) return null;
 
-  const categoryOptions = useMemo(() => {
-    const seen = new Set<string>();
+    const searchParams = new URLSearchParams();
+    if (filters.outcome !== "all") searchParams.set("outcome", filters.outcome);
+    if (viewMode === "individual" && filters.athleteId && filters.athleteId !== "all") {
+      searchParams.set("playerId", filters.athleteId);
+    }
+    if (filters.categoryCode && filters.categoryCode !== "all") {
+      searchParams.set("categoryCode", filters.categoryCode);
+    }
 
-    return sourceEntities.flatMap((entity) =>
-      entity.actions.flatMap((action) => {
-        if (seen.has(action.category.code)) return [];
-        seen.add(action.category.code);
+    const queryString = searchParams.toString();
+    return `/sessions/${sessionId}/view${queryString ? `?${queryString}` : ""}`;
+  }, [filters, sessionId, viewMode]);
 
-        return {
-          value: action.category.code,
-          label: action.category.label,
-        };
-      })
-    );
-  }, [sourceEntities]);
+  const {
+    data: filteredSessionView,
+    error: sessionViewError,
+    isLoading,
+    isValidating,
+  } = useApi<SessionViewData>(filteredSessionViewEndpoint);
 
-  const activeAthleteId =
-    viewMode === "individual" && athleteOptions.some((option) => option.value === selectedAthleteId)
-      ? selectedAthleteId
-      : "all";
-
-  const activeCategory =
-    categoryOptions.some((option) => option.value === selectedCategory) ? selectedCategory : "all";
-
-  const visibleEntities = useMemo(() => {
-    const entitiesByAthlete =
-      viewMode === "individual" && activeAthleteId !== "all"
-        ? sourceEntities.filter((athlete) => athlete.id === activeAthleteId)
-        : sourceEntities;
-
-    return entitiesByAthlete
-      .map((athlete) => ({
-        ...athlete,
-        actions: athlete.actions.filter((action) => {
-          const matchesType = actionTypeFilter === "all" || action.outcome === actionTypeFilter;
-          const matchesCategory = activeCategory === "all" || action.category.code === activeCategory;
-          return matchesType && matchesCategory;
-        }),
-      }))
-      .filter((athlete) => athlete.actions.length > 0);
-  }, [actionTypeFilter, activeAthleteId, activeCategory, sourceEntities, viewMode]);
-
-  const hasBaseAnalysisForView = sourceEntities.length > 0;
+  const view = filteredSessionView?.analysis?.[viewMode];
+  const filterOptions = filteredSessionView?.filters?.[viewMode] ?? {
+    athletes: [],
+    categories: [],
+  };
+  const visibleEntities = view?.entities ?? [];
+  const isRefreshing = isValidating && Boolean(view);
   const hasAnalysisForView = visibleEntities.length > 0;
   const hasActiveFilters =
-    actionTypeFilter !== "all" ||
-    activeCategory !== "all" ||
-    (viewMode === "individual" && activeAthleteId !== "all");
+    filters.outcome !== "all" ||
+    filters.categoryCode !== "all" ||
+    (viewMode === "individual" && filters.athleteId !== "all");
 
   const handleResetFilters = () => {
-    setActionTypeFilter("all");
-    setSelectedCategory("all");
-    setSelectedAthleteId("all");
+    setFilters(emptyFilters);
   };
 
   return (
     <>
-      <section className={styles.filtersCard}>
+      <section className={styles.filtersCard} aria-busy={isRefreshing}>
         <div className={styles.filtersTitleRow}>
           <FontAwesomeIcon icon={faFilter} />
           <h4>Filtros de ações</h4>
+          {isRefreshing && <span className={styles.refreshingLabel}>Atualizando...</span>}
         </div>
 
         <div className={styles.filtersGrid}>
@@ -99,22 +81,22 @@ const SessionActions = ({ viewMode, view }: Props) => {
             <div className={styles.typeFilters}>
               <button
                 type="button"
-                className={`${styles.typeFilterButton} ${actionTypeFilter === "all" ? styles.typeFilterActive : ""}`}
-                onClick={() => setActionTypeFilter("all")}
+                className={`${styles.typeFilterButton} ${filters.outcome === "all" ? styles.typeFilterActive : ""}`}
+                onClick={() => setFilters({ ...filters, outcome: "all" })}
               >
                 Todas
               </button>
               <button
                 type="button"
-                className={`${styles.typeFilterButton} ${actionTypeFilter === "positive" ? styles.typeFilterActive : ""}`}
-                onClick={() => setActionTypeFilter("positive")}
+                className={`${styles.typeFilterButton} ${filters.outcome === "positive" ? styles.typeFilterActive : ""}`}
+                onClick={() => setFilters({ ...filters, outcome: "positive" })}
               >
                 Positivas
               </button>
               <button
                 type="button"
-                className={`${styles.typeFilterButton} ${actionTypeFilter === "negative" ? styles.typeFilterActive : ""}`}
-                onClick={() => setActionTypeFilter("negative")}
+                className={`${styles.typeFilterButton} ${filters.outcome === "negative" ? styles.typeFilterActive : ""}`}
+                onClick={() => setFilters({ ...filters, outcome: "negative" })}
               >
                 Negativas
               </button>
@@ -125,41 +107,64 @@ const SessionActions = ({ viewMode, view }: Props) => {
             <Select
               label="Atleta"
               name="athlete-filter"
-              value={activeAthleteId}
-              options={[{ value: "all", label: "Todos os atletas" }, ...athleteOptions]}
-              onChange={(value) => setSelectedAthleteId(value)}
+              value={filters.athleteId}
+              options={[{ value: "all", label: "Todos os atletas" }, ...filterOptions.athletes]}
+              onChange={(value) => setFilters({ ...filters, athleteId: value || "all" })}
             />
           )}
 
           <Select
             label="Categoria"
             name="category-filter"
-            value={activeCategory}
-            options={[{ value: "all", label: "Todas as categorias" }, ...categoryOptions]}
-            onChange={(value) => setSelectedCategory(value)}
+            value={filters.categoryCode}
+            options={[{ value: "all", label: "Todas as categorias" }, ...filterOptions.categories]}
+            onChange={(value) => setFilters({ ...filters, categoryCode: value || "all" })}
           />
         </div>
       </section>
 
-      {hasAnalysisForView ? (
-        <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
-          {visibleEntities.map((athlete) => (
-            <SessionActionCard key={athlete.id} entity={athlete} />
-          ))}
-        </div>
-      ) : (
+      {isLoading && !view ? (
         <section className={styles.emptyState}>
-          <h3>
-            {hasBaseAnalysisForView
-              ? "Nenhuma ação encontrada com os filtros atuais."
-              : "Esta sessão ainda não possui ações para esta visualização."}
-          </h3>
-          {hasActiveFilters && (
-            <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
-              Limpar filtros
-            </button>
-          )}
+          <h3>Carregando ações...</h3>
         </section>
+      ) : sessionViewError || !view ? (
+        <section className={styles.emptyState}>
+          <h3>Não foi possível carregar as ações desta sessão.</h3>
+        </section>
+      ) : (
+        <>
+          <SessionSummary
+            positives={view.summary.positives}
+            negatives={view.summary.negatives}
+            positivePercentage={view.summary.positivePercentage}
+            negativePercentage={view.summary.negativePercentage}
+          />
+
+          <h3 className={styles.sectionTitle}>
+            {viewMode === "individual" ? "Ações Individuais" : "Ações da Equipe"}
+          </h3>
+
+          {hasAnalysisForView ? (
+            <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
+              {visibleEntities.map((athlete) => (
+                <SessionActionCard key={athlete.id} entity={athlete} />
+              ))}
+            </div>
+          ) : (
+            <section className={styles.emptyState}>
+              <h3>
+                {hasActiveFilters
+                  ? "Nenhuma ação encontrada com os filtros atuais."
+                  : "Esta sessão ainda não possui ações para esta visualização."}
+              </h3>
+              {hasActiveFilters && (
+                <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
+                  Limpar filtros
+                </button>
+              )}
+            </section>
+          )}
+        </>
       )}
     </>
   );

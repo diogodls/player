@@ -4,23 +4,26 @@ import { backendApi } from "../utils/api.ts";
 
 type UseApiOptions = {
   client?: AxiosInstance;
+  keepPreviousData?: boolean;
 };
 
 export function useApi<T>(
   endpoint: string | null,
-  { client = backendApi }: UseApiOptions = {},
+  { client = backendApi, keepPreviousData = true }: UseApiOptions = {},
 ) {
-  const { data, error, isLoading, mutate } = useSWR<T>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<T>(
     endpoint,
     endpoint
       ? (url: string) => client.get<T>(url).then((response) => response.data)
       : null,
+    { keepPreviousData },
   );
 
   return {
     data,
     error,
     isLoading,
+    isValidating,
     isError: error,
     mutate,
   };
