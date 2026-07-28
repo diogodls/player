@@ -31,6 +31,9 @@ export class CatalogActionEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 30 })
   sigla!: string;
 
+  @Column({ type: 'smallint', nullable: true })
+  ordem!: number | null;
+
   @ManyToOne(() => ActionCategoryEntity, (category) => category.acoes, {
     nullable: false,
   })

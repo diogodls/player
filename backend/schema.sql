@@ -100,11 +100,17 @@ CREATE TABLE categorias_acao (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo_analise_id smallint NOT NULL REFERENCES tipos_analise(id),
   nome varchar(100) NOT NULL,
+  chave varchar(50) NULL,
+  ordem smallint NULL,
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
   deleted_at timestamptz NULL,
   CONSTRAINT categorias_acao_tipo_nome_unique UNIQUE (tipo_analise_id, nome)
 );
+
+CREATE UNIQUE INDEX categorias_acao_tipo_chave_unique
+  ON categorias_acao (tipo_analise_id, chave)
+  WHERE chave IS NOT NULL;
 
 CREATE INDEX categorias_acao_tipo_deleted_at_idx
   ON categorias_acao (tipo_analise_id, deleted_at);
@@ -115,6 +121,7 @@ CREATE TABLE acoes_catalogo (
   impacto_id smallint NOT NULL REFERENCES impactos(id),
   nome varchar(255) NOT NULL,
   sigla varchar(30) NOT NULL,
+  ordem smallint NULL,
   created_at timestamptz NOT NULL DEFAULT NOW(),
   updated_at timestamptz NOT NULL DEFAULT NOW(),
   deleted_at timestamptz NULL,

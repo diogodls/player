@@ -2,41 +2,36 @@ import styles from './ActionsModal.module.scss';
 import {useContext} from "react";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUser, faX} from "@fortawesome/free-solid-svg-icons";
-import type {Action, ActionTagged} from "../../../pages/Analysis";
-import {uid} from "uid";
-import ActionsList from "../../elements/ActionsList/ActionsList.tsx";
+import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
+import type {CatalogAction, CatalogGroup} from "../../../pages/Analysis";
 import type {Session} from "../../../pages/Sessions";
 import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
+import {createIndividualTaggedAction} from "./createIndividualTaggedAction.ts";
 
 type ActionsModal = {
-  actions: Action[];
+  groups: CatalogGroup[];
   session: Session;
   closeModal: () => void;
 };
 
-const ActionsModal = ({actions, closeModal, session}: ActionsModal) => {
+const ActionsModal = ({groups, closeModal, session}: ActionsModal) => {
   const {selectedPlayer, setIndividualActions, currentVideoTime, isVideoLoaded} = useContext(ActionsContext);
   const {error} = useContext(ToastContext);
 
-  const handleActionClick = (action: Action) => {
+  const handleActionClick = (action: CatalogAction, category: string) => {
     if (!isVideoLoaded) {
       error("O vídeo precisa estar definido");
       closeModal();
       return;
     }
 
-    const actionTagged = {
-      id: uid(),
-      sessionId: session.id,
-      goodAction: action.goodAction,
-      title: action.label,
-      key: action.key,
-      category: action.category,
-      time: currentVideoTime,
-      type: 'individual',
-      player: selectedPlayer,
-    } as ActionTagged;
+    const actionTagged = createIndividualTaggedAction(
+      action,
+      category,
+      session,
+      selectedPlayer,
+      currentVideoTime,
+    );
 
     setIndividualActions((actions) => [...actions, actionTagged]);
     closeModal();
@@ -63,7 +58,35 @@ const ActionsModal = ({actions, closeModal, session}: ActionsModal) => {
           <FontAwesomeIcon icon={faX} className={styles.exitIcon} onClick={closeModal}/>
         </div>
 
-        <ActionsList actions={actions} handleActionClick={handleActionClick} className={styles.actionsListPadding}/>
+        {groups.length === 0 ? (
+          <div className={styles.emptyCatalog}>Nenhuma ação disponível.</div>
+        ) : (
+          <div className={styles.actionsListPadding}>
+            {groups.map((group) => (
+              <section className={styles.actionsType} key={group.key}>
+                <span className={styles.actionsTitle}>{group.title}</span>
+                <div className={styles.tagActions}>
+                  {group.actions.map((action) => {
+                    const isPositive = action.impact === 'POSITIVE';
+
+                    return (
+                      <button
+                        type="button"
+                        className={`${styles.action} ${isPositive ? styles.goodAction : styles.badAction}`}
+                        title={action.key}
+                        key={action.id}
+                        onClick={() => handleActionClick(action, group.title)}
+                      >
+                        <FontAwesomeIcon icon={isPositive ? faBullseye : faMinus}/>
+                        <span>{action.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

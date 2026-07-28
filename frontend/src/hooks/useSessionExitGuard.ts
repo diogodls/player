@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Cookies } from "react-cookie";
 import { ActionsContext } from "../contexts/ActionsContext/ActionsContext.tsx";
 import { ToastContext } from "../contexts/ToastContext/ToastContext.tsx";
+import { persistSessionActions } from "../utils/sessionActions.ts";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 
@@ -17,7 +18,7 @@ export const useSessionExitGuard = ({
 }: UseSessionExitGuardProps) => {
   const navigate = useNavigate();
   const cookies = useMemo(() => new Cookies(), []);
-  const { success, info } = useContext(ToastContext);
+  const { success, info, error } = useContext(ToastContext);
   const {
     individualActions,
     teamActions,
@@ -78,11 +79,16 @@ export const useSessionExitGuard = ({
     goToSession();
   };
 
-  const handleSaveAndExit = () => {
-    clearSessionActions();
-    setIsExitModalOpen(false);
-    success("Ações salvas com sucesso!");
-    goToSession();
+  const handleSaveAndExit = async () => {
+    try {
+      await persistSessionActions(sessionId, sessionActions);
+      clearSessionActions();
+      setIsExitModalOpen(false);
+      success("Ações salvas com sucesso!");
+      goToSession();
+    } catch {
+      error("Falha ao salvar ações");
+    }
   };
 
   return {

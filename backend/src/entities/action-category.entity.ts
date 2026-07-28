@@ -23,6 +23,12 @@ export class ActionCategoryEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   nome!: string;
 
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  chave!: string | null;
+
+  @Column({ type: 'smallint', nullable: true })
+  ordem!: number | null;
+
   @ManyToOne(() => AnalysisTypeEntity, { nullable: false })
   @JoinColumn({ name: 'tipo_analise_id' })
   tipoAnalise?: AnalysisTypeEntity;

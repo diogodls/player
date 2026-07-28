@@ -9,6 +9,7 @@ import type { Session } from "../../../pages/Sessions";
 import { useNavigate } from "react-router";
 import ActionLogConfirmModal from "../ActionLog/ActionLogConfirmModal.tsx";
 import {formatVideoTime} from "../../../utils/videoTime.ts";
+import {persistSessionActions} from "../../../utils/sessionActions.ts";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
@@ -110,6 +111,7 @@ const ActionLog = ({logType, session}: ActionLog) => {
     setIsSaving(true);
 
     try {
+      await persistSessionActions(session.id, selectedActions);
       showSuccessAndRedirect(session.id);
     } catch {
       setIsSaving(false);
