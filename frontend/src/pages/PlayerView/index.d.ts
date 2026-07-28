@@ -1,7 +1,10 @@
-import type {Player, Team} from "../CoachDashboard";
-
 export type PlayerViewData = {
-  player: Player;
-  team: Team;
-  metrics: string[];
-}
+  id: string;
+  name: string;
+  age: number;
+  positionId: number;
+  position: string;
+  preferredSideId: number;
+  preferredSide: string;
+  teamName: string;
+};
