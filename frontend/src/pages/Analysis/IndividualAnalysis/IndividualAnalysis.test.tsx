@@ -48,6 +48,7 @@ function apiState(overrides: Record<string, unknown> = {}) {
     data: undefined,
     error: undefined,
     isLoading: false,
+    isValidating: false,
     isError: undefined,
     mutate: vi.fn(),
     ...overrides,

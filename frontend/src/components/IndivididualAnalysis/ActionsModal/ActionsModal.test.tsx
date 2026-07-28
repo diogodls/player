@@ -6,7 +6,16 @@ import type { Session } from '../../../pages/Sessions';
 import ActionsModal from './ActionsModal';
 import { createIndividualTaggedAction } from './createIndividualTaggedAction';
 
-const session: Session = { id: 'session-1', type: 'Treino', date: '2026-07-15', local: 'Casa' };
+const session: Session = {
+  id: 'session-1',
+  typeId: 1,
+  type: 'Treino',
+  date: '2026-07-15',
+  locationId: 1,
+  local: 'Casa',
+  courtSizeId: 1,
+  courtSize: 'Pequena',
+};
 const groups: IndividualCatalogGroup[] = [{
   key: 'COURT_GOALS_CONCEDED',
   title: 'Gols tomados em quadra',
