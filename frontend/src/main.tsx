@@ -14,6 +14,7 @@ import SessionView from "./pages/SessionView/SessionView.tsx";
 import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 import AthleteRegistrationScreen from "./pages/AthleteRegistrationScreen/AthleteRegistrationScreen.tsx";
 import Rankings from "./pages/Rankings/Rankings.tsx";
+import SessionComparison from "./pages/SessionComparison/SessionComparison.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <CookiesProvider>
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path={"/player/:id"} element={<PlayerView/>}/>
               <Route path="/rankings" element={<Rankings/>}/>
               <Route path={"/sessions"} element={<Sessions />}/>
+              <Route path="/sessions/comparison" element={<SessionComparison />} />
               <Route path="/sessions/:id" element={<SessionView />} />
               <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
               <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis />} />

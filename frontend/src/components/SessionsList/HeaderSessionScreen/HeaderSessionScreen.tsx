@@ -1,12 +1,16 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFutbol } from "@fortawesome/free-solid-svg-icons";
+import { faCodeCompare, faFutbol } from "@fortawesome/free-solid-svg-icons";
 import styles from "./HeaderSessionScreen.module.scss";
 
 type HeaderSessionScreenProps = {
   onAddSession: () => void;
+  onCompareSessions: () => void;
 };
 
-const HeaderSessionScreen = ({ onAddSession }: HeaderSessionScreenProps) => {
+const HeaderSessionScreen = ({
+  onAddSession,
+  onCompareSessions,
+}: HeaderSessionScreenProps) => {
   return(
     <div className={styles.headerContainer}>
       <div className={styles.headerText}>
@@ -20,9 +24,15 @@ const HeaderSessionScreen = ({ onAddSession }: HeaderSessionScreenProps) => {
         </div>
       </div>
 
-      <button className={styles.addButton} onClick={onAddSession}>
-        Adicionar treino/jogo
-      </button>
+      <div className={styles.actions}>
+        <button className={styles.compareButton} onClick={onCompareSessions}>
+          <FontAwesomeIcon icon={faCodeCompare} />
+          Comparar período
+        </button>
+        <button className={styles.addButton} onClick={onAddSession}>
+          Adicionar treino/jogo
+        </button>
+      </div>
     </div>
   );
 };
