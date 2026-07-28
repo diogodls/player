@@ -55,6 +55,31 @@ INSERT INTO jogadores (id, equipe_id, posicao_id, lado_preferencial_id, nome, id
   ('00000000-0000-0000-0000-000000000205', '00000000-0000-0000-0000-000000000001', 2, 1, 'Balk', 20)
 ON CONFLICT (id) DO NOTHING;
 
+
+-- Indices experimentais usados apenas pelo ambiente de desenvolvimento.
+-- O UPSERT mantem o seed idempotente e permite substituir estes valores por calculos reais.
+INSERT INTO indices_jogadores (
+  jogador_id, radj, goals_relations, actions_relations, atd, dto,
+  pgj, ic, tio, gtj, rf, tid
+) VALUES
+  ('00000000-0000-0000-0000-000000000201', 1.35,  1.20,  3.40, 72, 68, 1.10, 74, 78, 0.80, 2.40, 81),
+  ('00000000-0000-0000-0000-000000000202', 1.62,  2.10,  4.80, 84, 61, 1.85, 86, 89, 1.10, 1.90, 67),
+  ('00000000-0000-0000-0000-000000000203', 1.18,  0.75,  2.60, 69, 73, 1.40, 81, 76, 0.65, 2.85, 84),
+  ('00000000-0000-0000-0000-000000000204', 1.74,  2.55,  5.20, 88, 70, 2.05, 91, 93, 0.95, 2.20, 79),
+  ('00000000-0000-0000-0000-000000000205', 0.96, -0.40, -1.30, 63, 82, 0.70, 66, 64, 1.35, 3.10, 88)
+ON CONFLICT (jogador_id) DO UPDATE SET
+  radj = EXCLUDED.radj,
+  goals_relations = EXCLUDED.goals_relations,
+  actions_relations = EXCLUDED.actions_relations,
+  atd = EXCLUDED.atd,
+  dto = EXCLUDED.dto,
+  pgj = EXCLUDED.pgj,
+  ic = EXCLUDED.ic,
+  tio = EXCLUDED.tio,
+  gtj = EXCLUDED.gtj,
+  rf = EXCLUDED.rf,
+  tid = EXCLUDED.tid;
+
 INSERT INTO sessoes (id, equipe_id, session_type_id, session_location_id, session_court_size_id, data, descricao) VALUES
   ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000001', 1, 1, 1, DATE '2026-02-15', 'Finalizacao e 1x1'),
   ('00000000-0000-0000-0000-000000000102', '00000000-0000-0000-0000-000000000001', 2, 2, 2, DATE '2026-02-19', NULL)

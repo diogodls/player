@@ -35,6 +35,7 @@ export class PlayersService {
         equipe: true,
         posicao: true,
         ladoPreferencial: true,
+        indices: true,
       },
       order: { nome: 'ASC' },
       skip: (page - 1) * limit,
@@ -106,6 +107,7 @@ export class PlayersService {
         equipe: true,
         posicao: true,
         ladoPreferencial: true,
+        indices: true,
       },
     });
 
@@ -138,6 +140,21 @@ export class PlayersService {
       preferredSideId: player.ladoPreferencialId,
       preferredSide: player.ladoPreferencial.nome,
       teamName: player.equipe.nome,
+      indexes: player.indices
+        ? {
+            radj: player.indices.radj,
+            goalsRelations: player.indices.goalsRelations,
+            actionsRelations: player.indices.actionsRelations,
+            atd: player.indices.atd,
+            dto: player.indices.dto,
+            pgj: player.indices.pgj,
+            ic: player.indices.ic,
+            tio: player.indices.tio,
+            gtj: player.indices.gtj,
+            rf: player.indices.rf,
+            tid: player.indices.tid,
+          }
+        : null,
     };
   }
 }

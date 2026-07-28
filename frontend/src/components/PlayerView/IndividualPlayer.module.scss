@@ -87,6 +87,27 @@
     }
   }
 
+  .indexGroups {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .indexGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .indexName {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .number {
+      font-weight: 600;
+    }
+  }
+
   .emptyIndexes {
     color: var(--text-muted);
     margin: 0;

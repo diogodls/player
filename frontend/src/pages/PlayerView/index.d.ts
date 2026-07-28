@@ -1,3 +1,17 @@
+export type PlayerIndexes = {
+  radj: number | null;
+  goalsRelations: number | null;
+  actionsRelations: number | null;
+  atd: number | null;
+  dto: number | null;
+  pgj: number | null;
+  ic: number | null;
+  tio: number | null;
+  gtj: number | null;
+  rf: number | null;
+  tid: number | null;
+};
+
 export type PlayerViewData = {
   id: string;
   name: string;
@@ -7,4 +21,5 @@ export type PlayerViewData = {
   preferredSideId: number;
   preferredSide: string;
   teamName: string;
+  indexes: PlayerIndexes | null;
 };

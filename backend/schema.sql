@@ -65,6 +65,22 @@ CREATE INDEX jogadores_equipe_deleted_at_idx
 CREATE INDEX jogadores_nome_idx
   ON jogadores (nome);
 
+
+CREATE TABLE indices_jogadores (
+  jogador_id uuid PRIMARY KEY REFERENCES jogadores(id) ON DELETE CASCADE,
+  radj double precision NULL,
+  goals_relations double precision NULL,
+  actions_relations double precision NULL,
+  atd double precision NULL,
+  dto double precision NULL,
+  pgj double precision NULL,
+  ic double precision NULL,
+  tio double precision NULL CHECK (tio BETWEEN 0 AND 100),
+  gtj double precision NULL,
+  rf double precision NULL,
+  tid double precision NULL CHECK (tid BETWEEN 0 AND 100)
+);
+
 CREATE TABLE sessoes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   equipe_id uuid NOT NULL REFERENCES equipes(id),
