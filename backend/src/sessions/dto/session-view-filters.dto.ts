@@ -26,4 +26,12 @@ export class SessionViewFiltersDto {
   @IsString({ message: 'Categoria deve ser um texto' })
   @MaxLength(30, { message: 'Categoria deve ter no maximo 30 caracteres' })
   categoryCode?: string;
+
+  @Transform(({ value }: { value: unknown }) =>
+    toOptionalString(trimString({ value })),
+  )
+  @IsOptional()
+  @IsString({ message: 'Fase deve ser um texto' })
+  @MaxLength(50, { message: 'Fase deve ter no maximo 50 caracteres' })
+  phaseKey?: string;
 }

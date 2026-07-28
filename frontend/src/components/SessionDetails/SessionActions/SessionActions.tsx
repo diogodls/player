@@ -11,11 +11,13 @@ import type {
 } from "../../../pages/SessionView";
 import Select from "../../elements/Select/Select.tsx";
 import { useApi } from "../../../hooks/useApi.ts";
+import type { TeamCatalog } from "../../../pages/Analysis";
 
 const emptyFilters: SessionViewFilters = {
   outcome: "all",
   athleteId: "all",
   categoryCode: "all",
+  phaseKey: "all",
 };
 
 type Props = {
@@ -25,6 +27,9 @@ type Props = {
 
 const SessionActions = ({ sessionId, viewMode }: Props) => {
   const [filters, setFilters] = useState<SessionViewFilters>(emptyFilters);
+  const { data: teamCatalog } = useApi<TeamCatalog>(
+    viewMode === "team" ? "/catalog/actions/team" : null,
+  );
 
   const filteredSessionViewEndpoint = useMemo(() => {
     if (!sessionId) return null;
@@ -36,6 +41,9 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
     }
     if (filters.categoryCode && filters.categoryCode !== "all") {
       searchParams.set("categoryCode", filters.categoryCode);
+    }
+    if (viewMode === "team" && filters.phaseKey !== "all") {
+      searchParams.set("phaseKey", filters.phaseKey);
     }
 
     const queryString = searchParams.toString();
@@ -60,6 +68,7 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
   const hasActiveFilters =
     filters.outcome !== "all" ||
     filters.categoryCode !== "all" ||
+    (viewMode === "team" && filters.phaseKey !== "all") ||
     (viewMode === "individual" && filters.athleteId !== "all");
 
   const handleResetFilters = () => {
@@ -110,6 +119,24 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
               value={filters.athleteId}
               options={[{ value: "all", label: "Todos os atletas" }, ...filterOptions.athletes]}
               onChange={(value) => setFilters({ ...filters, athleteId: value || "all" })}
+            />
+          )}
+
+          {viewMode === "team" && (
+            <Select
+              label="Fase"
+              name="phase-filter"
+              value={filters.phaseKey}
+              options={[
+                { value: "all", label: "Todas as fases" },
+                ...(teamCatalog?.groups.map((group) => ({
+                  value: group.key,
+                  label: group.title,
+                })) ?? []),
+              ]}
+              onChange={(value) =>
+                setFilters({ ...filters, phaseKey: value || "all" })
+              }
             />
           )}
 

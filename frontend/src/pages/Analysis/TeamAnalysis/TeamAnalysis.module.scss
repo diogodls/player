@@ -59,3 +59,11 @@
     padding: 14px 10px 24px;
   }
 }
+
+.feedback {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  background-color: #111828;
+  color: var(--text-primary);
+}

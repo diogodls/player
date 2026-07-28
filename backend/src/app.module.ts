@@ -19,6 +19,8 @@ import {
 } from './entities';
 import { PlayersModule } from './players/players.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { CatalogModule } from './catalog/catalog.module';
+import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
 
 @Module({
   imports: [
@@ -45,10 +47,14 @@ import { SessionsModule } from './sessions/sessions.module';
         TaggedActionEntity,
       ],
       synchronize: false,
+      migrations: [__dirname + '/migrations/*{.ts,.js}'],
+      migrationsRun: true,
       logging: false,
     }),
     PlayersModule,
     SessionsModule,
+    CatalogModule,
+    TaggedActionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

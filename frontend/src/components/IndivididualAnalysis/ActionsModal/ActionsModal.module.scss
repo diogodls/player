@@ -67,5 +67,76 @@
 
   .actionsListPadding {
     padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .actionsType {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    background: var(--secondary-bg-dark);
+  }
+
+  .actionsTitle {
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-50);
+    color: var(--text-primary);
+    font-size: 1.2em;
+    font-weight: 600;
+  }
+
+  .tagActions {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .action {
+    min-width: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    transition: .2s all ease-in-out;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  .goodAction {
+    background: var(--action-green);
+  }
+
+  .badAction {
+    background: var(--action-red);
+  }
+
+  .emptyCatalog {
+    padding: 40px 20px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 720px) {
+    .content {
+      width: calc(100% - 24px);
+    }
+
+    .actionsListPadding {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
   }
 }

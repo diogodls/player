@@ -6,12 +6,11 @@ import {
   type SetStateAction,
   type ReactNode, type RefObject, useRef,
 } from "react";
-import type {Player} from "../../pages/CoachDashboard";
-import type {ActionTagged} from "../../pages/Analysis";
+import type {ActionTagged, AnalysisPlayer} from "../../pages/Analysis";
 
 type ActionsContextValue = {
-  selectedPlayer: Player | null;
-  setSelectedPlayer: Dispatch<SetStateAction<Player | null>>;
+  selectedPlayer: AnalysisPlayer | null;
+  setSelectedPlayer: Dispatch<SetStateAction<AnalysisPlayer | null>>;
   individualActions: ActionTagged[];
   setIndividualActions: Dispatch<SetStateAction<ActionTagged[]>>;
   teamActions: ActionTagged[];
@@ -34,7 +33,7 @@ type ActionsProviderProps = {
 const ActionsContext = createContext<ActionsContextValue>({} as ActionsContextValue);
 
 const ActionsProvider = ({children}: ActionsProviderProps) => {
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<AnalysisPlayer | null>(null);
   const [individualActions, setIndividualActions] = useState<ActionTagged[]>([]);
   const [teamActions, setTeamActions] = useState<ActionTagged[]>([]);
   const [actionTagged, setActionTagged] = useState<ActionTagged | null>(null);

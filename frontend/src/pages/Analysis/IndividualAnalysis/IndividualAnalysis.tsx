@@ -5,17 +5,26 @@ import PlayerSelector from "../../../components/IndivididualAnalysis/PlayerSelec
 import {useApi} from "../../../hooks/useApi.ts";
 import {useContext, useEffect, useState} from "react";
 import ActionsModal from "../../../components/IndivididualAnalysis/ActionsModal/ActionsModal.tsx";
-import type {IndividualAnalysisData} from "../index";
+import type {AnalysisPlayerListResponse, IndividualCatalog} from "../index";
+import type {Session} from "../../Sessions";
 import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisHeader/SessionAnalysisHeader.tsx";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
 import AnalysisExitModal from "../../../components/elements/AnalysisExitModal/AnalysisExitModal.tsx";
-import {mockApi} from "../../../utils/api.ts";
+import {useParams} from "react-router";
 
 const IndividualAnalysis = () => {
+  const {id: sessionId} = useParams<{id: string}>();
   const { setIsTagging } = useContext(ActionsContext);
-  const {data} = useApi<IndividualAnalysisData>("individual-analysis", { client: mockApi });
-  // const { id } = useParams<{ id: string }>(); todo: usar para requisição futura
+  const {data: session, isLoading: isSessionLoading, isError: sessionError} =
+    useApi<Session>(sessionId ? `/sessions/${sessionId}` : null);
+  const {data: playersResponse, isLoading: arePlayersLoading, isError: playersError} =
+    useApi<AnalysisPlayerListResponse>(sessionId ? "/players?limit=100" : null);
+  const {
+    data: catalog,
+    isLoading: isCatalogLoading,
+    isError: catalogError,
+  } = useApi<IndividualCatalog>("/catalog/actions/individual");
   const [actionsModalOpen, setActionsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -24,31 +33,45 @@ const IndividualAnalysis = () => {
 
   const exitGuard = useSessionExitGuard({
     logType: "individual",
-    sessionId: data?.session ? data.session.id : '0',
+    sessionId: sessionId ?? '0',
   });
 
-  if (!data) return;
+  if (isSessionLoading || arePlayersLoading || isCatalogLoading) {
+    return <div className={styles.feedback}>Carregando análise individual...</div>;
+  }
+
+  if (
+    !sessionId ||
+    sessionError ||
+    playersError ||
+    catalogError ||
+    !session ||
+    !playersResponse ||
+    !catalog
+  ) {
+    return <div className={styles.feedback}>Não foi possível carregar a análise individual.</div>;
+  }
 
   return (
     <div className={styles.container}>
-      <SessionAnalysisHeader session={data.session} onBack={exitGuard.requestExit} />
+      <SessionAnalysisHeader session={session} onBack={exitGuard.requestExit} />
 
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <PlayerSelector players={data?.players ?? []} setActionsModalOpen={setActionsModalOpen} />
+          <PlayerSelector players={playersResponse.data} setActionsModalOpen={setActionsModalOpen} />
         </div>
         <div className={styles.videoAnalysis}>
           <VideoAnalysis />
         </div>
         <div className={styles.actionLog}>
-          <ActionLog logType={'individual'} session={data.session} />
+          <ActionLog logType={'individual'} session={session} />
         </div>
       </div>
       {actionsModalOpen && (
         <ActionsModal
           closeModal={() => setActionsModalOpen(false)}
-          actions={data?.actions ?? []}
-          session={data.session}
+          groups={catalog.groups}
+          session={session}
         />
       )}
 
