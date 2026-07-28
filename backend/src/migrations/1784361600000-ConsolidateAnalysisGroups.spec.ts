@@ -20,4 +20,13 @@ describe('ConsolidateAnalysisGroups migration', () => {
     expect(statements[0]).toContain("WHEN 'PPGL' THEN 6");
     expect(statements[1]).toMatch(/DELETE\s+FROM\s+categorias_acao/i);
   });
+
+  it('does not recreate the removed group when reverted', async () => {
+    const query = jest.fn().mockResolvedValue(undefined);
+    const migration = new ConsolidateAnalysisGroups1784361600000();
+
+    await migration.down({ query } as unknown as QueryRunner);
+
+    expect(query).not.toHaveBeenCalled();
+  });
 });

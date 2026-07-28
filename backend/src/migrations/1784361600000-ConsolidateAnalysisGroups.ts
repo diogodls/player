@@ -26,24 +26,10 @@ export class ConsolidateAnalysisGroups1784361600000 implements MigrationInterfac
     `);
   }
 
-  async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
-      INSERT INTO categorias_acao (id, tipo_analise_id, nome, chave, ordem)
-      VALUES (
-        '00000000-0000-0000-0000-000000000310',
-        2,
-        'Goleiro-linha',
-        'FLY_GOALKEEPER',
-        6
-      )
-      ON CONFLICT (id) DO NOTHING
-    `);
-
-    await queryRunner.query(`
-      UPDATE acoes_catalogo
-      SET categoria_acao_id = '00000000-0000-0000-0000-000000000310'
-      WHERE sigla IN ('GGL', 'PPGL')
-        AND categoria_acao_id = '00000000-0000-0000-0000-000000000306'
-    `);
+  down(queryRunner: QueryRunner): Promise<void> {
+    void queryRunner;
+    // Data consolidation is intentionally irreversible because the previous
+    // category may not have existed before this migration ran.
+    return Promise.resolve();
   }
 }
