@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { ActionsProvider } from '../../../contexts/ActionsContext/ActionsContext';
 import { useApi } from '../../../hooks/useApi';
 import IndividualAnalysis from './IndividualAnalysis';
+import { MemoryRouter, Route, Routes } from 'react-router';
 
 vi.mock('../../../hooks/useApi', () => ({ useApi: vi.fn() }));
 vi.mock('../../../hooks/useSessionExitGuard', () => ({
@@ -31,7 +32,8 @@ describe('IndividualAnalysis catalog states', () => {
 
   it('renders a safe error state when the catalog request fails', () => {
     mockedUseApi
-      .mockReturnValueOnce(apiState({ data: { session: session(), players: [] } }))
+      .mockReturnValueOnce(apiState({ data: session() }))
+      .mockReturnValueOnce(apiState({ data: { data: [], total: 0, page: 1, limit: 100, totalPages: 1 } }))
       .mockReturnValueOnce(apiState({ isError: new Error('catalog failed') }));
 
     renderPage();
@@ -40,7 +42,18 @@ describe('IndividualAnalysis catalog states', () => {
 });
 
 function renderPage() {
-  return render(<ActionsProvider><IndividualAnalysis/></ActionsProvider>);
+  return render(
+    <MemoryRouter initialEntries={['/sessions/session-1/analysis/individual']}>
+      <ActionsProvider>
+        <Routes>
+          <Route
+            path="/sessions/:id/analysis/individual"
+            element={<IndividualAnalysis/>}
+          />
+        </Routes>
+      </ActionsProvider>
+    </MemoryRouter>,
+  );
 }
 
 function apiState(overrides: Record<string, unknown> = {}) {

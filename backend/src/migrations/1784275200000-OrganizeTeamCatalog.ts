@@ -8,8 +8,7 @@ export class OrganizeTeamCatalog1784275200000 implements MigrationInterface {
       INSERT INTO categorias_acao (id, tipo_analise_id, nome, chave, ordem) VALUES
         ('00000000-0000-0000-0000-000000000307', 2, 'Transição ofensiva', 'OFFENSIVE_TRANSITION', 3),
         ('00000000-0000-0000-0000-000000000308', 2, 'Organização defensiva', 'DEFENSIVE_ORGANIZATION', 4),
-        ('00000000-0000-0000-0000-000000000309', 2, 'Transição defensiva', 'DEFENSIVE_TRANSITION', 5),
-        ('00000000-0000-0000-0000-000000000310', 2, 'Goleiro-linha', 'FLY_GOALKEEPER', 6)
+        ('00000000-0000-0000-0000-000000000309', 2, 'Transição defensiva', 'DEFENSIVE_TRANSITION', 5)
       ON CONFLICT (id) DO UPDATE SET
         tipo_analise_id = EXCLUDED.tipo_analise_id,
         nome = EXCLUDED.nome,
@@ -49,8 +48,8 @@ export class OrganizeTeamCatalog1784275200000 implements MigrationInterface {
         ('PRGT', '00000000-0000-0000-0000-000000000308'::uuid, 'Gol sofrido em marcação pressão', 6),
         ('TRP', '00000000-0000-0000-0000-000000000309'::uuid, 'Recuperação de bola em transição defensiva', 1),
         ('TGT', '00000000-0000-0000-0000-000000000309'::uuid, 'Gol sofrido em transição defensiva', 2),
-        ('GGL', '00000000-0000-0000-0000-000000000310'::uuid, 'Gol de goleiro-linha', 1),
-        ('PPGL', '00000000-0000-0000-0000-000000000310'::uuid, 'Perda de posse com goleiro-linha', 2)
+        ('GGL', '00000000-0000-0000-0000-000000000306'::uuid, 'Gol de goleiro-linha', 5),
+        ('PPGL', '00000000-0000-0000-0000-000000000306'::uuid, 'Perda de posse com goleiro-linha', 6)
       ) AS metadata(sigla, categoria_id, nome, ordem), categorias_acao categoria_atual
       WHERE acao.sigla = metadata.sigla
         AND categoria_atual.id = acao.categoria_acao_id

@@ -1,7 +1,11 @@
-import type {Player, Team} from "../CoachDashboard";
-import type {Session} from "../Sessions";
-
 type ActionType = 'team' | 'individual';
+
+export type AnalysisPlayer = {
+  id: string | number;
+  name: string;
+  age: number;
+  position: string;
+};
 
 export type ActionTagged = {
   id: string;
@@ -13,17 +17,20 @@ export type ActionTagged = {
   key?: string;
   category?: string;
   goodAction: boolean;
-  player?: Player;
+  player?: AnalysisPlayer;
 };
 
-export type IndividualAnalysisData = {
-  session: Session;
-  players: Player[];
+export type AnalysisPlayerListResponse = {
+  data: AnalysisPlayer[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 };
 
 export type CatalogImpact = 'POSITIVE' | 'NEGATIVE';
 
-export type IndividualCatalogAction = {
+export type CatalogAction = {
   id: string;
   key: string;
   name: string;
@@ -31,24 +38,19 @@ export type IndividualCatalogAction = {
   order: number;
 };
 
-export type IndividualCatalogGroup = {
+export type CatalogGroup = {
   key: string;
   title: string;
   order: number;
-  actions: IndividualCatalogAction[];
+  actions: CatalogAction[];
 };
 
 export type IndividualCatalog = {
   analysisType: 'INDIVIDUAL';
-  groups: IndividualCatalogGroup[];
-};
-
-export type TeamAnalysisData = {
-  session: Session;
-  team: Team;
+  groups: CatalogGroup[];
 };
 
 export type TeamCatalog = {
   analysisType: 'TEAM';
-  groups: IndividualCatalogGroup[];
+  groups: CatalogGroup[];
 };

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ActionsProvider } from '../../../contexts/ActionsContext/ActionsContext';
 import { ToastProvider } from '../../../contexts/ToastContext/ToastContext';
-import type { IndividualCatalogGroup } from '../../../pages/Analysis';
+import type { CatalogGroup } from '../../../pages/Analysis';
 import type { Session } from '../../../pages/Sessions';
 import ActionsModal from './ActionsModal';
 import { createIndividualTaggedAction } from './createIndividualTaggedAction';
@@ -16,7 +16,7 @@ const session: Session = {
   courtSizeId: 1,
   courtSize: 'Pequena',
 };
-const groups: IndividualCatalogGroup[] = [{
+const groups: CatalogGroup[] = [{
   key: 'COURT_GOALS_CONCEDED',
   title: 'Gols tomados em quadra',
   order: 4,
@@ -64,7 +64,7 @@ describe('ActionsModal', () => {
   });
 });
 
-function renderModal(catalogGroups: IndividualCatalogGroup[], closeModal = vi.fn()) {
+function renderModal(catalogGroups: CatalogGroup[], closeModal = vi.fn()) {
   return render(
     <ToastProvider>
       <ActionsProvider>

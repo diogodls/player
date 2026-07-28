@@ -1,11 +1,11 @@
 import styles from "./ActionsList.module.scss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBullseye, faMinus} from "@fortawesome/free-solid-svg-icons";
-import type {IndividualCatalogAction, IndividualCatalogGroup} from "../../../pages/Analysis";
+import type {CatalogAction, CatalogGroup} from "../../../pages/Analysis";
 
 type ActionsList = {
-  groups: IndividualCatalogGroup[];
-  handleActionClick: (action: IndividualCatalogAction, category: string) => void;
+  groups: CatalogGroup[];
+  handleActionClick: (action: CatalogAction, category: string) => void;
   className?: string;
 }
 

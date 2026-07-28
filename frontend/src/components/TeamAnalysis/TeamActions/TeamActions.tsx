@@ -1,6 +1,6 @@
 import styles from './TeamActions.module.scss';
 import {useContext} from "react";
-import type {IndividualCatalogAction, IndividualCatalogGroup} from "../../../pages/Analysis";
+import type {CatalogAction, CatalogGroup} from "../../../pages/Analysis";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import type {ActionTagged} from "../../../pages/Analysis";
 import { uid } from 'uid';
@@ -9,7 +9,7 @@ import type {Session} from "../../../pages/Sessions";
 import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 
 type TeamActions = {
-  groups: IndividualCatalogGroup[];
+  groups: CatalogGroup[];
   session: Session;
 }
 
@@ -17,7 +17,7 @@ const TeamActions = ({groups, session}: TeamActions) => {
   const {setTeamActions, currentVideoTime, isVideoLoaded} = useContext(ActionsContext);
   const {error} = useContext(ToastContext);
 
-  const handleActionClick = (action: IndividualCatalogAction, category: string) => {
+  const handleActionClick = (action: CatalogAction, category: string) => {
     if (!isVideoLoaded) {
       error("O vídeo precisa estar definido");
       return;

@@ -89,13 +89,20 @@ export class SessionsService {
       order: { timestampSegundos: 'ASC' },
     });
 
-    const individualActions = actions.filter((action) => action.jogador);
+    const individualActions = actions.filter(
+      (action) => action.jogadorId !== null,
+    );
+    const teamActions = actions.filter((action) => action.jogadorId === null);
     const filteredIndividualActions = this.applyViewFilters(
       individualActions,
       filters,
       true,
     );
-    const filteredTeamActions = this.applyViewFilters(actions, filters, false);
+    const filteredTeamActions = this.applyViewFilters(
+      teamActions,
+      filters,
+      false,
+    );
 
     return {
       session: this.toResponse(session),
@@ -125,11 +132,14 @@ export class SessionsService {
   }
 
   private buildViewFilters(actions: TaggedActionEntity[]) {
-    const individualActions = actions.filter((action) => action.jogador);
+    const individualActions = actions.filter(
+      (action) => action.jogadorId !== null,
+    );
+    const teamActions = actions.filter((action) => action.jogadorId === null);
 
     return {
       individual: this.buildFilterOptions(individualActions),
-      team: this.buildFilterOptions(actions),
+      team: this.buildFilterOptions(teamActions),
     };
   }
 
@@ -394,8 +404,12 @@ export class SessionsService {
       const matchesCategory =
         !filters.categoryCode ||
         action.acaoCatalogo?.sigla === filters.categoryCode;
+      const matchesPhase =
+        shouldFilterPlayer ||
+        !filters.phaseKey ||
+        action.acaoCatalogo?.categoriaAcao?.chave === filters.phaseKey;
 
-      return matchesOutcome && matchesPlayer && matchesCategory;
+      return matchesOutcome && matchesPlayer && matchesCategory && matchesPhase;
     });
   }
 

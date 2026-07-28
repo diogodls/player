@@ -65,6 +65,7 @@ export type SessionViewFilters = {
   outcome: ActionTypeFilter;
   athleteId: string;
   categoryCode: string;
+  phaseKey: string;
 };
 
 export type SessionViewData = {

@@ -69,8 +69,7 @@ INSERT INTO categorias_acao (id, tipo_analise_id, nome, chave, ordem) VALUES
   ('00000000-0000-0000-0000-000000000306', 2, 'Organizacao ofensiva', 'OFFENSIVE_ORGANIZATION', 2),
   ('00000000-0000-0000-0000-000000000307', 2, 'Transicao ofensiva', 'OFFENSIVE_TRANSITION', 3),
   ('00000000-0000-0000-0000-000000000308', 2, 'Organizacao defensiva', 'DEFENSIVE_ORGANIZATION', 4),
-  ('00000000-0000-0000-0000-000000000309', 2, 'Transicao defensiva', 'DEFENSIVE_TRANSITION', 5),
-  ('00000000-0000-0000-0000-000000000310', 2, 'Goleiro-linha', 'FLY_GOALKEEPER', 6)
+  ('00000000-0000-0000-0000-000000000309', 2, 'Transicao defensiva', 'DEFENSIVE_TRANSITION', 5)
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALUES
@@ -100,11 +99,11 @@ INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALU
   ('00000000-0000-0000-0000-000000000424', '00000000-0000-0000-0000-000000000306', 1, 'Gol de saida de pressao', 'GSP'),
   ('00000000-0000-0000-0000-000000000425', '00000000-0000-0000-0000-000000000306', 1, 'Gol de ataque posicional', 'GAP'),
   ('00000000-0000-0000-0000-000000000426', '00000000-0000-0000-0000-000000000307', 1, 'Gol em transicao ofensiva', 'GT'),
-  ('00000000-0000-0000-0000-000000000427', '00000000-0000-0000-0000-000000000310', 1, 'Gol de goleiro-linha', 'GGL'),
+  ('00000000-0000-0000-0000-000000000427', '00000000-0000-0000-0000-000000000306', 1, 'Gol de goleiro-linha', 'GGL'),
   ('00000000-0000-0000-0000-000000000428', '00000000-0000-0000-0000-000000000306', 2, 'Perda de posse na saida de pressao', 'PPSP'),
   ('00000000-0000-0000-0000-000000000429', '00000000-0000-0000-0000-000000000306', 2, 'Perda de posse no ataque posicional', 'PPAP'),
   ('00000000-0000-0000-0000-000000000430', '00000000-0000-0000-0000-000000000307', 2, 'Perda de posse em transicao ofensiva', 'PPT'),
-  ('00000000-0000-0000-0000-000000000431', '00000000-0000-0000-0000-000000000310', 2, 'Perda de posse com goleiro-linha', 'PPGL'),
+  ('00000000-0000-0000-0000-000000000431', '00000000-0000-0000-0000-000000000306', 2, 'Perda de posse com goleiro-linha', 'PPGL'),
   ('00000000-0000-0000-0000-000000000432', '00000000-0000-0000-0000-000000000308', 1, 'Recuperacao de bola em marcacao baixa', 'MBRP'),
   ('00000000-0000-0000-0000-000000000433', '00000000-0000-0000-0000-000000000308', 2, 'Gol sofrido em marcacao baixa', 'MBGT'),
   ('00000000-0000-0000-0000-000000000434', '00000000-0000-0000-0000-000000000308', 1, 'Recuperacao de bola em marcacao variando', 'VRP'),
@@ -114,88 +113,6 @@ INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALU
   ('00000000-0000-0000-0000-000000000438', '00000000-0000-0000-0000-000000000309', 1, 'Recuperacao de bola em transicao defensiva', 'TRP'),
   ('00000000-0000-0000-0000-000000000439', '00000000-0000-0000-0000-000000000309', 2, 'Gol sofrido em transicao defensiva', 'TGT')
 ON CONFLICT (id) DO NOTHING;
-
--- Mantem instalacoes ja populadas alinhadas ao catalogo atual, sem recriar acoes.
-UPDATE categorias_acao AS categoria
-SET nome = metadata.nome,
-    chave = metadata.chave,
-    ordem = metadata.ordem
-FROM (VALUES
-  ('00000000-0000-0000-0000-000000000305'::uuid, 'Bola parada', 'SET_PIECE', 1),
-  ('00000000-0000-0000-0000-000000000306'::uuid, 'Organização ofensiva', 'OFFENSIVE_ORGANIZATION', 2),
-  ('00000000-0000-0000-0000-000000000307'::uuid, 'Transição ofensiva', 'OFFENSIVE_TRANSITION', 3),
-  ('00000000-0000-0000-0000-000000000308'::uuid, 'Organização defensiva', 'DEFENSIVE_ORGANIZATION', 4),
-  ('00000000-0000-0000-0000-000000000309'::uuid, 'Transição defensiva', 'DEFENSIVE_TRANSITION', 5),
-  ('00000000-0000-0000-0000-000000000310'::uuid, 'Goleiro-linha', 'FLY_GOALKEEPER', 6)
-) AS metadata(id, nome, chave, ordem)
-WHERE categoria.id = metadata.id AND categoria.tipo_analise_id = 2;
-
-UPDATE acoes_catalogo AS acao
-SET categoria_acao_id = metadata.categoria_id,
-    nome = metadata.nome,
-    ordem = metadata.ordem
-FROM (VALUES
-  ('BPSE', '00000000-0000-0000-0000-000000000305'::uuid, 'Bola parada sem execução', 1),
-  ('BPME', '00000000-0000-0000-0000-000000000305'::uuid, 'Bola parada mal executada', 2),
-  ('BPBE', '00000000-0000-0000-0000-000000000305'::uuid, 'Bola parada bem executada', 3),
-  ('GBP', '00000000-0000-0000-0000-000000000305'::uuid, 'Gol de bola parada', 4),
-  ('GSP', '00000000-0000-0000-0000-000000000306'::uuid, 'Gol de saída de pressão', 1),
-  ('PPSP', '00000000-0000-0000-0000-000000000306'::uuid, 'Perda de posse na saída de pressão', 2),
-  ('GAP', '00000000-0000-0000-0000-000000000306'::uuid, 'Gol de ataque posicional', 3),
-  ('PPAP', '00000000-0000-0000-0000-000000000306'::uuid, 'Perda de posse no ataque posicional', 4),
-  ('GT', '00000000-0000-0000-0000-000000000307'::uuid, 'Gol em transição ofensiva', 1),
-  ('PPT', '00000000-0000-0000-0000-000000000307'::uuid, 'Perda de posse em transição ofensiva', 2),
-  ('MBRP', '00000000-0000-0000-0000-000000000308'::uuid, 'Recuperação de bola em marcação baixa', 1),
-  ('MBGT', '00000000-0000-0000-0000-000000000308'::uuid, 'Gol sofrido em marcação baixa', 2),
-  ('VRP', '00000000-0000-0000-0000-000000000308'::uuid, 'Recuperação de bola em marcação variando', 3),
-  ('VGT', '00000000-0000-0000-0000-000000000308'::uuid, 'Gol sofrido em marcação variando', 4),
-  ('PRP', '00000000-0000-0000-0000-000000000308'::uuid, 'Recuperação de bola em marcação pressão', 5),
-  ('PRGT', '00000000-0000-0000-0000-000000000308'::uuid, 'Gol sofrido em marcação pressão', 6),
-  ('TRP', '00000000-0000-0000-0000-000000000309'::uuid, 'Recuperação de bola em transição defensiva', 1),
-  ('TGT', '00000000-0000-0000-0000-000000000309'::uuid, 'Gol sofrido em transição defensiva', 2),
-  ('GGL', '00000000-0000-0000-0000-000000000310'::uuid, 'Gol de goleiro-linha', 1),
-  ('PPGL', '00000000-0000-0000-0000-000000000310'::uuid, 'Perda de posse com goleiro-linha', 2)
-) AS metadata(sigla, categoria_id, nome, ordem), categorias_acao categoria_atual
-WHERE acao.sigla = metadata.sigla
-  AND categoria_atual.id = acao.categoria_acao_id
-  AND categoria_atual.tipo_analise_id = 2;
-
-UPDATE categorias_acao AS categoria
-SET nome = metadata.nome,
-    chave = metadata.chave,
-    ordem = metadata.ordem
-FROM (VALUES
-  ('00000000-0000-0000-0000-000000000301'::uuid, 'Ações ofensivas', 'OFFENSIVE_ACTIONS', 1),
-  ('00000000-0000-0000-0000-000000000302'::uuid, 'Ações defensivas', 'DEFENSIVE_ACTIONS', 2),
-  ('00000000-0000-0000-0000-000000000303'::uuid, 'Gols em quadra', 'COURT_GOALS', 3),
-  ('00000000-0000-0000-0000-000000000304'::uuid, 'Gols tomados em quadra', 'COURT_GOALS_CONCEDED', 4)
-) AS metadata(id, nome, chave, ordem)
-WHERE categoria.id = metadata.id;
-
-UPDATE acoes_catalogo AS acao
-SET nome = metadata.nome,
-    ordem = metadata.ordem,
-    impacto_id = CASE
-      WHEN acao.sigla = 'GS BP' THEN 2
-      WHEN acao.sigla = 'Gol MGL' THEN 1
-      ELSE acao.impacto_id
-    END
-FROM (VALUES
-  ('GM', 'Gol marcado', 1), ('ASS', 'Assistência', 2), ('AD', 'Ação decisiva', 3),
-  ('CC', 'Chance criada', 4), ('PP', 'Perda de posse', 5),
-  ('GP', 'Gol pago', 1), ('FD', 'Falha defensiva', 2), ('RB', 'Roubada de bola', 3),
-  ('DIA', 'Desarme, interceptação e antecipação', 4),
-  ('Gol TO', 'Gol transição ofensiva', 1), ('Gol OO', 'Gol organização ofensiva', 2),
-  ('Gol BP', 'Gol bola parada', 3), ('Gol GL', 'Gol goleiro linha', 4),
-  ('Gol MGL', 'Gol marcação de goleiro linha', 5),
-  ('GS TO', 'Gol sofrido transição defensiva', 1),
-  ('GS OO', 'Gol sofrido organização defensiva', 2), ('GS BP', 'Gol sofrido bola parada', 3),
-  ('GS GLA', 'Gol sofrido goleiro linha adversário', 4),
-  ('GS GLO', 'Gol sofrido usando goleiro linha ofensivo', 5)
-) AS metadata(sigla, nome, ordem), categorias_acao categoria
-WHERE acao.sigla = metadata.sigla
-  AND categoria.id = acao.categoria_acao_id
-  AND categoria.tipo_analise_id = 1;
 
 INSERT INTO acoes_taggeadas (id, sessao_id, acao_catalogo_id, jogador_id, timestamp_segundos) VALUES
   ('00000000-0000-0000-0000-000000000501', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000418', '00000000-0000-0000-0000-000000000201', 24),

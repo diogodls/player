@@ -62,6 +62,31 @@ describe('CatalogService', () => {
     expect(new Set(keys).size).toBe(keys.length);
   });
 
+  it('merges offensive individual groups regardless of case and accents', async () => {
+    find.mockResolvedValue([
+      category('OFFENSIVE_ACTIONS', 'Ações ofensivas', 1, [
+        action('GM', 'Gol marcado', 'Positiva', 1),
+      ]),
+      category('LEGACY_OFFENSIVE_ACTIONS', 'ACOES OFENSIVAS', 5, [
+        action('ASS', 'Assistência', 'Positiva', 2),
+      ]),
+    ]);
+
+    const result = await service.getIndividualCatalog();
+
+    expect(result.groups).toEqual([
+      {
+        key: 'OFFENSIVE_ACTIONS',
+        title: 'Ações ofensivas',
+        order: 1,
+        actions: [
+          expect.objectContaining({ key: 'GM' }),
+          expect.objectContaining({ key: 'ASS' }),
+        ],
+      },
+    ]);
+  });
+
   it('returns team groups directly from database metadata', async () => {
     find.mockResolvedValue([
       category('SET_PIECE', 'Bola parada', 1, [

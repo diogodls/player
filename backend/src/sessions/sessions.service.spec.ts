@@ -39,6 +39,7 @@ function buildTaggedAction({
   playerName,
   title,
   categoryName,
+  categoryKey,
   acronym,
   impactId,
   seconds,
@@ -48,6 +49,7 @@ function buildTaggedAction({
   playerName?: string;
   title: string;
   categoryName: string;
+  categoryKey?: string;
   acronym: string;
   impactId: number;
   seconds: number;
@@ -66,6 +68,7 @@ function buildTaggedAction({
       categoriaAcao: {
         id: `category-${id}`,
         nome: categoryName,
+        chave: categoryKey ?? null,
       },
     },
     jogador: playerId
@@ -341,10 +344,10 @@ describe('SessionsService id validation', () => {
       outcome: 'positive',
     });
     expect(response.analysis.team.summary).toEqual({
-      positives: 2,
-      negatives: 2,
-      positivePercentage: 50,
-      negativePercentage: 50,
+      positives: 0,
+      negatives: 1,
+      positivePercentage: 0,
+      negativePercentage: 100,
     });
     expect(response.analysis.team.entities).toHaveLength(1);
     expect(response.analysis.team.entities[0]).toEqual(
@@ -353,19 +356,19 @@ describe('SessionsService id validation', () => {
         type: 'team',
         title: 'Equipe',
         stats: {
-          positive: 2,
-          negative: 2,
-          total: 4,
+          positive: 0,
+          negative: 1,
+          total: 1,
         },
         metrics: {
-          overall: 4,
-          offensive: 2,
-          defensive: 2,
-          performance: 50,
+          overall: 1,
+          offensive: 1,
+          defensive: 0,
+          performance: 0,
         },
       }),
     );
-    expect(response.analysis.team.entities[0].actions[3].time).toBe('61:01');
+    expect(response.analysis.team.entities[0].actions[0].time).toBe('61:01');
     expect(response.filters.individual).toEqual({
       athletes: [
         { value: 'player-1', label: 'Ana' },
@@ -377,15 +380,13 @@ describe('SessionsService id validation', () => {
         { value: 'ASS', label: 'ASS' },
       ],
     });
-    expect(response.filters.team.categories).toEqual([
-      { value: 'RB', label: 'RB' },
-      { value: 'FD', label: 'FD' },
-      { value: 'ASS', label: 'ASS' },
-      { value: 'BPSE', label: 'BPSE' },
-    ]);
+    expect(response.filters.team).toEqual({
+      athletes: [],
+      categories: [{ value: 'BPSE', label: 'BPSE' }],
+    });
   });
 
-  it('filters session view actions by outcome, player and category', async () => {
+  it('filters session view actions by outcome, player, category and phase', async () => {
     const session = buildSession();
     const actions = [
       buildTaggedAction({
@@ -414,6 +415,7 @@ describe('SessionsService id validation', () => {
         playerName: 'Bia',
         title: 'Assistencia',
         categoryName: 'Acoes ofensivas',
+        categoryKey: 'OFFENSIVE_ACTIONS',
         acronym: 'ASS',
         impactId: 1,
         seconds: 125,
@@ -435,6 +437,7 @@ describe('SessionsService id validation', () => {
       outcome: 'positive',
       playerId: 'player-2',
       categoryCode: 'ASS',
+      phaseKey: 'OFFENSIVE_ACTIONS',
     });
 
     expect(response.analysis.individual.summary).toEqual({
@@ -449,12 +452,73 @@ describe('SessionsService id validation', () => {
     expect(response.analysis.individual.entities[0].actions[0].id).toBe(
       'action-3',
     );
-    expect(response.analysis.team.entities).toHaveLength(1);
-    expect(response.analysis.team.entities[0].actions).toHaveLength(1);
-    expect(response.analysis.team.entities[0].actions[0].id).toBe('action-3');
+    expect(response.analysis.team.entities).toEqual([]);
+    expect(response.analysis.team.summary).toEqual({
+      positives: 0,
+      negatives: 0,
+      positivePercentage: 0,
+      negativePercentage: 0,
+    });
     expect(response.filters.individual.athletes).toEqual([
       { value: 'player-1', label: 'Ana' },
       { value: 'player-2', label: 'Bia' },
     ]);
+  });
+
+  it('filters team actions by catalog phase', async () => {
+    const session = buildSession();
+    const actions = [
+      buildTaggedAction({
+        id: 'action-1',
+        title: 'Gol de ataque posicional',
+        categoryName: 'Organizacao ofensiva',
+        categoryKey: 'OFFENSIVE_ORGANIZATION',
+        acronym: 'GAP',
+        impactId: 1,
+        seconds: 24,
+      }),
+      buildTaggedAction({
+        id: 'action-2',
+        title: 'Gol em transicao ofensiva',
+        categoryName: 'Transicao ofensiva',
+        categoryKey: 'OFFENSIVE_TRANSITION',
+        acronym: 'GT',
+        impactId: 1,
+        seconds: 63,
+      }),
+      buildTaggedAction({
+        id: 'action-3',
+        playerId: 'player-1',
+        playerName: 'Ana',
+        title: 'Roubada de bola',
+        categoryName: 'Acoes defensivas',
+        categoryKey: 'DEFENSIVE_ACTIONS',
+        acronym: 'RB',
+        impactId: 1,
+        seconds: 80,
+      }),
+    ];
+    const sessionsRepository = {
+      findOne: jest.fn().mockResolvedValue(session),
+    } as unknown as Repository<SessionEntity>;
+    const taggedActionsRepository = {
+      find: jest.fn().mockResolvedValue(actions),
+    } as unknown as Repository<TaggedActionEntity>;
+    const sessionsService = new SessionsService(
+      sessionsRepository,
+      {} as Repository<TeamEntity>,
+      taggedActionsRepository,
+    );
+
+    const response = await sessionsService.findView(SESSION_ID, {
+      phaseKey: 'OFFENSIVE_TRANSITION',
+    });
+
+    expect(response.analysis.team.entities).toHaveLength(1);
+    expect(response.analysis.team.entities[0].actions).toHaveLength(1);
+    expect(response.analysis.team.entities[0].actions[0].id).toBe('action-2');
+    expect(response.analysis.individual.entities[0].actions[0].id).toBe(
+      'action-3',
+    );
   });
 });

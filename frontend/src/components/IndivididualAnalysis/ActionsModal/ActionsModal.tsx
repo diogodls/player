@@ -3,13 +3,13 @@ import {useContext} from "react";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
-import type {IndividualCatalogAction, IndividualCatalogGroup} from "../../../pages/Analysis";
+import type {CatalogAction, CatalogGroup} from "../../../pages/Analysis";
 import type {Session} from "../../../pages/Sessions";
 import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
 import {createIndividualTaggedAction} from "./createIndividualTaggedAction.ts";
 
 type ActionsModal = {
-  groups: IndividualCatalogGroup[];
+  groups: CatalogGroup[];
   session: Session;
   closeModal: () => void;
 };
@@ -18,7 +18,7 @@ const ActionsModal = ({groups, closeModal, session}: ActionsModal) => {
   const {selectedPlayer, setIndividualActions, currentVideoTime, isVideoLoaded} = useContext(ActionsContext);
   const {error} = useContext(ToastContext);
 
-  const handleActionClick = (action: IndividualCatalogAction, category: string) => {
+  const handleActionClick = (action: CatalogAction, category: string) => {
     if (!isVideoLoaded) {
       error("O vídeo precisa estar definido");
       closeModal();

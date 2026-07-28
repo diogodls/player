@@ -1,5 +1,5 @@
 import {type Dispatch, type SetStateAction, useContext} from "react";
-import type {Player} from "../../../pages/CoachDashboard";
+import type {AnalysisPlayer} from "../../../pages/Analysis";
 import styles from './PlayerSelector.module.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
@@ -7,14 +7,14 @@ import {PLAYERS_POSITIONS} from "../../../constants/players.ts";
 import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
 
 type PlayerSelectorProps = {
-  players: Player[];
+  players: AnalysisPlayer[];
   setActionsModalOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 const PlayerSelector = ({players, setActionsModalOpen}: PlayerSelectorProps) => {
   const {setSelectedPlayer, selectedPlayer} = useContext(ActionsContext);
 
-  const handlePlayerClick = (player: Player) => {
+  const handlePlayerClick = (player: AnalysisPlayer) => {
     setSelectedPlayer(player);
     setActionsModalOpen(true);
   };
@@ -37,7 +37,7 @@ const PlayerSelector = ({players, setActionsModalOpen}: PlayerSelectorProps) => 
           <div className={styles.position} key={position}>
             <span className={styles.title}>{position}</span>
 
-            {players.map((player: Player) => {
+            {players.map((player: AnalysisPlayer) => {
               if (player.position !== position) return;
 
               return (

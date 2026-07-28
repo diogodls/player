@@ -1,13 +1,16 @@
 import { uid } from 'uid';
-import type { ActionTagged, IndividualCatalogAction } from '../../../pages/Analysis';
-import type { Player } from '../../../pages/CoachDashboard';
+import type {
+  ActionTagged,
+  AnalysisPlayer,
+  CatalogAction,
+} from '../../../pages/Analysis';
 import type { Session } from '../../../pages/Sessions';
 
 export function createIndividualTaggedAction(
-  action: IndividualCatalogAction,
+  action: CatalogAction,
   category: string,
   session: Session,
-  player: Player | null,
+  player: AnalysisPlayer | null,
   time: string,
 ): ActionTagged {
   return {

@@ -3,7 +3,7 @@ import { CatalogService } from './catalog.service';
 import {
   IndividualCatalogResponseDto,
   TeamCatalogResponseDto,
-} from './dto/individual-catalog-response.dto';
+} from './dto/catalog-response.dto';
 
 @Controller('catalog/actions')
 export class CatalogController {
