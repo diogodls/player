@@ -4,8 +4,9 @@ import { Repository } from 'typeorm';
 import { TaggedActionEntity } from '../entities';
 import { PlayerPerformanceDto } from './dto/player-performance.dto';
 
-const MINUTES_PER_SESSION = 40;
 const PLAYERS_ON_COURT = 4;
+export const PLAYER_ENTERED_COURT_CODE = 'ENTROU';
+export const PLAYER_LEFT_COURT_CODE = 'SAIU';
 
 const ACTION_CODES = [
   'Gol TO',
@@ -34,14 +35,29 @@ type ActionCounts = Record<ActionCode, number>;
 
 export type PlayerActionAggregate = {
   playerId: string;
-  sessionCount: number;
+  secondsPlayed: number;
   actions: ActionCounts;
 };
 
 type RawPlayerActionAggregate = {
   playerId: string;
-  sessionCount: string;
 } & Record<ActionCode, string>;
+
+export type PlayerCourtEvent = {
+  id: string;
+  playerId: string;
+  sessionId: string;
+  code: typeof PLAYER_ENTERED_COURT_CODE | typeof PLAYER_LEFT_COURT_CODE;
+  timestampSeconds: number;
+};
+
+type RawPlayerCourtEvent = {
+  id: string;
+  playerId: string;
+  sessionId: string;
+  code: PlayerCourtEvent['code'];
+  timestampSeconds: string;
+};
 
 const COURT_GOAL_CODES: ActionCode[] = [
   'Gol TO',
@@ -75,8 +91,7 @@ export class PlayerStatisticsService {
       .innerJoin('taggedAction.sessao', 'session')
       .innerJoin('taggedAction.jogador', 'player')
       .innerJoin('taggedAction.acaoCatalogo', 'catalogAction')
-      .select('taggedAction.jogadorId', 'playerId')
-      .addSelect('COUNT(DISTINCT taggedAction.sessaoId)', 'sessionCount');
+      .select('taggedAction.jogadorId', 'playerId');
 
     ACTION_CODES.forEach((code, index) => {
       query
@@ -87,7 +102,7 @@ export class PlayerStatisticsService {
         .setParameter(`actionCode${index}`, code);
     });
 
-    const rows = await query
+    const aggregateRows = await query
       .where('taggedAction.jogadorId IS NOT NULL')
       .andWhere('taggedAction.deletedAt IS NULL')
       .andWhere('session.deletedAt IS NULL')
@@ -98,17 +113,52 @@ export class PlayerStatisticsService {
       .groupBy('taggedAction.jogadorId')
       .getRawMany<RawPlayerActionAggregate>();
 
-    return calculatePlayerPerformances(rows.map(toPlayerActionAggregate));
+    const courtEventRows = await this.taggedActionsRepository
+      .createQueryBuilder('taggedAction')
+      .innerJoin('taggedAction.sessao', 'session')
+      .innerJoin('taggedAction.jogador', 'player')
+      .innerJoin('taggedAction.acaoCatalogo', 'catalogAction')
+      .select('taggedAction.id', 'id')
+      .addSelect('taggedAction.jogadorId', 'playerId')
+      .addSelect('taggedAction.sessaoId', 'sessionId')
+      .addSelect('catalogAction.sigla', 'code')
+      .addSelect('taggedAction.timestampSegundos', 'timestampSeconds')
+      .where('catalogAction.sigla IN (:...courtEventCodes)', {
+        courtEventCodes: [PLAYER_ENTERED_COURT_CODE, PLAYER_LEFT_COURT_CODE],
+      })
+      .andWhere('taggedAction.jogadorId IS NOT NULL')
+      .andWhere('taggedAction.deletedAt IS NULL')
+      .andWhere('session.deletedAt IS NULL')
+      .andWhere('player.deletedAt IS NULL')
+      .andWhere('catalogAction.deletedAt IS NULL')
+      .andWhere('session.equipeId = :teamId', { teamId })
+      .andWhere('player.equipeId = :teamId', { teamId })
+      .orderBy('taggedAction.timestampSegundos', 'ASC')
+      .addOrderBy('taggedAction.id', 'ASC')
+      .getRawMany<RawPlayerCourtEvent>();
+
+    const secondsPlayedByPlayer = calculatePlayingSeconds(
+      courtEventRows.map(toPlayerCourtEvent),
+    );
+
+    return calculatePlayerPerformances(
+      aggregateRows.map((row) =>
+        toPlayerActionAggregate(
+          row,
+          secondsPlayedByPlayer.get(row.playerId) ?? 0,
+        ),
+      ),
+    );
   }
 }
 
 export function calculatePlayerPerformances(
   aggregates: PlayerActionAggregate[],
 ): Map<string, PlayerPerformanceDto> {
+  if (aggregates.length === 0) return new Map();
   const participants = aggregates.filter(
-    (aggregate) => aggregate.sessionCount > 0,
+    (aggregate) => aggregate.secondsPlayed > 0,
   );
-  if (participants.length === 0) return new Map();
 
   const totalMinutes = participants.reduce(
     (total, aggregate) => total + minutesFor(aggregate),
@@ -124,14 +174,22 @@ export function calculatePlayerPerformances(
     0,
   );
   const averageAtd =
-    participants.reduce((total, aggregate) => total + atdBase(aggregate), 0) /
-    participants.length;
+    participants.length === 0
+      ? 0
+      : participants.reduce(
+          (total, aggregate) => total + atdBase(aggregate),
+          0,
+        ) / participants.length;
   const averageDto =
-    participants.reduce((total, aggregate) => total + dtoBase(aggregate), 0) /
-    participants.length;
+    participants.length === 0
+      ? 0
+      : participants.reduce(
+          (total, aggregate) => total + dtoBase(aggregate),
+          0,
+        ) / participants.length;
 
   return new Map(
-    participants.map((aggregate) => [
+    aggregates.map((aggregate) => [
       aggregate.playerId,
       calculatePerformance(aggregate, {
         totalMinutes,
@@ -190,7 +248,7 @@ function calculatePerformance(
   const gtj = divide(goalsTaken, minutes);
 
   return {
-    minutes,
+    minutes: round(minutes),
     goals,
     goalsTaken,
     offensiveActions,
@@ -211,8 +269,8 @@ function calculatePerformance(
           actions.PP + actions.GP + actions.FD,
         ),
       ),
-      atd: round(team.averageAtd - atdBase(aggregate)),
-      dto: round(team.averageDto - dtoBase(aggregate)),
+      atd: minutes === 0 ? 0 : round(team.averageAtd - atdBase(aggregate)),
+      dto: minutes === 0 ? 0 : round(team.averageDto - dtoBase(aggregate)),
       pgj: round(pgj),
       ic: round(
         divide(actions.CC + actions.GM + actions.ASS + actions.AD, actions.PP),
@@ -237,10 +295,11 @@ function calculatePerformance(
 
 function toPlayerActionAggregate(
   row: RawPlayerActionAggregate,
+  secondsPlayed: number,
 ): PlayerActionAggregate {
   return {
     playerId: row.playerId,
-    sessionCount: Number(row.sessionCount),
+    secondsPlayed,
     actions: Object.fromEntries(
       ACTION_CODES.map((code) => [code, Number(row[code] ?? 0)]),
     ) as ActionCounts,
@@ -248,7 +307,61 @@ function toPlayerActionAggregate(
 }
 
 function minutesFor(aggregate: PlayerActionAggregate) {
-  return aggregate.sessionCount * MINUTES_PER_SESSION;
+  return aggregate.secondsPlayed / 60;
+}
+
+export function calculatePlayingSeconds(
+  events: PlayerCourtEvent[],
+): Map<string, number> {
+  const eventsByPlayerAndSession = new Map<string, PlayerCourtEvent[]>();
+
+  events.forEach((event) => {
+    const key = `${event.playerId}:${event.sessionId}`;
+    const current = eventsByPlayerAndSession.get(key) ?? [];
+    current.push(event);
+    eventsByPlayerAndSession.set(key, current);
+  });
+
+  const secondsByPlayer = new Map<string, number>();
+  eventsByPlayerAndSession.forEach((sessionEvents) => {
+    sessionEvents.sort(
+      (left, right) =>
+        left.timestampSeconds - right.timestampSeconds ||
+        left.id.localeCompare(right.id),
+    );
+
+    let enteredAt: number | null = null;
+    let sessionSeconds = 0;
+    sessionEvents.forEach((event) => {
+      if (event.code === PLAYER_ENTERED_COURT_CODE) {
+        if (enteredAt === null) enteredAt = event.timestampSeconds;
+        return;
+      }
+
+      if (enteredAt === null || event.timestampSeconds < enteredAt) return;
+      sessionSeconds += event.timestampSeconds - enteredAt;
+      enteredAt = null;
+    });
+
+    const playerId = sessionEvents[0]?.playerId;
+    if (!playerId) return;
+    secondsByPlayer.set(
+      playerId,
+      (secondsByPlayer.get(playerId) ?? 0) + sessionSeconds,
+    );
+  });
+
+  return secondsByPlayer;
+}
+
+function toPlayerCourtEvent(row: RawPlayerCourtEvent): PlayerCourtEvent {
+  return {
+    id: row.id,
+    playerId: row.playerId,
+    sessionId: row.sessionId,
+    code: row.code,
+    timestampSeconds: Number(row.timestampSeconds),
+  };
 }
 
 function atdBase(aggregate: PlayerActionAggregate) {

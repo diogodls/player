@@ -21,7 +21,7 @@ export type SessionEntityAction = {
   title: string;
   category: SessionActionCategory;
   time: string;
-  outcome: "positive" | "negative";
+  outcome: "positive" | "negative" | "neutral";
 };
 
 export type SessionEntityMetrics = {
@@ -34,6 +34,7 @@ export type SessionEntityMetrics = {
 export type SessionEntityStats = {
   positive: number;
   negative: number;
+  neutral: number;
   total: number;
 };
 

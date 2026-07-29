@@ -1,10 +1,10 @@
-import { uid } from 'uid';
+import { uid } from "uid";
 import type {
   ActionTagged,
   AnalysisPlayer,
   CatalogAction,
-} from '../../../pages/Analysis';
-import type { Session } from '../../../pages/Sessions';
+} from "../../../pages/Analysis";
+import type { Session } from "../../../pages/Sessions";
 
 export function createIndividualTaggedAction(
   action: CatalogAction,
@@ -17,12 +17,13 @@ export function createIndividualTaggedAction(
     id: uid(),
     catalogActionId: action.id,
     sessionId: session.id,
-    goodAction: action.impact === 'POSITIVE',
+    goodAction: action.impact === "POSITIVE",
+    impact: action.impact,
     title: action.name,
     key: action.key,
     category,
     time,
-    type: 'individual',
+    type: "individual",
     player: player ?? undefined,
   };
 }

@@ -1,12 +1,18 @@
-import styles from './ActionsModal.module.scss';
-import {useContext} from "react";
-import {ActionsContext} from "../../../contexts/ActionsContext/ActionsContext.tsx";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBullseye, faMinus, faUser, faX} from "@fortawesome/free-solid-svg-icons";
-import type {CatalogAction, CatalogGroup} from "../../../pages/Analysis";
-import type {Session} from "../../../pages/Sessions";
-import {ToastContext} from "../../../contexts/ToastContext/ToastContext.tsx";
-import {createIndividualTaggedAction} from "./createIndividualTaggedAction.ts";
+import styles from "./ActionsModal.module.scss";
+import { useContext } from "react";
+import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBullseye,
+  faClock,
+  faMinus,
+  faUser,
+  faX,
+} from "@fortawesome/free-solid-svg-icons";
+import type { CatalogAction, CatalogGroup } from "../../../pages/Analysis";
+import type { Session } from "../../../pages/Sessions";
+import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
+import { createIndividualTaggedAction } from "./createIndividualTaggedAction.ts";
 
 type ActionsModal = {
   groups: CatalogGroup[];
@@ -14,9 +20,14 @@ type ActionsModal = {
   closeModal: () => void;
 };
 
-const ActionsModal = ({groups, closeModal, session}: ActionsModal) => {
-  const {selectedPlayer, setIndividualActions, currentVideoTime, isVideoLoaded} = useContext(ActionsContext);
-  const {error} = useContext(ToastContext);
+const ActionsModal = ({ groups, closeModal, session }: ActionsModal) => {
+  const {
+    selectedPlayer,
+    setIndividualActions,
+    currentVideoTime,
+    isVideoLoaded,
+  } = useContext(ActionsContext);
+  const { error } = useContext(ToastContext);
 
   const handleActionClick = (action: CatalogAction, category: string) => {
     if (!isVideoLoaded) {
@@ -35,7 +46,7 @@ const ActionsModal = ({groups, closeModal, session}: ActionsModal) => {
 
     setIndividualActions((actions) => [...actions, actionTagged]);
     closeModal();
-  }
+  };
 
   return (
     <div className={styles.modalOverlay} onClick={closeModal}>
@@ -43,19 +54,24 @@ const ActionsModal = ({groups, closeModal, session}: ActionsModal) => {
         <div className={styles.header}>
           <div className={styles.player}>
             <span>
-              <FontAwesomeIcon icon={faUser} className={styles.playerIcon}/>
+              <FontAwesomeIcon icon={faUser} className={styles.playerIcon} />
             </span>
             <span className={styles.playerInfos}>
-              <span className={styles.title}>
-                Taggear ação
-              </span>
+              <span className={styles.title}>Taggear ação</span>
               <span className={styles.playerField}>
-                Jogador: <span className={styles.playerName}>{selectedPlayer?.position} - {selectedPlayer?.name}</span>
+                Jogador:{" "}
+                <span className={styles.playerName}>
+                  {selectedPlayer?.position} - {selectedPlayer?.name}
+                </span>
               </span>
             </span>
           </div>
 
-          <FontAwesomeIcon icon={faX} className={styles.exitIcon} onClick={closeModal}/>
+          <FontAwesomeIcon
+            icon={faX}
+            className={styles.exitIcon}
+            onClick={closeModal}
+          />
         </div>
 
         {groups.length === 0 ? (
@@ -67,17 +83,32 @@ const ActionsModal = ({groups, closeModal, session}: ActionsModal) => {
                 <span className={styles.actionsTitle}>{group.title}</span>
                 <div className={styles.tagActions}>
                   {group.actions.map((action) => {
-                    const isPositive = action.impact === 'POSITIVE';
+                    const isPositive = action.impact === "POSITIVE";
+                    const isNeutral = action.impact === "NEUTRAL";
 
                     return (
                       <button
                         type="button"
-                        className={`${styles.action} ${isPositive ? styles.goodAction : styles.badAction}`}
+                        className={`${styles.action} ${
+                          isNeutral
+                            ? styles.neutralAction
+                            : isPositive
+                              ? styles.goodAction
+                              : styles.badAction
+                        }`}
                         title={action.key}
                         key={action.id}
                         onClick={() => handleActionClick(action, group.title)}
                       >
-                        <FontAwesomeIcon icon={isPositive ? faBullseye : faMinus}/>
+                        <FontAwesomeIcon
+                          icon={
+                            isNeutral
+                              ? faClock
+                              : isPositive
+                                ? faBullseye
+                                : faMinus
+                          }
+                        />
                         <span>{action.name}</span>
                       </button>
                     );

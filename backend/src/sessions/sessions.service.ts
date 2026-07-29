@@ -22,6 +22,7 @@ import {
 } from './dto/session-view-response.dto';
 
 const POSITIVE_IMPACT_ID = 1;
+const NEGATIVE_IMPACT_ID = 2;
 const TEAM_ENTITY_ID = 'team';
 const TEAM_ENTITY_TITLE = 'Equipe';
 
@@ -320,7 +321,10 @@ export class SessionsService {
         overall: stats.total,
         offensive: this.countOffensiveActions(actions),
         defensive: this.countDefensiveActions(actions),
-        performance: this.calculatePercentage(stats.positive, stats.total),
+        performance: this.calculatePercentage(
+          stats.positive,
+          stats.positive + stats.negative,
+        ),
       },
       actions: actions.map((action) => this.toViewAction(action)),
     };
@@ -332,18 +336,28 @@ export class SessionsService {
     return {
       positives: stats.positive,
       negatives: stats.negative,
-      positivePercentage: this.calculatePercentage(stats.positive, stats.total),
-      negativePercentage: this.calculatePercentage(stats.negative, stats.total),
+      positivePercentage: this.calculatePercentage(
+        stats.positive,
+        stats.positive + stats.negative,
+      ),
+      negativePercentage: this.calculatePercentage(
+        stats.negative,
+        stats.positive + stats.negative,
+      ),
     };
   }
 
   private buildStats(actions: TaggedActionEntity[]) {
     const positive = actions.filter((action) => this.isPositive(action)).length;
+    const negative = actions.filter(
+      (action) => action.acaoCatalogo?.impactoId === NEGATIVE_IMPACT_ID,
+    ).length;
     const total = actions.length;
 
     return {
       positive,
-      negative: total - positive,
+      negative,
+      neutral: total - positive - negative,
       total,
     };
   }
@@ -361,7 +375,7 @@ export class SessionsService {
         label: action.acaoCatalogo.sigla,
       },
       time: this.formatTimestamp(action.timestampSegundos),
-      outcome: this.isPositive(action) ? 'positive' : 'negative',
+      outcome: this.getOutcome(action),
     };
   }
 
@@ -394,8 +408,7 @@ export class SessionsService {
   ) {
     return actions.filter((action) => {
       const matchesOutcome =
-        !filters.outcome ||
-        (filters.outcome === 'positive') === this.isPositive(action);
+        !filters.outcome || filters.outcome === this.getOutcome(action);
       const matchesPlayer =
         !shouldFilterPlayer ||
         !filters.playerId ||
@@ -439,6 +452,14 @@ export class SessionsService {
   private calculatePercentage(value: number, total: number) {
     if (total === 0) return 0;
     return Math.round((value / total) * 100);
+  }
+
+  private getOutcome(action: TaggedActionEntity) {
+    if (this.isPositive(action)) return 'positive' as const;
+    if (action.acaoCatalogo?.impactoId === NEGATIVE_IMPACT_ID) {
+      return 'negative' as const;
+    }
+    return 'neutral' as const;
   }
 
   private formatTimestamp(seconds: number) {

@@ -1,4 +1,4 @@
-type ActionType = 'team' | 'individual';
+type ActionType = "team" | "individual";
 
 export type AnalysisPlayer = {
   id: string | number;
@@ -17,6 +17,7 @@ export type ActionTagged = {
   key?: string;
   category?: string;
   goodAction: boolean;
+  impact?: CatalogImpact;
   player?: AnalysisPlayer;
 };
 
@@ -28,7 +29,7 @@ export type AnalysisPlayerListResponse = {
   totalPages: number;
 };
 
-export type CatalogImpact = 'POSITIVE' | 'NEGATIVE';
+export type CatalogImpact = "POSITIVE" | "NEGATIVE" | "NEUTRAL";
 
 export type CatalogAction = {
   id: string;
@@ -46,11 +47,11 @@ export type CatalogGroup = {
 };
 
 export type IndividualCatalog = {
-  analysisType: 'INDIVIDUAL';
+  analysisType: "INDIVIDUAL";
   groups: CatalogGroup[];
 };
 
 export type TeamCatalog = {
-  analysisType: 'TEAM';
+  analysisType: "TEAM";
   groups: CatalogGroup[];
 };

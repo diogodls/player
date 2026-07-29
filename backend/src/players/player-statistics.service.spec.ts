@@ -1,16 +1,18 @@
 import { Repository } from 'typeorm';
 import { TaggedActionEntity } from '../entities';
 import {
+  calculatePlayingSeconds,
   calculatePlayerPerformances,
   emptyPlayerPerformance,
   PlayerActionAggregate,
+  PlayerCourtEvent,
   PlayerStatisticsService,
 } from './player-statistics.service';
 
 describe('calculatePlayerPerformances', () => {
   it('calculates cumulative metrics and every player index', () => {
     const performances = calculatePlayerPerformances([
-      aggregate('player-1', 2, {
+      aggregate('player-1', 4800, {
         'Gol TO': 4,
         'Gol OO': 1,
         'GS TO': 1,
@@ -25,7 +27,7 @@ describe('calculatePlayerPerformances', () => {
         RB: 6,
         DIA: 3,
       }),
-      aggregate('player-2', 1, {
+      aggregate('player-2', 2400, {
         'Gol BP': 1,
         'GS TO': 2,
         GM: 1,
@@ -80,9 +82,9 @@ describe('calculatePlayerPerformances', () => {
     });
   });
 
-  it('uses forty minutes for each distinct session count', () => {
+  it('uses the accumulated court-event duration as minutes played', () => {
     const performance = calculatePlayerPerformances([
-      aggregate('player-1', 3, { GM: 1 }),
+      aggregate('player-1', 7200, { GM: 1 }),
     ]).get('player-1');
 
     expect(performance?.minutes).toBe(120);
@@ -91,7 +93,7 @@ describe('calculatePlayerPerformances', () => {
 
   it('returns zero for indexes with zero denominators', () => {
     const performance = calculatePlayerPerformances([
-      aggregate('player-1', 1),
+      aggregate('player-1', 2400),
     ]).get('player-1');
 
     expect(performance).toEqual({
@@ -100,25 +102,73 @@ describe('calculatePlayerPerformances', () => {
     });
   });
 
-  it('ignores aggregates without a participating session', () => {
+  it('keeps action metrics but zeroes time-based indexes without a complete interval', () => {
     const performances = calculatePlayerPerformances([
       aggregate('player-1', 0, { GM: 10 }),
     ]);
 
-    expect(performances.size).toBe(0);
+    expect(performances.get('player-1')).toEqual({
+      ...emptyPlayerPerformance(),
+      offensiveActions: 10,
+    });
+  });
+});
+
+describe('calculatePlayingSeconds', () => {
+  it('sums multiple complete entry and exit intervals across sessions', () => {
+    const seconds = calculatePlayingSeconds([
+      courtEvent('1', 'player-1', 'session-1', 'ENTROU', 30),
+      courtEvent('2', 'player-1', 'session-1', 'SAIU', 150),
+      courtEvent('3', 'player-1', 'session-1', 'ENTROU', 200),
+      courtEvent('4', 'player-1', 'session-1', 'SAIU', 320),
+      courtEvent('5', 'player-1', 'session-2', 'ENTROU', 10),
+      courtEvent('6', 'player-1', 'session-2', 'SAIU', 70),
+    ]);
+
+    expect(seconds.get('player-1')).toBe(300);
+  });
+
+  it('ignores unmatched exits, duplicate entries and an open final interval', () => {
+    const seconds = calculatePlayingSeconds([
+      courtEvent('1', 'player-1', 'session-1', 'SAIU', 10),
+      courtEvent('2', 'player-1', 'session-1', 'ENTROU', 20),
+      courtEvent('3', 'player-1', 'session-1', 'ENTROU', 40),
+      courtEvent('4', 'player-1', 'session-1', 'SAIU', 80),
+      courtEvent('5', 'player-1', 'session-1', 'ENTROU', 100),
+    ]);
+
+    expect(seconds.get('player-1')).toBe(60);
   });
 });
 
 describe('PlayerStatisticsService', () => {
-  it('aggregates the complete team in one query and excludes soft deletes', async () => {
-    const queryBuilder = chainableQueryBuilder([
+  it('loads team action totals and court events without per-player queries', async () => {
+    const aggregateQueryBuilder = chainableQueryBuilder([
       {
         playerId: 'player-1',
-        sessionCount: '2',
         GM: '3',
       },
     ]);
-    const createQueryBuilder = jest.fn().mockReturnValue(queryBuilder);
+    const courtEventsQueryBuilder = chainableQueryBuilder([
+      {
+        id: 'event-1',
+        playerId: 'player-1',
+        sessionId: 'session-1',
+        code: 'ENTROU',
+        timestampSeconds: '20',
+      },
+      {
+        id: 'event-2',
+        playerId: 'player-1',
+        sessionId: 'session-1',
+        code: 'SAIU',
+        timestampSeconds: '140',
+      },
+    ]);
+    const createQueryBuilder = jest
+      .fn()
+      .mockReturnValueOnce(aggregateQueryBuilder)
+      .mockReturnValueOnce(courtEventsQueryBuilder);
     const repository = {
       createQueryBuilder,
     } as unknown as Repository<TaggedActionEntity>;
@@ -126,43 +176,45 @@ describe('PlayerStatisticsService', () => {
 
     const performances = await service.findByTeamId('team-1');
 
-    expect(createQueryBuilder).toHaveBeenCalledTimes(1);
-    expect(queryBuilder.groupBy).toHaveBeenCalledWith('taggedAction.jogadorId');
-    expect(queryBuilder.addSelect).toHaveBeenCalledWith(
-      'COUNT(DISTINCT taggedAction.sessaoId)',
-      'sessionCount',
+    expect(createQueryBuilder).toHaveBeenCalledTimes(2);
+    expect(aggregateQueryBuilder.groupBy).toHaveBeenCalledWith(
+      'taggedAction.jogadorId',
     );
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+    expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
       'taggedAction.deletedAt IS NULL',
     );
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+    expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
       'session.deletedAt IS NULL',
     );
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+    expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
       'player.deletedAt IS NULL',
     );
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+    expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
       'catalogAction.deletedAt IS NULL',
     );
-    expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+    expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
       'session.equipeId = :teamId',
       { teamId: 'team-1' },
     );
+    expect(courtEventsQueryBuilder.where).toHaveBeenCalledWith(
+      'catalogAction.sigla IN (:...courtEventCodes)',
+      { courtEventCodes: ['ENTROU', 'SAIU'] },
+    );
     const performance = performances.get('player-1');
-    expect(performance?.minutes).toBe(80);
+    expect(performance?.minutes).toBe(2);
     expect(performance?.offensiveActions).toBe(3);
-    expect(performance?.indexes.pgj).toBe(0.04);
+    expect(performance?.indexes.pgj).toBe(1.5);
   });
 });
 
 function aggregate(
   playerId: string,
-  sessionCount: number,
+  secondsPlayed: number,
   actions: Partial<PlayerActionAggregate['actions']> = {},
 ): PlayerActionAggregate {
   return {
     playerId,
-    sessionCount,
+    secondsPlayed,
     actions: {
       'Gol TO': 0,
       'Gol OO': 0,
@@ -188,6 +240,16 @@ function aggregate(
   };
 }
 
+function courtEvent(
+  id: string,
+  playerId: string,
+  sessionId: string,
+  code: PlayerCourtEvent['code'],
+  timestampSeconds: number,
+): PlayerCourtEvent {
+  return { id, playerId, sessionId, code, timestampSeconds };
+}
+
 function chainableQueryBuilder(rows: unknown[]) {
   const queryBuilder = {
     innerJoin: jest.fn(),
@@ -197,6 +259,8 @@ function chainableQueryBuilder(rows: unknown[]) {
     where: jest.fn(),
     andWhere: jest.fn(),
     groupBy: jest.fn(),
+    orderBy: jest.fn(),
+    addOrderBy: jest.fn(),
     getRawMany: jest.fn().mockResolvedValue(rows),
   };
 
