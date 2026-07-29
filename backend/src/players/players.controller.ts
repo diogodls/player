@@ -23,6 +23,11 @@ export class PlayersController {
     return this.playersService.findAll(filters);
   }
 
+  @Get('rankings/:indexKey')
+  findRanking(@Param('indexKey') indexKey: string) {
+    return this.playersService.findRanking(indexKey);
+  }
+
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.playersService.findOne(id);

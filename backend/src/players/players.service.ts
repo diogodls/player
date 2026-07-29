@@ -4,11 +4,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, IsNull, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerListResponseDto } from './dto/player-list-response.dto';
 import { PlayerDto } from './dto/player.dto';
+import type {
+  PlayerIndexKey,
+  PlayerRankingResponseDto,
+} from './dto/player-ranking-response.dto';
 import {
   PlayerIndexesResponseDto,
   PlayerResponseDto,
@@ -101,6 +105,31 @@ export class PlayersService {
     rf: 2.5,
     tid: 75,
   };
+  private static readonly INDEX_RANKING_RULES: Record<
+    PlayerIndexKey,
+    { name: string; sortDirection: 'ASC' | 'DESC' }
+  > = {
+    radj: { name: 'Relação Ataque-Defesa por jogo', sortDirection: 'DESC' },
+    goalsRelations: { name: '+/- gols', sortDirection: 'DESC' },
+    actionsRelations: { name: '+/- ações', sortDirection: 'DESC' },
+    atd: {
+      name: 'Relação ataque + transições defensivas',
+      sortDirection: 'DESC',
+    },
+    dto: {
+      name: 'Relação defesa + transições ofensivas',
+      sortDirection: 'DESC',
+    },
+    pgj: { name: 'Participações em gol por jogo', sortDirection: 'DESC' },
+    ic: { name: 'Índice de criação', sortDirection: 'DESC' },
+    tio: { name: 'Taxa de influência ofensiva', sortDirection: 'DESC' },
+    gtj: { name: 'Gols tomados por jogo', sortDirection: 'ASC' },
+    rf: {
+      name: 'Relação recuperação/falhas defensivas',
+      sortDirection: 'DESC',
+    },
+    tid: { name: 'Taxa de influência defensiva', sortDirection: 'DESC' },
+  };
   constructor(
     @InjectRepository(PlayerEntity)
     private readonly playersRepository: Repository<PlayerEntity>,
@@ -143,12 +172,64 @@ export class PlayersService {
 
     return {
       ...this.toResponse(player),
-      indexes:
-        PlayersService.TEST_INDEXES_BY_PLAYER_ID[player.id] ??
-        PlayersService.DEFAULT_TEST_INDEXES,
+      indexes: this.getIndexes(player.id),
     };
   }
 
+  async findRanking(indexKey: string): Promise<PlayerRankingResponseDto> {
+    const rule = PlayersService.INDEX_RANKING_RULES[indexKey as PlayerIndexKey];
+    if (!rule) throw new BadRequestException('Índice de ranking inválido');
+
+    const players = await this.playersRepository.find({
+      where: { deletedAt: IsNull() },
+      relations: { posicao: true },
+    });
+    const rankedPlayers = players
+      .filter((player) => player.deletedAt == null)
+      .map((player) => {
+        if (!player.posicao) {
+          throw new Error('Relação de posição do jogador não foi carregada');
+        }
+
+        return {
+          player: {
+            id: player.id,
+            name: player.nome,
+            position: player.posicao.nome,
+          },
+          value: this.getIndexes(player.id)[indexKey as PlayerIndexKey],
+        };
+      })
+      .sort((left, right) => {
+        if (left.value === null) return right.value === null ? 0 : 1;
+        if (right.value === null) return -1;
+
+        const valueComparison = left.value - right.value;
+        if (valueComparison !== 0) {
+          return rule.sortDirection === 'ASC'
+            ? valueComparison
+            : -valueComparison;
+        }
+        return left.player.name.localeCompare(right.player.name, 'pt-BR', {
+          sensitivity: 'base',
+        });
+      });
+
+    let previousValue: number | null | undefined;
+    let previousPosition = 0;
+    return {
+      index: { key: indexKey as PlayerIndexKey, ...rule },
+      ranking: rankedPlayers.map((item, itemIndex) => {
+        const position =
+          itemIndex > 0 && item.value === previousValue
+            ? previousPosition
+            : itemIndex + 1;
+        previousValue = item.value;
+        previousPosition = position;
+        return { position, ...item };
+      }),
+    };
+  }
   async create(dto: PlayerDto): Promise<PlayerResponseDto> {
     if (dto.id !== null) {
       throw new BadRequestException('Id deve ser nulo ao criar um jogador');
@@ -209,6 +290,12 @@ export class PlayersService {
     return player;
   }
 
+  private getIndexes(playerId: string): PlayerIndexesResponseDto {
+    return (
+      PlayersService.TEST_INDEXES_BY_PLAYER_ID[playerId] ??
+      PlayersService.DEFAULT_TEST_INDEXES
+    );
+  }
   private async findTeam(): Promise<TeamEntity> {
     const [team] = await this.teamsRepository.find({ take: 1 });
 

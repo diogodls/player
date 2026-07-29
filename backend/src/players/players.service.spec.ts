@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
@@ -7,6 +7,29 @@ import { PlayersService } from './players.service';
 const PLAYER_ID = '79fbbbe8-39b1-4b25-bd11-236a0f228cb0';
 const OTHER_PLAYER_ID = '9828b90e-6aa0-4d75-985d-f286802c3086';
 const TEAM_ID = 'd62ec1e1-f762-45bd-a1e9-09ba8ef8d461';
+
+const buildRankingPlayer = (
+  id: string,
+  name: string,
+  deletedAt: Date | null = null,
+): PlayerEntity =>
+  ({
+    id,
+    nome: name,
+    deletedAt,
+    posicao: { id: 3, nome: 'Ala' },
+  }) as PlayerEntity;
+
+const buildRankingService = (players: PlayerEntity[]) => {
+  const find = jest.fn().mockResolvedValue(players);
+  return {
+    find,
+    service: new PlayersService(
+      { find } as unknown as Repository<PlayerEntity>,
+      {} as Repository<TeamEntity>,
+    ),
+  };
+};
 
 const buildPlayerDto = (id: string | null): PlayerDto => ({
   id,
@@ -157,18 +180,28 @@ describe('PlayersService id validation', () => {
       where: { id: player.id },
       relations: { equipe: true, posicao: true, ladoPreferencial: true },
     });
-    expect(response.indexes).toEqual({
-      radj: 1.35,
-      goalsRelations: 1.2,
-      actionsRelations: 3.4,
-      atd: 72,
-      dto: 68,
-      pgj: 1.1,
-      ic: 74,
-      tio: 78,
-      gtj: 0.8,
-      rf: 2.4,
-      tid: 81,
+    expect(response).toEqual({
+      id: player.id,
+      name: 'Ana Silva',
+      age: 21,
+      positionId: 3,
+      position: 'Ala',
+      preferredSideId: 2,
+      preferredSide: 'Canhoto',
+      teamName: 'Equipe Principal',
+      indexes: {
+        radj: 1.35,
+        goalsRelations: 1.2,
+        actionsRelations: 3.4,
+        atd: 72,
+        dto: 68,
+        pgj: 1.1,
+        ic: 74,
+        tio: 78,
+        gtj: 0.8,
+        rf: 2.4,
+        tid: 81,
+      },
     });
   });
 
@@ -206,5 +239,96 @@ describe('PlayersService id validation', () => {
         tid: 75,
       },
     });
+  });
+
+  it('rejects an invalid ranking index', async () => {
+    const { service } = buildRankingService([]);
+    await expect(service.findRanking('overall')).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('sorts descending indexes from highest to lowest', async () => {
+    const { service } = buildRankingService([
+      buildRankingPlayer('00000000-0000-0000-0000-000000000201', 'João'),
+      buildRankingPlayer('00000000-0000-0000-0000-000000000204', 'Senna'),
+      buildRankingPlayer('00000000-0000-0000-0000-000000000203', 'Guedes'),
+    ]);
+    const response = await service.findRanking('radj');
+    expect(response.index).toEqual({
+      key: 'radj',
+      name: 'Relação Ataque-Defesa por jogo',
+      sortDirection: 'DESC',
+    });
+    expect(response.ranking.map((item) => item.value)).toEqual([
+      1.74, 1.35, 1.18,
+    ]);
+  });
+
+  it('sorts gtj ascending from lowest to highest', async () => {
+    const { service } = buildRankingService([
+      buildRankingPlayer('00000000-0000-0000-0000-000000000205', 'Balk'),
+      buildRankingPlayer('00000000-0000-0000-0000-000000000201', 'João'),
+      buildRankingPlayer('00000000-0000-0000-0000-000000000203', 'Guedes'),
+    ]);
+    const response = await service.findRanking('gtj');
+    expect(response.index.sortDirection).toBe('ASC');
+    expect(response.ranking.map((item) => item.value)).toEqual([
+      0.65, 0.8, 1.35,
+    ]);
+  });
+
+  it('uses competition positions for tied values', async () => {
+    const { service } = buildRankingService([
+      buildRankingPlayer('11111111-1111-1111-1111-111111111111', 'Carlos'),
+      buildRankingPlayer('22222222-2222-2222-2222-222222222222', 'Bruno'),
+      buildRankingPlayer('00000000-0000-0000-0000-000000000203', 'Guedes'),
+    ]);
+    const response = await service.findRanking('radj');
+    expect(response.ranking.map((item) => item.position)).toEqual([1, 1, 3]);
+  });
+
+  it('sorts tied players alphabetically by name', async () => {
+    const { service } = buildRankingService([
+      buildRankingPlayer('11111111-1111-1111-1111-111111111111', 'Carlos'),
+      buildRankingPlayer('22222222-2222-2222-2222-222222222222', 'Ana'),
+      buildRankingPlayer('33333333-3333-3333-3333-333333333333', 'Bruno'),
+    ]);
+    const response = await service.findRanking('radj');
+    expect(response.ranking.map((item) => item.player.name)).toEqual([
+      'Ana',
+      'Bruno',
+      'Carlos',
+    ]);
+  });
+
+  it('returns an empty ranking when there are no active players', async () => {
+    const { service } = buildRankingService([]);
+    await expect(service.findRanking('radj')).resolves.toMatchObject({
+      ranking: [],
+    });
+  });
+
+  it('excludes soft-deleted players from the ranking', async () => {
+    const activePlayer = buildRankingPlayer(
+      '00000000-0000-0000-0000-000000000201',
+      'Ativo',
+    );
+    const removedPlayer = buildRankingPlayer(
+      '00000000-0000-0000-0000-000000000204',
+      'Removido',
+      new Date(),
+    );
+    const { find, service } = buildRankingService([
+      removedPlayer,
+      activePlayer,
+    ]);
+    const response = await service.findRanking('radj');
+    expect(find).toHaveBeenCalledWith({
+      where: { deletedAt: IsNull() },
+      relations: { posicao: true },
+    });
+    expect(response.ranking).toHaveLength(1);
+    expect(response.ranking[0].player.name).toBe('Ativo');
   });
 });
