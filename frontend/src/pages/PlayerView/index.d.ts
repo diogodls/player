@@ -1,7 +1,25 @@
-import type {Player, Team} from "../CoachDashboard";
+export type PlayerIndexes = {
+  radj: number | null;
+  goalsRelations: number | null;
+  actionsRelations: number | null;
+  atd: number | null;
+  dto: number | null;
+  pgj: number | null;
+  ic: number | null;
+  tio: number | null;
+  gtj: number | null;
+  rf: number | null;
+  tid: number | null;
+};
 
 export type PlayerViewData = {
-  player: Player;
-  team: Team;
-  metrics: string[];
-}
+  id: string;
+  name: string;
+  age: number;
+  positionId: number;
+  position: string;
+  preferredSideId: number;
+  preferredSide: string;
+  teamName: string;
+  indexes: PlayerIndexes | null;
+};

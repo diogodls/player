@@ -1,60 +1,36 @@
-import styles from './IndividualPlayer.module.scss';
-import type {Indexes, IndexType, Player, Team} from "../../pages/CoachDashboard";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-  faArrowLeft,
-  faArrowRightArrowLeft,
-  faArrowTrendDown,
-  faArrowTrendUp,
-  faCircle
-} from "@fortawesome/free-solid-svg-icons";
-import PlayerRadarChart from "../elements/PlayerRadarChart/PlayerRadarChart.tsx";
-import {
-  INDEXES_COLORS, INDEXES_LABELS, INDEXES_META,
-  PLAYER_METRICS
-} from "../../constants/metrics.ts";
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
-import {useNavigate} from "react-router";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router";
+import { INDEXES_LABELS, INDEXES_META } from "../../constants/metrics.ts";
+import type { PlayerIndexes, PlayerViewData } from "../../pages/PlayerView";
+import styles from "./IndividualPlayer.module.scss";
 
-const responsive = {
-  desktop: {
-    breakpoint: {max: 3000, min: 1024},
-    items: 1,
-    slidesToSlide: 1
-  },
-  tablet: {
-    breakpoint: {max: 1024, min: 464},
-    items: 1,
-    slidesToSlide: 1
-  },
-  mobile: {
-    breakpoint: {max: 464, min: 0},
-    items: 1,
-    slidesToSlide: 1
-  }
+type IndividualPlayerProps = {
+  player: PlayerViewData;
 };
 
-type IndividualPlayer = {
-  player: Player;
-  team: Team;
-  metrics: string[];
-};
+const indexEntries = Object.entries(INDEXES_META) as Array<
+  [keyof PlayerIndexes, (typeof INDEXES_META)[keyof typeof INDEXES_META]]
+>;
 
-const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
+const formatIndex = (value: number | null) =>
+  value === null || !Number.isFinite(value)
+    ? "-"
+    : new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 2 }).format(value);
+
+const IndividualPlayer = ({ player }: IndividualPlayerProps) => {
   const navigate = useNavigate();
-
-  const groupedIndexes = Object.entries(INDEXES_META).reduce((acc, [key, meta]) => {
-    if (!acc[meta.category]) acc[meta.category] = [];
-    acc[meta.category].push({ key, label: meta.label });
-    return acc;
-  }, {} as Record<string, { key: string; label: string }[]>);
 
   return (
     <div className={styles.playerView}>
       <div className={styles.header}>
         <div className={styles.playerName}>
-          <button className={styles.icon} type="button" onClick={() => navigate(-1)} aria-label="Voltar">
+          <button
+            className={styles.icon}
+            type="button"
+            onClick={() => navigate(-1)}
+            aria-label="Voltar"
+          >
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
           <div className={styles.player}>
@@ -62,121 +38,62 @@ const IndividualPlayer = ({player, team, metrics}: IndividualPlayer) => {
             <span>{player.position}</span>
           </div>
         </div>
-        <div className={styles.overall}>
-          <span>Overall Rating</span>
-          <span className={styles.rating}>{player.overall}</span>
-        </div>
       </div>
 
       <div className={styles.content}>
-        <div className={styles.radarGraph}>
-          <PlayerRadarChart players={[player]} showButtons={false} metrics={metrics ?? []} primaryColor/>
-
-          <div className={styles.metrics}>
-            {metrics.map(metric => (
-              <div className={styles.metric} key={metric}>
-                <span className={styles.name}>{metric}</span>
-                <span className={styles.value}>{player[PLAYER_METRICS[metric as keyof typeof PLAYER_METRICS]]}</span>
-              </div>
-            ))}
+        <section className={styles.playerData}>
+          <span className={styles.title}>Dados cadastrais</span>
+          <div className={styles.values}>
+            <span className={styles.value}>
+              <span className={styles.valueName}>Idade</span>
+              <span>{player.age} anos</span>
+            </span>
+            <span className={styles.value}>
+              <span className={styles.valueName}>Posição</span>
+              <span>{player.position}</span>
+            </span>
+            <span className={styles.value}>
+              <span className={styles.valueName}>Lado preferencial</span>
+              <span>{player.preferredSide}</span>
+            </span>
+            <span className={styles.value}>
+              <span className={styles.valueName}>Equipe</span>
+              <span>{player.teamName}</span>
+            </span>
           </div>
-        </div>
+        </section>
 
-        <div className={styles.playerData}>
-          <div className={styles.performance}>
-            <div className={styles.performanceHeader}>
-              <span>Performance vs Média da equipe</span>
-            </div>
-            <Carousel
-              showDots={true}
-              responsive={responsive}
-              infinite={true}
-              customTransition="all .5"
-              transitionDuration={500}
-              removeArrowOnDeviceType={["tablet", "mobile"]}
-              itemClass={styles.carouselItemClass}
-            >
-              {Object.entries(groupedIndexes).map(([indexType, indexes]) => {
-                return (
-                  <div className={styles.carouselItem}>
-                    {indexes.map(({key, label}) => (
-                      <CarouselItem
-                        indexColor={indexType as IndexType}
-                        label={label}
-                        indexKey={key as keyof Indexes}
-                        key={key}
-                        player={player}
-                        team={team}
-                      />
-                    ))}
+        <section className={styles.indexes}>
+          <span className={styles.title}>Índices individuais</span>
+          {player.indexes ? (
+            <div className={styles.indexGroups}>
+              {Object.entries(INDEXES_LABELS).map(([category, label]) => (
+                <div className={styles.indexGroup} key={category}>
+                  <span className={styles.indexName}>{label}</span>
+                  <div className={styles.values}>
+                    {indexEntries
+                      .filter(([, meta]) => meta.category === category)
+                      .map(([key, meta]) => (
+                        <span className={styles.value} key={key} title={meta.label}>
+                          <span className={styles.valueName}>{meta.label}</span>
+                          <span className={styles.number}>
+                            {formatIndex(player.indexes?.[key] ?? null)}
+                          </span>
+                        </span>
+                      ))}
                   </div>
-                );
-              })}
-            </Carousel>
-          </div>
-
-          <div className={styles.indexes}>
-            <span className={styles.title}>Índices detalhados</span>
-
-            {Object.entries(groupedIndexes).map(([indexType, indexes]) => (
-              <div className={styles.index}>
-                <span className={styles.indexName} style={{color: `${INDEXES_COLORS[indexType as IndexType]}`}}>{INDEXES_LABELS[indexType as IndexType]}</span>
-                <div className={styles.values}>
-                  {indexes.map(({key, label}) => (
-                    <span className={styles.value} title={label} key={key}>
-                      <span className={styles.valueName}>{label}:</span>
-                      <span className={styles.number}>{player.indexes[key as keyof Indexes]}</span>
-                    </span>
-                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          ) : (
+            <p className={styles.emptyIndexes}>
+              Nenhum índice individual disponível para este atleta.
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );
 };
-
-type CarouselItem = {
-  label: string,
-  indexKey: keyof Indexes,
-  player: Player,
-  team: Team,
-  indexColor: 'general' | 'offensive' | 'deffensive',
-};
-
-const CarouselItem = ({label, player, indexKey, team, indexColor}: CarouselItem) => {
-  const playerScore = player.indexes[indexKey] - team.indexes[indexKey];
-  const indexIcon = playerScore > 0 ? faArrowTrendUp
-    : playerScore === 0 ? faArrowRightArrowLeft
-      : faArrowTrendDown;
-  const numberColor = playerScore > 0 ? '#86efac'
-    : playerScore === 0 ? '#facc15'
-      : '#dc2626';
-
-  return (
-    <span className={styles.teamIndex}>
-      <span className={styles.topSide}>
-        <span className={styles.name}>
-          <FontAwesomeIcon icon={faCircle} style={{color: INDEXES_COLORS[indexColor]}}/>
-          {label}
-        </span>
-        <span className={styles.icon}>
-          <FontAwesomeIcon icon={indexIcon}/>
-        </span>
-      </span>
-      <span className={styles.value}>
-        <span className={styles.infos}>
-          {player.name}: {player.indexes[indexKey]} |
-          <span> Média do time: {team.indexes[indexKey]}</span>
-        </span>
-        <span className={styles.number} style={{color: numberColor}}>
-          {playerScore}
-        </span>
-      </span>
-    </span>
-  )
-}
 
 export default IndividualPlayer;

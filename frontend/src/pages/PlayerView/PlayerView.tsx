@@ -1,30 +1,49 @@
-import {useApi} from "../../hooks/useApi.ts";
+import axios from "axios";
+import { useParams } from "react-router";
 import IndividualPlayer from "../../components/PlayerView/IndividualPlayer.tsx";
-import type {PlayerViewData} from "./index";
-import styles from './PlayerView.module.scss';
-import {mockApi} from "../../utils/api.ts";
+import { useApi } from "../../hooks/useApi.ts";
+import type { PlayerViewData } from "./index";
+import styles from "./PlayerView.module.scss";
 
 const PlayerView = () => {
-  // const { id } = useParams<{ id: string }>(); //todo: usar depois pra req do back
-  const { data } = useApi<PlayerViewData>("player-view", { client: mockApi });
+  const { id } = useParams<{ id: string }>();
+  const { data, error, isLoading } = useApi<PlayerViewData>(
+    id ? `/players/${id}` : null,
+    { keepPreviousData: false },
+  );
 
-  if (!data) {
+  if (isLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.emptyState}>Carregando atleta...</div>
+      </div>
+    );
+  }
+
+  if (!id || (axios.isAxiosError(error) && error.response?.status === 404)) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.emptyState}>Atleta não encontrado.</div>
+      </div>
+    );
+  }
+
+  if (error) {
     return (
       <div className={styles.container}>
         <div className={styles.emptyState}>
-          Atleta nao encontrado.
+          Não foi possível carregar o atleta. Verifique se o backend está
+          disponível e tente novamente.
         </div>
       </div>
     );
   }
 
+  if (!data) return null;
+
   return (
     <div className={styles.container}>
-      <IndividualPlayer
-        player={data.player}
-        team={data.team}
-        metrics={data.metrics}
-      />
+      <IndividualPlayer player={data} />
     </div>
   );
 };
