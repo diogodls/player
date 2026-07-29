@@ -250,7 +250,7 @@ describe('PlayersService id validation', () => {
     });
   });
 
-  it('returns deterministic default test indexes for other players', async () => {
+  it('returns stable deterministic test indexes for other players', async () => {
     const player = {
       id: PLAYER_ID,
       equipeId: TEAM_ID,
@@ -268,22 +268,67 @@ describe('PlayersService id validation', () => {
       } as unknown as Repository<PlayerEntity>,
       {} as Repository<TeamEntity>,
     );
+    const first = await service.findOne(PLAYER_ID);
+    const second = await service.findOne(PLAYER_ID);
+    expect(first.indexes).toEqual(second.indexes);
+    expect(Object.values(first.indexes ?? {})).toHaveLength(11);
+  });
 
-    await expect(service.findOne(PLAYER_ID)).resolves.toMatchObject({
-      indexes: {
-        radj: 1.25,
-        goalsRelations: 0.9,
-        actionsRelations: 2.2,
-        atd: 70,
-        dto: 70,
-        pgj: 1.2,
-        ic: 75,
-        tio: 75,
-        gtj: 1,
-        rf: 2.5,
-        tid: 75,
-      },
-    });
+  it('returns different deterministic test indexes for different players', async () => {
+    const findOne = jest.fn(({ where }: { where: { id: string } }) =>
+      Promise.resolve({
+        id: where.id,
+        equipeId: TEAM_ID,
+        posicaoId: 3,
+        ladoPreferencialId: 2,
+        nome: 'Jogador',
+        idade: 21,
+        equipe: { id: TEAM_ID, nome: 'Equipe Principal' },
+        posicao: { id: 3, nome: 'Ala' },
+        ladoPreferencial: { id: 2, nome: 'Canhoto' },
+      } as PlayerEntity),
+    );
+    const service = new PlayersService(
+      { findOne } as unknown as Repository<PlayerEntity>,
+      {} as Repository<TeamEntity>,
+    );
+    const first = await service.findOne(PLAYER_ID);
+    const second = await service.findOne(OTHER_PLAYER_ID);
+    expect(first.indexes).not.toEqual(second.indexes);
+  });
+
+  it('keeps session temporary indexes stable and different between sessions', async () => {
+    const player = buildRankingPlayer(PLAYER_ID, 'Ana');
+    const { service } = buildRankingService([]);
+    const first = service.buildRankingForPlayers([player], 'radj', 'session-a');
+    const repeated = service.buildRankingForPlayers(
+      [player],
+      'radj',
+      'session-a',
+    );
+    const anotherSession = service.buildRankingForPlayers(
+      [player],
+      'radj',
+      'session-b',
+    );
+    expect(first).toEqual(repeated);
+    expect(first.ranking[0].value).not.toBe(anotherSession.ranking[0].value);
+  });
+
+  it('uses the session participant group for relative overall normalization', () => {
+    const first = buildRankingPlayer(PLAYER_ID, 'Ana');
+    const second = buildRankingPlayer(OTHER_PLAYER_ID, 'Bia');
+    const { service } = buildRankingService([]);
+    const response = service.buildRankingForPlayers(
+      [first, second],
+      'overall',
+      'session-a',
+    );
+    expect(response.index.key).toBe('overall');
+    expect(response.ranking).toHaveLength(2);
+    expect(response.ranking.every(({ value }) => Number.isInteger(value))).toBe(
+      true,
+    );
   });
 
   it('returns every ranking option from the centralized ranking rules', () => {
@@ -294,12 +339,12 @@ describe('PlayersService id validation', () => {
       { key: 'radj', name: 'Ranking RADJ', sortDirection: 'DESC' },
       {
         key: 'goalsRelations',
-        name: 'Ranking Goals Relations',
+        name: 'Relação de Gols',
         sortDirection: 'DESC',
       },
       {
         key: 'actionsRelations',
-        name: 'Ranking Actions Relations',
+        name: 'Relação de Ações',
         sortDirection: 'DESC',
       },
       { key: 'atd', name: 'Ranking ATD', sortDirection: 'DESC' },
@@ -350,21 +395,31 @@ describe('PlayersService id validation', () => {
   });
 
   it('uses competition positions for tied values', async () => {
-    const { service } = buildRankingService([
-      buildRankingPlayer('11111111-1111-1111-1111-111111111111', 'Carlos'),
-      buildRankingPlayer('22222222-2222-2222-2222-222222222222', 'Bruno'),
-      buildRankingPlayer('00000000-0000-0000-0000-000000000203', 'Guedes'),
-    ]);
+    const players = [
+      buildRankingPlayer('carlos', 'Carlos'),
+      buildRankingPlayer('bruno', 'Bruno'),
+      buildRankingPlayer('guedes', 'Guedes'),
+    ];
+    const { service } = buildOverallService(players, {
+      carlos: indexes({ radj: 10 }),
+      bruno: indexes({ radj: 10 }),
+      guedes: indexes({ radj: 5 }),
+    });
     const response = await service.findRanking('radj');
     expect(response.ranking.map((item) => item.position)).toEqual([1, 1, 3]);
   });
 
   it('sorts tied players alphabetically by name', async () => {
-    const { service } = buildRankingService([
-      buildRankingPlayer('11111111-1111-1111-1111-111111111111', 'Carlos'),
-      buildRankingPlayer('22222222-2222-2222-2222-222222222222', 'Ana'),
-      buildRankingPlayer('33333333-3333-3333-3333-333333333333', 'Bruno'),
-    ]);
+    const players = [
+      buildRankingPlayer('carlos', 'Carlos'),
+      buildRankingPlayer('ana', 'Ana'),
+      buildRankingPlayer('bruno', 'Bruno'),
+    ];
+    const { service } = buildOverallService(players, {
+      carlos: indexes({ radj: 10 }),
+      ana: indexes({ radj: 10 }),
+      bruno: indexes({ radj: 10 }),
+    });
     const response = await service.findRanking('radj');
     expect(response.ranking.map((item) => item.player.name)).toEqual([
       'Ana',

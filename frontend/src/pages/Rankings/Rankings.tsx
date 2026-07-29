@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RankingSection from "../../components/elements/RankingSection/RankingSection.tsx";
 import Select from "../../components/elements/Select/Select.tsx";
 import sessionActionStyles from "../../components/SessionDetails/SessionActions/SessionActions.module.scss";
@@ -38,6 +38,14 @@ const Rankings = () => {
     isLoading: areRankingOptionsLoading,
     isError: rankingOptionsError,
   } = useApi<RankingOption[]>(RANKING_OPTIONS_ENDPOINT);
+  useEffect(() => {
+    if (
+      !selectedIndexKey &&
+      rankingOptions?.some((option) => option.key === "overall")
+    ) {
+      setSelectedIndexKey("overall");
+    }
+  }, [rankingOptions, selectedIndexKey]);
   const {
     data: sessionsResponse,
     isLoading: areSessionsLoading,
@@ -70,8 +78,6 @@ const Rankings = () => {
       rankingPosition: item.position,
       rankingValue: item.value,
     })) ?? [];
-  const isSessionRankingUnavailable =
-    selectedSessionId !== ALL_SESSIONS_VALUE && Boolean(selectedIndexKey);
   const renderRankingContent = () => {
     if (rankingOptionsError)
       return (
@@ -91,12 +97,6 @@ const Rankings = () => {
       return (
         <div className={styles.emptyState}>
           Selecione um índice no filtro para começar a visualizar
-        </div>
-      );
-    if (isSessionRankingUnavailable)
-      return (
-        <div className={styles.emptyState}>
-          O ranking desta sessão ainda não está disponível.
         </div>
       );
     if (isRankingLoading)
