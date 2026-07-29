@@ -29,6 +29,12 @@
   }
 }
 
+.filters {
+  align-items: flex-end;
+  display: flex;
+  gap: 16px;
+}
+
 .filter {
   min-width: 280px;
 }
@@ -67,13 +73,19 @@
   text-align: center;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .page {
     padding: 24px 16px 36px;
   }
 
   .header {
     flex-direction: column;
+  }
+
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
   }
 
   .filter {
