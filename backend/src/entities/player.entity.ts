@@ -6,14 +6,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PositionEntity } from './position.entity';
 import { PreferredSideEntity } from './preferred-side.entity';
 import { TeamEntity } from './team.entity';
 import { TaggedActionEntity } from './tagged-action.entity';
-import { PlayerIndexesEntity } from './player-indexes.entity';
 
 @Entity({ name: 'jogadores' })
 @Check(`"idade" > 0`)
@@ -50,7 +48,4 @@ export class PlayerEntity extends BaseEntity {
 
   @OneToMany(() => TaggedActionEntity, (action) => action.jogador)
   acoesTaggeadas?: TaggedActionEntity[];
-
-  @OneToOne(() => PlayerIndexesEntity, (indexes) => indexes.jogador)
-  indices?: PlayerIndexesEntity | null;
 }

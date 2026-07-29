@@ -132,23 +132,10 @@ describe('PlayersService id validation', () => {
     expect(response.page).toBe(2);
     expect(response.totalPages).toBe(2);
   });
-  it('returns every persisted index when finding a player by id', async () => {
-    const indexes = {
-      jogadorId: PLAYER_ID,
-      radj: 1.35,
-      goalsRelations: 1.2,
-      actionsRelations: 3.4,
-      atd: 72,
-      dto: 68,
-      pgj: 1.1,
-      ic: 74,
-      tio: 78,
-      gtj: 0.8,
-      rf: 2.4,
-      tid: 81,
-    };
+
+  it('returns deterministic test indexes selected by player id', async () => {
     const player = {
-      id: PLAYER_ID,
+      id: '00000000-0000-0000-0000-000000000201',
       equipeId: TEAM_ID,
       posicaoId: 3,
       ladoPreferencialId: 2,
@@ -157,7 +144,6 @@ describe('PlayersService id validation', () => {
       equipe: { id: TEAM_ID, nome: 'Equipe Principal' },
       posicao: { id: 3, nome: 'Ala' },
       ladoPreferencial: { id: 2, nome: 'Canhoto' },
-      indices: indexes,
     } as PlayerEntity;
     const findOne = jest.fn().mockResolvedValue(player);
     const service = new PlayersService(
@@ -165,16 +151,11 @@ describe('PlayersService id validation', () => {
       {} as Repository<TeamEntity>,
     );
 
-    const response = await service.findOne(PLAYER_ID);
+    const response = await service.findOne(player.id);
 
     expect(findOne).toHaveBeenCalledWith({
-      where: { id: PLAYER_ID },
-      relations: {
-        equipe: true,
-        posicao: true,
-        ladoPreferencial: true,
-        indices: true,
-      },
+      where: { id: player.id },
+      relations: { equipe: true, posicao: true, ladoPreferencial: true },
     });
     expect(response.indexes).toEqual({
       radj: 1.35,
@@ -191,7 +172,7 @@ describe('PlayersService id validation', () => {
     });
   });
 
-  it('returns null indexes when calculations are not available yet', async () => {
+  it('returns deterministic default test indexes for other players', async () => {
     const player = {
       id: PLAYER_ID,
       equipeId: TEAM_ID,
@@ -202,7 +183,6 @@ describe('PlayersService id validation', () => {
       equipe: { id: TEAM_ID, nome: 'Equipe Principal' },
       posicao: { id: 3, nome: 'Ala' },
       ladoPreferencial: { id: 2, nome: 'Canhoto' },
-      indices: null,
     } as PlayerEntity;
     const service = new PlayersService(
       {
@@ -212,7 +192,19 @@ describe('PlayersService id validation', () => {
     );
 
     await expect(service.findOne(PLAYER_ID)).resolves.toMatchObject({
-      indexes: null,
+      indexes: {
+        radj: 1.25,
+        goalsRelations: 0.9,
+        actionsRelations: 2.2,
+        atd: 70,
+        dto: 70,
+        pgj: 1.2,
+        ic: 75,
+        tio: 75,
+        gtj: 1,
+        rf: 2.5,
+        tid: 75,
+      },
     });
   });
 });
