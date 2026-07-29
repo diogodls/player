@@ -1,18 +1,6 @@
-export class PlayerIndexesResponseDto {
-  radj!: number | null;
-  goalsRelations!: number | null;
-  actionsRelations!: number | null;
-  atd!: number | null;
-  dto!: number | null;
-  pgj!: number | null;
-  ic!: number | null;
-  tio!: number | null;
-  gtj!: number | null;
-  rf!: number | null;
-  tid!: number | null;
-}
+import { PlayerPerformanceDto } from './player-performance.dto';
 
-export class PlayerResponseDto {
+export class PlayerResponseDto extends PlayerPerformanceDto {
   id!: string;
   name!: string;
   age!: number;
@@ -21,5 +9,4 @@ export class PlayerResponseDto {
   preferredSideId!: number;
   preferredSide!: string;
   teamName!: string;
-  indexes!: PlayerIndexesResponseDto | null;
 }

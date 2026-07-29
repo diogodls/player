@@ -2,6 +2,10 @@ import { BadRequestException } from '@nestjs/common';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerDto } from './dto/player.dto';
+import {
+  emptyPlayerPerformance,
+  PlayerStatisticsService,
+} from './player-statistics.service';
 import { PlayersService } from './players.service';
 
 const PLAYER_ID = '79fbbbe8-39b1-4b25-bd11-236a0f228cb0';
@@ -20,6 +24,7 @@ describe('PlayersService id validation', () => {
   const service = new PlayersService(
     {} as Repository<PlayerEntity>,
     {} as Repository<TeamEntity>,
+    {} as PlayerStatisticsService,
   );
 
   it('rejects a non-null id when creating a player', async () => {
@@ -59,6 +64,9 @@ describe('PlayersService id validation', () => {
     const playersService = new PlayersService(
       playersRepository,
       teamsRepository,
+      {
+        findByTeamId: jest.fn().mockResolvedValue(new Map()),
+      } as unknown as PlayerStatisticsService,
     );
 
     await playersService.create(buildPlayerDto(null));
@@ -85,6 +93,9 @@ describe('PlayersService id validation', () => {
     const playersService = new PlayersService(
       playersRepository,
       {} as Repository<TeamEntity>,
+      {
+        findByTeamId: jest.fn().mockResolvedValue(new Map()),
+      } as unknown as PlayerStatisticsService,
     );
 
     const response = await playersService.findAll({
@@ -124,6 +135,9 @@ describe('PlayersService id validation', () => {
     const playersService = new PlayersService(
       playersRepository,
       {} as Repository<TeamEntity>,
+      {
+        findByTeamId: jest.fn().mockResolvedValue(new Map()),
+      } as unknown as PlayerStatisticsService,
     );
 
     const response = await playersService.findAll({ page: 4, limit: 8 });
@@ -133,9 +147,9 @@ describe('PlayersService id validation', () => {
     expect(response.totalPages).toBe(2);
   });
 
-  it('returns deterministic test indexes selected by player id', async () => {
+  it('includes cumulative metrics and indexes in the player response', async () => {
     const player = {
-      id: '00000000-0000-0000-0000-000000000201',
+      id: PLAYER_ID,
       equipeId: TEAM_ID,
       posicaoId: 3,
       ladoPreferencialId: 2,
@@ -145,34 +159,55 @@ describe('PlayersService id validation', () => {
       posicao: { id: 3, nome: 'Ala' },
       ladoPreferencial: { id: 2, nome: 'Canhoto' },
     } as PlayerEntity;
-    const findOne = jest.fn().mockResolvedValue(player);
+    const performance = {
+      minutes: 80,
+      goals: 4,
+      goalsTaken: 2,
+      offensiveActions: 9,
+      defensiveActions: 7,
+      indexes: {
+        radj: 0.03,
+        goalsRelations: 3,
+        actionsRelations: 2,
+        atd: 0.01,
+        dto: -0.01,
+        pgj: 0.05,
+        ic: 2,
+        tio: 25,
+        gtj: 0.03,
+        rf: 3,
+        tid: 20,
+      },
+    };
+    const findByTeamId = jest
+      .fn()
+      .mockResolvedValue(new Map([[PLAYER_ID, performance]]));
     const service = new PlayersService(
-      { findOne } as unknown as Repository<PlayerEntity>,
+      {
+        findOne: jest.fn().mockResolvedValue(player),
+      } as unknown as Repository<PlayerEntity>,
       {} as Repository<TeamEntity>,
+      { findByTeamId } as unknown as PlayerStatisticsService,
     );
 
-    const response = await service.findOne(player.id);
+    const response = await service.findOne(PLAYER_ID);
 
-    expect(findOne).toHaveBeenCalledWith({
-      where: { id: player.id },
-      relations: { equipe: true, posicao: true, ladoPreferencial: true },
-    });
-    expect(response.indexes).toEqual({
-      radj: 1.35,
-      goalsRelations: 1.2,
-      actionsRelations: 3.4,
-      atd: 72,
-      dto: 68,
-      pgj: 1.1,
-      ic: 74,
-      tio: 78,
-      gtj: 0.8,
-      rf: 2.4,
-      tid: 81,
+    expect(findByTeamId).toHaveBeenCalledTimes(1);
+    expect(findByTeamId).toHaveBeenCalledWith(TEAM_ID);
+    expect(response).toEqual({
+      id: PLAYER_ID,
+      name: 'Ana Silva',
+      age: 21,
+      positionId: 3,
+      position: 'Ala',
+      preferredSideId: 2,
+      preferredSide: 'Canhoto',
+      teamName: 'Equipe Principal',
+      ...performance,
     });
   });
 
-  it('returns deterministic default test indexes for other players', async () => {
+  it('returns zeroed performance for a player without tagged actions', async () => {
     const player = {
       id: PLAYER_ID,
       equipeId: TEAM_ID,
@@ -189,22 +224,23 @@ describe('PlayersService id validation', () => {
         findOne: jest.fn().mockResolvedValue(player),
       } as unknown as Repository<PlayerEntity>,
       {} as Repository<TeamEntity>,
+      {
+        findByTeamId: jest.fn().mockResolvedValue(new Map()),
+      } as unknown as PlayerStatisticsService,
     );
 
-    await expect(service.findOne(PLAYER_ID)).resolves.toMatchObject({
-      indexes: {
-        radj: 1.25,
-        goalsRelations: 0.9,
-        actionsRelations: 2.2,
-        atd: 70,
-        dto: 70,
-        pgj: 1.2,
-        ic: 75,
-        tio: 75,
-        gtj: 1,
-        rf: 2.5,
-        tid: 75,
-      },
+    const response = await service.findOne(PLAYER_ID);
+
+    expect(response).toEqual({
+      id: PLAYER_ID,
+      name: 'Ana Silva',
+      age: 21,
+      positionId: 3,
+      position: 'Ala',
+      preferredSideId: 2,
+      preferredSide: 'Canhoto',
+      teamName: 'Equipe Principal',
+      ...emptyPlayerPerformance(),
     });
   });
 });
