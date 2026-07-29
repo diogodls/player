@@ -1,4 +1,5 @@
 export type RankingIndexKey =
+  | "overall"
   | "radj"
   | "goalsRelations"
   | "actionsRelations"
@@ -10,6 +11,11 @@ export type RankingIndexKey =
   | "gtj"
   | "rf"
   | "tid";
+export type RankingOption = {
+  key: RankingIndexKey;
+  name: string;
+  sortDirection: "ASC" | "DESC";
+};
 export type RankingResponse = {
   index: { key: RankingIndexKey; name: string; sortDirection: "ASC" | "DESC" };
   ranking: RankingResponseItem[];

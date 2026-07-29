@@ -2,7 +2,15 @@ import type { PlayerIndexesResponseDto } from './player-response.dto';
 
 export type PlayerIndexKey = keyof PlayerIndexesResponseDto;
 
+export type PlayerRankingKey = PlayerIndexKey | 'overall';
+
 export type PlayerIndexSortDirection = 'ASC' | 'DESC';
+
+export class PlayerRankingOptionDto {
+  key!: PlayerRankingKey;
+  name!: string;
+  sortDirection!: PlayerIndexSortDirection;
+}
 
 export class PlayerRankingItemDto {
   position!: number;
@@ -16,7 +24,7 @@ export class PlayerRankingItemDto {
 
 export class PlayerRankingResponseDto {
   index!: {
-    key: PlayerIndexKey;
+    key: PlayerRankingKey;
     name: string;
     sortDirection: PlayerIndexSortDirection;
   };

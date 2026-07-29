@@ -1,6 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
+import type { PlayerIndexKey } from './dto/player-ranking-response.dto';
+import type { PlayerIndexesResponseDto } from './dto/player-response.dto';
 import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
 
@@ -31,6 +33,49 @@ const buildRankingService = (players: PlayerEntity[]) => {
   };
 };
 
+type TestIndexes = Partial<Record<PlayerIndexKey, number | null | undefined>>;
+
+class TestPlayersService extends PlayersService {
+  constructor(
+    repository: Repository<PlayerEntity>,
+    private readonly indexesByPlayerId: Record<string, TestIndexes>,
+  ) {
+    super(repository, {} as Repository<TeamEntity>);
+  }
+
+  protected override getIndexes(playerId: string): PlayerIndexesResponseDto {
+    return this.indexesByPlayerId[playerId] as PlayerIndexesResponseDto;
+  }
+}
+
+const buildOverallService = (
+  players: PlayerEntity[],
+  indexesByPlayerId: Record<string, TestIndexes>,
+) => {
+  const find = jest.fn().mockResolvedValue(players);
+  return {
+    find,
+    service: new TestPlayersService(
+      { find } as unknown as Repository<PlayerEntity>,
+      indexesByPlayerId,
+    ),
+  };
+};
+
+const indexes = (values: TestIndexes): TestIndexes => ({
+  radj: null,
+  goalsRelations: null,
+  actionsRelations: null,
+  atd: null,
+  dto: null,
+  pgj: null,
+  ic: null,
+  tio: null,
+  gtj: null,
+  rf: null,
+  tid: null,
+  ...values,
+});
 const buildPlayerDto = (id: string | null): PlayerDto => ({
   id,
   name: 'Ana Silva',
@@ -241,9 +286,35 @@ describe('PlayersService id validation', () => {
     });
   });
 
+  it('returns every ranking option from the centralized ranking rules', () => {
+    const { service } = buildRankingService([]);
+
+    expect(service.findRankingOptions()).toEqual([
+      { key: 'overall', name: 'Ranking Geral', sortDirection: 'DESC' },
+      { key: 'radj', name: 'Ranking RADJ', sortDirection: 'DESC' },
+      {
+        key: 'goalsRelations',
+        name: 'Ranking Goals Relations',
+        sortDirection: 'DESC',
+      },
+      {
+        key: 'actionsRelations',
+        name: 'Ranking Actions Relations',
+        sortDirection: 'DESC',
+      },
+      { key: 'atd', name: 'Ranking ATD', sortDirection: 'DESC' },
+      { key: 'dto', name: 'Ranking DTO', sortDirection: 'DESC' },
+      { key: 'pgj', name: 'Ranking PGJ', sortDirection: 'DESC' },
+      { key: 'ic', name: 'Ranking IC', sortDirection: 'DESC' },
+      { key: 'tio', name: 'Ranking TIO', sortDirection: 'DESC' },
+      { key: 'gtj', name: 'Ranking GTJ', sortDirection: 'ASC' },
+      { key: 'rf', name: 'Ranking RF', sortDirection: 'DESC' },
+      { key: 'tid', name: 'Ranking TID', sortDirection: 'DESC' },
+    ]);
+  });
   it('rejects an invalid ranking index', async () => {
     const { service } = buildRankingService([]);
-    await expect(service.findRanking('overall')).rejects.toThrow(
+    await expect(service.findRanking('unknown')).rejects.toThrow(
       BadRequestException,
     );
   });
@@ -257,7 +328,7 @@ describe('PlayersService id validation', () => {
     const response = await service.findRanking('radj');
     expect(response.index).toEqual({
       key: 'radj',
-      name: 'Relação Ataque-Defesa por jogo',
+      name: 'Ranking RADJ',
       sortDirection: 'DESC',
     });
     expect(response.ranking.map((item) => item.value)).toEqual([
@@ -330,5 +401,185 @@ describe('PlayersService id validation', () => {
     });
     expect(response.ranking).toHaveLength(1);
     expect(response.ranking[0].player.name).toBe('Ativo');
+  });
+
+  describe('overall ranking', () => {
+    it('normalizes higher-is-better indexes with the best at 99 and worst at 0', async () => {
+      const worst = buildRankingPlayer('worst', 'Pior');
+      const middle = buildRankingPlayer('middle', 'Meio');
+      const best = buildRankingPlayer('best', 'Melhor');
+      const { service } = buildOverallService([middle, worst, best], {
+        worst: indexes({ radj: 10 }),
+        middle: indexes({ radj: 15 }),
+        best: indexes({ radj: 20 }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(response.index).toEqual({
+        key: 'overall',
+        name: 'Ranking Geral',
+        sortDirection: 'DESC',
+      });
+      expect(
+        response.ranking.map(({ player, value }) => [player.id, value]),
+      ).toEqual([
+        ['best', 99],
+        ['middle', 50],
+        ['worst', 0],
+      ]);
+    });
+
+    it('uses the centralized ascending direction to invert gtj normalization', async () => {
+      const low = buildRankingPlayer('low', 'Menor GTJ');
+      const high = buildRankingPlayer('high', 'Maior GTJ');
+      const { service } = buildOverallService([high, low], {
+        low: indexes({ gtj: 1 }),
+        high: indexes({ gtj: 3 }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(
+        response.ranking.map(({ player, value }) => [player.id, value]),
+      ).toEqual([
+        ['low', 99],
+        ['high', 0],
+      ]);
+    });
+
+    it('assigns 50 when every valid value of an index is equal', async () => {
+      const first = buildRankingPlayer('first', 'Ana');
+      const second = buildRankingPlayer('second', 'Bruno');
+      const { service } = buildOverallService([second, first], {
+        first: indexes({ radj: 7 }),
+        second: indexes({ radj: 7 }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(response.ranking.map(({ value }) => value)).toEqual([50, 50]);
+    });
+
+    it('uses equal weights, keeps normalized precision and rounds only the final bounded overall', async () => {
+      const minimum = buildRankingPlayer('minimum', 'Mínimo');
+      const target = buildRankingPlayer('target', 'Alvo');
+      const maximum = buildRankingPlayer('maximum', 'Máximo');
+      const { service } = buildOverallService([target, maximum, minimum], {
+        minimum: indexes({ radj: 0, goalsRelations: 0 }),
+        target: indexes({ radj: 24.6, goalsRelations: 73.6 }),
+        maximum: indexes({ radj: 100, goalsRelations: 100 }),
+      });
+
+      const response = await service.findRanking('overall');
+      const values = Object.fromEntries(
+        response.ranking.map((item) => [item.player.id, item.value]),
+      );
+
+      expect(values).toMatchObject({ maximum: 99, target: 49, minimum: 0 });
+      expect(
+        response.ranking.every(
+          ({ value }) => value !== null && value >= 0 && value <= 99,
+        ),
+      ).toBe(true);
+    });
+
+    it('ignores missing, null and non-numeric indexes and excludes players without valid values', async () => {
+      const minimum = buildRankingPlayer('minimum', 'Mínimo');
+      const partial = buildRankingPlayer('partial', 'Parcial');
+      const invalid = buildRankingPlayer('invalid', 'Inválido');
+      const { service } = buildOverallService([invalid, partial, minimum], {
+        minimum: indexes({ radj: 0 }),
+        partial: indexes({ radj: 10, goalsRelations: Number.NaN }),
+        invalid: indexes({ radj: Number.NaN, goalsRelations: undefined }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(response.ranking.map(({ player }) => player.id)).toEqual([
+        'partial',
+        'minimum',
+      ]);
+      expect(response.ranking[0].value).toBe(99);
+    });
+
+    it('sorts descending and preserves competition ties with alphabetical order', async () => {
+      const bruno = buildRankingPlayer('bruno', 'Bruno');
+      const ana = buildRankingPlayer('ana', 'Ana');
+      const carlos = buildRankingPlayer('carlos', 'Carlos');
+      const { service } = buildOverallService([bruno, carlos, ana], {
+        bruno: indexes({ radj: 10 }),
+        ana: indexes({ radj: 10 }),
+        carlos: indexes({ radj: 0 }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(response.ranking.map(({ player }) => player.name)).toEqual([
+        'Ana',
+        'Bruno',
+        'Carlos',
+      ]);
+      expect(response.ranking.map(({ position }) => position)).toEqual([
+        1, 1, 3,
+      ]);
+      expect(response.ranking.map(({ value }) => value)).toEqual([99, 99, 0]);
+    });
+
+    it('excludes soft-deleted players from both ranking and normalization', async () => {
+      const minimum = buildRankingPlayer('minimum', 'Mínimo');
+      const activeBest = buildRankingPlayer('active-best', 'Melhor ativo');
+      const removed = buildRankingPlayer('removed', 'Removido', new Date());
+      const { find, service } = buildOverallService(
+        [removed, minimum, activeBest],
+        {
+          minimum: indexes({ radj: 0 }),
+          'active-best': indexes({ radj: 5 }),
+          removed: indexes({ radj: 10 }),
+        },
+      );
+
+      const response = await service.findRanking('overall');
+
+      expect(find).toHaveBeenCalledWith({
+        where: { deletedAt: IsNull() },
+        relations: { posicao: true },
+      });
+      expect(
+        response.ranking.map(({ player, value }) => [player.id, value]),
+      ).toEqual([
+        ['active-best', 99],
+        ['minimum', 0],
+      ]);
+    });
+
+    it('recalculates relative normalization when the active roster changes', async () => {
+      const minimum = buildRankingPlayer('minimum', 'Mínimo');
+      const middle = buildRankingPlayer('middle', 'Meio');
+      const maximum = buildRankingPlayer('maximum', 'Máximo');
+      const values = {
+        minimum: indexes({ radj: 0 }),
+        middle: indexes({ radj: 5 }),
+        maximum: indexes({ radj: 10 }),
+      };
+      const fullRoster = buildOverallService(
+        [minimum, middle, maximum],
+        values,
+      );
+      const reducedRoster = buildOverallService([minimum, middle], values);
+
+      const fullResponse = await fullRoster.service.findRanking('overall');
+      const reducedResponse =
+        await reducedRoster.service.findRanking('overall');
+      const fullMiddle = fullResponse.ranking.find(
+        ({ player }) => player.id === 'middle',
+      );
+      const reducedMiddle = reducedResponse.ranking.find(
+        ({ player }) => player.id === 'middle',
+      );
+
+      expect(fullMiddle?.value).toBe(50);
+      expect(reducedMiddle?.value).toBe(99);
+    });
   });
 });

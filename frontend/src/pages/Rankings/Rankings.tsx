@@ -2,16 +2,17 @@ import { useMemo, useState } from "react";
 import RankingSection from "../../components/elements/RankingSection/RankingSection.tsx";
 import Select from "../../components/elements/Select/Select.tsx";
 import sessionActionStyles from "../../components/SessionDetails/SessionActions/SessionActions.module.scss";
-import { rankingConfigs } from "../../constants/rankings.ts";
 import { useApi } from "../../hooks/useApi.ts";
 import {
   getGeneralRankingEndpoint,
   getSessionRankingEndpoint,
+  RANKING_OPTIONS_ENDPOINT,
   RANKING_SESSIONS_ENDPOINT,
 } from "../../services/rankings.ts";
 import type { Session, SessionListResponse } from "../Sessions";
 import type {
   RankingIndexKey,
+  RankingOption,
   RankingPlayerBase,
   RankingResponse,
 } from "./index";
@@ -32,6 +33,11 @@ const Rankings = () => {
   >("");
   const [selectedSessionId, setSelectedSessionId] =
     useState(ALL_SESSIONS_VALUE);
+  const {
+    data: rankingOptions,
+    isLoading: areRankingOptionsLoading,
+    isError: rankingOptionsError,
+  } = useApi<RankingOption[]>(RANKING_OPTIONS_ENDPOINT);
   const {
     data: sessionsResponse,
     isLoading: areSessionsLoading,
@@ -67,6 +73,14 @@ const Rankings = () => {
   const isSessionRankingUnavailable =
     selectedSessionId !== ALL_SESSIONS_VALUE && Boolean(selectedIndexKey);
   const renderRankingContent = () => {
+    if (rankingOptionsError)
+      return (
+        <div className={styles.feedback}>
+          Não foi possível carregar os índices.
+        </div>
+      );
+    if (rankingOptions && rankingOptions.length === 0)
+      return <div className={styles.emptyState}>Nenhum índice disponível.</div>;
     if (sessionsError)
       return (
         <div className={styles.feedback}>
@@ -97,7 +111,7 @@ const Rankings = () => {
     return (
       <section className={styles.rankingContent}>
         <RankingSection
-          title={`Ranking ${rankingResponse.index.name}`}
+          title={rankingResponse.index.name}
           players={rankingPlayers}
           metricLabel={rankingResponse.index.name || rankingResponse.index.key}
           highlightTop3
@@ -137,16 +151,21 @@ const Rankings = () => {
               id="ranking-filter"
               value={selectedIndexKey}
               onChange={(value) => setSelectedIndexKey(value)}
-              options={rankingConfigs.map((item) => ({
+              options={(rankingOptions ?? []).map((item) => ({
                 value: item.key,
-                label: item.title,
+                label: item.name,
               }))}
               placeholder="Selecione um índice"
+              disabled={
+                areRankingOptionsLoading || Boolean(rankingOptionsError)
+              }
             />
           </label>
         </div>
       </section>
-      {areSessionsLoading ? (
+      {areRankingOptionsLoading ? (
+        <div className={styles.feedback}>Carregando índices...</div>
+      ) : areSessionsLoading ? (
         <div className={styles.feedback}>Carregando sessões...</div>
       ) : (
         renderRankingContent()
