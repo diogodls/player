@@ -24,6 +24,10 @@ describe('CatalogService', () => {
       category('COURT_GOALS_CONCEDED', 'Gols tomados em quadra', 4, [
         action('GS BP', 'Gol sofrido bola parada', 'Negativa', 3),
       ]),
+      category('PLAYING_TIME', 'Minutagem', 5, [
+        action('ENTROU', 'Entrou em quadra', 'Neutra', 1),
+        action('SAIU', 'Saiu de quadra', 'Neutra', 2),
+      ]),
     ]);
 
     const result = await service.getIndividualCatalog();
@@ -37,14 +41,16 @@ describe('CatalogService', () => {
       'DEFENSIVE_ACTIONS',
       'COURT_GOALS',
       'COURT_GOALS_CONCEDED',
+      'PLAYING_TIME',
     ]);
     expect(
       result.groups
         .flatMap((group) => group.actions)
         .map((action) => action.key),
-    ).toEqual(['GM', 'GP', 'Gol MGL', 'GS BP']);
+    ).toEqual(['GM', 'GP', 'Gol MGL', 'GS BP', 'ENTROU', 'SAIU']);
     expect(result.groups[2].actions[0].impact).toBe('POSITIVE');
     expect(result.groups[3].actions[0].impact).toBe('NEGATIVE');
+    expect(result.groups[4].actions[0].impact).toBe('NEUTRAL');
   });
 
   it('does not duplicate actions', async () => {
@@ -140,11 +146,13 @@ function category(
 }
 
 function action(sigla: string, nome: string, impacto: string, ordem: number) {
+  const impactId = impacto === 'Positiva' ? 1 : impacto === 'Negativa' ? 2 : 3;
+
   return {
     id: `id-${sigla}`,
     sigla,
     nome,
     ordem,
-    impacto: { id: impacto === 'Positiva' ? 1 : 2, nome: impacto },
+    impacto: { id: impactId, nome: impacto },
   };
 }

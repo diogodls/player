@@ -3,24 +3,33 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
 import { Cookies } from "react-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullseye, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBullseye,
+  faClock,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.tsx";
 import type { Session } from "../../../pages/Sessions";
 import { useNavigate } from "react-router";
 import ActionLogConfirmModal from "../ActionLog/ActionLogConfirmModal.tsx";
-import {formatVideoTime} from "../../../utils/videoTime.ts";
-import {persistSessionActions} from "../../../utils/sessionActions.ts";
+import { formatVideoTime } from "../../../utils/videoTime.ts";
+import { persistSessionActions } from "../../../utils/sessionActions.ts";
 
 const COOKIE_KEY_PREFIX = "ufsm_action_log_session_";
 const REDIRECT_DELAY_MS = 1000;
 
 type ActionLog = {
-  logType: 'team' | 'individual';
+  logType: "team" | "individual";
   session: Session;
 };
 
-const ActionLog = ({logType, session}: ActionLog) => {
-  const {individualActions, teamActions, setIndividualActions, setTeamActions} = useContext(ActionsContext);
+const ActionLog = ({ logType, session }: ActionLog) => {
+  const {
+    individualActions,
+    teamActions,
+    setIndividualActions,
+    setTeamActions,
+  } = useContext(ActionsContext);
   const navigate = useNavigate();
   const cookieKey = `${COOKIE_KEY_PREFIX}${logType}${session.id}`;
   const cookiesRef = useRef(new Cookies());
@@ -28,9 +37,12 @@ const ActionLog = ({logType, session}: ActionLog) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const redirectTimeoutRef = useRef<number | null>(null);
-  const selectedActions = (logType === 'individual' ? individualActions : teamActions).filter((action) => action.sessionId === session.id);
-  const setActions = logType === 'individual' ? setIndividualActions : setTeamActions;
-  const {success, info, error} = useContext(ToastContext);
+  const selectedActions = (
+    logType === "individual" ? individualActions : teamActions
+  ).filter((action) => action.sessionId === session.id);
+  const setActions =
+    logType === "individual" ? setIndividualActions : setTeamActions;
+  const { success, info, error } = useContext(ToastContext);
 
   useEffect(() => {
     if (!isInitialMount.current) return;
@@ -128,10 +140,18 @@ const ActionLog = ({logType, session}: ActionLog) => {
         </div>
 
         <div className={styles.actions}>
-          <button className={styles.save} onClick={handleSaveActions} disabled={isSaving}>
+          <button
+            className={styles.save}
+            onClick={handleSaveActions}
+            disabled={isSaving}
+          >
             {isSaving ? "Salvando..." : "Salvar"}
           </button>
-          <button className={styles.clear} onClick={handleClear} disabled={isSaving}>
+          <button
+            className={styles.clear}
+            onClick={handleClear}
+            disabled={isSaving}
+          >
             Limpar
           </button>
         </div>
@@ -139,22 +159,34 @@ const ActionLog = ({logType, session}: ActionLog) => {
 
       {selectedActions.length === 0 ? (
         <div className={styles.emptyState}>
-          <span>Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.</span>
+          <span>
+            Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.
+          </span>
         </div>
       ) : (
         <div className={styles.list}>
           {selectedActions.map((action) => (
             <div
               key={action.id}
-              className={`${styles.item} ${action.goodAction ? styles.good : styles.bad}`}
+              className={`${styles.item} ${
+                action.impact === "NEUTRAL"
+                  ? styles.neutral
+                  : action.goodAction
+                    ? styles.good
+                    : styles.bad
+              }`}
             >
               <div className={styles.itemLeft}>
-                <span className={styles.time}>{formatVideoTime(action.time)}</span>
+                <span className={styles.time}>
+                  {formatVideoTime(action.time)}
+                </span>
               </div>
 
               <div className={styles.itemBody}>
                 <span className={styles.actionTitle}>
-                  <FontAwesomeIcon icon={faBullseye} />
+                  <FontAwesomeIcon
+                    icon={action.impact === "NEUTRAL" ? faClock : faBullseye}
+                  />
                   {action.title}
                 </span>
 

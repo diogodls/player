@@ -46,7 +46,9 @@
         font-size: 12px;
         border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.18s ease, transform 0.18s ease;
+        transition:
+          background-color 0.18s ease,
+          transform 0.18s ease;
 
         &:hover {
           background-color: var(--selected-blue-hover);
@@ -61,7 +63,9 @@
         font-size: 12px;
         border-radius: 6px;
         cursor: pointer;
-        transition: background-color 0.18s ease, transform 0.18s ease;
+        transition:
+          background-color 0.18s ease,
+          transform 0.18s ease;
 
         &:hover {
           background-color: rgba(239, 68, 68, 0.2);
@@ -90,12 +94,17 @@
 
     .good {
       border-color: rgba(34, 197, 94, 0.28);
-      background: rgba(34, 197, 94, 0.10);
+      background: rgba(34, 197, 94, 0.1);
     }
 
     .bad {
       border-color: rgba(239, 68, 68, 0.28);
-      background: rgba(239, 68, 68, 0.10);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .neutral {
+      border-color: rgba(59, 130, 246, 0.32);
+      background: rgba(59, 130, 246, 0.12);
     }
 
     .item {
@@ -119,7 +128,9 @@
         color: var(--text-primary);
         cursor: pointer;
         padding: 0;
-        transition: background-color 0.18s ease, border-color 0.18s ease;
+        transition:
+          background-color 0.18s ease,
+          border-color 0.18s ease;
 
         &:hover {
           background: #ef4444;

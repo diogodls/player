@@ -2,7 +2,7 @@ import { SessionResponseDto } from './session-response.dto';
 
 export type SessionViewMode = 'individual' | 'team';
 export type SessionViewEntityType = 'player' | 'team';
-export type SessionViewActionOutcome = 'positive' | 'negative';
+export type SessionViewActionOutcome = 'positive' | 'negative' | 'neutral';
 
 export class SessionViewActionCategoryDto {
   code!: string;
@@ -34,6 +34,7 @@ export class SessionViewEntityMetricsDto {
 export class SessionViewEntityStatsDto {
   positive!: number;
   negative!: number;
+  neutral!: number;
   total!: number;
 }
 
