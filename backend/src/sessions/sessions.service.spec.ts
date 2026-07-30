@@ -13,6 +13,9 @@ import { SessionsService } from './sessions.service';
 const SESSION_ID = '79fbbbe8-39b1-4b25-bd11-236a0f228cb0';
 const OTHER_SESSION_ID = '9828b90e-6aa0-4d75-985d-f286802c3086';
 const TEAM_ID = 'd62ec1e1-f762-45bd-a1e9-09ba8ef8d461';
+const playersServiceMock = {
+  buildRankingForPlayers: jest.fn(),
+} as unknown as PlayersService;
 
 const buildSessionDto = (id: string | null): SessionDto => ({
   id,
@@ -91,6 +94,7 @@ describe('SessionsService id validation', () => {
     {} as Repository<SessionEntity>,
     {} as Repository<TeamEntity>,
     {} as Repository<TaggedActionEntity>,
+    playersServiceMock,
   );
 
   it('rejects a non-null id when creating a session', async () => {
@@ -121,6 +125,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       teamsRepository,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     await sessionsService.create(buildSessionDto(null));
@@ -148,6 +153,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findAll({
@@ -190,6 +196,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findAll({ page: 4, limit: 5 });
@@ -207,6 +214,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     await expect(sessionsService.findView(SESSION_ID)).rejects.toThrow(
@@ -227,6 +235,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID);
@@ -319,6 +328,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID);
@@ -456,6 +466,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID, {
@@ -533,6 +544,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID, {
@@ -608,7 +620,7 @@ describe('SessionsService session rankings', () => {
   it('returns an empty ranking group when there are no individual actions', async () => {
     const { service, buildRankingForPlayers } = setup([action('team', null)]);
     await service.findRanking(SESSION_ID, 'radj');
-    expect(buildRankingForPlayers).toHaveBeenCalledWith([], 'radj', SESSION_ID);
+    expect(buildRankingForPlayers).toHaveBeenCalledWith([], 'radj');
   });
 
   it('ignores team actions, inactive players and duplicate individual actions', async () => {
@@ -625,10 +637,6 @@ describe('SessionsService session rankings', () => {
       where: { sessaoId: SESSION_ID },
       relations: { jogador: { posicao: true } },
     });
-    expect(buildRankingForPlayers).toHaveBeenCalledWith(
-      [ana],
-      'gtj',
-      SESSION_ID,
-    );
+    expect(buildRankingForPlayers).toHaveBeenCalledWith([ana], 'gtj');
   });
 });

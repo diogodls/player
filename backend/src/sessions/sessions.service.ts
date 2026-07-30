@@ -42,7 +42,7 @@ export class SessionsService {
     private readonly teamsRepository: Repository<TeamEntity>,
     @InjectRepository(TaggedActionEntity)
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
-    private readonly playersService: PlayersService = null as unknown as PlayersService,
+    private readonly playersService: PlayersService,
   ) {}
 
   async findAll(filters?: SessionFiltersDto): Promise<SessionListResponseDto> {
@@ -100,7 +100,6 @@ export class SessionsService {
     return this.playersService.buildRankingForPlayers(
       [...playersById.values()],
       indexKey,
-      id,
     );
   }
 

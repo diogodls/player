@@ -25,7 +25,7 @@ import {
 
 @Injectable()
 export class PlayersService {
-  // TEMPORÁRIO: índices determinísticos apenas para validar a tela do jogador.
+  // TODO: substituir estes índices temporários pelos cálculos reais quando as fórmulas forem definidas.
   private static readonly TEST_INDEXES_BY_PLAYER_ID: Record<
     string,
     PlayerIndexesDto
@@ -199,15 +199,14 @@ export class PlayersService {
   buildRankingForPlayers(
     players: PlayerEntity[],
     indexKey: string,
-    sessionId?: string,
   ): PlayerRankingResponseDto {
     const rankingKey = indexKey as PlayerRankingKey;
     const rule = PlayersService.INDEX_RANKING_RULES[rankingKey];
     if (!rule) throw new BadRequestException('?ndice de ranking inv?lido');
 
     return rankingKey === 'overall'
-      ? this.buildOverallRanking(players, rule, sessionId)
-      : this.buildIndexRanking(players, rankingKey, rule, sessionId);
+      ? this.buildOverallRanking(players, rule)
+      : this.buildIndexRanking(players, rankingKey, rule);
   }
   async create(dto: PlayerDto): Promise<PlayerResponseDto> {
     if (dto.id !== null) {
@@ -269,25 +268,20 @@ export class PlayersService {
     return player;
   }
 
-  protected getIndexes(playerId: string, sessionId?: string): PlayerIndexesDto {
+  protected getIndexes(playerId: string): PlayerIndexesDto {
     return (
-      (!sessionId && PlayersService.TEST_INDEXES_BY_PLAYER_ID[playerId]) ||
-      this.generateTestIndexes(playerId, sessionId)
+      PlayersService.TEST_INDEXES_BY_PLAYER_ID[playerId] ||
+      this.generateTemporaryIndexes(playerId)
     );
   }
-  private generateTestIndexes(
-    playerId: string,
-    sessionId?: string,
-  ): PlayerIndexesDto {
+  private generateTemporaryIndexes(playerId: string): PlayerIndexesDto {
     const valueFor = (
       key: PlayerIndexKey,
       minimum: number,
       maximum: number,
     ) => {
       let hash = 2166136261;
-      const seed = sessionId
-        ? `${playerId}:${sessionId}:${key}`
-        : `${playerId}:${key}`;
+      const seed = `${playerId}:${key}`;
       for (const character of seed) {
         hash ^= character.charCodeAt(0);
         hash = Math.imul(hash, 16777619);
@@ -323,12 +317,11 @@ export class PlayersService {
     players: PlayerEntity[],
     indexKey: PlayerIndexKey,
     rule: { name: string; sortDirection: 'ASC' | 'DESC' },
-    sessionId?: string,
   ): PlayerRankingResponseDto {
     const ranking = players
       .map((player) => ({
         player: this.toRankingPlayer(player),
-        value: this.getIndexes(player.id, sessionId)[indexKey],
+        value: this.getIndexes(player.id)[indexKey],
       }))
       .sort((left, right) => this.compareRankingItems(left, right, rule));
     return {
@@ -340,11 +333,10 @@ export class PlayersService {
   private buildOverallRanking(
     players: PlayerEntity[],
     rule: { name: string; sortDirection: 'ASC' | 'DESC' },
-    sessionId?: string,
   ): PlayerRankingResponseDto {
     const playersWithIndexes = players.map((player) => ({
       player: this.toRankingPlayer(player),
-      indexes: this.getIndexes(player.id, sessionId),
+      indexes: this.getIndexes(player.id),
     }));
     const ranges = new Map<
       PlayerIndexKey,

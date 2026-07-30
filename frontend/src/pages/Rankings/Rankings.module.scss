@@ -39,6 +39,12 @@
   min-width: 280px;
 }
 
+.sessionError {
+  color: var(--danger, #dc3545);
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
 .eyebrow {
   color: var(--accent-orange);
   font-size: 0.78rem;

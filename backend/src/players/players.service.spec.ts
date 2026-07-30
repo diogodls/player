@@ -311,33 +311,22 @@ describe('PlayersService id validation', () => {
     });
   });
 
-  it('keeps session temporary indexes stable and different between sessions', () => {
+  it('uses the same temporary indexes for the same player in every ranking context', () => {
     const player = buildRankingPlayer(PLAYER_ID, 'Ana');
     const { service } = buildRankingService([]);
-    const first = service.buildRankingForPlayers([player], 'radj', 'session-a');
-    const repeated = service.buildRankingForPlayers(
-      [player],
-      'radj',
-      'session-a',
-    );
-    const anotherSession = service.buildRankingForPlayers(
-      [player],
-      'radj',
-      'session-b',
-    );
-    expect(first).toEqual(repeated);
-    expect(first.ranking[0].value).not.toBe(anotherSession.ranking[0].value);
-  });
 
+    const generalRanking = service.buildRankingForPlayers([player], 'radj');
+    const sessionRanking = service.buildRankingForPlayers([player], 'radj');
+
+    expect(sessionRanking.ranking[0].value).toBe(
+      generalRanking.ranking[0].value,
+    );
+  });
   it('uses the session participant group for relative overall normalization', () => {
     const first = buildRankingPlayer(PLAYER_ID, 'Ana');
     const second = buildRankingPlayer(OTHER_PLAYER_ID, 'Bia');
     const { service } = buildRankingService([]);
-    const response = service.buildRankingForPlayers(
-      [first, second],
-      'overall',
-      'session-a',
-    );
+    const response = service.buildRankingForPlayers([first, second], 'overall');
     expect(response.index.key).toBe('overall');
     expect(response.ranking).toHaveLength(2);
     expect(response.ranking.every(({ value }) => Number.isInteger(value))).toBe(

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import RankingSection from "../../components/elements/RankingSection/RankingSection.tsx";
 import Select from "../../components/elements/Select/Select.tsx";
 import sessionActionStyles from "../../components/SessionDetails/SessionActions/SessionActions.module.scss";
@@ -30,7 +30,7 @@ const getSessionOptionLabel = (session: Session) => {
 const Rankings = () => {
   const [selectedIndexKey, setSelectedIndexKey] = useState<
     RankingIndexKey | ""
-  >("");
+  >("overall");
   const [selectedSessionId, setSelectedSessionId] =
     useState(ALL_SESSIONS_VALUE);
   const {
@@ -38,14 +38,6 @@ const Rankings = () => {
     isLoading: areRankingOptionsLoading,
     isError: rankingOptionsError,
   } = useApi<RankingOption[]>(RANKING_OPTIONS_ENDPOINT);
-  useEffect(() => {
-    if (
-      !selectedIndexKey &&
-      rankingOptions?.some((option) => option.key === "overall")
-    ) {
-      setSelectedIndexKey("overall");
-    }
-  }, [rankingOptions, selectedIndexKey]);
   const {
     data: sessionsResponse,
     isLoading: areSessionsLoading,
@@ -64,7 +56,7 @@ const Rankings = () => {
   } = useApi<RankingResponse>(rankingEndpoint, { keepPreviousData: false });
   const sessionOptions = useMemo(
     () => [
-      { value: ALL_SESSIONS_VALUE, label: "Média geral de todas as sessões" },
+      { value: ALL_SESSIONS_VALUE, label: "Ranking geral do elenco" },
       ...(sessionsResponse?.data ?? []).map((session) => ({
         value: session.id,
         label: getSessionOptionLabel(session),
@@ -87,12 +79,6 @@ const Rankings = () => {
       );
     if (rankingOptions && rankingOptions.length === 0)
       return <div className={styles.emptyState}>Nenhum índice disponível.</div>;
-    if (sessionsError)
-      return (
-        <div className={styles.feedback}>
-          Não foi possível carregar as sessões.
-        </div>
-      );
     if (!selectedIndexKey)
       return (
         <div className={styles.emptyState}>
@@ -141,6 +127,11 @@ const Rankings = () => {
               options={sessionOptions}
               disabled={areSessionsLoading || Boolean(sessionsError)}
             />
+            {sessionsError && (
+              <span className={styles.sessionError}>
+                Não foi possível carregar as sessões.
+              </span>
+            )}
           </label>
           <label
             className={`${sessionActionStyles.filterField} ${styles.filter}`}
@@ -165,8 +156,6 @@ const Rankings = () => {
       </section>
       {areRankingOptionsLoading ? (
         <div className={styles.feedback}>Carregando índices...</div>
-      ) : areSessionsLoading ? (
-        <div className={styles.feedback}>Carregando sessões...</div>
       ) : (
         renderRankingContent()
       )}
