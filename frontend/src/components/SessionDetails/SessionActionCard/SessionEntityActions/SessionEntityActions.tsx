@@ -1,15 +1,21 @@
 import styles from "./SessionEntityActions.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleCheck,
+  faCircleInfo,
+  faCircleXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import type { SessionEntityAction } from "../../../../pages/SessionView";
-import {formatVideoTime} from "../../../../utils/videoTime.ts";
+import { formatVideoTime } from "../../../../utils/videoTime.ts";
 
 type Props = {
   actions: SessionEntityAction[];
 };
 
 function iconByType(outcome: SessionEntityAction["outcome"]) {
-  return outcome === "positive" ? faCircleCheck : faCircleXmark;
+  if (outcome === "positive") return faCircleCheck;
+  if (outcome === "negative") return faCircleXmark;
+  return faCircleInfo;
 }
 
 const SessionEntityActions = ({ actions }: Props) => {

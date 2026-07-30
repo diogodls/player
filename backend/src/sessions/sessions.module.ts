@@ -8,6 +8,7 @@ import { SessionsService } from './sessions.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([SessionEntity, TeamEntity, TaggedActionEntity]),
+    PlayersModule,
   ],
   controllers: [SessionsController],
   providers: [SessionsService],

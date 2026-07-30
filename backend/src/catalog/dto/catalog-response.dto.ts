@@ -1,4 +1,4 @@
-export type CatalogImpact = 'POSITIVE' | 'NEGATIVE';
+export type CatalogImpact = 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL';
 
 export class CatalogActionDto {
   id!: string;

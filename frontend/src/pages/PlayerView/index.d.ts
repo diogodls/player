@@ -21,5 +21,10 @@ export type PlayerViewData = {
   preferredSideId: number;
   preferredSide: string;
   teamName: string;
+  minutes: number;
+  goals: number;
+  goalsTaken: number;
+  offensiveActions: number;
+  defensiveActions: number;
   indexes: PlayerIndexes | null;
 };

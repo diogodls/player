@@ -8,6 +8,7 @@ import { ILike, IsNull, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerListResponseDto } from './dto/player-list-response.dto';
+import { PlayerPerformanceDto } from './dto/player-performance.dto';
 import { PlayerDto } from './dto/player.dto';
 import type {
   PlayerIndexKey,
@@ -15,17 +16,19 @@ import type {
   PlayerRankingKey,
   PlayerRankingResponseDto,
 } from './dto/player-ranking-response.dto';
+import type { PlayerIndexesDto } from './dto/player-performance.dto';
+import { PlayerResponseDto } from './dto/player-response.dto';
 import {
-  PlayerIndexesResponseDto,
-  PlayerResponseDto,
-} from './dto/player-response.dto';
+  emptyPlayerPerformance,
+  PlayerStatisticsService,
+} from './player-statistics.service';
 
 @Injectable()
 export class PlayersService {
   // TEMPORÁRIO: índices determinísticos apenas para validar a tela do jogador.
   private static readonly TEST_INDEXES_BY_PLAYER_ID: Record<
     string,
-    PlayerIndexesResponseDto
+    PlayerIndexesDto
   > = {
     '00000000-0000-0000-0000-000000000201': {
       radj: 1.35,
@@ -126,6 +129,7 @@ export class PlayersService {
     private readonly playersRepository: Repository<PlayerEntity>,
     @InjectRepository(TeamEntity)
     private readonly teamsRepository: Repository<TeamEntity>,
+    private readonly playerStatisticsService: PlayerStatisticsService,
   ) {}
 
   async findAll(filters?: PlayerFiltersDto): Promise<PlayerListResponseDto> {
@@ -148,9 +152,15 @@ export class PlayersService {
       skip: (page - 1) * limit,
       take: limit,
     });
+    const performances =
+      players.length > 0
+        ? await this.playerStatisticsService.findByTeamId(players[0].equipeId)
+        : new Map<string, PlayerPerformanceDto>();
 
     return {
-      data: players.map((player) => this.toResponse(player)),
+      data: players.map((player) =>
+        this.toResponse(player, performances.get(player.id)),
+      ),
       total,
       page,
       limit,
@@ -160,11 +170,10 @@ export class PlayersService {
 
   async findOne(id: string): Promise<PlayerResponseDto> {
     const player = await this.findEntity(id);
-
-    return {
-      ...this.toResponse(player),
-      indexes: this.getIndexes(player.id),
-    };
+    const performances = await this.playerStatisticsService.findByTeamId(
+      player.equipeId,
+    );
+    return this.toResponse(player, performances.get(player.id));
   }
 
   findRankingOptions(): PlayerRankingOptionDto[] {
@@ -260,10 +269,7 @@ export class PlayersService {
     return player;
   }
 
-  protected getIndexes(
-    playerId: string,
-    sessionId?: string,
-  ): PlayerIndexesResponseDto {
+  protected getIndexes(playerId: string, sessionId?: string): PlayerIndexesDto {
     return (
       (!sessionId && PlayersService.TEST_INDEXES_BY_PLAYER_ID[playerId]) ||
       this.generateTestIndexes(playerId, sessionId)
@@ -272,7 +278,7 @@ export class PlayersService {
   private generateTestIndexes(
     playerId: string,
     sessionId?: string,
-  ): PlayerIndexesResponseDto {
+  ): PlayerIndexesDto {
     const valueFor = (
       key: PlayerIndexKey,
       minimum: number,
@@ -454,7 +460,10 @@ export class PlayersService {
     return team;
   }
 
-  private toResponse(player: PlayerEntity): PlayerResponseDto {
+  private toResponse(
+    player: PlayerEntity,
+    performance = emptyPlayerPerformance(),
+  ): PlayerResponseDto {
     if (!player.posicao || !player.ladoPreferencial || !player.equipe) {
       throw new Error('Relações do jogador não foram carregadas');
     }
@@ -468,7 +477,7 @@ export class PlayersService {
       preferredSideId: player.ladoPreferencialId,
       preferredSide: player.ladoPreferencial.nome,
       teamName: player.equipe.nome,
-      indexes: null,
+      ...performance,
     };
   }
 }

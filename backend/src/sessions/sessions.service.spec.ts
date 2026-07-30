@@ -297,6 +297,16 @@ describe('SessionsService id validation', () => {
         impactId: 2,
         seconds: 3661,
       }),
+      buildTaggedAction({
+        id: 'action-5',
+        playerId: 'player-1',
+        playerName: 'Ana',
+        title: 'Entrou em quadra',
+        categoryName: 'Minutagem',
+        acronym: 'ENTROU',
+        impactId: 3,
+        seconds: 10,
+      }),
     ];
     const sessionsRepository = {
       findOne: jest.fn().mockResolvedValue(session),
@@ -329,10 +339,11 @@ describe('SessionsService id validation', () => {
         stats: {
           positive: 1,
           negative: 1,
-          total: 2,
+          neutral: 1,
+          total: 3,
         },
         metrics: {
-          overall: 2,
+          overall: 3,
           offensive: 0,
           defensive: 2,
           performance: 50,
@@ -349,6 +360,12 @@ describe('SessionsService id validation', () => {
       time: '00:24',
       outcome: 'positive',
     });
+    expect(response.analysis.individual.entities[0].actions[2]).toEqual(
+      expect.objectContaining({
+        id: 'action-5',
+        outcome: 'neutral',
+      }),
+    );
     expect(response.analysis.team.summary).toEqual({
       positives: 0,
       negatives: 1,
@@ -364,6 +381,7 @@ describe('SessionsService id validation', () => {
         stats: {
           positive: 0,
           negative: 1,
+          neutral: 0,
           total: 1,
         },
         metrics: {
@@ -384,6 +402,7 @@ describe('SessionsService id validation', () => {
         { value: 'RB', label: 'RB' },
         { value: 'FD', label: 'FD' },
         { value: 'ASS', label: 'ASS' },
+        { value: 'ENTROU', label: 'ENTROU' },
       ],
     });
     expect(response.filters.team).toEqual({
@@ -550,13 +569,15 @@ describe('SessionsService session rankings', () => {
   ) => {
     const findOne = jest.fn().mockResolvedValue(session);
     const find = jest.fn().mockResolvedValue(actions);
-    const buildRankingForPlayers = jest.fn((players, indexKey) => {
-      if (indexKey === 'invalid') throw new BadRequestException();
-      return {
-        index: { key: indexKey, name: 'Ranking', sortDirection: 'DESC' },
-        ranking: players,
-      };
-    });
+    const buildRankingForPlayers = jest.fn(
+      (players: PlayerEntity[], indexKey: string) => {
+        if (indexKey === 'invalid') throw new BadRequestException();
+        return {
+          index: { key: indexKey, name: 'Ranking', sortDirection: 'DESC' },
+          ranking: players,
+        };
+      },
+    );
     return {
       find,
       buildRankingForPlayers,

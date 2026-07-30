@@ -14,6 +14,11 @@ const player: PlayerViewData = {
   preferredSideId: 1,
   preferredSide: "Destro",
   teamName: "Equipe Principal",
+  minutes: 40,
+  goals: 2,
+  goalsTaken: 1,
+  offensiveActions: 8,
+  defensiveActions: 6,
   indexes: {
     radj: 1.35,
     goalsRelations: 1.2,
@@ -31,12 +36,20 @@ const player: PlayerViewData = {
 
 describe("IndividualPlayer indexes", () => {
   it("renders all index fields returned by the backend", () => {
-    render(<MemoryRouter><IndividualPlayer player={player} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <IndividualPlayer player={player} />
+      </MemoryRouter>,
+    );
 
-    expect(screen.getByTitle(INDEXES_META.radj.label)).toHaveTextContent("1,35");
-    expect(screen.getByTitle(INDEXES_META.goalsRelations.label)).toHaveTextContent("1,2");
+    expect(screen.getByTitle(INDEXES_META.radj.label)).toHaveTextContent(
+      "1,35",
+    );
+    expect(
+      screen.getByTitle(INDEXES_META.goalsRelations.label),
+    ).toHaveTextContent("1,2");
     expect(screen.getByTitle(INDEXES_META.tid.label)).toHaveTextContent("81");
-    expect(document.querySelectorAll('[title]').length).toBe(11);
+    expect(document.querySelectorAll("[title]").length).toBe(11);
   });
 
   it("keeps the page usable when a player has no indexes yet", () => {

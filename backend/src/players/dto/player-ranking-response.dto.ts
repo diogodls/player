@@ -1,6 +1,6 @@
-import type { PlayerIndexesResponseDto } from './player-response.dto';
+import type { PlayerIndexesDto } from './player-performance.dto';
 
-export type PlayerIndexKey = keyof PlayerIndexesResponseDto;
+export type PlayerIndexKey = keyof PlayerIndexesDto;
 
 export type PlayerRankingKey = PlayerIndexKey | 'overall';
 
