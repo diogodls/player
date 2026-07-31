@@ -24,6 +24,14 @@ export class SessionsController {
     return this.sessionsService.findAll(filters);
   }
 
+  @Get(':id/rankings/:indexKey')
+  findRanking(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('indexKey') indexKey: string,
+  ) {
+    return this.sessionsService.findRanking(id, indexKey);
+  }
+
   @Get(':id/view/filters')
   findViewFilters(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.sessionsService.findViewFilters(id);

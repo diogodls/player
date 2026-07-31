@@ -1,41 +1,22 @@
-import {useMemo} from "react";
 import styles from "./RankingSection.module.scss";
-import type {RankingMetric, RankingPlayerBase} from "../../../pages/Rankings";
-
+import type { RankingPlayerBase } from "../../../pages/Rankings";
 type RankingSectionProps = {
   title: string;
   players: RankingPlayerBase[];
-  metricKey: RankingMetric;
+  metricLabel: string;
   limit?: number;
   highlightTop3?: boolean;
 };
-
 const podiumClassMap = [styles.top1, styles.top2, styles.top3];
-
-const formatMetricLabel = (metricKey: string) => metricKey
-  .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-  .replace(/^\w/, (character) => character.toUpperCase());
-
 const RankingSection = ({
   title,
   players,
-  metricKey,
+  metricLabel,
   limit,
   highlightTop3 = true,
 }: RankingSectionProps) => {
-  const rankedPlayers = useMemo(() => {
-    const sortedPlayers = [...players].sort((currentPlayer, nextPlayer) => {
-      const currentValue = currentPlayer[metricKey] as number;
-      const nextValue = nextPlayer[metricKey] as number;
-
-      return nextValue - currentValue;
-    });
-
-    return typeof limit === "number"
-      ? sortedPlayers.slice(0, limit)
-      : sortedPlayers;
-  }, [limit, metricKey, players]);
-
+  const displayedPlayers =
+    typeof limit === "number" ? players.slice(0, limit) : players;
   return (
     <section className={styles.card}>
       <div className={styles.header}>
@@ -43,36 +24,30 @@ const RankingSection = ({
           <span className={styles.eyebrow}>Ranking</span>
           <h3>{title}</h3>
         </div>
-
-        <span className={styles.total}>{rankedPlayers.length} atletas</span>
+        <span className={styles.total}>{displayedPlayers.length} atletas</span>
       </div>
-
-      {rankedPlayers.length ? (
+      {displayedPlayers.length ? (
         <div className={styles.list}>
-          {rankedPlayers.map((player, index) => {
-            const position = index + 1;
-            const metricValue = player[metricKey] as number;
-            const highlightClass = highlightTop3 && index < 3
-              ? podiumClassMap[index]
-              : "";
-
+          {displayedPlayers.map((player) => {
+            const highlightClass =
+              highlightTop3 && player.rankingPosition <= 3
+                ? podiumClassMap[player.rankingPosition - 1]
+                : "";
             return (
               <article
-                key={player.id ?? `${player.name}-${position}`}
+                key={player.id}
                 className={`${styles.row} ${highlightClass}`.trim()}
               >
                 <div className={styles.rankBadge}>
-                  <span>{position}</span>
+                  <span>{player.rankingPosition}</span>
                 </div>
-
                 <div className={styles.playerInfo}>
                   <strong>{player.name}</strong>
                   <span>{player.position}</span>
                 </div>
-
                 <div className={styles.metric}>
-                  <span className={styles.metricLabel}>{formatMetricLabel(String(metricKey))}</span>
-                  <strong>{metricValue}</strong>
+                  <span className={styles.metricLabel}>{metricLabel}</span>
+                  <strong>{player.rankingValue ?? "—"}</strong>
                 </div>
               </article>
             );
@@ -80,12 +55,11 @@ const RankingSection = ({
         </div>
       ) : (
         <div className={styles.emptyState}>
-          Nenhum atleta disponível para este ranking.
+          Nenhum jogador disponível para este ranking.
         </div>
       )}
     </section>
   );
 };
-
 export default RankingSection;
-export type {RankingSectionProps};
+export type { RankingSectionProps };

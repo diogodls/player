@@ -174,7 +174,7 @@ describe('PlayerStatisticsService', () => {
     } as unknown as Repository<TaggedActionEntity>;
     const service = new PlayerStatisticsService(repository);
 
-    const performances = await service.findByTeamId('team-1');
+    const performances = await service.findByTeamId('team-1', 'session-1');
 
     expect(createQueryBuilder).toHaveBeenCalledTimes(2);
     expect(aggregateQueryBuilder.groupBy).toHaveBeenCalledWith(
@@ -195,6 +195,14 @@ describe('PlayerStatisticsService', () => {
     expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
       'session.equipeId = :teamId',
       { teamId: 'team-1' },
+    );
+    expect(aggregateQueryBuilder.andWhere).toHaveBeenCalledWith(
+      'session.id = :sessionId',
+      { sessionId: 'session-1' },
+    );
+    expect(courtEventsQueryBuilder.andWhere).toHaveBeenCalledWith(
+      'session.id = :sessionId',
+      { sessionId: 'session-1' },
     );
     expect(courtEventsQueryBuilder.where).toHaveBeenCalledWith(
       'catalogAction.sigla IN (:...courtEventCodes)',

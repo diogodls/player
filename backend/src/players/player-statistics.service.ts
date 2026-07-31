@@ -85,6 +85,7 @@ export class PlayerStatisticsService {
 
   async findByTeamId(
     teamId: string,
+    sessionId?: string,
   ): Promise<Map<string, PlayerPerformanceDto>> {
     const query = this.taggedActionsRepository
       .createQueryBuilder('taggedAction')
@@ -102,18 +103,22 @@ export class PlayerStatisticsService {
         .setParameter(`actionCode${index}`, code);
     });
 
-    const aggregateRows = await query
+    query
       .where('taggedAction.jogadorId IS NOT NULL')
       .andWhere('taggedAction.deletedAt IS NULL')
       .andWhere('session.deletedAt IS NULL')
       .andWhere('player.deletedAt IS NULL')
       .andWhere('catalogAction.deletedAt IS NULL')
       .andWhere('session.equipeId = :teamId', { teamId })
-      .andWhere('player.equipeId = :teamId', { teamId })
+      .andWhere('player.equipeId = :teamId', { teamId });
+    if (sessionId) {
+      query.andWhere('session.id = :sessionId', { sessionId });
+    }
+    const aggregateRows = await query
       .groupBy('taggedAction.jogadorId')
       .getRawMany<RawPlayerActionAggregate>();
 
-    const courtEventRows = await this.taggedActionsRepository
+    const courtEventsQuery = this.taggedActionsRepository
       .createQueryBuilder('taggedAction')
       .innerJoin('taggedAction.sessao', 'session')
       .innerJoin('taggedAction.jogador', 'player')
@@ -132,7 +137,11 @@ export class PlayerStatisticsService {
       .andWhere('player.deletedAt IS NULL')
       .andWhere('catalogAction.deletedAt IS NULL')
       .andWhere('session.equipeId = :teamId', { teamId })
-      .andWhere('player.equipeId = :teamId', { teamId })
+      .andWhere('player.equipeId = :teamId', { teamId });
+    if (sessionId) {
+      courtEventsQuery.andWhere('session.id = :sessionId', { sessionId });
+    }
+    const courtEventRows = await courtEventsQuery
       .orderBy('taggedAction.timestampSegundos', 'ASC')
       .addOrderBy('taggedAction.id', 'ASC')
       .getRawMany<RawPlayerCourtEvent>();

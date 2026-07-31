@@ -5,7 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { SessionEntity, TaggedActionEntity, TeamEntity } from '../entities';
+import {
+  PlayerEntity,
+  SessionEntity,
+  TaggedActionEntity,
+  TeamEntity,
+} from '../entities';
+import type { PlayerRankingResponseDto } from '../players/dto/player-ranking-response.dto';
+import { PlayersService } from '../players/players.service';
 import { SESSION_TYPES } from './sessions.constants';
 import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionListResponseDto } from './dto/session-list-response.dto';
@@ -35,6 +42,7 @@ export class SessionsService {
     private readonly teamsRepository: Repository<TeamEntity>,
     @InjectRepository(TaggedActionEntity)
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
+    private readonly playersService: PlayersService,
   ) {}
 
   async findAll(filters?: SessionFiltersDto): Promise<SessionListResponseDto> {
@@ -71,6 +79,29 @@ export class SessionsService {
 
   async findOne(id: string): Promise<SessionResponseDto> {
     return this.toResponse(await this.findEntity(id));
+  }
+
+  async findRanking(
+    id: string,
+    indexKey: string,
+  ): Promise<PlayerRankingResponseDto> {
+    await this.findEntity(id);
+    const actions = await this.taggedActionsRepository.find({
+      where: { sessaoId: id },
+      relations: { jogador: { posicao: true } },
+    });
+    const playersById = new Map<string, PlayerEntity>();
+    for (const action of actions) {
+      const player = action.jogador;
+      if (action.jogadorId && player && player.deletedAt == null) {
+        playersById.set(player.id, player);
+      }
+    }
+    return this.playersService.buildRankingForPlayers(
+      [...playersById.values()],
+      indexKey,
+      id,
+    );
   }
 
   async findView(
