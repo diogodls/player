@@ -24,7 +24,7 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
     ) ?? [];
   }, [players, selectedPlayers]);
 
-  const setPlayer = (playerId: number, index: number) => {
+  const setPlayer = (playerId: string, index: number) => {
     const player = playersList.find((player) => player.id === playerId) ?? selectedPlayers[index] ?? null;
     if (!player) return;
 
@@ -33,7 +33,7 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
     setSelectedPlayers(newSelectedPlayersList);
   };
 
-  const removePlayer = (playerId: number) => {
+  const removePlayer = (playerId: string) => {
     setSelectedPlayers(
       (players) => players.filter((selectedPlayer) => selectedPlayer.id !== playerId)
     );

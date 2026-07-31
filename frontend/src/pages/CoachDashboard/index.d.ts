@@ -4,21 +4,23 @@ export type CoachDashboardData = {
   metrics: string[];
   teamIndexes: TeamIndex[];
 };
-
+export type CoachDashboardResponse = Partial<{
+  averageTeamCards: AverageCard[];
+  players: Array<Partial<Player>>;
+  metrics: string[];
+  teamIndexes: TeamIndex[];
+}>;
 export type AverageCard = {
   name: string;
   color: string;
-  value: string;
+  value: string | number;
   icon: string;
 };
-
 export type Player = {
-  id: number;
+  id: string;
   name: string;
-  age: number;
   overall: number;
   position: string;
-  //todo: separar metricas
   minutes: number;
   defensiveActions: number;
   offensiveActions: number;
@@ -26,23 +28,16 @@ export type Player = {
   goals: number;
   indexes: Indexes;
 };
-
-export type Metrics = { //todo: aplicar em jogador em nova task
+export type Metrics = {
   minutes: number;
   defensiveActions: number;
   offensiveActions: number;
   goalsTaken: number;
   goals: number;
 };
-
-export type Team = {
-  indexes: Indexes;
-};
-
-export type TeamIndexPhase = 'offensive' | 'defensive' | 'set-piece';
-
-export type TeamIndexTrend = 'up' | 'stable' | 'down';
-
+export type Team = { indexes: Indexes };
+export type TeamIndexPhase = "offensive" | "defensive" | "set-piece";
+export type TeamIndexTrend = "up" | "stable" | "down";
 export type TeamIndex = {
   id: string;
   title: string;
@@ -51,27 +46,15 @@ export type TeamIndex = {
   maxValue: number;
   trend: TeamIndexTrend;
 };
-
-export interface Indexes extends GeneralIndexes, OffensiveIndexes, DeffensiveIndexes {}
-
+export interface Indexes
+  extends GeneralIndexes, OffensiveIndexes, DeffensiveIndexes {}
 export type GeneralIndexes = {
-  radj: number,
-  goalsRelations: number,
-  actionsRelations: number,
-  atd: number,
-  dto: number,
+  radj: number;
+  goalsRelations: number;
+  actionsRelations: number;
+  atd: number;
+  dto: number;
 };
-
-export type OffensiveIndexes = {
-  pgj: number,
-  ic: number,
-  tio: number,
-};
-
-export type DeffensiveIndexes = {
-  gtj: number,
-  rf: number,
-  tid: number,
-};
-
-export type IndexType = 'general' | 'offensive' | 'deffensive'
+export type OffensiveIndexes = { pgj: number; ic: number; tio: number };
+export type DeffensiveIndexes = { gtj: number; rf: number; tid: number };
+export type IndexType = "general" | "offensive" | "deffensive";
