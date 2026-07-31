@@ -150,10 +150,24 @@ describe('CoachDashboardService efficiencies', () => {
     expect(valueById(result, 'defensive-transition')).toBeCloseTo(57.142, 2);
     expect(valueById(result, 'playing-out-pressure')).toBeNull();
     expect(
-      result.teamIndexes
-        .filter(({ phase }) => phase === 'set-piece')
-        .every(({ value }) => value === null),
-    ).toBe(true);
+      result.teamIndexes.filter(({ phase }) => phase === 'set-piece'),
+    ).toEqual([
+      {
+        id: 'set-piece',
+        title: 'Bolas paradas',
+        phase: 'set-piece',
+        value: null,
+        maxValue: 100,
+        trend: 'stable',
+      },
+    ]);
+    expect(result.teamIndexes.map(({ id }) => id)).not.toEqual(
+      expect.arrayContaining([
+        'set-piece-fouls',
+        'set-piece-offensive-throw-in',
+        'set-piece-corners',
+      ]),
+    );
     expect(
       result.teamIndexes.every(
         ({ value }) =>

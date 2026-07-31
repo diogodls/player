@@ -42,7 +42,7 @@ export type TeamIndex = {
   id: string;
   title: string;
   phase: TeamIndexPhase;
-  value: number;
+  value: number | null;
   maxValue: number;
   trend: TeamIndexTrend;
 };

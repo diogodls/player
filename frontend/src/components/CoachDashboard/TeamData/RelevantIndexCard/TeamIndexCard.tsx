@@ -18,15 +18,23 @@ const phaseMap: Record<TeamIndex["phase"], { label: string; className: string }>
 };
 
 const trendMap: Record<TeamIndex["trend"], { icon: typeof faArrowTrendUp; color: string; label: string }> = {
-  up: { icon: faArrowTrendUp, color: "#86efac", label: "Indice acima da media esperada" },
-  stable: { icon: faMinus, color: "#facc15", label: "Indice estavel" },
-  down: { icon: faArrowTrendDown, color: "#dc2626", label: "Indice abaixo da media esperada" },
+  up: { icon: faArrowTrendUp, color: "#86efac", label: "Eficiência acima da média esperada" },
+  stable: { icon: faMinus, color: "#facc15", label: "Eficiência estável" },
+  down: { icon: faArrowTrendDown, color: "#dc2626", label: "Eficiência abaixo da média esperada" },
 };
+
+const percentageFormatter = new Intl.NumberFormat("pt-BR", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
 
 const TeamIndexCard = ({ index }: IndexCardProps) => {
   const phase = phaseMap[index.phase];
   const trend = trendMap[index.trend];
-  const progressValue = Math.max(0, Math.min(100, (index.value / index.maxValue) * 100));
+  const hasValue = index.value !== null;
+  const formattedValue = index.value === null
+    ? "Nenhum dado registrado"
+    : `${percentageFormatter.format(index.value)}%`;
 
   return (
     <article className={styles.card}>
@@ -47,8 +55,8 @@ const TeamIndexCard = ({ index }: IndexCardProps) => {
 
       <div className={styles.metrics}>
         <div className={styles.metricGroup}>
-          <span className={styles.metricLabel}>Indice</span>
-          <strong className={styles.metricValue}>{index.value}</strong>
+          <span className={styles.metricLabel}>Eficiência</span>
+          <strong className={styles.metricValue}>{formattedValue}</strong>
         </div>
       </div>
 
@@ -58,7 +66,7 @@ const TeamIndexCard = ({ index }: IndexCardProps) => {
       >
         <span
           className={`${styles.progressFill} ${styles[phase.className]}`}
-          style={{ width: `${progressValue}%` }}
+          style={{ width: hasValue ? `${index.value}%` : "0%" }}
         />
       </div>
     </article>
