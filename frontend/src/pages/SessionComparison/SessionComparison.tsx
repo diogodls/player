@@ -345,6 +345,17 @@ const SessionComparison = () => {
                 </div>
               </div>
 
+              <div className={styles.performanceNote} role="note">
+                <FontAwesomeIcon icon={faCircleInfo} />
+                <p>
+                  <strong>Como interpretar:</strong> Inicial e Final mostram a
+                  performance percentual na primeira e na última sessão em que
+                  o atleta possui ações no período. A performance é calculada
+                  por ações positivas ÷ total de ações × 100, e a Variação é a
+                  diferença entre esses valores em pontos percentuais (pp).
+                </p>
+              </div>
+
               <div className={styles.desktopTable}>
                 <table>
                   <thead>
