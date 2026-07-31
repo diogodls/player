@@ -620,7 +620,11 @@ describe('SessionsService session rankings', () => {
   it('returns an empty ranking group when there are no individual actions', async () => {
     const { service, buildRankingForPlayers } = setup([action('team', null)]);
     await service.findRanking(SESSION_ID, 'radj');
-    expect(buildRankingForPlayers).toHaveBeenCalledWith([], 'radj');
+    expect(buildRankingForPlayers).toHaveBeenCalledWith(
+      [],
+      'radj',
+      SESSION_ID,
+    );
   });
 
   it('ignores team actions, inactive players and duplicate individual actions', async () => {
@@ -637,6 +641,10 @@ describe('SessionsService session rankings', () => {
       where: { sessaoId: SESSION_ID },
       relations: { jogador: { posicao: true } },
     });
-    expect(buildRankingForPlayers).toHaveBeenCalledWith([ana], 'gtj');
+    expect(buildRankingForPlayers).toHaveBeenCalledWith(
+      [ana],
+      'gtj',
+      SESSION_ID,
+    );
   });
 });

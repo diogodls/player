@@ -22,49 +22,12 @@ const buildRankingPlayer = (
   ({
     id,
     nome: name,
+    equipeId: TEAM_ID,
     deletedAt,
     posicao: { id: 3, nome: 'Ala' },
   }) as PlayerEntity;
 
-const buildRankingService = (players: PlayerEntity[]) => {
-  const find = jest.fn().mockResolvedValue(players);
-  return {
-    find,
-    service: new PlayersService(
-      { find } as unknown as Repository<PlayerEntity>,
-      {} as Repository<TeamEntity>,
-    ),
-  };
-};
-
 type TestIndexes = Partial<Record<PlayerIndexKey, number | null | undefined>>;
-
-class TestPlayersService extends PlayersService {
-  constructor(
-    repository: Repository<PlayerEntity>,
-    private readonly indexesByPlayerId: Record<string, TestIndexes>,
-  ) {
-    super(repository, {} as Repository<TeamEntity>);
-  }
-
-  protected override getIndexes(playerId: string): PlayerIndexesDto {
-    return this.indexesByPlayerId[playerId] as PlayerIndexesDto;
-  }
-}
-
-const buildOverallService = (
-  players: PlayerEntity[],
-  indexesByPlayerId: Record<string, TestIndexes>,
-) => {
-  const find = jest.fn().mockResolvedValue(players);
-  return {
-    find,
-    service: new TestPlayersService(
-      { find } as unknown as Repository<PlayerEntity>,
-      indexesByPlayerId,
-    ),
-  };
-};
 
 const indexes = (values: TestIndexes): TestIndexes => ({
   radj: null,
@@ -80,6 +43,36 @@ const indexes = (values: TestIndexes): TestIndexes => ({
   tid: null,
   ...values,
 });
+
+const buildRankingService = (
+  players: PlayerEntity[],
+  indexesByPlayerId: Record<string, TestIndexes> = {},
+) => {
+  const find = jest.fn().mockResolvedValue(players);
+  const performances = new Map(
+    Object.entries(indexesByPlayerId).map(([playerId, playerIndexes]) => [
+      playerId,
+      { ...emptyPlayerPerformance(), indexes: playerIndexes as PlayerIndexesDto },
+    ]),
+  );
+  const findByTeamId = jest.fn().mockResolvedValue(performances);
+  return {
+    find,
+    findByTeamId,
+    service: new PlayersService(
+      { find } as unknown as Repository<PlayerEntity>,
+      {} as Repository<TeamEntity>,
+      { findByTeamId } as unknown as PlayerStatisticsService,
+    ),
+  };
+};
+
+const buildOverallService = (
+  players: PlayerEntity[],
+  indexesByPlayerId: Record<string, TestIndexes>,
+) => {
+  return buildRankingService(players, indexesByPlayerId);
+};
 const buildPlayerDto = (id: string | null): PlayerDto => ({
   id,
   name: 'Ana Silva',
@@ -311,22 +304,34 @@ describe('PlayersService id validation', () => {
     });
   });
 
-  it('uses the same temporary indexes for the same player in every ranking context', () => {
+  it('uses statistics indexes for the same player in every ranking context', async () => {
     const player = buildRankingPlayer(PLAYER_ID, 'Ana');
-    const { service } = buildRankingService([]);
+    const { service } = buildRankingService([], {
+      [PLAYER_ID]: indexes({ radj: 1.25 }),
+    });
 
-    const generalRanking = service.buildRankingForPlayers([player], 'radj');
-    const sessionRanking = service.buildRankingForPlayers([player], 'radj');
+    const generalRanking = await service.buildRankingForPlayers([player], 'radj');
+    const sessionRanking = await service.buildRankingForPlayers(
+      [player],
+      'radj',
+      'session-id',
+    );
 
     expect(sessionRanking.ranking[0].value).toBe(
       generalRanking.ranking[0].value,
     );
   });
-  it('uses the session participant group for relative overall normalization', () => {
+  it('uses the session participant group for relative overall normalization', async () => {
     const first = buildRankingPlayer(PLAYER_ID, 'Ana');
     const second = buildRankingPlayer(OTHER_PLAYER_ID, 'Bia');
-    const { service } = buildRankingService([]);
-    const response = service.buildRankingForPlayers([first, second], 'overall');
+    const { service } = buildRankingService([], {
+      [PLAYER_ID]: indexes({ radj: 1 }),
+      [OTHER_PLAYER_ID]: indexes({ radj: 2 }),
+    });
+    const response = await service.buildRankingForPlayers(
+      [first, second],
+      'overall',
+    );
     expect(response.index.key).toBe('overall');
     expect(response.ranking).toHaveLength(2);
     expect(response.ranking.every(({ value }) => Number.isInteger(value))).toBe(
@@ -368,11 +373,16 @@ describe('PlayersService id validation', () => {
   });
 
   it('sorts descending indexes from highest to lowest', async () => {
-    const { service } = buildRankingService([
+    const players = [
       buildRankingPlayer('00000000-0000-0000-0000-000000000201', 'João'),
       buildRankingPlayer('00000000-0000-0000-0000-000000000204', 'Senna'),
       buildRankingPlayer('00000000-0000-0000-0000-000000000203', 'Guedes'),
-    ]);
+    ];
+    const { service } = buildRankingService(players, {
+      '00000000-0000-0000-0000-000000000201': indexes({ radj: 1.35 }),
+      '00000000-0000-0000-0000-000000000204': indexes({ radj: 1.74 }),
+      '00000000-0000-0000-0000-000000000203': indexes({ radj: 1.18 }),
+    });
     const response = await service.findRanking('radj');
     expect(response.index).toEqual({
       key: 'radj',
@@ -385,11 +395,16 @@ describe('PlayersService id validation', () => {
   });
 
   it('sorts gtj ascending from lowest to highest', async () => {
-    const { service } = buildRankingService([
+    const players = [
       buildRankingPlayer('00000000-0000-0000-0000-000000000205', 'Balk'),
       buildRankingPlayer('00000000-0000-0000-0000-000000000201', 'João'),
       buildRankingPlayer('00000000-0000-0000-0000-000000000203', 'Guedes'),
-    ]);
+    ];
+    const { service } = buildRankingService(players, {
+      '00000000-0000-0000-0000-000000000205': indexes({ gtj: 1.35 }),
+      '00000000-0000-0000-0000-000000000201': indexes({ gtj: 0.8 }),
+      '00000000-0000-0000-0000-000000000203': indexes({ gtj: 0.65 }),
+    });
     const response = await service.findRanking('gtj');
     expect(response.index.sortDirection).toBe('ASC');
     expect(response.ranking.map((item) => item.value)).toEqual([

@@ -25,78 +25,6 @@ import {
 
 @Injectable()
 export class PlayersService {
-  // TODO: substituir estes índices temporários pelos cálculos reais quando as fórmulas forem definidas.
-  private static readonly TEST_INDEXES_BY_PLAYER_ID: Record<
-    string,
-    PlayerIndexesDto
-  > = {
-    '00000000-0000-0000-0000-000000000201': {
-      radj: 1.35,
-      goalsRelations: 1.2,
-      actionsRelations: 3.4,
-      atd: 72,
-      dto: 68,
-      pgj: 1.1,
-      ic: 74,
-      tio: 78,
-      gtj: 0.8,
-      rf: 2.4,
-      tid: 81,
-    },
-    '00000000-0000-0000-0000-000000000202': {
-      radj: 1.62,
-      goalsRelations: 2.1,
-      actionsRelations: 4.8,
-      atd: 84,
-      dto: 61,
-      pgj: 1.85,
-      ic: 86,
-      tio: 89,
-      gtj: 1.1,
-      rf: 1.9,
-      tid: 67,
-    },
-    '00000000-0000-0000-0000-000000000203': {
-      radj: 1.18,
-      goalsRelations: 0.75,
-      actionsRelations: 2.6,
-      atd: 69,
-      dto: 73,
-      pgj: 1.4,
-      ic: 81,
-      tio: 76,
-      gtj: 0.65,
-      rf: 2.85,
-      tid: 84,
-    },
-    '00000000-0000-0000-0000-000000000204': {
-      radj: 1.74,
-      goalsRelations: 2.55,
-      actionsRelations: 5.2,
-      atd: 88,
-      dto: 70,
-      pgj: 2.05,
-      ic: 91,
-      tio: 93,
-      gtj: 0.95,
-      rf: 2.2,
-      tid: 79,
-    },
-    '00000000-0000-0000-0000-000000000205': {
-      radj: 0.96,
-      goalsRelations: -0.4,
-      actionsRelations: -1.3,
-      atd: 63,
-      dto: 82,
-      pgj: 0.7,
-      ic: 66,
-      tio: 64,
-      gtj: 1.35,
-      rf: 3.1,
-      tid: 88,
-    },
-  };
-
   private static readonly INDEX_RANKING_RULES: Record<
     PlayerRankingKey,
     { name: string; sortDirection: 'ASC' | 'DESC' }
@@ -119,9 +47,7 @@ export class PlayersService {
   };
 
   private static readonly PLAYER_INDEX_KEYS = Object.keys(
-    PlayersService.TEST_INDEXES_BY_PLAYER_ID[
-      '00000000-0000-0000-0000-000000000201'
-    ],
+    emptyPlayerPerformance().indexes,
   ) as PlayerIndexKey[];
 
   constructor(
@@ -196,17 +122,25 @@ export class PlayersService {
     return this.buildRankingForPlayers(players, rankingKey);
   }
 
-  buildRankingForPlayers(
+  async buildRankingForPlayers(
     players: PlayerEntity[],
     indexKey: string,
-  ): PlayerRankingResponseDto {
+    sessionId?: string,
+  ): Promise<PlayerRankingResponseDto> {
     const rankingKey = indexKey as PlayerRankingKey;
     const rule = PlayersService.INDEX_RANKING_RULES[rankingKey];
-    if (!rule) throw new BadRequestException('?ndice de ranking inv?lido');
+    if (!rule) throw new BadRequestException('Índice de ranking inválido');
 
+    if (players.length === 0) {
+      return { index: { key: rankingKey, ...rule }, ranking: [] };
+    }
+    const performances = await this.playerStatisticsService.findByTeamId(
+      players[0].equipeId,
+      sessionId,
+    );
     return rankingKey === 'overall'
-      ? this.buildOverallRanking(players, rule)
-      : this.buildIndexRanking(players, rankingKey, rule);
+      ? this.buildOverallRanking(players, performances, rule)
+      : this.buildIndexRanking(players, performances, rankingKey, rule);
   }
   async create(dto: PlayerDto): Promise<PlayerResponseDto> {
     if (dto.id !== null) {
@@ -268,41 +202,11 @@ export class PlayersService {
     return player;
   }
 
-  protected getIndexes(playerId: string): PlayerIndexesDto {
-    return (
-      PlayersService.TEST_INDEXES_BY_PLAYER_ID[playerId] ||
-      this.generateTemporaryIndexes(playerId)
-    );
-  }
-  private generateTemporaryIndexes(playerId: string): PlayerIndexesDto {
-    const valueFor = (
-      key: PlayerIndexKey,
-      minimum: number,
-      maximum: number,
-    ) => {
-      let hash = 2166136261;
-      const seed = `${playerId}:${key}`;
-      for (const character of seed) {
-        hash ^= character.charCodeAt(0);
-        hash = Math.imul(hash, 16777619);
-      }
-      const ratio = (hash >>> 0) / 4294967295;
-      return Number((minimum + ratio * (maximum - minimum)).toFixed(2));
-    };
-
-    return {
-      radj: valueFor('radj', 0.8, 1.8),
-      goalsRelations: valueFor('goalsRelations', -1, 3),
-      actionsRelations: valueFor('actionsRelations', -2, 6),
-      atd: valueFor('atd', 60, 90),
-      dto: valueFor('dto', 60, 90),
-      pgj: valueFor('pgj', 0.5, 2.2),
-      ic: valueFor('ic', 60, 95),
-      tio: valueFor('tio', 60, 95),
-      gtj: valueFor('gtj', 0.5, 1.5),
-      rf: valueFor('rf', 1.5, 3.5),
-      tid: valueFor('tid', 60, 95),
-    };
+  protected getIndexes(
+    playerId: string,
+    performances: Map<string, PlayerPerformanceDto>,
+  ): PlayerIndexesDto {
+    return (performances.get(playerId) ?? emptyPlayerPerformance()).indexes;
   }
 
   private async findActiveRankingPlayers(): Promise<PlayerEntity[]> {
@@ -315,13 +219,14 @@ export class PlayersService {
 
   private buildIndexRanking(
     players: PlayerEntity[],
+    performances: Map<string, PlayerPerformanceDto>,
     indexKey: PlayerIndexKey,
     rule: { name: string; sortDirection: 'ASC' | 'DESC' },
   ): PlayerRankingResponseDto {
     const ranking = players
       .map((player) => ({
         player: this.toRankingPlayer(player),
-        value: this.getIndexes(player.id)[indexKey],
+        value: this.getIndexes(player.id, performances)[indexKey],
       }))
       .sort((left, right) => this.compareRankingItems(left, right, rule));
     return {
@@ -332,11 +237,12 @@ export class PlayersService {
 
   private buildOverallRanking(
     players: PlayerEntity[],
+    performances: Map<string, PlayerPerformanceDto>,
     rule: { name: string; sortDirection: 'ASC' | 'DESC' },
   ): PlayerRankingResponseDto {
     const playersWithIndexes = players.map((player) => ({
       player: this.toRankingPlayer(player),
-      indexes: this.getIndexes(player.id),
+      indexes: this.getIndexes(player.id, performances),
     }));
     const ranges = new Map<
       PlayerIndexKey,

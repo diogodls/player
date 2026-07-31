@@ -100,6 +100,7 @@ export class SessionsService {
     return this.playersService.buildRankingForPlayers(
       [...playersById.values()],
       indexKey,
+      id,
     );
   }
 
