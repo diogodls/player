@@ -1,10 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { CoachDashboardService } from './coach-dashboard.service';
+import { CoachDashboardFiltersDto } from './dto/coach-dashboard-filters.dto';
 @Controller('coach-dashboard')
 export class CoachDashboardController {
   constructor(private readonly coachDashboardService: CoachDashboardService) {}
   @Get()
-  findOne() {
-    return this.coachDashboardService.getDashboard();
+  findOne(@Query() filters: CoachDashboardFiltersDto) {
+    return this.coachDashboardService.getDashboard(filters);
   }
 }
