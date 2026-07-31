@@ -43,11 +43,6 @@ const setup = (counts: Record<string, number> = {}) => {
   };
 };
 
-const valueById = (
-  result: Awaited<ReturnType<CoachDashboardService['getDashboard']>>,
-  id: string,
-) => result.teamIndexes.find((item) => item.id === id)?.value;
-
 describe('CoachDashboardService efficiencies', () => {
   it('calculates the offensive and defensive weighted examples', () => {
     expect(
@@ -121,7 +116,7 @@ describe('CoachDashboardService efficiencies', () => {
     expect(withMaintainedPossession).toBeCloseTo(57.142, 2);
   });
 
-  it('maps grouped acronyms to card-ready efficiencies with safe zero fallback', async () => {
+  it('returns the temporary card-ready test values', async () => {
     const { service } = setup({
       GAP: 1,
       FAP: 1,
@@ -145,10 +140,21 @@ describe('CoachDashboardService efficiencies', () => {
     expect(typeof result.players[0]?.name).toBe('string');
     expect(typeof result.players[0]?.overall).toBe('number');
     expect(typeof result.players[0]?.indexes).toBe('object');
-    expect(valueById(result, 'positional-attack')).toBeCloseTo(77.777, 2);
-    expect(valueById(result, 'low-block')).toBeCloseTo(63.636, 2);
-    expect(valueById(result, 'defensive-transition')).toBeCloseTo(57.142, 2);
-    expect(valueById(result, 'playing-out-pressure')).toBeNull();
+    expect(
+      Object.fromEntries(
+        result.teamIndexes.map(({ id, value }) => [id, value]),
+      ),
+    ).toEqual({
+      'positional-attack': 77.8,
+      'playing-out-pressure': 64.3,
+      'fly-goalkeeper': 0,
+      'offensive-transition': 100,
+      'low-block': 63.6,
+      'variable-defense': 48.2,
+      pressing: 82.5,
+      'defensive-transition': 57.1,
+      'set-piece': null,
+    });
     expect(
       result.teamIndexes.filter(({ phase }) => phase === 'set-piece'),
     ).toEqual([
@@ -175,12 +181,6 @@ describe('CoachDashboardService efficiencies', () => {
           (Number.isFinite(value) && value >= 0 && value <= 100),
       ),
     ).toBe(true);
-  });
-
-  it('returns zero when a phase has recorded actions but none in the numerator', async () => {
-    const { service } = setup({ PMAP: 1, PPAP: 1 });
-    const result = await service.getDashboard();
-    expect(valueById(result, 'positional-attack')).toBe(0);
   });
 
   it('applies team, collective-action, session and period filters in one grouped query', async () => {

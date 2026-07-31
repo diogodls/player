@@ -10,13 +10,14 @@ const mockedUseApi = vi.mocked(useApi);
 describe("CoachDashboard", () => {
   beforeEach(() => mockedUseApi.mockReset());
 
-  it("loads dashboard data from the backend endpoint and renders teamIndexes", () => {
+  it("loads dashboard data exclusively from the backend endpoint", () => {
     mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));
     renderPage();
 
     expect(mockedUseApi).toHaveBeenCalledWith("/coach-dashboard", {
       keepPreviousData: false,
     });
+    expect(mockedUseApi).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Ataque posicional")).toBeInTheDocument();
     expect(screen.getByText("77,8%")).toBeInTheDocument();
     expect(screen.getAllByText("Eficiência")).toHaveLength(4);

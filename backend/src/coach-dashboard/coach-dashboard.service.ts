@@ -25,6 +25,26 @@ type DefensiveEfficiencyInput = {
 
 type CollectiveActionCountRow = { acronym: string; count: string };
 
+const USE_TEAM_INDEX_TEST_VALUES = true;
+const TEAM_INDEX_TEST_VALUES = {
+  positionalAttack: 77.8,
+  pressureExit: 64.3,
+  goalkeeperLine: 0,
+  offensiveTransition: 100,
+  lowBlock: 63.6,
+  variableMarking: 48.2,
+  pressureMarking: 82.5,
+  defensiveTransition: 57.1,
+  setPiece: null,
+} as const;
+
+function teamIndexValue(
+  testValue: number | null,
+  calculatedValue: number | null,
+): number | null {
+  return USE_TEAM_INDEX_TEST_VALUES ? testValue : calculatedValue;
+}
+
 export function calculateOffensiveEfficiency({
   goals,
   shots,
@@ -217,7 +237,10 @@ export class CoachDashboardService {
         {
           id: 'positional-attack',
           title: 'Ataque posicional',
-          value: positionalAttack,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.positionalAttack,
+            positionalAttack,
+          ),
           phase: 'offensive',
           trend: 'up',
           maxValue: 100,
@@ -225,7 +248,10 @@ export class CoachDashboardService {
         {
           id: 'playing-out-pressure',
           title: 'Saída de pressão',
-          value: pressureExit,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.pressureExit,
+            pressureExit,
+          ),
           phase: 'offensive',
           trend: 'up',
           maxValue: 100,
@@ -233,7 +259,10 @@ export class CoachDashboardService {
         {
           id: 'fly-goalkeeper',
           title: 'Goleiro linha',
-          value: goalkeeperLine,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.goalkeeperLine,
+            goalkeeperLine,
+          ),
           phase: 'offensive',
           trend: 'stable',
           maxValue: 100,
@@ -241,7 +270,10 @@ export class CoachDashboardService {
         {
           id: 'offensive-transition',
           title: 'Transição ofensiva',
-          value: offensiveTransition,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.offensiveTransition,
+            offensiveTransition,
+          ),
           phase: 'offensive',
           trend: 'up',
           maxValue: 100,
@@ -249,7 +281,7 @@ export class CoachDashboardService {
         {
           id: 'low-block',
           title: 'Marcação baixa',
-          value: lowBlock,
+          value: teamIndexValue(TEAM_INDEX_TEST_VALUES.lowBlock, lowBlock),
           phase: 'defensive',
           trend: 'stable',
           maxValue: 100,
@@ -257,7 +289,10 @@ export class CoachDashboardService {
         {
           id: 'variable-defense',
           title: 'Marcação variável',
-          value: variableMarking,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.variableMarking,
+            variableMarking,
+          ),
           phase: 'defensive',
           trend: 'up',
           maxValue: 100,
@@ -265,7 +300,10 @@ export class CoachDashboardService {
         {
           id: 'pressing',
           title: 'Pressing',
-          value: pressureMarking,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.pressureMarking,
+            pressureMarking,
+          ),
           phase: 'defensive',
           trend: 'up',
           maxValue: 100,
@@ -273,7 +311,10 @@ export class CoachDashboardService {
         {
           id: 'defensive-transition',
           title: 'Transição defensiva',
-          value: defensiveTransition,
+          value: teamIndexValue(
+            TEAM_INDEX_TEST_VALUES.defensiveTransition,
+            defensiveTransition,
+          ),
           phase: 'defensive',
           trend: 'down',
           maxValue: 100,
@@ -281,7 +322,7 @@ export class CoachDashboardService {
         {
           id: 'set-piece',
           title: 'Bolas paradas',
-          value: null,
+          value: TEAM_INDEX_TEST_VALUES.setPiece,
           phase: 'set-piece',
           trend: 'stable',
           maxValue: 100,

@@ -1,9 +1,3 @@
-export type CoachDashboardData = {
-  averageTeamCards: AverageCard[];
-  players: Player[];
-  metrics: string[];
-  teamIndexes: TeamIndex[];
-};
 export type CoachDashboardResponse = Partial<{
   averageTeamCards: AverageCard[];
   players: Array<Partial<Player>>;
@@ -28,14 +22,6 @@ export type Player = {
   goals: number;
   indexes: Indexes;
 };
-export type Metrics = {
-  minutes: number;
-  defensiveActions: number;
-  offensiveActions: number;
-  goalsTaken: number;
-  goals: number;
-};
-export type Team = { indexes: Indexes };
 export type TeamIndexPhase = "offensive" | "defensive" | "set-piece";
 export type TeamIndexTrend = "up" | "stable" | "down";
 export type TeamIndex = {
@@ -57,4 +43,3 @@ export type GeneralIndexes = {
 };
 export type OffensiveIndexes = { pgj: number; ic: number; tio: number };
 export type DeffensiveIndexes = { gtj: number; rf: number; tid: number };
-export type IndexType = "general" | "offensive" | "deffensive";
