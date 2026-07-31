@@ -220,27 +220,11 @@
         "maxValue": 100
       },
       {
-        "id": "set-piece-fouls",
-        "title": "Faltas",
-        "value": 76,
+        "id": "set-piece",
+        "title": "Bolas paradas",
+        "value": null,
         "phase": "set-piece",
         "trend": "stable",
-        "maxValue": 100
-      },
-      {
-        "id": "set-piece-offensive-throw-in",
-        "title": "Lateral ofensivo",
-        "value": 72,
-        "phase": "set-piece",
-        "trend": "up",
-        "maxValue": 100
-      },
-      {
-        "id": "set-piece-corners",
-        "title": "Cantos",
-        "value": 85,
-        "phase": "set-piece",
-        "trend": "up",
         "maxValue": 100
       }
     ]
