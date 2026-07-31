@@ -17,7 +17,6 @@ export type MetricDefinition = {
   unit: string;
   decimals: number;
   direction: MetricDirection;
-  mockRange?: readonly [number, number];
 };
 
 export const COMPARISON_METRICS: Record<
@@ -79,7 +78,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 2,
     direction: "higher",
-    mockRange: [0.5, 4],
   },
   goalsRelations: {
     label: "+/- gols",
@@ -88,7 +86,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 1,
     direction: "higher",
-    mockRange: [-3, 8],
   },
   actionsRelations: {
     label: "+/- ações",
@@ -97,7 +94,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 1,
     direction: "higher",
-    mockRange: [-8, 18],
   },
   atd: {
     label: "Ataque + transições defensivas",
@@ -106,7 +102,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 2,
     direction: "higher",
-    mockRange: [0, 5],
   },
   dto: {
     label: "Defesa + transições ofensivas",
@@ -115,7 +110,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 2,
     direction: "higher",
-    mockRange: [0, 5],
   },
   pgj: {
     label: "Participações em gol por jogo",
@@ -124,7 +118,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 2,
     direction: "higher",
-    mockRange: [0, 4],
   },
   ic: {
     label: "Índice de criação",
@@ -133,7 +126,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 1,
     direction: "higher",
-    mockRange: [15, 95],
   },
   tio: {
     label: "Taxa de influência ofensiva",
@@ -142,7 +134,6 @@ export const COMPARISON_METRICS: Record<
     unit: "%",
     decimals: 1,
     direction: "higher",
-    mockRange: [10, 90],
   },
   gtj: {
     label: "Gols tomados por jogo",
@@ -151,7 +142,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 2,
     direction: "lower",
-    mockRange: [0, 4],
   },
   rf: {
     label: "Relação recuperação/falhas",
@@ -160,7 +150,6 @@ export const COMPARISON_METRICS: Record<
     unit: "",
     decimals: 2,
     direction: "higher",
-    mockRange: [0.5, 6],
   },
   tid: {
     label: "Taxa de influência defensiva",
@@ -169,7 +158,6 @@ export const COMPARISON_METRICS: Record<
     unit: "%",
     decimals: 1,
     direction: "higher",
-    mockRange: [10, 90],
   },
 };
 
@@ -208,67 +196,17 @@ export const METRIC_GROUPS: Array<{
   },
 ];
 
-export const INDEX_MOCKS_ENABLED =
-  import.meta.env.VITE_ENABLE_COMPARISON_INDEX_MOCKS !== "false";
-
-function stableHash(value: string) {
-  let hash = 2166136261;
-
-  for (let index = 0; index < value.length; index += 1) {
-    hash ^= value.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-
-  return hash >>> 0;
-}
-
-export function buildMockIndexes(
-  athleteId: string,
-  sessionId: string,
-): ComparisonIndexes {
-  return Object.fromEntries(
-    INDEX_METRIC_KEYS.map((metricKey) => {
-      const definition = COMPARISON_METRICS[metricKey];
-      const [minimum, maximum] = definition.mockRange ?? [0, 100];
-      const normalized =
-        stableHash(`${athleteId}:${sessionId}:${metricKey}`) / 0xffffffff;
-      const value = minimum + normalized * (maximum - minimum);
-
-      return [metricKey, Number(value.toFixed(definition.decimals))];
-    }),
-  ) as ComparisonIndexes;
-}
-
 export function getPointMetricValue(
   point: ComparisonPoint,
   metricKey: ComparisonMetricKey,
-  athleteId: string,
-  useIndexMocks = INDEX_MOCKS_ENABLED,
-): { value: number | null; isMock: boolean } {
+): number {
   const definition = COMPARISON_METRICS[metricKey];
 
   if (definition.group !== "indexes") {
-    return {
-      value: point.metrics[metricKey as keyof ComparisonPoint["metrics"]],
-      isMock: false,
-    };
+    return point.metrics[metricKey as keyof ComparisonPoint["metrics"]];
   }
 
-  if (point.indexes) {
-    return {
-      value: point.indexes[metricKey as keyof ComparisonIndexes],
-      isMock: false,
-    };
-  }
-
-  if (!useIndexMocks) return { value: null, isMock: false };
-
-  return {
-    value: buildMockIndexes(athleteId, point.sessionId)[
-      metricKey as keyof ComparisonIndexes
-    ],
-    isMock: true,
-  };
+  return point.indexes[metricKey as keyof ComparisonIndexes];
 }
 
 export function formatMetricValue(
@@ -300,25 +238,15 @@ export function formatMetricDelta(
 export function getMetricSummary(
   points: ComparisonPoint[],
   metricKey: ComparisonMetricKey,
-  athleteId: string,
-  useIndexMocks = INDEX_MOCKS_ENABLED,
 ) {
-  const values = points
-    .map((point) =>
-      getPointMetricValue(point, metricKey, athleteId, useIndexMocks),
-    )
-    .filter(
-      (entry): entry is { value: number; isMock: boolean } =>
-        entry.value !== null,
-    );
-  const first = values[0]?.value ?? null;
-  const last = values.at(-1)?.value ?? null;
+  const values = points.map((point) => getPointMetricValue(point, metricKey));
+  const first = values[0] ?? null;
+  const last = values.at(-1) ?? null;
 
   return {
     first,
     last,
     delta: first === null || last === null ? null : last - first,
-    hasMock: values.some((entry) => entry.isMock),
   };
 }
 

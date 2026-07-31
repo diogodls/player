@@ -91,7 +91,7 @@ function metricValues(
   return sessions.map((session) => {
     const point = pointBySession.get(session.id);
     if (!point) return null;
-    return getPointMetricValue(point, metric, athlete.id).value;
+    return getPointMetricValue(point, metric);
   });
 }
 

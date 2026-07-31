@@ -3,11 +3,31 @@ import { TaggedActionEntity } from '../entities';
 import {
   calculatePlayingSeconds,
   calculatePlayerPerformances,
+  calculateSessionPlayerPerformances,
   emptyPlayerPerformance,
   PlayerActionAggregate,
   PlayerCourtEvent,
   PlayerStatisticsService,
 } from './player-statistics.service';
+
+describe('calculateSessionPlayerPerformances', () => {
+  it('builds real indexes from the actions and court time of one session', () => {
+    const actions = [
+      taggedAction('entered', 'player-1', 'ENTROU', 0),
+      taggedAction('goal', 'player-1', 'GM', 100),
+      taggedAction('assist', 'player-1', 'ASS', 200),
+      taggedAction('left', 'player-1', 'SAIU', 1200),
+    ];
+
+    const performance =
+      calculateSessionPlayerPerformances(actions).get('player-1');
+
+    expect(performance?.minutes).toBe(20);
+    expect(performance?.offensiveActions).toBe(2);
+    expect(performance?.indexes.pgj).toBe(0.1);
+    expect(performance?.indexes.tio).toBe(25);
+  });
+});
 
 describe('calculatePlayerPerformances', () => {
   it('calculates cumulative metrics and every player index', () => {
@@ -246,6 +266,21 @@ function aggregate(
       ...actions,
     },
   };
+}
+
+function taggedAction(
+  id: string,
+  playerId: string,
+  code: string,
+  timestampSeconds: number,
+): TaggedActionEntity {
+  return {
+    id,
+    sessaoId: 'session-1',
+    jogadorId: playerId,
+    timestampSegundos: timestampSeconds,
+    acaoCatalogo: { sigla: code },
+  } as TaggedActionEntity;
 }
 
 function courtEvent(

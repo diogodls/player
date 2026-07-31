@@ -87,4 +87,38 @@ SELECT
 FROM numbered_actions
 ON CONFLICT (id) DO NOTHING;
 
+WITH participation AS (
+  SELECT DISTINCT sessao_id, jogador_id
+  FROM acoes_taggeadas
+  WHERE sessao_id IN (
+    '00000000-0000-0000-0000-000000000103'::uuid,
+    '00000000-0000-0000-0000-000000000104'::uuid,
+    '00000000-0000-0000-0000-000000000105'::uuid,
+    '00000000-0000-0000-0000-000000000106'::uuid,
+    '00000000-0000-0000-0000-000000000107'::uuid,
+    '00000000-0000-0000-0000-000000000108'::uuid
+  )
+    AND jogador_id IS NOT NULL
+), court_events (event_name, catalog_action_id, timestamp_seconds) AS (
+  VALUES
+    ('entered', '00000000-0000-0000-0000-000000000440'::uuid, 0),
+    ('left', '00000000-0000-0000-0000-000000000441'::uuid, 1200)
+)
+INSERT INTO acoes_taggeadas (
+  id,
+  sessao_id,
+  acao_catalogo_id,
+  jogador_id,
+  timestamp_segundos
+)
+SELECT
+  md5(format('comparison-court-%s-%s-%s', sessao_id, jogador_id, event_name))::uuid,
+  sessao_id,
+  catalog_action_id,
+  jogador_id,
+  timestamp_seconds
+FROM participation
+CROSS JOIN court_events
+ON CONFLICT (id) DO NOTHING;
+
 COMMIT;

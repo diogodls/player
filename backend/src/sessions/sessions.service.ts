@@ -19,6 +19,7 @@ import {
   TeamEntity,
 } from '../entities';
 import type { PlayerRankingResponseDto } from '../players/dto/player-ranking-response.dto';
+import { calculateSessionPlayerPerformances } from '../players/player-statistics.service';
 import { PlayersService } from '../players/players.service';
 import { SESSION_TYPES } from './sessions.constants';
 import { SessionFiltersDto } from './dto/session-filters.dto';
@@ -498,6 +499,21 @@ export class SessionsService {
     actions: TaggedActionEntity[],
     orderedSessionIds: string[],
   ): SessionComparisonAthleteDto[] {
+    const actionsBySession = new Map<string, TaggedActionEntity[]>();
+    actions.forEach((action) => {
+      const sessionActions = actionsBySession.get(action.sessaoId) ?? [];
+      sessionActions.push(action);
+      actionsBySession.set(action.sessaoId, sessionActions);
+    });
+    const indexesBySession = new Map(
+      orderedSessionIds.map((sessionId) => [
+        sessionId,
+        calculateSessionPlayerPerformances(
+          actionsBySession.get(sessionId) ?? [],
+        ),
+      ]),
+    );
+
     const grouped = new Map<
       string,
       {
@@ -534,6 +550,12 @@ export class SessionsService {
         points: orderedSessionIds.flatMap((sessionId) => {
           const sessionActions = actionsBySession.get(sessionId);
           if (!sessionActions) return [];
+          const performance = indexesBySession.get(sessionId)?.get(athlete.id);
+          if (!performance) {
+            throw new Error(
+              'Indices do jogador nao foram calculados para a sessao',
+            );
+          }
 
           const stats = this.buildStats(sessionActions);
           return [
@@ -550,7 +572,7 @@ export class SessionsService {
                   stats.total,
                 ),
               },
-              indexes: null,
+              indexes: performance.indexes,
             },
           ];
         }),

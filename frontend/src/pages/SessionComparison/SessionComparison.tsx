@@ -75,8 +75,6 @@ function getPerformanceSummary(athlete: ComparisonAthlete) {
   return getMetricSummary(
     athlete.points,
     "performancePercentage",
-    athlete.id,
-    false,
   );
 }
 

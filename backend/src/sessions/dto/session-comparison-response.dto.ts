@@ -38,7 +38,7 @@ export class SessionComparisonIndexesDto {
 export class SessionComparisonPointDto {
   sessionId!: string;
   metrics!: SessionComparisonMetricsDto;
-  indexes!: SessionComparisonIndexesDto | null;
+  indexes!: SessionComparisonIndexesDto;
 }
 
 export class SessionComparisonAthleteDto {

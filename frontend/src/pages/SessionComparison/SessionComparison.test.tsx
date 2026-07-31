@@ -13,6 +13,20 @@ import SessionComparison from "./SessionComparison";
 
 const useApiMock = vi.hoisted(() => vi.fn());
 
+const indexes = {
+  radj: 1,
+  goalsRelations: 2,
+  actionsRelations: 3,
+  atd: 4,
+  dto: 5,
+  pgj: 6,
+  ic: 7,
+  tio: 8,
+  gtj: 9,
+  rf: 10,
+  tid: 11,
+};
+
 afterEach(() => cleanup());
 
 vi.mock("../../hooks/useApi", () => ({
@@ -88,7 +102,7 @@ const comparisonData: SessionComparisonResponse = {
             totalActions: 4,
             performancePercentage: 75,
           },
-          indexes: null,
+          indexes,
         },
       ],
     },
@@ -107,7 +121,7 @@ const comparisonData: SessionComparisonResponse = {
             totalActions: 5,
             performancePercentage: 80,
           },
-          indexes: null,
+          indexes,
         },
       ],
     },

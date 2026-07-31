@@ -8,14 +8,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.ts',
+    css: true,
   },
   server: {
     host: true,
     port: 5173
-  },
-  test: {
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-    css: true
   }
 })

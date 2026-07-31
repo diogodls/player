@@ -26,7 +26,7 @@ export type ComparisonIndexes = {
 export type ComparisonPoint = {
   sessionId: string;
   metrics: ComparisonActionMetrics;
-  indexes: ComparisonIndexes | null;
+  indexes: ComparisonIndexes;
 };
 
 export type ComparisonAthlete = {
