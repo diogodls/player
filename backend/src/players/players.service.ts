@@ -37,7 +37,7 @@ export class PlayersService {
       sortDirection: 'DESC',
     },
     atd: { name: 'Ranking ATD', sortDirection: 'DESC' },
-    dto: { name: 'Ranking DTO', sortDirection: 'DESC' },
+    dto: { name: 'Ranking DTO', sortDirection: 'ASC' },
     pgj: { name: 'Ranking PGJ', sortDirection: 'DESC' },
     ic: { name: 'Ranking IC', sortDirection: 'DESC' },
     tio: { name: 'Ranking TIO', sortDirection: 'DESC' },
@@ -205,8 +205,9 @@ export class PlayersService {
   protected getIndexes(
     playerId: string,
     performances: Map<string, PlayerPerformanceDto>,
-  ): PlayerIndexesDto {
-    return (performances.get(playerId) ?? emptyPlayerPerformance()).indexes;
+  ): PlayerIndexesDto | null {
+    const performance = performances.get(playerId);
+    return performance && performance.minutes > 0 ? performance.indexes : null;
   }
 
   private async findActiveRankingPlayers(): Promise<PlayerEntity[]> {
@@ -224,10 +225,13 @@ export class PlayersService {
     rule: { name: string; sortDirection: 'ASC' | 'DESC' },
   ): PlayerRankingResponseDto {
     const ranking = players
-      .map((player) => ({
-        player: this.toRankingPlayer(player),
-        value: this.getIndexes(player.id, performances)[indexKey],
-      }))
+      .map((player) => {
+        const indexes = this.getIndexes(player.id, performances);
+        const value = indexes?.[indexKey];
+        if (!this.isValidIndexValue(value)) return null;
+        return { player: this.toRankingPlayer(player), value };
+      })
+      .filter((item) => item !== null)
       .sort((left, right) => this.compareRankingItems(left, right, rule));
     return {
       index: { key: indexKey, ...rule },
@@ -240,10 +244,14 @@ export class PlayersService {
     performances: Map<string, PlayerPerformanceDto>,
     rule: { name: string; sortDirection: 'ASC' | 'DESC' },
   ): PlayerRankingResponseDto {
-    const playersWithIndexes = players.map((player) => ({
-      player: this.toRankingPlayer(player),
-      indexes: this.getIndexes(player.id, performances),
-    }));
+    const playersWithIndexes = players
+      .map((player) => {
+        const indexes = this.getIndexes(player.id, performances);
+        return indexes
+          ? { player: this.toRankingPlayer(player), indexes }
+          : null;
+      })
+      .filter((item) => item !== null);
     const ranges = new Map<
       PlayerIndexKey,
       {
@@ -266,6 +274,9 @@ export class PlayersService {
       });
     }
 
+    // Overall is relative to the compared group. It can change when valid
+    // players enter or leave the group even if an individual's performance
+    // remains unchanged.
     const ranking = playersWithIndexes
       .map(({ player, indexes }) => {
         const normalizedValues: number[] = [];

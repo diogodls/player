@@ -47,12 +47,17 @@ const indexes = (values: TestIndexes): TestIndexes => ({
 const buildRankingService = (
   players: PlayerEntity[],
   indexesByPlayerId: Record<string, TestIndexes> = {},
+  minutesByPlayerId: Record<string, number> = {},
 ) => {
   const find = jest.fn().mockResolvedValue(players);
   const performances = new Map(
     Object.entries(indexesByPlayerId).map(([playerId, playerIndexes]) => [
       playerId,
-      { ...emptyPlayerPerformance(), indexes: playerIndexes as PlayerIndexesDto },
+      {
+        ...emptyPlayerPerformance(),
+        minutes: minutesByPlayerId[playerId] ?? 1,
+        indexes: playerIndexes as PlayerIndexesDto,
+      },
     ]),
   );
   const findByTeamId = jest.fn().mockResolvedValue(performances);
@@ -310,7 +315,10 @@ describe('PlayersService id validation', () => {
       [PLAYER_ID]: indexes({ radj: 1.25 }),
     });
 
-    const generalRanking = await service.buildRankingForPlayers([player], 'radj');
+    const generalRanking = await service.buildRankingForPlayers(
+      [player],
+      'radj',
+    );
     const sessionRanking = await service.buildRankingForPlayers(
       [player],
       'radj',
@@ -339,6 +347,34 @@ describe('PlayersService id validation', () => {
     );
   });
 
+  it('normalizes a session overall using only participants with valid statistics', async () => {
+    const missing = buildRankingPlayer('missing', 'Sem dados');
+    const worst = buildRankingPlayer('worst', 'Participante pior');
+    const best = buildRankingPlayer('best', 'Participante melhor');
+    const { findByTeamId, service } = buildRankingService(
+      [],
+      {
+        worst: indexes({ radj: 2 }),
+        best: indexes({ radj: 6 }),
+      },
+      { worst: 10, best: 10 },
+    );
+
+    const response = await service.buildRankingForPlayers(
+      [missing, worst, best],
+      'overall',
+      'session-id',
+    );
+
+    expect(findByTeamId).toHaveBeenCalledWith(TEAM_ID, 'session-id');
+    expect(
+      response.ranking.map(({ player, value }) => [player.id, value]),
+    ).toEqual([
+      ['best', 99],
+      ['worst', 0],
+    ]);
+  });
+
   it('returns every ranking option from the centralized ranking rules', () => {
     const { service } = buildRankingService([]);
 
@@ -356,7 +392,7 @@ describe('PlayersService id validation', () => {
         sortDirection: 'DESC',
       },
       { key: 'atd', name: 'Ranking ATD', sortDirection: 'DESC' },
-      { key: 'dto', name: 'Ranking DTO', sortDirection: 'DESC' },
+      { key: 'dto', name: 'Ranking DTO', sortDirection: 'ASC' },
       { key: 'pgj', name: 'Ranking PGJ', sortDirection: 'DESC' },
       { key: 'ic', name: 'Ranking IC', sortDirection: 'DESC' },
       { key: 'tio', name: 'Ranking TIO', sortDirection: 'DESC' },
@@ -463,10 +499,10 @@ describe('PlayersService id validation', () => {
       'Removido',
       new Date(),
     );
-    const { find, service } = buildRankingService([
-      removedPlayer,
-      activePlayer,
-    ]);
+    const { find, service } = buildRankingService(
+      [removedPlayer, activePlayer],
+      { [activePlayer.id]: indexes({ radj: 0 }) },
+    );
     const response = await service.findRanking('radj');
     expect(find).toHaveBeenCalledWith({
       where: { deletedAt: IsNull() },
@@ -518,6 +554,24 @@ describe('PlayersService id validation', () => {
       ).toEqual([
         ['low', 99],
         ['high', 0],
+      ]);
+    });
+
+    it('uses the centralized ascending direction to invert dto normalization', async () => {
+      const best = buildRankingPlayer('best', 'Melhor defesa');
+      const worst = buildRankingPlayer('worst', 'Pior defesa');
+      const { service } = buildOverallService([worst, best], {
+        best: indexes({ dto: -2 }),
+        worst: indexes({ dto: 3 }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(
+        response.ranking.map(({ player, value }) => [player.id, value]),
+      ).toEqual([
+        ['best', 99],
+        ['worst', 0],
       ]);
     });
 
@@ -654,5 +708,46 @@ describe('PlayersService id validation', () => {
       expect(fullMiddle?.value).toBe(50);
       expect(reducedMiddle?.value).toBe(99);
     });
+  });
+
+  it('excludes missing and non-participating players while preserving a real zero', async () => {
+    const missing = buildRankingPlayer('missing', 'Sem dados');
+    const noParticipation = buildRankingPlayer('bench', 'Sem participaÃ§Ã£o');
+    const realZero = buildRankingPlayer('zero', 'Zero real');
+    const { service } = buildRankingService(
+      [missing, noParticipation, realZero],
+      {
+        bench: indexes({ gtj: 0 }),
+        zero: indexes({ gtj: 0 }),
+      },
+      { bench: 0, zero: 12 },
+    );
+
+    const response = await service.findRanking('gtj');
+
+    expect(response.ranking).toHaveLength(1);
+    expect(response.ranking[0]).toMatchObject({
+      player: { id: 'zero' },
+      value: 0,
+    });
+  });
+
+  it('sorts dto ascending so the best defensive performance ranks first', async () => {
+    const best = buildRankingPlayer('best', 'Melhor defesa');
+    const worst = buildRankingPlayer('worst', 'Pior defesa');
+    const { service } = buildRankingService([worst, best], {
+      best: indexes({ dto: -1.5 }),
+      worst: indexes({ dto: 2 }),
+    });
+
+    const response = await service.findRanking('dto');
+
+    expect(response.index.sortDirection).toBe('ASC');
+    expect(
+      response.ranking.map(({ player, value }) => [player.id, value]),
+    ).toEqual([
+      ['best', -1.5],
+      ['worst', 2],
+    ]);
   });
 });
