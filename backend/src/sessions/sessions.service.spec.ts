@@ -1,12 +1,21 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { SessionEntity, TaggedActionEntity, TeamEntity } from '../entities';
+import {
+  PlayerEntity,
+  SessionEntity,
+  TaggedActionEntity,
+  TeamEntity,
+} from '../entities';
+import { PlayersService } from '../players/players.service';
 import { SessionDto } from './dto/session.dto';
 import { SessionsService } from './sessions.service';
 
 const SESSION_ID = '79fbbbe8-39b1-4b25-bd11-236a0f228cb0';
 const OTHER_SESSION_ID = '9828b90e-6aa0-4d75-985d-f286802c3086';
 const TEAM_ID = 'd62ec1e1-f762-45bd-a1e9-09ba8ef8d461';
+const playersServiceMock = {
+  buildRankingForPlayers: jest.fn(),
+} as unknown as PlayersService;
 
 const buildSessionDto = (id: string | null): SessionDto => ({
   id,
@@ -85,6 +94,7 @@ describe('SessionsService id validation', () => {
     {} as Repository<SessionEntity>,
     {} as Repository<TeamEntity>,
     {} as Repository<TaggedActionEntity>,
+    playersServiceMock,
   );
 
   it('rejects a non-null id when creating a session', async () => {
@@ -115,6 +125,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       teamsRepository,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     await sessionsService.create(buildSessionDto(null));
@@ -142,6 +153,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findAll({
@@ -184,6 +196,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findAll({ page: 4, limit: 5 });
@@ -201,6 +214,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       {} as Repository<TaggedActionEntity>,
+      playersServiceMock,
     );
 
     await expect(sessionsService.findView(SESSION_ID)).rejects.toThrow(
@@ -221,6 +235,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID);
@@ -313,6 +328,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID);
@@ -450,6 +466,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID, {
@@ -527,6 +544,7 @@ describe('SessionsService id validation', () => {
       sessionsRepository,
       {} as Repository<TeamEntity>,
       taggedActionsRepository,
+      playersServiceMock,
     );
 
     const response = await sessionsService.findView(SESSION_ID, {
@@ -538,6 +556,95 @@ describe('SessionsService id validation', () => {
     expect(response.analysis.team.entities[0].actions[0].id).toBe('action-2');
     expect(response.analysis.individual.entities[0].actions[0].id).toBe(
       'action-3',
+    );
+  });
+});
+
+describe('SessionsService session rankings', () => {
+  const player = (id: string, name: string, deletedAt: Date | null = null) =>
+    ({
+      id,
+      nome: name,
+      deletedAt,
+      posicao: { id: 3, nome: 'Ala' },
+    }) as PlayerEntity;
+  const action = (id: string, jogador: PlayerEntity | null) =>
+    ({
+      id,
+      sessaoId: SESSION_ID,
+      jogadorId: jogador?.id ?? null,
+      jogador,
+    }) as TaggedActionEntity;
+  const setup = (
+    actions: TaggedActionEntity[],
+    session: SessionEntity | null = buildSession(),
+  ) => {
+    const findOne = jest.fn().mockResolvedValue(session);
+    const find = jest.fn().mockResolvedValue(actions);
+    const buildRankingForPlayers = jest.fn(
+      (players: PlayerEntity[], indexKey: string) => {
+        if (indexKey === 'invalid') throw new BadRequestException();
+        return {
+          index: { key: indexKey, name: 'Ranking', sortDirection: 'DESC' },
+          ranking: players,
+        };
+      },
+    );
+    return {
+      find,
+      buildRankingForPlayers,
+      service: new SessionsService(
+        { findOne } as unknown as Repository<SessionEntity>,
+        {} as Repository<TeamEntity>,
+        { find } as unknown as Repository<TaggedActionEntity>,
+        { buildRankingForPlayers } as unknown as PlayersService,
+      ),
+    };
+  };
+
+  it('rejects a missing session before loading actions', async () => {
+    const { service, find } = setup([], null);
+    await expect(service.findRanking(SESSION_ID, 'radj')).rejects.toThrow(
+      NotFoundException,
+    );
+    expect(find).not.toHaveBeenCalled();
+  });
+
+  it('delegates invalid index validation to the centralized players ranking rules', async () => {
+    const { service } = setup([]);
+    await expect(service.findRanking(SESSION_ID, 'invalid')).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('returns an empty ranking group when there are no individual actions', async () => {
+    const { service, buildRankingForPlayers } = setup([action('team', null)]);
+    await service.findRanking(SESSION_ID, 'radj');
+    expect(buildRankingForPlayers).toHaveBeenCalledWith(
+      [],
+      'radj',
+      SESSION_ID,
+    );
+  });
+
+  it('ignores team actions, inactive players and duplicate individual actions', async () => {
+    const ana = player('ana', 'Ana');
+    const removed = player('removed', 'Removida', new Date());
+    const { service, buildRankingForPlayers, find } = setup([
+      action('team', null),
+      action('ana-1', ana),
+      action('ana-2', ana),
+      action('removed', removed),
+    ]);
+    await service.findRanking(SESSION_ID, 'gtj');
+    expect(find).toHaveBeenCalledWith({
+      where: { sessaoId: SESSION_ID },
+      relations: { jogador: { posicao: true } },
+    });
+    expect(buildRankingForPlayers).toHaveBeenCalledWith(
+      [ana],
+      'gtj',
+      SESSION_ID,
     );
   });
 });
