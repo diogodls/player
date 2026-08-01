@@ -34,31 +34,38 @@ function buildAction({
   playerId,
   playerName,
   category,
+  categoryKey,
+  acronym,
   impactId,
+  timestampSeconds = 10,
 }: {
   id: string;
   sessionId: string;
   playerId?: string;
   playerName?: string;
   category: string;
+  categoryKey?: string;
+  acronym?: string;
   impactId: number;
+  timestampSeconds?: number;
 }): TaggedActionEntity {
   return {
     id,
     sessaoId: sessionId,
     jogadorId: playerId ?? null,
-    timestampSegundos: 10,
+    timestampSegundos: timestampSeconds,
     acaoCatalogoId: `catalog-${id}`,
     acaoCatalogo: {
       id: `catalog-${id}`,
       categoriaAcaoId: `category-${id}`,
       impactoId: impactId,
       nome: `Acao ${id}`,
-      sigla: id,
+      sigla: acronym ?? id,
       categoriaAcao: {
         id: `category-${id}`,
         tipoAnaliseId: 1,
         nome: category,
+        chave: categoryKey ?? null,
       },
     },
     jogador: playerId
@@ -171,7 +178,8 @@ describe('SessionsService comparison', () => {
         sessionId: FIRST_SESSION_ID,
         playerId,
         playerName: 'Ana',
-        category: 'Acoes ofensivas',
+        category: 'Categoria renomeada',
+        categoryKey: 'OFFENSIVE_ACTIONS',
         impactId: 1,
       }),
       buildAction({
@@ -179,8 +187,31 @@ describe('SessionsService comparison', () => {
         sessionId: FIRST_SESSION_ID,
         playerId,
         playerName: 'Ana',
-        category: 'Acoes defensivas',
+        category: 'Outra traducao',
+        categoryKey: 'DEFENSIVE_ACTIONS',
         impactId: 2,
+      }),
+      buildAction({
+        id: 'entered',
+        sessionId: FIRST_SESSION_ID,
+        playerId,
+        playerName: 'Ana',
+        category: 'Minutagem',
+        categoryKey: 'PLAYING_TIME',
+        acronym: 'ENTROU',
+        impactId: 3,
+        timestampSeconds: 0,
+      }),
+      buildAction({
+        id: 'left',
+        sessionId: FIRST_SESSION_ID,
+        playerId,
+        playerName: 'Ana',
+        category: 'Minutagem',
+        categoryKey: 'PLAYING_TIME',
+        acronym: 'SAIU',
+        impactId: 3,
+        timestampSeconds: 1200,
       }),
       buildAction({
         id: 'team-action',

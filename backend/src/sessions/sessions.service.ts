@@ -20,6 +20,11 @@ import {
 } from '../entities';
 import type { PlayerRankingResponseDto } from '../players/dto/player-ranking-response.dto';
 import { calculateSessionPlayerPerformances } from '../players/player-statistics.service';
+import {
+  countActionsByCategoryKeys,
+  isPerformanceAction,
+  PLAYER_ACTION_CATEGORY_KEYS,
+} from '../players/player-performance-actions';
 import { PlayersService } from '../players/players.service';
 import { SESSION_TYPES } from './sessions.constants';
 import { SessionFiltersDto } from './dto/session-filters.dto';
@@ -481,11 +486,14 @@ export class SessionsService {
   }
 
   private buildStats(actions: TaggedActionEntity[]) {
-    const positive = actions.filter((action) => this.isPositive(action)).length;
-    const negative = actions.filter(
+    const performanceActions = actions.filter(isPerformanceAction);
+    const positive = performanceActions.filter((action) =>
+      this.isPositive(action),
+    ).length;
+    const negative = performanceActions.filter(
       (action) => action.acaoCatalogo?.impactoId === NEGATIVE_IMPACT_ID,
     ).length;
-    const total = actions.length;
+    const total = performanceActions.length;
 
     return {
       positive,
@@ -598,21 +606,17 @@ export class SessionsService {
   }
 
   private countOffensiveActions(actions: TaggedActionEntity[]) {
-    return this.countByCategory(actions, ['ofens', 'gols em quadra']);
+    return countActionsByCategoryKeys(
+      actions,
+      PLAYER_ACTION_CATEGORY_KEYS.offensive,
+    );
   }
 
   private countDefensiveActions(actions: TaggedActionEntity[]) {
-    return this.countByCategory(actions, ['defens', 'gols tomados']);
-  }
-
-  private countByCategory(actions: TaggedActionEntity[], needles: string[]) {
-    return actions.filter((action) =>
-      needles.some((needle) =>
-        action.acaoCatalogo?.categoriaAcao?.nome
-          .toLocaleLowerCase()
-          .includes(needle),
-      ),
-    ).length;
+    return countActionsByCategoryKeys(
+      actions,
+      PLAYER_ACTION_CATEGORY_KEYS.defensive,
+    );
   }
 
   private isPositive(action: TaggedActionEntity) {

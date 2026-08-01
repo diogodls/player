@@ -33,6 +33,26 @@ import styles from "./SessionComparison.module.scss";
 
 type SessionTypeFilter = "all" | "1" | "2";
 
+type FilterDraft = {
+  appliedKey: string;
+  startDate: string;
+  endDate: string;
+  typeFilter: SessionTypeFilter;
+};
+
+function createFilterDraft(
+  startDate: string,
+  endDate: string,
+  typeId: string | null,
+): FilterDraft {
+  return {
+    appliedKey: `${startDate}:${endDate}:${typeId ?? "all"}`,
+    startDate,
+    endDate,
+    typeFilter: typeId === "1" || typeId === "2" ? typeId : "all",
+  };
+}
+
 const TREND_CONTENT = {
   improved: {
     label: "Melhora",
@@ -103,12 +123,22 @@ const SessionComparison = () => {
   const appliedStartDate = searchParams.get("startDate") ?? "";
   const appliedEndDate = searchParams.get("endDate") ?? "";
   const appliedTypeId = searchParams.get("typeId");
-  const [startDate, setStartDate] = useState(appliedStartDate);
-  const [endDate, setEndDate] = useState(appliedEndDate);
-  const [typeFilter, setTypeFilter] = useState<SessionTypeFilter>(
-    appliedTypeId === "1" || appliedTypeId === "2" ? appliedTypeId : "all",
+  const appliedDraft = createFilterDraft(
+    appliedStartDate,
+    appliedEndDate,
+    appliedTypeId,
   );
+  const [storedDraft, setStoredDraft] = useState<FilterDraft>(appliedDraft);
+  const draft =
+    storedDraft.appliedKey === appliedDraft.appliedKey
+      ? storedDraft
+      : appliedDraft;
+  const { startDate, endDate, typeFilter } = draft;
   const hasAppliedRange = isValidRange(appliedStartDate, appliedEndDate);
+
+  const updateDraft = (changes: Partial<Omit<FilterDraft, "appliedKey">>) => {
+    setStoredDraft({ ...draft, ...changes });
+  };
 
   const endpoint = useMemo(() => {
     if (!hasAppliedRange) return null;
@@ -222,7 +252,9 @@ const SessionComparison = () => {
                 type="date"
                 value={startDate}
                 max={endDate || undefined}
-                onChange={(event) => setStartDate(event.target.value)}
+                onChange={(event) =>
+                  updateDraft({ startDate: event.target.value })
+                }
               />
             </label>
             <label>
@@ -231,7 +263,9 @@ const SessionComparison = () => {
                 type="date"
                 value={endDate}
                 min={startDate || undefined}
-                onChange={(event) => setEndDate(event.target.value)}
+                onChange={(event) =>
+                  updateDraft({ endDate: event.target.value })
+                }
               />
             </label>
             <label>
@@ -239,7 +273,9 @@ const SessionComparison = () => {
               <select
                 value={typeFilter}
                 onChange={(event) =>
-                  setTypeFilter(event.target.value as SessionTypeFilter)
+                  updateDraft({
+                    typeFilter: event.target.value as SessionTypeFilter,
+                  })
                 }
               >
                 <option value="all">Todos</option>

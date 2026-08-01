@@ -1,4 +1,5 @@
 import {createRoot} from 'react-dom/client'
+import {lazy, Suspense} from 'react'
 import './index.css'
 import {BrowserRouter, Route, Routes} from "react-router";
 import Home from "./pages/Home/Home.tsx";
@@ -14,7 +15,10 @@ import SessionView from "./pages/SessionView/SessionView.tsx";
 import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 import AthleteRegistrationScreen from "./pages/AthleteRegistrationScreen/AthleteRegistrationScreen.tsx";
 import Rankings from "./pages/Rankings/Rankings.tsx";
-import SessionComparison from "./pages/SessionComparison/SessionComparison.tsx";
+
+const SessionComparison = lazy(
+  () => import("./pages/SessionComparison/SessionComparison.tsx"),
+);
 
 createRoot(document.getElementById('root')!).render(
   <CookiesProvider>
@@ -28,7 +32,14 @@ createRoot(document.getElementById('root')!).render(
               <Route path={"/player/:id"} element={<PlayerView/>}/>
               <Route path="/rankings" element={<Rankings/>}/>
               <Route path={"/sessions"} element={<Sessions />}/>
-              <Route path="/sessions/comparison" element={<SessionComparison />} />
+              <Route
+                path="/sessions/comparison"
+                element={
+                  <Suspense fallback={<div role="status">Carregando comparaÃ§Ã£o...</div>}>
+                    <SessionComparison />
+                  </Suspense>
+                }
+              />
               <Route path="/sessions/:id" element={<SessionView />} />
               <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
               <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis />} />

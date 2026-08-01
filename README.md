@@ -114,6 +114,13 @@ Start the entire environment with:
 docker compose up
 ```
 
+The additional session-comparison demo data is optional. With the database
+running, load it explicitly with:
+
+```bash
+docker compose exec postgres psql -U player -d player -f /demo-data/seeds-comparison.sql
+```
+
 ---
 
 ## Main Routes

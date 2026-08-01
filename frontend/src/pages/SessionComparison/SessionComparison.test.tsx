@@ -6,7 +6,13 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { MemoryRouter, Route, Routes, useLocation } from "react-router";
+import {
+  MemoryRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SessionComparisonResponse } from "./index";
 import SessionComparison from "./SessionComparison";
@@ -142,7 +148,22 @@ const comparisonWithFiveAthletes: SessionComparisonResponse = {
 
 function LocationProbe() {
   const location = useLocation();
-  return <output data-testid="location">{location.search}</output>;
+  const navigate = useNavigate();
+  return (
+    <>
+      <output data-testid="location">{location.search}</output>
+      <button
+        type="button"
+        onClick={() =>
+          navigate(
+            "/sessions/comparison?startDate=2026-03-01&endDate=2026-03-10&typeId=2",
+          )
+        }
+      >
+        Alterar URL externamente
+      </button>
+    </>
+  );
 }
 
 function renderComparison(initialEntry = "/sessions/comparison") {
@@ -194,6 +215,29 @@ describe("SessionComparison", () => {
       "endDate=2026-02-19",
     );
     expect(screen.getByTestId("location")).toHaveTextContent("typeId=1");
+  });
+
+  it("synchronizes the form when navigation changes the applied URL", async () => {
+    useApiMock.mockReturnValue({
+      data: undefined,
+      error: undefined,
+      isLoading: false,
+      isValidating: false,
+      mutate: vi.fn(),
+    });
+    renderComparison(
+      "/sessions/comparison?startDate=2026-02-15&endDate=2026-02-19&typeId=1",
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Alterar URL externamente" }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Data inicial")).toHaveValue("2026-03-01");
+    });
+    expect(screen.getByLabelText("Data final")).toHaveValue("2026-03-10");
+    expect(screen.getByLabelText("Tipo de sessão")).toHaveValue("2");
   });
 
   it("compares multiple athletes in three charts using PlayerView colors", () => {

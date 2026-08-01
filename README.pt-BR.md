@@ -116,6 +116,13 @@ Inicie todo o ambiente com:
 docker compose up
 ```
 
+Os dados extras para demonstrar a comparação de sessões são opcionais. Com o
+banco em execução, carregue-os explicitamente com:
+
+```bash
+docker compose exec postgres psql -U player -d player -f /demo-data/seeds-comparison.sql
+```
+
 ---
 
 ## Principais Rotas
