@@ -21,10 +21,10 @@ const percentageFormatter = new Intl.NumberFormat("pt-BR", {
 
 const TeamIndexCard = ({ index }: IndexCardProps) => {
   const phase = phaseMap[index.phase];
-  const hasValue =
-    typeof index.value === "number" && Number.isFinite(index.value);
+  const value = index.value;
+  const hasValue = typeof value === "number" && Number.isFinite(value);
   const formattedValue = hasValue
-    ? `${percentageFormatter.format(index.value)}%`
+    ? `${percentageFormatter.format(value)}%`
     : "Nenhum dado registrado";
 
   return (
@@ -47,7 +47,11 @@ const TeamIndexCard = ({ index }: IndexCardProps) => {
       <div className={styles.progressTrack} aria-hidden="true">
         <span
           className={`${styles.progressFill} ${styles[phase.className]}`}
-          style={{ width: hasValue ? `${Math.max(0, Math.min(100, (index.value / index.maxValue) * 100))}%` : "0%" }}
+          style={{
+            width: hasValue
+              ? `${Math.max(0, Math.min(100, (value / index.maxValue) * 100))}%`
+              : "0%",
+          }}
         />
       </div>
     </article>
