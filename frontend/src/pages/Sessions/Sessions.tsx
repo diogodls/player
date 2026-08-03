@@ -18,6 +18,7 @@ import {
   SESSION_TYPE_IDS,
 } from "../../constants/sessions.ts";
 import { ToastContext } from "../../contexts/ToastContext/ToastContext.tsx";
+import { useNavigate } from "react-router";
 
 const SESSIONS_PER_PAGE = 5;
 
@@ -32,6 +33,7 @@ function toSessionMeta(session: Session): SessionMeta {
 }
 
 const Sessions = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<SessionFilters>({
     type: "all",
@@ -151,7 +153,10 @@ const Sessions = () => {
 
   return (
     <div className={styles.container}>
-      <HeaderSessionScreen onAddSession={handleOpenCreate} />
+      <HeaderSessionScreen
+        onAddSession={handleOpenCreate}
+        onCompareSessions={() => navigate("/sessions/comparison")}
+      />
       <SessionsList
         sessions={sessions}
         total={totalSessions}
