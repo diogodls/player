@@ -13,6 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./backend/seeds.sql:/docker-entrypoint-initdb.d/02-seeds.sql:ro
+      - ./backend/seeds-comparison.sql:/demo-data/seeds-comparison.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U player -d player"]
       interval: 10s

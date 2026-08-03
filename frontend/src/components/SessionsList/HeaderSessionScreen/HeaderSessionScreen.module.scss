@@ -46,20 +46,44 @@
     }
   }
 
-  .addButton {
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     flex-shrink: 0;
-    background: var(--green);
+  }
+
+  .addButton,
+  .compareButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex-shrink: 0;
     color: var(--text-primary);
-    border: none;
     border-radius: 8px;
     padding: 10px 14px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease-in-out;
+    transition: background 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  }
+
+  .addButton {
+    background: var(--green);
+    border: none;
 
     &:hover {
       background: color-mix(in srgb, var(--green) 80%, white);
+    }
+  }
+
+  .compareButton {
+    border: 1px solid var(--selected-blue);
+    background: rgba(37, 99, 235, 0.12);
+
+    &:hover {
+      background: rgba(37, 99, 235, 0.25);
     }
   }
 
@@ -79,10 +103,10 @@
       }
     }
 
-    .addButton {
+    .actions {
       width: 100%;
-      text-align: center;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
     }
   }
 
@@ -101,7 +125,8 @@
       }
     }
 
-    .addButton {
+    .addButton,
+    .compareButton {
       padding: 10px 12px;
       font-size: 13px;
     }

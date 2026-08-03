@@ -161,6 +161,48 @@ export class PlayerStatisticsService {
   }
 }
 
+export function calculateSessionPlayerPerformances(
+  actions: TaggedActionEntity[],
+): Map<string, PlayerPerformanceDto> {
+  const countsByPlayer = new Map<string, ActionCounts>();
+  const courtEvents: PlayerCourtEvent[] = [];
+
+  actions.forEach((action) => {
+    if (!action.jogadorId || !action.acaoCatalogo) return;
+
+    const counts =
+      countsByPlayer.get(action.jogadorId) ??
+      (Object.fromEntries(
+        ACTION_CODES.map((code) => [code, 0]),
+      ) as ActionCounts);
+    const code = action.acaoCatalogo.sigla;
+
+    if ((ACTION_CODES as readonly string[]).includes(code)) {
+      counts[code as ActionCode] += 1;
+    }
+    countsByPlayer.set(action.jogadorId, counts);
+
+    if (code === PLAYER_ENTERED_COURT_CODE || code === PLAYER_LEFT_COURT_CODE) {
+      courtEvents.push({
+        id: action.id,
+        playerId: action.jogadorId,
+        sessionId: action.sessaoId,
+        code,
+        timestampSeconds: action.timestampSegundos,
+      });
+    }
+  });
+
+  const secondsByPlayer = calculatePlayingSeconds(courtEvents);
+  return calculatePlayerPerformances(
+    Array.from(countsByPlayer, ([playerId, actionCounts]) => ({
+      playerId,
+      secondsPlayed: secondsByPlayer.get(playerId) ?? 0,
+      actions: actionCounts,
+    })),
+  );
+}
+
 export function calculatePlayerPerformances(
   aggregates: PlayerActionAggregate[],
 ): Map<string, PlayerPerformanceDto> {

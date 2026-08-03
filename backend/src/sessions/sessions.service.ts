@@ -4,7 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import {
+  Between,
+  FindOptionsWhere,
+  In,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import {
   PlayerEntity,
   SessionEntity,
@@ -12,9 +19,20 @@ import {
   TeamEntity,
 } from '../entities';
 import type { PlayerRankingResponseDto } from '../players/dto/player-ranking-response.dto';
+import { calculateSessionPlayerPerformances } from '../players/player-statistics.service';
+import {
+  countActionsByCategoryKeys,
+  isPerformanceAction,
+  PLAYER_ACTION_CATEGORY_KEYS,
+} from '../players/player-performance-actions';
 import { PlayersService } from '../players/players.service';
 import { SESSION_TYPES } from './sessions.constants';
 import { SessionFiltersDto } from './dto/session-filters.dto';
+import { SessionComparisonFiltersDto } from './dto/session-comparison-filters.dto';
+import {
+  SessionComparisonAthleteDto,
+  SessionComparisonResponseDto,
+} from './dto/session-comparison-response.dto';
 import { SessionListResponseDto } from './dto/session-list-response.dto';
 import { SessionDto } from './dto/session.dto';
 import { SessionResponseDto } from './dto/session-response.dto';
@@ -79,6 +97,95 @@ export class SessionsService {
 
   async findOne(id: string): Promise<SessionResponseDto> {
     return this.toResponse(await this.findEntity(id));
+  }
+
+  async compare(
+    filters: SessionComparisonFiltersDto,
+  ): Promise<SessionComparisonResponseDto> {
+    const startDate = new Date(`${filters.startDate}T00:00:00.000Z`);
+    const endDate = new Date(`${filters.endDate}T00:00:00.000Z`);
+
+    if (startDate >= endDate) {
+      throw new BadRequestException(
+        'Data inicial deve ser anterior a data final',
+      );
+    }
+
+    const sessions = await this.sessionsRepository.find({
+      where: {
+        data: Between(startDate, endDate),
+        ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
+      },
+      relations: {
+        sessionType: true,
+      },
+      order: {
+        data: 'ASC',
+        createdAt: 'ASC',
+        id: 'ASC',
+      },
+    });
+
+    const comparisonSessions = sessions.map((session) => {
+      if (!session.sessionType) {
+        throw new Error('Tipo da sessao nao foi carregado');
+      }
+
+      const description = session.descricao ?? null;
+      return {
+        id: session.id,
+        date: this.formatDate(session.data),
+        type: session.sessionType.nome,
+        description,
+        opponent:
+          session.sessionTypeId === SESSION_TYPES.Jogo ? description : null,
+      };
+    });
+
+    if (sessions.length === 0) {
+      return {
+        period: {
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+          typeId: filters.typeId ?? null,
+        },
+        sessions: [],
+        athletes: [],
+      };
+    }
+
+    const actions = await this.taggedActionsRepository.find({
+      where: {
+        sessaoId: In(sessions.map((session) => session.id)),
+        jogadorId: Not(IsNull()),
+      },
+      relations: {
+        acaoCatalogo: {
+          categoriaAcao: true,
+          impacto: true,
+        },
+        jogador: {
+          posicao: true,
+        },
+      },
+      order: {
+        sessaoId: 'ASC',
+        timestampSegundos: 'ASC',
+      },
+    });
+
+    return {
+      period: {
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+        typeId: filters.typeId ?? null,
+      },
+      sessions: comparisonSessions,
+      athletes: this.buildComparisonAthletes(
+        actions,
+        sessions.map((session) => session.id),
+      ),
+    };
   }
 
   async findRanking(
@@ -379,11 +486,14 @@ export class SessionsService {
   }
 
   private buildStats(actions: TaggedActionEntity[]) {
-    const positive = actions.filter((action) => this.isPositive(action)).length;
-    const negative = actions.filter(
+    const performanceActions = actions.filter(isPerformanceAction);
+    const positive = performanceActions.filter((action) =>
+      this.isPositive(action),
+    ).length;
+    const negative = performanceActions.filter(
       (action) => action.acaoCatalogo?.impactoId === NEGATIVE_IMPACT_ID,
     ).length;
-    const total = actions.length;
+    const total = performanceActions.length;
 
     return {
       positive,
@@ -391,6 +501,91 @@ export class SessionsService {
       neutral: total - positive - negative,
       total,
     };
+  }
+
+  private buildComparisonAthletes(
+    actions: TaggedActionEntity[],
+    orderedSessionIds: string[],
+  ): SessionComparisonAthleteDto[] {
+    const actionsBySession = new Map<string, TaggedActionEntity[]>();
+    actions.forEach((action) => {
+      const sessionActions = actionsBySession.get(action.sessaoId) ?? [];
+      sessionActions.push(action);
+      actionsBySession.set(action.sessaoId, sessionActions);
+    });
+    const indexesBySession = new Map(
+      orderedSessionIds.map((sessionId) => [
+        sessionId,
+        calculateSessionPlayerPerformances(
+          actionsBySession.get(sessionId) ?? [],
+        ),
+      ]),
+    );
+
+    const grouped = new Map<
+      string,
+      {
+        athlete: SessionComparisonAthleteDto;
+        actionsBySession: Map<string, TaggedActionEntity[]>;
+      }
+    >();
+
+    actions.forEach((action) => {
+      if (!action.jogador) return;
+      if (!action.jogador.posicao) {
+        throw new Error('Posicao do jogador nao foi carregada');
+      }
+
+      const current = grouped.get(action.jogador.id) ?? {
+        athlete: {
+          id: action.jogador.id,
+          name: action.jogador.nome,
+          position: action.jogador.posicao.nome,
+          points: [],
+        },
+        actionsBySession: new Map<string, TaggedActionEntity[]>(),
+      };
+      const sessionActions =
+        current.actionsBySession.get(action.sessaoId) ?? [];
+      sessionActions.push(action);
+      current.actionsBySession.set(action.sessaoId, sessionActions);
+      grouped.set(action.jogador.id, current);
+    });
+
+    return Array.from(grouped.values())
+      .map(({ athlete, actionsBySession }) => ({
+        ...athlete,
+        points: orderedSessionIds.flatMap((sessionId) => {
+          const sessionActions = actionsBySession.get(sessionId);
+          if (!sessionActions) return [];
+          const performance = indexesBySession.get(sessionId)?.get(athlete.id);
+          if (!performance) {
+            throw new Error(
+              'Indices do jogador nao foram calculados para a sessao',
+            );
+          }
+
+          const stats = this.buildStats(sessionActions);
+          return [
+            {
+              sessionId,
+              metrics: {
+                positiveActions: stats.positive,
+                negativeActions: stats.negative,
+                offensiveActions: this.countOffensiveActions(sessionActions),
+                defensiveActions: this.countDefensiveActions(sessionActions),
+                totalActions: stats.total,
+                performancePercentage: this.calculatePercentage(
+                  stats.positive,
+                  stats.total,
+                ),
+              },
+              indexes: performance.indexes,
+            },
+          ];
+        }),
+      }))
+      .sort((first, second) => first.name.localeCompare(second.name, 'pt-BR'));
   }
 
   private toViewAction(action: TaggedActionEntity): SessionViewActionDto {
@@ -411,21 +606,17 @@ export class SessionsService {
   }
 
   private countOffensiveActions(actions: TaggedActionEntity[]) {
-    return this.countByCategory(actions, ['ofens', 'gols em quadra']);
+    return countActionsByCategoryKeys(
+      actions,
+      PLAYER_ACTION_CATEGORY_KEYS.offensive,
+    );
   }
 
   private countDefensiveActions(actions: TaggedActionEntity[]) {
-    return this.countByCategory(actions, ['defens', 'gols tomados']);
-  }
-
-  private countByCategory(actions: TaggedActionEntity[], needles: string[]) {
-    return actions.filter((action) =>
-      needles.some((needle) =>
-        action.acaoCatalogo?.categoriaAcao?.nome
-          .toLocaleLowerCase()
-          .includes(needle),
-      ),
-    ).length;
+    return countActionsByCategoryKeys(
+      actions,
+      PLAYER_ACTION_CATEGORY_KEYS.defensive,
+    );
   }
 
   private isPositive(action: TaggedActionEntity) {
