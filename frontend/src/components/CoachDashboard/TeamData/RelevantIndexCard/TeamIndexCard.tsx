@@ -21,11 +21,11 @@ const percentageFormatter = new Intl.NumberFormat("pt-BR", {
 
 const TeamIndexCard = ({ index }: IndexCardProps) => {
   const phase = phaseMap[index.phase];
-  const hasValue = index.value !== null;
-  const formattedValue =
-    index.value === null
-      ? "Nenhum dado registrado"
-      : `${percentageFormatter.format(index.value)}%`;
+  const hasValue =
+    typeof index.value === "number" && Number.isFinite(index.value);
+  const formattedValue = hasValue
+    ? `${percentageFormatter.format(index.value)}%`
+    : "Nenhum dado registrado";
 
   return (
     <article className={styles.card}>
