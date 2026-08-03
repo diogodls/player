@@ -8,8 +8,10 @@ import { ILike, IsNull, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerListResponseDto } from './dto/player-list-response.dto';
-import { PlayerPerformanceDto } from './dto/player-performance.dto';
-import { DashboardPlayerDto } from './dto/player-performance.dto';
+import {
+  DashboardPlayerDto,
+  PlayerPerformanceDto,
+} from './dto/player-performance.dto';
 import { PlayerDto } from './dto/player.dto';
 import type {
   PlayerIndexKey,

@@ -10,9 +10,7 @@ import {
 } from './dto/coach-dashboard-response.dto';
 import { CoachDashboardFiltersDto } from './dto/coach-dashboard-filters.dto';
 type CountRow = { acronym: string; count: string };
-type Kind = 'offensive' | 'defensive' | 'set-piece';
 type CardConfig = Omit<TeamIndexDto, 'value' | 'maxValue'> & {
-  kind: Kind;
   positiveActionKeys: readonly string[];
   negativeActionKeys: readonly string[];
 };
@@ -21,7 +19,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'positional-attack',
     title: 'Ataque posicional',
     phase: 'offensive',
-    kind: 'offensive',
     positiveActionKeys: ['GAP', 'FAP'],
     negativeActionKeys: ['PPAP', 'PMAP'],
   },
@@ -29,7 +26,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'playing-out-pressure',
     title: 'Saída de pressão',
     phase: 'offensive',
-    kind: 'offensive',
     positiveActionKeys: ['GSP', 'FSP'],
     negativeActionKeys: ['PPSP', 'PMSP'],
   },
@@ -37,7 +33,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'fly-goalkeeper',
     title: 'Goleiro linha',
     phase: 'offensive',
-    kind: 'offensive',
     positiveActionKeys: ['GGL', 'FGL'],
     negativeActionKeys: ['PPGL', 'PMGL'],
   },
@@ -45,7 +40,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'offensive-transition',
     title: 'Transição ofensiva',
     phase: 'offensive',
-    kind: 'offensive',
     positiveActionKeys: ['GT', 'FT'],
     negativeActionKeys: ['PPT', 'PMT'],
   },
@@ -53,7 +47,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'low-block',
     title: 'Marcação baixa',
     phase: 'defensive',
-    kind: 'defensive',
     positiveActionKeys: ['MBRP', 'MBJI'],
     negativeActionKeys: ['MBFS', 'MBGT'],
   },
@@ -61,7 +54,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'variable-defense',
     title: 'Marcação variável',
     phase: 'defensive',
-    kind: 'defensive',
     positiveActionKeys: ['VRP', 'VJI'],
     negativeActionKeys: ['VFS', 'VGT'],
   },
@@ -69,7 +61,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'pressing',
     title: 'Pressing',
     phase: 'defensive',
-    kind: 'defensive',
     positiveActionKeys: ['PRP', 'PJI'],
     negativeActionKeys: ['PFS', 'PRGT'],
   },
@@ -77,7 +68,6 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'defensive-transition',
     title: 'Transição defensiva',
     phase: 'defensive',
-    kind: 'defensive',
     positiveActionKeys: ['TRP'],
     negativeActionKeys: ['TFS', 'TGT'],
   },
@@ -85,19 +75,14 @@ export const TEAM_INDEX_CONFIG: readonly CardConfig[] = [
     id: 'set-piece',
     title: 'Bolas paradas',
     phase: 'set-piece',
-    kind: 'set-piece',
     positiveActionKeys: ['BPBE', 'GBP'],
     negativeActionKeys: ['BPSE', 'BPME'],
   },
 ] as const;
-const WEIGHTS: Record<
-  Kind,
-  { positive: readonly number[]; negative: readonly number[] }
-> = {
-  offensive: { positive: [4, 3], negative: [2, 1] },
-  defensive: { positive: [4, 3], negative: [2, 1] },
-  'set-piece': { positive: [4, 3], negative: [2, 1] },
-};
+const TEAM_INDEX_WEIGHTS = {
+  positive: [4, 3],
+  negative: [2, 1],
+} as const;
 export function calculateWeightedEfficiency(
   positives: readonly number[],
   negatives: readonly number[],
@@ -127,7 +112,7 @@ export function calculateOffensiveEfficiency(input: {
   return calculateWeightedEfficiency(
     [input.goals, input.shots],
     [input.possessionLosses, input.maintainedPossessions],
-    WEIGHTS.offensive,
+    TEAM_INDEX_WEIGHTS,
   );
 }
 export function calculateDefensiveEfficiency(input: {
@@ -139,7 +124,7 @@ export function calculateDefensiveEfficiency(input: {
   return calculateWeightedEfficiency(
     [input.recoveries, input.interceptions],
     [input.shotsConceded, input.goalsConceded],
-    WEIGHTS.defensive,
+    TEAM_INDEX_WEIGHTS,
   );
 }
 @Injectable()
@@ -195,7 +180,7 @@ export class CoachDashboardService {
       value: calculateWeightedEfficiency(
         config.positiveActionKeys.map(count),
         config.negativeActionKeys.map(count),
-        WEIGHTS[config.kind],
+        TEAM_INDEX_WEIGHTS,
       ),
     };
   }

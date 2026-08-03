@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import styles from "./CoachDashboard.module.scss";
 import { useApi } from "../../hooks/useApi.ts";
-import type { CoachDashboardResponse } from "./index";
+import type { CoachDashboardResponse, Player } from "./index";
 import HeaderDashboard from "../../components/CoachDashboard/HeaderDashboard/HeaderDashboard.tsx";
 import PlayerComparison from "../../components/CoachDashboard/PlayerComparison/PlayerComparison.tsx";
 import PlayersSection from "../../components/CoachDashboard/PlayersSection/PlayersSection.tsx";
@@ -14,9 +14,10 @@ import type { Session, SessionListResponse } from "../Sessions";
 type ViewMode = "team" | "individual" | "compare";
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 const ALL = "all";
+const EMPTY_PLAYERS: Player[] = [];
 const sessionLabel = (session: Session) =>
   session.description?.trim() ||
-  session.type + " — " + session.date.slice(0, 10);
+  `${session.type} — ${session.date.slice(0, 10)}`;
 
 const CoachDashboard = () => {
   const [sessionId, setSessionId] = useState(ALL);
@@ -40,7 +41,7 @@ const CoachDashboard = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("team");
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
   const [nameFilter, setNameFilter] = useState("");
-  const players = useMemo(() => data?.players ?? [], [data?.players]);
+  const players = Array.isArray(data?.players) ? data.players : EMPTY_PLAYERS;
   const filteredPlayers = useMemo(() => {
     const name = nameFilter.trim().toLocaleLowerCase();
     return players.filter(

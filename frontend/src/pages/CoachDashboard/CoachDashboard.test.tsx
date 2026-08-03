@@ -94,6 +94,18 @@ describe("CoachDashboard", () => {
     );
   });
 
+  it("reports malformed players without crashing while filtering", () => {
+    mockedUseApi.mockReturnValue(
+      apiState({ data: { ...dashboardData(), players: {} } }),
+    );
+
+    renderPage();
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "A dashboard recebeu dados inválidos.",
+    );
+  });
+
   it("renders an empty players state", () => {
     mockedUseApi.mockReturnValue(
       apiState({ data: { ...dashboardData(), players: [] } }),
