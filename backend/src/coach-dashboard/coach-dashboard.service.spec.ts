@@ -5,6 +5,7 @@ import {
   calculateOffensiveEfficiency,
   CoachDashboardService,
 } from './coach-dashboard.service';
+import { PlayersService } from '../players/players.service';
 
 const TEAM_ID = 'd62ec1e1-f762-45bd-a1e9-09ba8ef8d461';
 const SESSION_ID = '79fbbbe8-39b1-4b25-bd11-236a0f228cb0';
@@ -33,13 +34,18 @@ const setup = (counts: Record<string, number> = {}) => {
   const teamsRepository = {
     find: jest.fn().mockResolvedValue([{ id: TEAM_ID }]),
   } as unknown as Repository<TeamEntity>;
+  const playersService = {
+    findDashboardPlayers: jest.fn().mockResolvedValue([]),
+  } as unknown as PlayersService;
 
   return {
     queryMocks: { where, andWhere, groupBy, getRawMany },
     service: new CoachDashboardService(
       taggedActionsRepository,
       teamsRepository,
+      playersService,
     ),
+    playersService,
   };
 };
 
@@ -52,7 +58,7 @@ describe('CoachDashboardService efficiencies', () => {
         possessionLosses: 1,
         maintainedPossessions: 0,
       }),
-    ).toBeCloseTo(77.777, 2);
+    ).toBe(77.8);
     expect(
       calculateDefensiveEfficiency({
         recoveries: 1,
@@ -60,7 +66,7 @@ describe('CoachDashboardService efficiencies', () => {
         shotsConceded: 1,
         goalsConceded: 2,
       }),
-    ).toBeCloseTo(63.636, 2);
+    ).toBe(63.6);
     expect(
       calculateDefensiveEfficiency({
         recoveries: 1,
@@ -68,7 +74,7 @@ describe('CoachDashboardService efficiencies', () => {
         shotsConceded: 1,
         goalsConceded: 1,
       }),
-    ).toBeCloseTo(57.142, 2);
+    ).toBe(57.1);
   });
 
   it('distinguishes no actions, only negative actions and only positive actions', () => {
@@ -112,11 +118,11 @@ describe('CoachDashboardService efficiencies', () => {
       maintainedPossessions: 1,
     });
 
-    expect(withoutMaintainedPossession).toBeCloseTo(66.666, 2);
-    expect(withMaintainedPossession).toBeCloseTo(57.142, 2);
+    expect(withoutMaintainedPossession).toBe(66.7);
+    expect(withMaintainedPossession).toBe(57.1);
   });
 
-  it('returns the temporary card-ready test values', async () => {
+  it('builds all cards from real counts without visual data', async () => {
     const { service } = setup({
       GAP: 1,
       FAP: 1,
@@ -128,32 +134,31 @@ describe('CoachDashboardService efficiencies', () => {
       TRP: 1,
       TFS: 1,
       TGT: 1,
+      BPBE: 1,
+      GBP: 1,
+      BPSE: 1,
+      BPME: 2,
     });
 
     const result = await service.getDashboard();
 
-    expect(Array.isArray(result.averageTeamCards)).toBe(true);
     expect(Array.isArray(result.metrics)).toBe(true);
     expect(Array.isArray(result.players)).toBe(true);
     expect(Array.isArray(result.teamIndexes)).toBe(true);
-    expect(typeof result.players[0]?.id).toBe('string');
-    expect(typeof result.players[0]?.name).toBe('string');
-    expect(typeof result.players[0]?.overall).toBe('number');
-    expect(typeof result.players[0]?.indexes).toBe('object');
     expect(
       Object.fromEntries(
         result.teamIndexes.map(({ id, value }) => [id, value]),
       ),
     ).toEqual({
       'positional-attack': 77.8,
-      'playing-out-pressure': 64.3,
-      'fly-goalkeeper': 0,
-      'offensive-transition': 100,
+      'playing-out-pressure': null,
+      'fly-goalkeeper': null,
+      'offensive-transition': null,
       'low-block': 63.6,
-      'variable-defense': 48.2,
-      pressing: 82.5,
+      'variable-defense': null,
+      pressing: null,
       'defensive-transition': 57.1,
-      'set-piece': null,
+      'set-piece': 63.6,
     });
     expect(
       result.teamIndexes.filter(({ phase }) => phase === 'set-piece'),
@@ -162,9 +167,8 @@ describe('CoachDashboardService efficiencies', () => {
         id: 'set-piece',
         title: 'Bolas paradas',
         phase: 'set-piece',
-        value: null,
+        value: 63.6,
         maxValue: 100,
-        trend: 'stable',
       },
     ]);
     expect(result.teamIndexes.map(({ id }) => id)).not.toEqual(
@@ -181,6 +185,7 @@ describe('CoachDashboardService efficiencies', () => {
           (Number.isFinite(value) && value >= 0 && value <= 100),
       ),
     ).toBe(true);
+    expect(JSON.stringify(result)).not.toMatch(/color|gradient|icon|trend/i);
   });
 
   it('applies team, collective-action, session and period filters in one grouped query', async () => {

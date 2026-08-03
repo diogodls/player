@@ -20,3 +20,10 @@ export class PlayerPerformanceDto {
   defensiveActions!: number;
   indexes!: PlayerIndexesDto;
 }
+
+export class DashboardPlayerDto extends PlayerPerformanceDto {
+  id!: string;
+  name!: string;
+  position!: string;
+  overall!: number | null;
+}

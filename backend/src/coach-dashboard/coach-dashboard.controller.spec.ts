@@ -3,7 +3,6 @@ import { CoachDashboardService } from './coach-dashboard.service';
 describe('CoachDashboardController', () => {
   it('delegates the filters to the service and returns its response', async () => {
     const response = {
-      averageTeamCards: [],
       metrics: [],
       players: [],
       teamIndexes: [],

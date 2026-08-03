@@ -17,7 +17,7 @@ describe("CoachDashboard", () => {
     expect(mockedUseApi).toHaveBeenCalledWith("/coach-dashboard", {
       keepPreviousData: false,
     });
-    expect(mockedUseApi).toHaveBeenCalledTimes(1);
+    expect(mockedUseApi).toHaveBeenCalledTimes(2);
     expect(screen.getByText("Ataque posicional")).toBeInTheDocument();
     expect(screen.getByText("77,8%")).toBeInTheDocument();
     expect(screen.getAllByText("Eficiência")).toHaveLength(4);
@@ -75,15 +75,23 @@ describe("CoachDashboard", () => {
     expect(screen.queryByText("0,0%")).not.toBeInTheDocument();
   });
 
-  it.each([
-    ["empty teamIndexes", { ...dashboardData(), teamIndexes: [] }],
-    ["missing teamIndexes", { ...dashboardData(), teamIndexes: undefined }],
-  ])("renders the collective empty state for %s", (_case, data) => {
+  it("renders the collective empty state for an empty list", () => {
+    const data = { ...dashboardData(), teamIndexes: [] };
     mockedUseApi.mockReturnValue(apiState({ data }));
     renderPage();
     expect(
       screen.getByText("Nenhuma eficiência disponível para a equipe."),
     ).toBeInTheDocument();
+  });
+
+  it("reports a malformed response instead of silently hiding it", () => {
+    mockedUseApi.mockReturnValue(
+      apiState({ data: { ...dashboardData(), teamIndexes: undefined } }),
+    );
+    renderPage();
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "A dashboard recebeu dados inválidos.",
+    );
   });
 
   it("renders an empty players state", () => {

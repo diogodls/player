@@ -1,12 +1,12 @@
 import styles from "./PlayerCard.module.scss";
-import type {Player} from "../../../../pages/CoachDashboard";
-import {Link} from "react-router";
+import type { Player } from "../../../../pages/CoachDashboard";
+import { Link } from "react-router";
 
 type PlayerCardProps = {
   player: Player;
 };
 
-const PlayerCard = ({player}: PlayerCardProps) => {
+const PlayerCard = ({ player }: PlayerCardProps) => {
   return (
     <Link to={`/player/${player.id}`} className={styles.card}>
       <div className={styles.header}>
@@ -15,11 +15,9 @@ const PlayerCard = ({player}: PlayerCardProps) => {
       </div>
 
       <div className={styles.overall}>
-        {player.overall}
+        {player.overall ?? "Nenhum dado registrado"}
       </div>
-      <div className={styles.radar}>
-        Click to view radar chart
-      </div>
+      <div className={styles.radar}>Click to view radar chart</div>
 
       <div className={styles.stats}>
         <div className={`${styles.stat} ${styles.off}`}>

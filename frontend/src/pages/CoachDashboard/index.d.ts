@@ -1,19 +1,12 @@
-export type CoachDashboardResponse = Partial<{
-  averageTeamCards: AverageCard[];
-  players: Array<Partial<Player>>;
+export type CoachDashboardResponse = {
+  players: Player[];
   metrics: string[];
   teamIndexes: TeamIndex[];
-}>;
-export type AverageCard = {
-  name: string;
-  color: string;
-  value: string | number;
-  icon: string;
 };
 export type Player = {
   id: string;
   name: string;
-  overall: number;
+  overall: number | null;
   position: string;
   minutes: number;
   defensiveActions: number;
@@ -23,14 +16,12 @@ export type Player = {
   indexes: Indexes;
 };
 export type TeamIndexPhase = "offensive" | "defensive" | "set-piece";
-export type TeamIndexTrend = "up" | "stable" | "down";
 export type TeamIndex = {
   id: string;
   title: string;
   phase: TeamIndexPhase;
   value: number | null;
   maxValue: number;
-  trend: TeamIndexTrend;
 };
 export interface Indexes
   extends GeneralIndexes, OffensiveIndexes, DeffensiveIndexes {}
