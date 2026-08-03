@@ -47,7 +47,7 @@ const TeamIndexCard = ({ index }: IndexCardProps) => {
       <div className={styles.progressTrack} aria-hidden="true">
         <span
           className={`${styles.progressFill} ${styles[phase.className]}`}
-          style={{ width: hasValue ? `${index.value}%` : "0%" }}
+          style={{ width: hasValue ? `${Math.max(0, Math.min(100, (index.value / index.maxValue) * 100))}%` : "0%" }}
         />
       </div>
     </article>
