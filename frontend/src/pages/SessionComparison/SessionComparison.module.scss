@@ -541,37 +541,6 @@
   }
 }
 
-.mockNotice {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(250, 204, 21, 0.28);
-  border-radius: 11px;
-  background: rgba(250, 204, 21, 0.07);
-  color: #fde68a;
-  padding: 11px 13px;
-
-  > svg {
-    font-size: 19px;
-  }
-
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  strong {
-    font-size: 12px;
-  }
-
-  span {
-    color: #d6d3d1;
-    font-size: 11px;
-  }
-}
-
 .metricCards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

@@ -1,160 +1,60 @@
-# README.pt-BR.md (Português)
-
 # Player
 
-Plataforma web para análise de desempenho de atletas e sessões de futsal, desenvolvida em parceria com a equipe UFSM Futsal.
-
-Construída com React, TypeScript e Vite, a aplicação oferece dashboards, comparação entre atletas, análise de sessões e fluxos de tagueamento de ações para treinadores e analistas.
-
-O projeto será validado na prática junto à equipe da UFSM Futsal, formada majoritariamente por atletas universitários que competem no mais alto nível estadual de futsal profissional, na Série Ouro do futsal gaúcho. A equipe também é tetracampeã dos Jogos Universitários Gaúchos (JUGS), reforçando o contexto competitivo e real de utilização da plataforma.
-
----
-
-## Funcionalidades
-
-* Dashboard de desempenho de atletas
-* Gerenciamento de treinos e jogos
-* Comparação de atletas com gráfico radar
-* Resumo e estatísticas de sessões
-* Análise individual baseada em vídeo
-* Fluxo de tagueamento de ações
-* Filtros por posição e ações
-* Sistema de notificações toast
-
----
+Plataforma web para análise de desempenho de atletas e sessões de futsal, composta por frontend React/Vite, backend NestJS e persistência PostgreSQL.
 
 ## Tecnologias
 
-* React 19
-* TypeScript
-* Vite
-* React Router
-* Axios
-* SWR
-* Sass / CSS Modules
-* Material UI & MUI X Charts
-* Font Awesome
-* rc-select
-* react-cookie
-* json-server
-* Docker & Docker Compose
+- React 19, TypeScript e Vite
+- NestJS e TypeORM
+- PostgreSQL 16
+- Docker e Docker Compose
 
----
+## Execução local
 
-## Arquitetura
+Requisitos: Node.js 20+, npm, PostgreSQL 16 e Docker para o ambiente em contêineres.
 
-A aplicação segue uma arquitetura frontend modular baseada em:
-
-* React + TypeScript
-* Componentes organizados por feature
-* SWR para gerenciamento de estado servidor
-* Axios para requisições HTTP
-* Context API para estados compartilhados
-* CSS Modules com Sass
-
----
-
-## Estrutura do Projeto
-
-```text
-src
-├── assets
-├── components
-├── contexts
-├── hooks
-├── pages
-├── utils
-└── constants
-```
-
----
-
-## Executando Localmente
-
-### Pré-requisitos
-
-* Node.js 20+
-* npm
-
-### Instalação
+O frontend consome a API NestJS. Use `VITE_BACKEND_URL` quando a API não estiver disponível em `http://localhost:3000`.
 
 ```bash
+cd backend
 npm install
+npm run start:dev
 ```
 
-### Iniciar mock
-
 ```bash
-npm run mock
-```
-
-### Iniciar frontend
-
-```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-Frontend:
-
-```text
-http://localhost:5173
-```
-
-Mock API:
-
-```text
-http://localhost:3001
-```
-
----
-
 ## Docker
 
-Inicie todo o ambiente com:
+Inicie PostgreSQL, backend e frontend:
 
 ```bash
-docker compose up
+docker compose up -d --build
 ```
 
-Os dados extras para demonstrar a comparação de sessões são opcionais. Com o
-banco em execução, carregue-os explicitamente com:
+Serviços:
+
+- PostgreSQL: `localhost:5432`
+- Backend NestJS: `http://localhost:3000`
+- Frontend React: `http://localhost:5173`
+
+O arquivo `backend/seeds.sql` é inicializado com o banco e contém somente catálogos estruturais necessários e a equipe base. O arquivo `backend/seeds-comparison.sql` é uma demonstração manual e não é montado nem executado pelo Docker Compose.
+
+## Validação
 
 ```bash
-docker compose exec postgres psql -U player -d player -f /demo-data/seeds-comparison.sql
+cd frontend
+npm run build
+npm test
+
+cd ../backend
+npm run build
+npm test -- --runInBand
+
+cd ..
+docker compose config
+docker compose ps
 ```
-
----
-
-## Principais Rotas
-
-| Rota                                | Descrição              |
-| ----------------------------------- | ---------------------- |
-| `/`                                 | Página inicial         |
-| `/coach-dashboard`                  | Dashboard do treinador |
-| `/player/:id`                       | Visualização do atleta |
-| `/sessions`                         | Lista de sessões       |
-| `/sessions/:id`                     | Detalhes da sessão     |
-| `/sessions/:id/analysis/individual` | Análise individual     |
-
----
-
-## Notas de Desenvolvimento
-
-* O projeto utiliza `json-server` como backend mock local.
-* Os fluxos do frontend funcionam com dados mockados.
-* A persistência real com backend será integrada futuramente.
-* Algumas funcionalidades exibidas na interface ainda estão em desenvolvimento.
-
----
-
-## Roadmap
-
-* Integração com backend real
-* Persistência de sessões e ações
-* Fluxo de análise coletiva
-* Sincronização de timestamp do vídeo
-* Testes automatizados
-* Melhor tratamento de loading e erros
-* Configuração via variáveis de ambiente
-
----
