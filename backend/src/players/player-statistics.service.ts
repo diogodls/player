@@ -86,6 +86,7 @@ export class PlayerStatisticsService {
   async findByTeamId(
     teamId: string,
     sessionId?: string,
+    period?: { startDate?: string; endDate?: string },
   ): Promise<Map<string, PlayerPerformanceDto>> {
     const query = this.taggedActionsRepository
       .createQueryBuilder('taggedAction')
@@ -114,6 +115,12 @@ export class PlayerStatisticsService {
     if (sessionId) {
       query.andWhere('session.id = :sessionId', { sessionId });
     }
+    if (period?.startDate)
+      query.andWhere('session.data >= :startDate', {
+        startDate: period.startDate,
+      });
+    if (period?.endDate)
+      query.andWhere('session.data <= :endDate', { endDate: period.endDate });
     const aggregateRows = await query
       .groupBy('taggedAction.jogadorId')
       .getRawMany<RawPlayerActionAggregate>();
@@ -141,6 +148,14 @@ export class PlayerStatisticsService {
     if (sessionId) {
       courtEventsQuery.andWhere('session.id = :sessionId', { sessionId });
     }
+    if (period?.startDate)
+      courtEventsQuery.andWhere('session.data >= :startDate', {
+        startDate: period.startDate,
+      });
+    if (period?.endDate)
+      courtEventsQuery.andWhere('session.data <= :endDate', {
+        endDate: period.endDate,
+      });
     const courtEventRows = await courtEventsQuery
       .orderBy('taggedAction.timestampSegundos', 'ASC')
       .addOrderBy('taggedAction.id', 'ASC')

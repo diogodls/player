@@ -8,7 +8,10 @@ import { ILike, IsNull, Repository } from 'typeorm';
 import { PlayerEntity, TeamEntity } from '../entities';
 import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerListResponseDto } from './dto/player-list-response.dto';
-import { PlayerPerformanceDto } from './dto/player-performance.dto';
+import {
+  DashboardPlayerDto,
+  PlayerPerformanceDto,
+} from './dto/player-performance.dto';
 import { PlayerDto } from './dto/player.dto';
 import type {
   PlayerIndexKey,
@@ -100,6 +103,42 @@ export class PlayersService {
       player.equipeId,
     );
     return this.toResponse(player, performances.get(player.id));
+  }
+
+  async findDashboardPlayers(
+    teamId: string,
+    filters: { sessionId?: string; startDate?: string; endDate?: string },
+  ): Promise<DashboardPlayerDto[]> {
+    const players = await this.playersRepository.find({
+      where: { equipeId: teamId, deletedAt: IsNull() },
+      relations: { posicao: true },
+      order: { nome: 'ASC' },
+    });
+    if (players.length === 0) return [];
+    const performances = await this.playerStatisticsService.findByTeamId(
+      teamId,
+      filters.sessionId,
+      { startDate: filters.startDate, endDate: filters.endDate },
+    );
+    const overallRanking = this.buildOverallRanking(
+      players,
+      performances,
+      PlayersService.INDEX_RANKING_RULES.overall,
+    );
+    const overallByPlayer = new Map(
+      overallRanking.ranking.map(({ player, value }) => [player.id, value]),
+    );
+    return players.map((player) => {
+      if (!player.posicao)
+        throw new Error('Relação de posição do jogador não foi carregada');
+      return {
+        id: player.id,
+        name: player.nome,
+        position: player.posicao.nome,
+        overall: overallByPlayer.get(player.id) ?? null,
+        ...(performances.get(player.id) ?? emptyPlayerPerformance()),
+      };
+    });
   }
 
   findRankingOptions(): PlayerRankingOptionDto[] {

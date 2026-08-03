@@ -14,6 +14,7 @@ const TEAM_ID = '00000000-0000-0000-0000-000000000001';
 const PLAYER_ID = '00000000-0000-0000-0000-000000000201';
 const INDIVIDUAL_ACTION_ID = '00000000-0000-0000-0000-000000000411';
 const TEAM_ACTION_ID = '00000000-0000-0000-0000-000000000420';
+const NEW_TEAM_ACTION_ID = '00000000-0000-0000-0000-000000000601';
 
 describe('TaggedActionsService', () => {
   it('validates and saves the complete batch in one transaction', async () => {
@@ -100,6 +101,33 @@ describe('TaggedActionsService', () => {
       }),
     ).rejects.toThrow('Ação de equipe não deve possuir um jogador');
   });
+
+  it('saves a new team action without a player', async () => {
+    const setup = buildService({
+      catalogActions: [teamCatalogAction(NEW_TEAM_ACTION_ID)],
+    });
+    await setup.service.createForSession(SESSION_ID, {
+      actions: [action(NEW_TEAM_ACTION_ID, null, 45)],
+    });
+    expect(setup.save).toHaveBeenCalledWith([
+      expect.objectContaining({
+        acaoCatalogoId: NEW_TEAM_ACTION_ID,
+        jogadorId: null,
+      }),
+    ]);
+  });
+
+  it('rejects a new team action with a player', async () => {
+    const setup = buildService({
+      catalogActions: [teamCatalogAction(NEW_TEAM_ACTION_ID)],
+    });
+    await expect(
+      setup.service.createForSession(SESSION_ID, {
+        actions: [action(NEW_TEAM_ACTION_ID, PLAYER_ID, 45)],
+      }),
+    ).rejects.toThrow('Ação de equipe não deve possuir um jogador');
+    expect(setup.save).not.toHaveBeenCalled();
+  });
 });
 
 function dto(): CreateSessionActionsDto {
@@ -121,9 +149,9 @@ function individualCatalogAction(): CatalogActionEntity {
   } as CatalogActionEntity;
 }
 
-function teamCatalogAction(): CatalogActionEntity {
+function teamCatalogAction(id = TEAM_ACTION_ID): CatalogActionEntity {
   return {
-    id: TEAM_ACTION_ID,
+    id,
     categoriaAcao: { tipoAnaliseId: 2 },
   } as CatalogActionEntity;
 }

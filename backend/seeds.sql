@@ -118,6 +118,35 @@ INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla) VALU
   ('00000000-0000-0000-0000-000000000441', '00000000-0000-0000-0000-000000000311', 3, 'Saiu de quadra', 'SAIU')
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO acoes_catalogo (id, categoria_acao_id, impacto_id, nome, sigla, ordem) VALUES
+  ('00000000-0000-0000-0000-000000000601', '00000000-0000-0000-0000-000000000306', 1, 'Finalização em saída de pressão', 'FSP', 2),
+  ('00000000-0000-0000-0000-000000000602', '00000000-0000-0000-0000-000000000306', 1, 'Posse mantida em saída de pressão', 'PMSP', 3),
+  ('00000000-0000-0000-0000-000000000603', '00000000-0000-0000-0000-000000000306', 1, 'Finalização em ataque posicional', 'FAP', 6),
+  ('00000000-0000-0000-0000-000000000604', '00000000-0000-0000-0000-000000000306', 1, 'Posse mantida ou progressão em ataque posicional', 'PMAP', 7),
+  ('00000000-0000-0000-0000-000000000605', '00000000-0000-0000-0000-000000000306', 1, 'Finalização com goleiro-linha', 'FGL', 10),
+  ('00000000-0000-0000-0000-000000000606', '00000000-0000-0000-0000-000000000306', 1, 'Posse mantida ou progressão com goleiro-linha', 'PMGL', 11),
+  ('00000000-0000-0000-0000-000000000607', '00000000-0000-0000-0000-000000000307', 1, 'Finalização em transição ofensiva', 'FT', 2),
+  ('00000000-0000-0000-0000-000000000608', '00000000-0000-0000-0000-000000000307', 1, 'Posse mantida ou progressão em transição ofensiva', 'PMT', 3),
+  ('00000000-0000-0000-0000-000000000609', '00000000-0000-0000-0000-000000000308', 1, 'Jogada interceptada em marcação baixa', 'MBJI', 2),
+  ('00000000-0000-0000-0000-000000000610', '00000000-0000-0000-0000-000000000308', 2, 'Finalização sofrida em marcação baixa', 'MBFS', 3),
+  ('00000000-0000-0000-0000-000000000611', '00000000-0000-0000-0000-000000000308', 1, 'Jogada interceptada em marcação variando', 'VJI', 6),
+  ('00000000-0000-0000-0000-000000000612', '00000000-0000-0000-0000-000000000308', 2, 'Finalização sofrida em marcação variando', 'VFS', 7),
+  ('00000000-0000-0000-0000-000000000613', '00000000-0000-0000-0000-000000000308', 1, 'Jogada interceptada em marcação pressão', 'PJI', 10),
+  ('00000000-0000-0000-0000-000000000614', '00000000-0000-0000-0000-000000000308', 2, 'Finalização sofrida em marcação pressão', 'PFS', 11),
+  ('00000000-0000-0000-0000-000000000615', '00000000-0000-0000-0000-000000000309', 2, 'Finalização sofrida em transição defensiva', 'TFS', 2)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE acoes_catalogo AS acao SET ordem = metadata.ordem
+FROM (VALUES
+  ('GSP', 1), ('PPSP', 4), ('GAP', 5), ('PPAP', 8), ('GGL', 9), ('PPGL', 12),
+  ('GT', 1), ('PPT', 4),
+  ('MBRP', 1), ('MBGT', 4), ('VRP', 5), ('VGT', 8), ('PRP', 9), ('PRGT', 12),
+  ('TRP', 1), ('TGT', 3)
+) AS metadata(sigla, ordem), categorias_acao AS categoria
+WHERE categoria.id = acao.categoria_acao_id
+  AND categoria.tipo_analise_id = 2
+  AND acao.sigla = metadata.sigla;
+
 INSERT INTO acoes_taggeadas (id, sessao_id, acao_catalogo_id, jogador_id, timestamp_segundos) VALUES
   ('00000000-0000-0000-0000-000000000501', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000418', '00000000-0000-0000-0000-000000000201', 24),
   ('00000000-0000-0000-0000-000000000502', '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000419', '00000000-0000-0000-0000-000000000201', 63),

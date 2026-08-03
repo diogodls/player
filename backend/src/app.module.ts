@@ -21,6 +21,7 @@ import { PlayersModule } from './players/players.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
+import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
     SessionsModule,
     CatalogModule,
     TaggedActionsModule,
+    CoachDashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

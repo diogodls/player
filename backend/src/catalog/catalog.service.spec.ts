@@ -128,6 +128,96 @@ describe('CatalogService', () => {
       ],
     });
   });
+
+  it('returns all 35 team actions with database category, impact and order', async () => {
+    const definitions: ReadonlyArray<
+      readonly [string, string, readonly string[]]
+    > = [
+      ['SET_PIECE', 'Bola parada', ['BPSE:N', 'BPME:N', 'BPBE:P', 'GBP:P']],
+      [
+        'OFFENSIVE_ORGANIZATION',
+        'Organização ofensiva',
+        [
+          'GSP:P',
+          'FSP:P',
+          'PMSP:P',
+          'PPSP:N',
+          'GAP:P',
+          'FAP:P',
+          'PMAP:P',
+          'PPAP:N',
+          'GGL:P',
+          'FGL:P',
+          'PMGL:P',
+          'PPGL:N',
+        ],
+      ],
+      [
+        'OFFENSIVE_TRANSITION',
+        'Transição ofensiva',
+        ['GT:P', 'FT:P', 'PMT:P', 'PPT:N'],
+      ],
+      [
+        'DEFENSIVE_ORGANIZATION',
+        'Organização defensiva',
+        [
+          'MBRP:P',
+          'MBJI:P',
+          'MBFS:N',
+          'MBGT:N',
+          'VRP:P',
+          'VJI:P',
+          'VFS:N',
+          'VGT:N',
+          'PRP:P',
+          'PJI:P',
+          'PFS:N',
+          'PRGT:N',
+        ],
+      ],
+      [
+        'DEFENSIVE_TRANSITION',
+        'Transição defensiva',
+        ['TRP:P', 'TFS:N', 'TGT:N'],
+      ],
+    ];
+    find.mockResolvedValue(
+      definitions.map(([key, title, entries], groupIndex) =>
+        category(
+          key,
+          title,
+          groupIndex + 1,
+          entries.map((entry, actionIndex) => {
+            const [key, impact] = entry.split(':');
+            return action(
+              key,
+              key,
+              impact === 'P' ? 'Positiva' : 'Negativa',
+              actionIndex + 1,
+            );
+          }),
+        ),
+      ),
+    );
+
+    const result = await service.getTeamCatalog();
+    expect(result.groups.map((group) => group.key)).toEqual(
+      definitions.map(([key]) => key),
+    );
+    expect(result.groups.flatMap((group) => group.actions)).toHaveLength(35);
+    definitions.forEach(([key, , entries], groupIndex) => {
+      const group = result.groups[groupIndex];
+      expect(group.key).toBe(key);
+      expect(group.actions.map((item) => item.key)).toEqual(
+        entries.map((entry) => entry.split(':')[0]),
+      );
+      expect(group.actions.map((item) => item.impact)).toEqual(
+        entries.map((entry) =>
+          entry.endsWith(':P') ? 'POSITIVE' : 'NEGATIVE',
+        ),
+      );
+    });
+  });
 });
 
 function category(

@@ -31,7 +31,7 @@ const TeamData = ({ teamRelevantIndexes }: TeamAnalysisProps) => {
     return (
       <section className={styles.wrapper}>
         <div className={styles.emptyState}>
-          Nenhum índice disponível para a equipe.
+          Nenhuma eficiência disponível para a equipe.
         </div>
       </section>
     );
