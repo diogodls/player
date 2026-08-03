@@ -1,5 +1,8 @@
-import type { ActionTagged } from '../pages/Analysis';
-import { backendApi } from './api';
+import type { ActionTagged } from "../pages/Analysis";
+import { backendApi } from "./api";
+
+const POSTGRES_ID_PATTERN =
+  /^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$/;
 
 export type PersistedSessionAction = {
   id: string;
@@ -15,17 +18,31 @@ export async function persistSessionActions(
 ): Promise<PersistedSessionAction[]> {
   const payload = {
     actions: actions.map((action) => {
-      if (!action.catalogActionId) {
-        throw new Error('Ação sem identificador do catálogo');
+      if (
+        !action.catalogActionId ||
+        !POSTGRES_ID_PATTERN.test(action.catalogActionId)
+      ) {
+        throw new Error("Identificador da ação do catálogo inválido");
       }
       const timestampSeconds = Math.floor(Number(action.time));
       if (!Number.isFinite(timestampSeconds) || timestampSeconds < 0) {
-        throw new Error('Ação com tempo de vídeo inválido');
+        throw new Error("Ação com tempo de vídeo inválido");
+      }
+
+      const playerId = action.player ? String(action.player.id) : null;
+      if (action.type === "individual" && !playerId) {
+        throw new Error("Ação individual deve possuir um jogador");
+      }
+      if (playerId && !POSTGRES_ID_PATTERN.test(playerId)) {
+        throw new Error("Identificador do jogador inválido");
+      }
+      if (action.type === "team" && playerId) {
+        throw new Error("Ação coletiva não deve possuir um jogador");
       }
 
       return {
         catalogActionId: action.catalogActionId,
-        playerId: action.player ? String(action.player.id) : null,
+        playerId,
         timestampSeconds,
       };
     }),
