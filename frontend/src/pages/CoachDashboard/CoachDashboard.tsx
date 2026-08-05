@@ -10,6 +10,8 @@ import TeamData from "../../components/CoachDashboard/TeamData/TeamData.tsx";
 import PlayersFilter from "../../components/CoachDashboard/PlayersFilter/PlayersFilter.tsx";
 import Select from "../../components/elements/Select/Select.tsx";
 import type { Session, SessionListResponse } from "../Sessions";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 
 type ViewMode = "team" | "individual" | "compare";
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
@@ -63,40 +65,56 @@ const CoachDashboard = () => {
 
   return (
     <div className={styles.container}>
-      <section aria-label="Filtros da dashboard">
-        <label htmlFor="coach-session">Sessão</label>
-        <Select
-          id="coach-session"
-          value={sessionId}
-          onChange={(value) => setSessionId(value || ALL)}
-          options={[
-            { value: ALL, label: "Todas as sessões" },
-            ...(sessionsResponse?.data ?? []).map((session) => ({
-              value: session.id,
-              label: sessionLabel(session),
-            })),
-          ]}
-          disabled={Boolean(sessionsError)}
-        />
-        <label htmlFor="coach-start-date">Data inicial</label>
-        <input
-          id="coach-start-date"
-          type="date"
-          value={startDate}
-          onChange={(event) => setStartDate(event.target.value)}
-        />
-        <label htmlFor="coach-end-date">Data final</label>
-        <input
-          id="coach-end-date"
-          type="date"
-          value={endDate}
-          onChange={(event) => setEndDate(event.target.value)}
-        />
-        <button type="button" onClick={clearFilters}>
-          Limpar filtros
-        </button>
+      <section className={styles.filterCard} aria-label="Filtros da dashboard">
+        <div className={styles.filterHeader}>
+          <FontAwesomeIcon className={styles.filterIcon} icon={faFilter} />
+          <div>
+            <h2>Filtros da análise</h2>
+            <p>Selecione uma sessão específica ou delimite um período.</p>
+          </div>
+        </div>
+
+        <div className={styles.filterFields}>
+          <Select
+            id="coach-session"
+            label="Sessão"
+            value={sessionId}
+            onChange={(value) => setSessionId(value || ALL)}
+            options={[
+              { value: ALL, label: "Todas as sessões" },
+              ...(sessionsResponse?.data ?? []).map((session) => ({
+                value: session.id,
+                label: sessionLabel(session),
+              })),
+            ]}
+            disabled={Boolean(sessionsError)}
+          />
+          <label className={styles.dateField} htmlFor="coach-start-date">
+            <span>Data inicial</span>
+            <input
+              id="coach-start-date"
+              type="date"
+              value={startDate}
+              onChange={(event) => setStartDate(event.target.value)}
+            />
+          </label>
+          <label className={styles.dateField} htmlFor="coach-end-date">
+            <span>Data final</span>
+            <input
+              id="coach-end-date"
+              type="date"
+              value={endDate}
+              onChange={(event) => setEndDate(event.target.value)}
+            />
+          </label>
+          <button className={styles.clearButton} type="button" onClick={clearFilters}>
+            Limpar filtros
+          </button>
+        </div>
         {invalidPeriod && (
-          <div role="alert">A data inicial deve ser anterior à data final.</div>
+          <div className={styles.filterError} role="alert">
+            A data inicial deve ser anterior à data final.
+          </div>
         )}
       </section>
       {isLoading && (
