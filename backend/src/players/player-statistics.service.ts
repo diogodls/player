@@ -5,6 +5,7 @@ import { TaggedActionEntity } from '../entities';
 import { PlayerPerformanceDto } from './dto/player-performance.dto';
 
 const PLAYERS_ON_COURT = 4;
+const GAME_MINUTES = 40;
 export const PLAYER_ENTERED_COURT_CODE = 'ENTROU';
 export const PLAYER_LEFT_COURT_CODE = 'SAIU';
 
@@ -310,8 +311,9 @@ function calculatePerformance(
   const goalParticipations = actions.GM + actions.ASS + actions.AD;
   const offensiveInfluence = actions.GM + actions.ASS + actions.AD + actions.CC;
   const defensiveInfluence = actions.RB + actions.DIA;
-  const pgj = divide(goalParticipations, minutes);
-  const gtj = divide(goalsTaken, minutes);
+  const equivalentGames = divide(minutes, GAME_MINUTES);
+  const pgj = divide(goalParticipations, equivalentGames);
+  const gtj = divide(goalsTaken + actions.GP, equivalentGames);
 
   return {
     minutes: round(minutes),
@@ -433,7 +435,7 @@ function toPlayerCourtEvent(row: RawPlayerCourtEvent): PlayerCourtEvent {
 function atdBase(aggregate: PlayerActionAggregate) {
   return divide(
     aggregate.actions.PP + aggregate.actions['GS TO'],
-    minutesFor(aggregate),
+    divide(minutesFor(aggregate), GAME_MINUTES),
   );
 }
 
@@ -441,7 +443,7 @@ function dtoBase(aggregate: PlayerActionAggregate) {
   return divide(
     (2 * aggregate.actions.RB + aggregate.actions.DIA) / 3 +
       aggregate.actions['Gol TO'],
-    minutesFor(aggregate),
+    divide(minutesFor(aggregate), GAME_MINUTES),
   );
 }
 

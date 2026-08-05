@@ -24,12 +24,49 @@ describe('calculateSessionPlayerPerformances', () => {
 
     expect(performance?.minutes).toBe(20);
     expect(performance?.offensiveActions).toBe(2);
-    expect(performance?.indexes.pgj).toBe(0.1);
+    expect(performance?.indexes.pgj).toBe(4);
     expect(performance?.indexes.tio).toBe(25);
   });
 });
 
 describe('calculatePlayerPerformances', () => {
+  it('normalizes PGJ, GTJ and RADJ by equivalent 40-minute games', () => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 2400, {
+        'GS TO': 2,
+        GM: 1,
+      }),
+    ]).get('player-1');
+
+    expect(performance?.indexes.pgj).toBe(1);
+    expect(performance?.indexes.gtj).toBe(2);
+    expect(performance?.indexes.radj).toBe(-1);
+  });
+
+  it('includes GP in the normalized GTJ numerator', () => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 2400, { GP: 1 }),
+    ]).get('player-1');
+
+    expect(performance?.goalsTaken).toBe(0);
+    expect(performance?.indexes.gtj).toBe(1);
+    expect(performance?.indexes.radj).toBe(-1);
+  });
+
+  it('uses equivalent 40-minute games in ATD-base and DTO-base', () => {
+    const performances = calculatePlayerPerformances([
+      aggregate('player-1', 2400, {
+        'Gol TO': 1,
+        PP: 2,
+      }),
+      aggregate('player-2', 2400),
+    ]);
+
+    expect(performances.get('player-1')?.indexes.atd).toBe(-1);
+    expect(performances.get('player-2')?.indexes.atd).toBe(1);
+    expect(performances.get('player-1')?.indexes.dto).toBe(-0.5);
+    expect(performances.get('player-2')?.indexes.dto).toBe(0.5);
+  });
   it('calculates cumulative metrics and every player index', () => {
     const performances = calculatePlayerPerformances([
       aggregate('player-1', 4800, {
@@ -67,15 +104,15 @@ describe('calculatePlayerPerformances', () => {
       offensiveActions: 8,
       defensiveActions: 11,
       indexes: {
-        radj: 0.03,
+        radj: 0.5,
         goalsRelations: 4.5,
         actionsRelations: 3.75,
-        atd: 0.02,
-        dto: -0.04,
-        pgj: 0.05,
+        atd: 0.75,
+        dto: -1.75,
+        pgj: 2,
         ic: 3,
         tio: 25,
-        gtj: 0.03,
+        gtj: 1.5,
         rf: 7.5,
         tid: 30.68,
       },
@@ -87,15 +124,15 @@ describe('calculatePlayerPerformances', () => {
       offensiveActions: 4,
       defensiveActions: 3,
       indexes: {
-        radj: 0,
+        radj: -1,
         goalsRelations: 1.5,
         actionsRelations: 2.5,
-        atd: -0.02,
-        dto: 0.04,
-        pgj: 0.05,
+        atd: -0.75,
+        dto: 1.75,
+        pgj: 2,
         ic: 3,
         tio: 25,
-        gtj: 0.05,
+        gtj: 3,
         rf: 3,
         tid: 13.64,
       },
@@ -108,7 +145,7 @@ describe('calculatePlayerPerformances', () => {
     ]).get('player-1');
 
     expect(performance?.minutes).toBe(120);
-    expect(performance?.indexes.pgj).toBe(0.01);
+    expect(performance?.indexes.pgj).toBe(0.33);
   });
 
   it('returns zero for indexes with zero denominators', () => {
@@ -231,7 +268,7 @@ describe('PlayerStatisticsService', () => {
     const performance = performances.get('player-1');
     expect(performance?.minutes).toBe(2);
     expect(performance?.offensiveActions).toBe(3);
-    expect(performance?.indexes.pgj).toBe(1.5);
+    expect(performance?.indexes.pgj).toBe(60);
   });
 });
 
