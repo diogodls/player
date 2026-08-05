@@ -2,10 +2,11 @@ import { validate } from 'class-validator';
 import { CreateTaggedActionDto } from './create-tagged-action.dto';
 
 const CATALOG_ACTION_ID = '00000000-0000-0000-0000-000000000418';
-const PLAYER_ID = '00000000-0000-0000-0000-000000000201';
+// Active player read from PostgreSQL's jogadores table.
+const PLAYER_ID = '00000000-0000-0000-0000-000000000202';
 
 describe('CreateTaggedActionDto', () => {
-  it('accepts canonical PostgreSQL identifiers without requiring a UUID version', async () => {
+  it('accepts a real PostgreSQL player id without requiring a UUID version', async () => {
     const dto = Object.assign(new CreateTaggedActionDto(), {
       catalogActionId: CATALOG_ACTION_ID,
       playerId: PLAYER_ID,
