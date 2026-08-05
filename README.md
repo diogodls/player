@@ -41,7 +41,6 @@ Services:
 - NestJS backend: `http://localhost:3000`
 - React frontend: `http://localhost:5173`
 
-`backend/seeds.sql` is initialized with the database and contains only required structural catalogs and the base team. `backend/seeds-comparison.sql` is a manual demonstration file and is not mounted or executed by Docker Compose.
 
 ## Validation
 
