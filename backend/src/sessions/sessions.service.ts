@@ -35,6 +35,7 @@ import {
 } from './dto/session-comparison-response.dto';
 import { SessionListResponseDto } from './dto/session-list-response.dto';
 import { SessionDto } from './dto/session.dto';
+import { UpdateSessionDto } from './dto/update-session.dto';
 import { SessionResponseDto } from './dto/session-response.dto';
 import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import {
@@ -301,19 +302,24 @@ export class SessionsService {
     return this.findOne(savedSession.id);
   }
 
-  async update(id: string, dto: SessionDto): Promise<SessionResponseDto> {
+  async update(id: string, dto: UpdateSessionDto): Promise<SessionResponseDto> {
     if (dto.id !== id) {
       throw new BadRequestException(
         'Id da sessão deve ser igual ao identificador da rota',
       );
     }
 
+    await this.findEntity(id);
     await this.sessionsRepository.update(id, {
-      sessionTypeId: dto.typeId,
-      sessionLocationId: dto.locationId,
-      sessionCourtSizeId: dto.courtSizeId,
-      data: new Date(dto.date),
-      descricao: dto.description ?? null,
+      ...(dto.typeId !== undefined ? { sessionTypeId: dto.typeId } : {}),
+      ...(dto.locationId !== undefined
+        ? { sessionLocationId: dto.locationId }
+        : {}),
+      ...(dto.courtSizeId !== undefined
+        ? { sessionCourtSizeId: dto.courtSizeId }
+        : {}),
+      ...(dto.date !== undefined ? { data: new Date(dto.date) } : {}),
+      ...(dto.description !== undefined ? { descricao: dto.description } : {}),
     });
     return this.findOne(id);
   }

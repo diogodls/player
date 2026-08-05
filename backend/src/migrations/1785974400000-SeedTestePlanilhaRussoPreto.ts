@@ -82,7 +82,7 @@ export class SeedTestePlanilhaRussoPreto1785974400000 implements MigrationInterf
           (id, equipe_id, session_type_id, session_location_id,
            session_court_size_id, data, descricao)
         VALUES
-          ('70000000-0000-0000-0000-000000000010', equipe_uuid, tipo_id,
+          ('70000000-0000-4000-8000-000000000010', equipe_uuid, tipo_id,
            local_id, quadra_id, DATE '2026-08-05', 'Teste planilha Russo Preto')
         ON CONFLICT (id) DO UPDATE SET
           equipe_id = EXCLUDED.equipe_id,
@@ -154,7 +154,7 @@ export class SeedTestePlanilhaRussoPreto1785974400000 implements MigrationInterf
           'teste-planilha-russo-preto:' || jogador_id::text || ':' ||
           sigla || ':' || ocorrencia::text
         )::uuid,
-        '70000000-0000-0000-0000-000000000010', acao_id, jogador_id,
+        '70000000-0000-4000-8000-000000000010', acao_id, jogador_id,
         instante * 5
       FROM preparados
       ON CONFLICT (id) DO UPDATE SET
@@ -167,7 +167,7 @@ export class SeedTestePlanilhaRussoPreto1785974400000 implements MigrationInterf
     await queryRunner.query(`
       INSERT INTO acoes_taggeadas
         (id, sessao_id, acao_catalogo_id, jogador_id, timestamp_segundos)
-      SELECT evento.id, '70000000-0000-0000-0000-000000000010', acao.id,
+      SELECT evento.id, '70000000-0000-4000-8000-000000000010', acao.id,
         evento.jogador_id, evento.timestamp_segundos
       FROM (VALUES
         ('70000000-0000-0000-0000-000000000101'::uuid, '70000000-0000-4000-8000-000000000003'::uuid, 'ENTROU', 0),
@@ -196,11 +196,11 @@ export class SeedTestePlanilhaRussoPreto1785974400000 implements MigrationInterf
   async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       DELETE FROM acoes_taggeadas
-      WHERE sessao_id = '70000000-0000-0000-0000-000000000010'
+      WHERE sessao_id = '70000000-0000-4000-8000-000000000010'
     `);
     await queryRunner.query(`
       DELETE FROM sessoes
-      WHERE id = '70000000-0000-0000-0000-000000000010'
+      WHERE id = '70000000-0000-4000-8000-000000000010'
     `);
     await queryRunner.query(`
       DELETE FROM jogadores

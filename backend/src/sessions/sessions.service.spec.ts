@@ -105,7 +105,10 @@ describe('SessionsService id validation', () => {
 
   it('rejects an update when body and route ids differ', async () => {
     await expect(
-      service.update(SESSION_ID, buildSessionDto(OTHER_SESSION_ID)),
+      service.update(SESSION_ID, {
+        ...buildSessionDto(OTHER_SESSION_ID),
+        id: OTHER_SESSION_ID,
+      }),
     ).rejects.toThrow(BadRequestException);
   });
 
