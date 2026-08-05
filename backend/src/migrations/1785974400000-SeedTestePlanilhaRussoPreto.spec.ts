@@ -1,4 +1,4 @@
-﻿import { QueryRunner } from 'typeorm';
+import { QueryRunner } from 'typeorm';
 import { SeedTestePlanilhaRussoPreto1785974400000 } from './1785974400000-SeedTestePlanilhaRussoPreto';
 
 describe('SeedTestePlanilhaRussoPreto migration', () => {
@@ -37,10 +37,10 @@ describe('SeedTestePlanilhaRussoPreto migration', () => {
     const eventSql = query.mock.calls[1][0] as string;
 
     const expectedTotals: Record<string, number> = {
-      '70000000-0000-0000-0000-000000000001': 18,
-      '70000000-0000-0000-0000-000000000002': 45,
-      '70000000-0000-0000-0000-000000000003': 31,
-      '70000000-0000-0000-0000-000000000004': 32,
+      '70000000-0000-4000-8000-000000000001': 18,
+      '70000000-0000-4000-8000-000000000002': 45,
+      '70000000-0000-4000-8000-000000000003': 31,
+      '70000000-0000-4000-8000-000000000004': 32,
     };
     for (const [playerId, total] of Object.entries(expectedTotals)) {
       const quantities = [
