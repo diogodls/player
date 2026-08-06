@@ -28,11 +28,16 @@ const INDEX_KEYS: PlayerIndexKey[] = [
   "tid",
 ];
 
-function normalizedBarWidth(value: number, values: number[]) {
+function normalizedBarWidth(
+  value: number,
+  values: number[],
+  direction: "higher" | "lower" | "neutral",
+) {
   const minimum = Math.min(...values);
   const maximum = Math.max(...values);
   if (maximum === minimum) return 100;
-  return ((value - minimum) / (maximum - minimum)) * 100;
+  const normalized = ((value - minimum) / (maximum - minimum)) * 100;
+  return direction === "lower" ? 100 - normalized : normalized;
 }
 
 const ComparativePlayerInfos = ({
@@ -107,7 +112,11 @@ const ComparativePlayerInfos = ({
                               className={styles.color}
                               style={{
                                 background: PLAYER_COLORS[playerIndex],
-                                width: `${normalizedBarWidth(value, values)}%`,
+                                width: `${normalizedBarWidth(
+                                  value,
+                                  values,
+                                  definition.direction,
+                                )}%`,
                               }}
                             />
                           </div>

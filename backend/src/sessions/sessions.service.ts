@@ -69,7 +69,7 @@ export class SessionsService {
     const where: FindOptionsWhere<SessionEntity> = {
       ...(filters?.typeId ? { sessionTypeId: filters.typeId } : {}),
       ...(filters?.locationId ? { sessionLocationId: filters.locationId } : {}),
-      ...(filters?.date ? { data: new Date(filters.date) } : {}),
+      ...(filters?.date ? { data: filters.date } : {}),
     };
     const total = await this.sessionsRepository.count({ where });
     const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -103,10 +103,7 @@ export class SessionsService {
   async compare(
     filters: SessionComparisonFiltersDto,
   ): Promise<SessionComparisonResponseDto> {
-    const startDate = new Date(`${filters.startDate}T00:00:00.000Z`);
-    const endDate = new Date(`${filters.endDate}T00:00:00.000Z`);
-
-    if (startDate >= endDate) {
+    if (filters.startDate >= filters.endDate) {
       throw new BadRequestException(
         'Data inicial deve ser anterior a data final',
       );
@@ -114,7 +111,7 @@ export class SessionsService {
 
     const sessions = await this.sessionsRepository.find({
       where: {
-        data: Between(startDate, endDate),
+        data: Between(filters.startDate, filters.endDate),
         ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
       },
       relations: {
@@ -294,7 +291,7 @@ export class SessionsService {
       sessionTypeId: dto.typeId,
       sessionLocationId: dto.locationId,
       sessionCourtSizeId: dto.courtSizeId,
-      data: new Date(dto.date),
+      data: dto.date,
       descricao: dto.description ?? null,
     });
 
@@ -318,7 +315,7 @@ export class SessionsService {
       ...(dto.courtSizeId !== undefined
         ? { sessionCourtSizeId: dto.courtSizeId }
         : {}),
-      ...(dto.date !== undefined ? { data: new Date(dto.date) } : {}),
+      ...(dto.date !== undefined ? { data: dto.date } : {}),
       ...(dto.description !== undefined ? { descricao: dto.description } : {}),
     });
     return this.findOne(id);
@@ -383,9 +380,8 @@ export class SessionsService {
     };
   }
 
-  private formatDate(date: Date | string): string {
-    if (typeof date === 'string') return date.slice(0, 10);
-    return date.toISOString().slice(0, 10);
+  private formatDate(date: string): string {
+    return date.slice(0, 10);
   }
 
   private buildAnalysisSection(

@@ -109,7 +109,7 @@ export const COMPARISON_METRICS: Record<
     group: "indexes",
     unit: "",
     decimals: 2,
-    direction: "higher",
+    direction: "lower",
   },
   pgj: {
     label: "Participações em gol por jogo",

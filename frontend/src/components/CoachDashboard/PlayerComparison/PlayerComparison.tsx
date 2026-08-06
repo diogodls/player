@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,
@@ -22,6 +22,18 @@ type PlayerComparisonProps = {
 const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
   const [playersCount, setPlayersCount] = useState<number>(2);
+
+  useEffect(() => {
+    const currentPlayers = new Map(
+      (players ?? []).map((player) => [player.id, player]),
+    );
+    setSelectedPlayers((selected) =>
+      selected.flatMap((player) => {
+        const currentPlayer = currentPlayers.get(player.id);
+        return currentPlayer ? [currentPlayer] : [];
+      }),
+    );
+  }, [players]);
 
   const playersList = useMemo(() => {
     return (

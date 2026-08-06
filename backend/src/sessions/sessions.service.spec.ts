@@ -22,7 +22,7 @@ const buildSessionDto = (id: string | null): SessionDto => ({
   typeId: 1,
   locationId: 1,
   courtSizeId: 2,
-  date: '2026-02-15',
+  date: '2026-08-05',
   description: 'Finalizacao e 1x1',
 });
 
@@ -33,7 +33,7 @@ function buildSession(): SessionEntity {
     sessionTypeId: 1,
     sessionLocationId: 1,
     sessionCourtSizeId: 2,
-    data: new Date('2026-02-15T00:00:00.000Z'),
+    data: '2026-08-05',
     descricao: 'Finalizacao e 1x1',
     equipe: { id: TEAM_ID, nome: 'Equipe Principal' },
     sessionType: { id: 1, nome: 'Treino' },
@@ -135,7 +135,7 @@ describe('SessionsService id validation', () => {
 
     expect(findTeam).toHaveBeenCalledWith({ take: 1 });
     expect(createSession).toHaveBeenCalledWith(
-      expect.objectContaining({ equipeId: TEAM_ID }),
+      expect.objectContaining({ equipeId: TEAM_ID, data: '2026-08-05' }),
     );
   });
 
@@ -172,7 +172,7 @@ describe('SessionsService id validation', () => {
     const where = receivedFindOptions?.where as FindOptionsWhere<SessionEntity>;
     expect(where.sessionTypeId).toBe(1);
     expect(where.sessionLocationId).toBe(2);
-    expect(where.data).toBeDefined();
+    expect(where.data).toBe('2026-02-15');
     expect(receivedFindOptions?.skip).toBe(5);
     expect(receivedFindOptions?.take).toBe(5);
     expect(response).toEqual({

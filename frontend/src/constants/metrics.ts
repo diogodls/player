@@ -8,8 +8,8 @@ export const PLAYER_COLORS = Object.freeze([
 export const METRICS_TYPES = Object.freeze({
   "Ofensivo em quadra": ["goals"],
   "Defensivo em quadra": ["goalsTaken"],
-  "Ações Ofensivas": ["defensiveActions"],
-  "Ações Defensivas": ["offensiveActions"],
+  "Ações Ofensivas": ["offensiveActions"],
+  "Ações Defensivas": ["defensiveActions"],
 });
 
 export const INDEXES_COLORS = Object.freeze({

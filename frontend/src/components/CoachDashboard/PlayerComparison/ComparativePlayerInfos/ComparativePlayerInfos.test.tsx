@@ -61,6 +61,22 @@ describe("ComparativePlayerInfos", () => {
       within(gtjRow!).getByText("2,00").querySelector("svg"),
     ).not.toBeNull();
     expect(within(gtjRow!).getByText("4,00").querySelector("svg")).toBeNull();
+    expect(
+      Array.from(
+        gtjRow!.querySelectorAll<HTMLElement>("[style*='width']"),
+        (element) => element.style.width,
+      ),
+    ).toEqual(["0%", "100%"]);
+
+    const dtoRow = screen.getByText("DTO").closest("tr");
+    expect(dtoRow).not.toBeNull();
+    expect(within(dtoRow!).getByText("1,00").querySelector("svg")).not.toBeNull();
+    expect(
+      Array.from(
+        dtoRow!.querySelectorAll<HTMLElement>("[style*='width']"),
+        (element) => element.style.width,
+      ),
+    ).toEqual(["0%", "100%"]);
 
     const barWidths = Array.from(
       container.querySelectorAll<HTMLElement>("[style*='width']"),

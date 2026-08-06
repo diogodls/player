@@ -14,7 +14,7 @@ function session(): SessionEntity {
     sessionTypeId: 1,
     sessionLocationId: 1,
     sessionCourtSizeId: 2,
-    data: new Date('2026-08-05T00:00:00.000Z'),
+    data: '2026-08-05',
     descricao: 'Teste planilha Russo Preto',
     equipe: { id: TEAM_ID, nome: 'Equipe Principal' },
     sessionType: { id: 1, nome: 'Treino' },
@@ -50,7 +50,7 @@ describe('SessionsService update', () => {
 
     expect(update).toHaveBeenCalledWith(SESSION_ID, {
       sessionLocationId: 2,
-      data: new Date('2026-08-06'),
+      data: '2026-08-06',
       descricao: 'Treino editado',
     });
     expect(update).not.toHaveBeenCalledWith(
