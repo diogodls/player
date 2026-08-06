@@ -1,4 +1,5 @@
-import {faCodeCompare, faPeopleGroup, faUser, faFileExport} from "@fortawesome/free-solid-svg-icons";
+import {faCodeCompare, faPeopleGroup, faUser} from "@fortawesome/free-solid-svg-icons";
+// import {faFileExport} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./HeaderDashboard.module.scss"
 import {classNames} from "../../../utils/classNames.ts";
@@ -35,7 +36,7 @@ type Props = {
   canExport: boolean;
 };
 
-const HeaderDashboard = ({ viewMode, onChangeView, onExport, canExport}: Props) => {
+const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
   return (
     <div className={styles.div}>
       <div>
@@ -64,6 +65,7 @@ const HeaderDashboard = ({ viewMode, onChangeView, onExport, canExport}: Props) 
             </button>
           ))}
         </div>
+        {/* Exportação temporariamente indisponível.
         <div>
           <button
             className={styles.export}
@@ -76,6 +78,7 @@ const HeaderDashboard = ({ viewMode, onChangeView, onExport, canExport}: Props) 
             <span>Exportar dados</span>
           </button>
         </div>
+        */}
       </div>
     </div>
   );
