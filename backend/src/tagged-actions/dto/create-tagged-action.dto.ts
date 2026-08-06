@@ -1,9 +1,25 @@
-import { IsInt, IsOptional, Matches, Min } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 const POSTGRES_ID_PATTERN =
   /^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$/;
 
 export class CreateTaggedActionDto {
+  @IsString({ message: 'Identificador idempotente da ação é obrigatório' })
+  @IsNotEmpty({ message: 'Identificador idempotente da ação é obrigatório' })
+  @MaxLength(64, {
+    message:
+      'Identificador idempotente da ação deve ter no máximo 64 caracteres',
+  })
+  clientActionId!: string;
+
   @Matches(POSTGRES_ID_PATTERN, {
     message: 'Identificador da ação do catálogo deve ser um UUID válido',
   })

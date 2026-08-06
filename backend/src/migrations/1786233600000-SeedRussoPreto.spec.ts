@@ -6,6 +6,7 @@ describe('SeedRussoPreto1786233600000', () => {
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    delete process.env.RUN_LEGACY_MIGRATION_SEEDS;
   });
 
   it('does not override the global transaction and does not run in production', async () => {
@@ -22,6 +23,7 @@ describe('SeedRussoPreto1786233600000', () => {
     const migration = new SeedRussoPreto1786233600000();
     const query = jest.fn().mockResolvedValue(undefined);
     process.env.NODE_ENV = 'development';
+    process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
 
     await migration.up({ query } as unknown as QueryRunner);
 
@@ -29,7 +31,7 @@ describe('SeedRussoPreto1786233600000', () => {
     expect(sql).toContain("lower(nome) = lower('Jogo')");
     expect(sql).toContain("lower(nome) = lower('Casa')");
     expect(sql).toContain("lower(nome) = lower('Grande')");
-    expect(sql).toContain("lower(action.sigla) = lower(event.sigla)");
+    expect(sql).toContain('lower(action.sigla) = lower(event.sigla)');
     expect(sql).toContain('ON CONFLICT (id) DO UPDATE');
     expect(sql).toContain('DELETE FROM acoes_taggeadas');
   });
@@ -38,6 +40,7 @@ describe('SeedRussoPreto1786233600000', () => {
     const migration = new SeedRussoPreto1786233600000();
     const query = jest.fn().mockResolvedValue(undefined);
     process.env.NODE_ENV = 'development';
+    process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
 
     await migration.up({ query } as unknown as QueryRunner);
     const sql = query.mock.calls[0][0] as string;
@@ -51,6 +54,7 @@ describe('SeedRussoPreto1786233600000', () => {
     const migration = new SeedRussoPreto1786233600000();
     const query = jest.fn().mockResolvedValue(undefined);
     process.env.NODE_ENV = 'development';
+    process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
 
     await migration.down({ query } as unknown as QueryRunner);
     const sql = query.mock.calls[0][0] as string;

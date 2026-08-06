@@ -16,12 +16,14 @@ vi.mock("../../utils/api", () => ({
 
 const mockedUseApi = vi.mocked(useApi);
 const mockedPut = vi.mocked(backendApi.put);
+const mockedPost = vi.mocked(backendApi.post);
 const playerId = "5e859c16-66a6-4d4f-b088-cd77f2f07d33";
 
 describe("AthleteRegistrationScreen editing", () => {
   beforeEach(() => {
     mockedUseApi.mockReset();
     mockedPut.mockReset();
+    mockedPost.mockReset();
   });
 
   it("sends only the complete PUT payload with a numeric age and matching id", async () => {
@@ -60,7 +62,9 @@ describe("AthleteRegistrationScreen editing", () => {
       isAxiosError: true,
       response: {
         status: 400,
-        data: { message: "Id do jogador deve ser igual ao identificador da rota" },
+        data: {
+          message: "Id do jogador deve ser igual ao identificador da rota",
+        },
       },
     });
     renderPage();
@@ -73,10 +77,12 @@ describe("AthleteRegistrationScreen editing", () => {
         "Id do jogador deve ser igual ao identificador da rota",
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Editar atleta/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /Editar atleta/ }),
+    ).toBeInTheDocument();
   });
 
-  it("revalidates the current list before closing the modal after success", async () => {
+  it("closes after POST success without waiting for list revalidation", async () => {
     let finishMutation: (() => void) | undefined;
     const mutate = vi.fn(
       () =>
@@ -92,15 +98,63 @@ describe("AthleteRegistrationScreen editing", () => {
     fireEvent.click(screen.getByRole("button", { name: /Salvar/ }));
 
     await waitFor(() => expect(mutate).toHaveBeenCalledTimes(1));
-    expect(screen.getByRole("heading", { name: /Editar atleta/ })).toBeInTheDocument();
-
-    finishMutation?.();
     await waitFor(() =>
       expect(
         screen.queryByRole("heading", { name: /Editar atleta/ }),
       ).not.toBeInTheDocument(),
     );
+    finishMutation?.();
     expect(mockedUseApi).toHaveBeenCalledWith("/players?page=1&limit=8");
+  });
+
+  it("does not repeat the create POST on a double click", async () => {
+    let finishPost: (() => void) | undefined;
+    mockedUseApi.mockReturnValue(apiState(vi.fn()) as never);
+    mockedPost.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishPost = () => resolve({ data: player } as never);
+        }),
+    );
+    renderPage();
+
+    fireEvent.click(screen.getByRole("button", { name: "Novo atleta" }));
+    fireEvent.change(screen.getByLabelText("Nome *"), {
+      target: { value: "Nova atleta" },
+    });
+    const saveButton = screen.getByRole("button", { name: "Salvar atleta" });
+    fireEvent.click(saveButton);
+    fireEvent.click(saveButton);
+
+    await waitFor(() => expect(mockedPost).toHaveBeenCalledTimes(1));
+    expect(saveButton).toBeDisabled();
+    finishPost?.();
+  });
+
+  it("reports only the list refresh failure after a successful create", async () => {
+    const mutate = vi.fn().mockRejectedValue(new Error("refresh failed"));
+    mockedUseApi.mockReturnValue(apiState(mutate) as never);
+    mockedPost.mockResolvedValue({ data: player } as never);
+    renderPage();
+
+    fireEvent.click(screen.getByRole("button", { name: "Novo atleta" }));
+    fireEvent.change(screen.getByLabelText("Nome *"), {
+      target: { value: "Nova atleta" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Salvar atleta" }));
+
+    expect(
+      await screen.findByText("Atleta criado!", { exact: false }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        /Atleta salvo, mas não foi possível atualizar a lista/,
+      ),
+    ).toBeInTheDocument();
+    expect(mockedPost).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByRole("heading", { name: /Cadastrar atleta/ }),
+    ).not.toBeInTheDocument();
   });
 });
 
@@ -142,10 +196,10 @@ function renderPage() {
 }
 
 function openEditForm() {
-  fireEvent.click(screen.getByRole("button", { name: "Editar" }));
-  expect(
-    screen.getByRole("combobox", { name: "Posição *" }),
-  ).toHaveValue("Ala");
+  fireEvent.click(screen.getByRole("button", { name: /^Editar Ana Silva$/ }));
+  expect(screen.getByRole("combobox", { name: "Posição *" })).toHaveValue(
+    "Ala",
+  );
   expect(
     screen.getByRole("combobox", { name: "Lado preferencial *" }),
   ).toHaveValue("Canhoto");

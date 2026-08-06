@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import AthleteForm, {
   type AthleteFormValues,
 } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
@@ -58,6 +58,7 @@ const AthleteRegistrationScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
+  const isSavingAthlete = useRef(false);
   const { success, info, error } = useContext(ToastContext);
   const debouncedNameFilter = useDebouncedValue(nameFilter, 300);
 
@@ -94,28 +95,24 @@ const AthleteRegistrationScreen = () => {
   const safeCurrentPage =
     athletesResponse?.page ?? Math.min(currentPage, totalPages);
 
-  const formInitialValues = useMemo<AthleteFormValues | undefined>(
-    () => {
-      if (!editingAthlete) return undefined;
+  const formInitialValues = useMemo<AthleteFormValues | undefined>(() => {
+    if (!editingAthlete) return undefined;
 
-      const position = PLAYERS_POSITIONS.find(
-        (value) => PLAYER_POSITION_IDS[value] === editingAthlete.positionId,
-      );
-      const preferredSide = PREFERRED_SIDES.find(
-        (value) =>
-          PREFERRED_SIDE_IDS[value] === editingAthlete.preferredSideId,
-      );
-      if (!position || !preferredSide) return undefined;
+    const position = PLAYERS_POSITIONS.find(
+      (value) => PLAYER_POSITION_IDS[value] === editingAthlete.positionId,
+    );
+    const preferredSide = PREFERRED_SIDES.find(
+      (value) => PREFERRED_SIDE_IDS[value] === editingAthlete.preferredSideId,
+    );
+    if (!position || !preferredSide) return undefined;
 
-      return {
-        name: editingAthlete.name,
-        age: Number(editingAthlete.age),
-        position,
-        preferredSide,
-      };
-    },
-    [editingAthlete],
-  );
+    return {
+      name: editingAthlete.name,
+      age: Number(editingAthlete.age),
+      position,
+      preferredSide,
+    };
+  }, [editingAthlete]);
 
   const handleOpenCreateModal = () => {
     setEditingAthlete(null);
@@ -123,6 +120,8 @@ const AthleteRegistrationScreen = () => {
   };
 
   const handleSubmitAthlete = async (values: AthleteFormValues) => {
+    if (isSavingAthlete.current) return;
+    isSavingAthlete.current = true;
     const payload = {
       id: editingAthlete?.id ?? null,
       name: values.name,
@@ -139,13 +138,7 @@ const AthleteRegistrationScreen = () => {
       }
     } catch (caughtError) {
       error(getBackendErrorMessage(caughtError));
-      return;
-    }
-
-    try {
-      await mutate();
-    } catch {
-      error("Não foi possível atualizar a lista de atletas.");
+      isSavingAthlete.current = false;
       return;
     }
 
@@ -153,6 +146,13 @@ const AthleteRegistrationScreen = () => {
     success(`Atleta ${editingAthlete ? "editado" : "criado"}!`);
     setIsModalOpen(false);
     setEditingAthlete(null);
+    isSavingAthlete.current = false;
+
+    void Promise.resolve(mutate()).catch(() => {
+      info(
+        "Atleta salvo, mas não foi possível atualizar a lista. Recarregue para visualizar os dados mais recentes.",
+      );
+    });
   };
 
   const handleCloseForm = () => {

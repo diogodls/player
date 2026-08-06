@@ -1,3 +1,7 @@
+-- Compatibilidade e catálogo-base consumidos por `npm run seed`.
+-- A execução oficial remove BEGIN/COMMIT e envolve este SQL e os dados de
+-- demonstração em uma única transação. Não é migration estrutural.
+
 BEGIN;
 
 INSERT INTO session_types (id, nome) VALUES
@@ -132,6 +136,35 @@ FROM (VALUES
 ) AS metadata(sigla, ordem), categorias_acao AS categoria
 WHERE categoria.id = acao.categoria_acao_id
   AND categoria.tipo_analise_id = 2
+  AND acao.sigla = metadata.sigla;
+
+UPDATE acoes_catalogo AS acao SET ordem = metadata.ordem
+FROM categorias_acao AS categoria, (VALUES
+  ('OFFENSIVE_ACTIONS', 'GM', 1),
+  ('OFFENSIVE_ACTIONS', 'ASS', 2),
+  ('OFFENSIVE_ACTIONS', 'AD', 3),
+  ('OFFENSIVE_ACTIONS', 'CC', 4),
+  ('OFFENSIVE_ACTIONS', 'PP', 5),
+  ('DEFENSIVE_ACTIONS', 'GP', 1),
+  ('DEFENSIVE_ACTIONS', 'FD', 2),
+  ('DEFENSIVE_ACTIONS', 'RB', 3),
+  ('DEFENSIVE_ACTIONS', 'DIA', 4),
+  ('COURT_GOALS', 'Gol TO', 1),
+  ('COURT_GOALS', 'Gol OO', 2),
+  ('COURT_GOALS', 'Gol BP', 3),
+  ('COURT_GOALS', 'Gol GL', 4),
+  ('COURT_GOALS', 'Gol MGL', 5),
+  ('COURT_GOALS_CONCEDED', 'GS TO', 1),
+  ('COURT_GOALS_CONCEDED', 'GS OO', 2),
+  ('COURT_GOALS_CONCEDED', 'GS BP', 3),
+  ('COURT_GOALS_CONCEDED', 'GS GLA', 4),
+  ('COURT_GOALS_CONCEDED', 'GS GLO', 5),
+  ('PLAYING_TIME', 'ENTROU', 1),
+  ('PLAYING_TIME', 'SAIU', 2)
+) AS metadata(categoria_chave, sigla, ordem)
+WHERE categoria.id = acao.categoria_acao_id
+  AND categoria.tipo_analise_id = 1
+  AND categoria.chave = metadata.categoria_chave
   AND acao.sigla = metadata.sigla;
 
 COMMIT;

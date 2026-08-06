@@ -11,18 +11,135 @@ type SeedPlayer = {
 const SESSION_ID = 'a91e1d48-76c2-4d57-8f04-29ed25c8b001';
 
 const PLAYERS: SeedPlayer[] = [
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000001', name: 'MATEUS', position: 'Fixo', secondsPlayed: 1484, actions: { 'Gol GL': 1, 'GS OO': 2, 'GS BP': 1, CC: 8, PP: 6, FD: 5, RB: 2, DIA: 6 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000002', name: 'DUPIN', position: 'Fixo', secondsPlayed: 62, actions: { PP: 1 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000003', name: 'PET', position: 'Fixo', secondsPlayed: 1090, actions: { 'GS TO': 1, 'GS OO': 2, 'GS BP': 1, CC: 12, PP: 2, FD: 7, DIA: 7 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000004', name: 'BRESOLIN', position: 'Fixo', secondsPlayed: 32, actions: { FD: 1, DIA: 2 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000005', name: 'GARCIA', position: 'Ala', secondsPlayed: 1015, actions: { 'Gol GL': 1, 'GS OO': 2, CC: 9, PP: 3, FD: 3, DIA: 6 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000006', name: 'EVERTON', position: 'Ala', secondsPlayed: 1561, actions: { 'Gol GL': 1, 'GS OO': 2, 'GS BP': 1, ASS: 1, CC: 24, PP: 8, FD: 4, RB: 2, DIA: 2 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000007', name: 'PEPO', position: 'Ala', secondsPlayed: 704, actions: { 'Gol TO': 1, 'GS TO': 1, CC: 4, PP: 4, FD: 4, DIA: 10 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000008', name: 'SENNA', position: 'Ala', secondsPlayed: 851, actions: { 'Gol TO': 1, 'GS TO': 2, ASS: 1, CC: 10, PP: 9, FD: 2, RB: 1, DIA: 5 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000009', name: 'LORENZO', position: 'Ala', secondsPlayed: 606, actions: { 'Gol TO': 1, 'GS TO': 1, GM: 1, CC: 4, RB: 1, DIA: 4 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000010', name: 'NICO', position: 'Pivo', secondsPlayed: 422, actions: { 'GS TO': 1, PP: 3, FD: 1 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000011', name: 'LEO ELIAS', position: 'Pivo', secondsPlayed: 1183, actions: { 'Gol TO': 1, 'Gol GL': 1, 'GS TO': 2, GM: 1, CC: 4, PP: 2, FD: 3, DIA: 4 } },
-  { id: 'd10b7c3e-129a-4d1f-8a01-000000000012', name: 'LUCAS LEMOS', position: 'Pivo', secondsPlayed: 991, actions: { 'Gol GL': 1, 'GS BP': 1, CC: 7, PP: 3, DIA: 2 } },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000001',
+    name: 'MATEUS',
+    position: 'Fixo',
+    secondsPlayed: 1484,
+    actions: {
+      'Gol GL': 1,
+      'GS OO': 2,
+      'GS BP': 1,
+      CC: 8,
+      PP: 6,
+      FD: 5,
+      RB: 2,
+      DIA: 6,
+    },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000002',
+    name: 'DUPIN',
+    position: 'Fixo',
+    secondsPlayed: 62,
+    actions: { PP: 1 },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000003',
+    name: 'PET',
+    position: 'Fixo',
+    secondsPlayed: 1090,
+    actions: {
+      'GS TO': 1,
+      'GS OO': 2,
+      'GS BP': 1,
+      CC: 12,
+      PP: 2,
+      FD: 7,
+      DIA: 7,
+    },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000004',
+    name: 'BRESOLIN',
+    position: 'Fixo',
+    secondsPlayed: 32,
+    actions: { FD: 1, DIA: 2 },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000005',
+    name: 'GARCIA',
+    position: 'Ala',
+    secondsPlayed: 1015,
+    actions: { 'Gol GL': 1, 'GS OO': 2, CC: 9, PP: 3, FD: 3, DIA: 6 },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000006',
+    name: 'EVERTON',
+    position: 'Ala',
+    secondsPlayed: 1561,
+    actions: {
+      'Gol GL': 1,
+      'GS OO': 2,
+      'GS BP': 1,
+      ASS: 1,
+      CC: 24,
+      PP: 8,
+      FD: 4,
+      RB: 2,
+      DIA: 2,
+    },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000007',
+    name: 'PEPO',
+    position: 'Ala',
+    secondsPlayed: 704,
+    actions: { 'Gol TO': 1, 'GS TO': 1, CC: 4, PP: 4, FD: 4, DIA: 10 },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000008',
+    name: 'SENNA',
+    position: 'Ala',
+    secondsPlayed: 851,
+    actions: {
+      'Gol TO': 1,
+      'GS TO': 2,
+      ASS: 1,
+      CC: 10,
+      PP: 9,
+      FD: 2,
+      RB: 1,
+      DIA: 5,
+    },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000009',
+    name: 'LORENZO',
+    position: 'Ala',
+    secondsPlayed: 606,
+    actions: { 'Gol TO': 1, 'GS TO': 1, GM: 1, CC: 4, RB: 1, DIA: 4 },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000010',
+    name: 'NICO',
+    position: 'Pivo',
+    secondsPlayed: 422,
+    actions: { 'GS TO': 1, PP: 3, FD: 1 },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000011',
+    name: 'LEO ELIAS',
+    position: 'Pivo',
+    secondsPlayed: 1183,
+    actions: {
+      'Gol TO': 1,
+      'Gol GL': 1,
+      'GS TO': 2,
+      GM: 1,
+      CC: 4,
+      PP: 2,
+      FD: 3,
+      DIA: 4,
+    },
+  },
+  {
+    id: 'd10b7c3e-129a-4d1f-8a01-000000000012',
+    name: 'LUCAS LEMOS',
+    position: 'Pivo',
+    secondsPlayed: 991,
+    actions: { 'Gol GL': 1, 'GS BP': 1, CC: 7, PP: 3, DIA: 2 },
+  },
 ];
 
 const quote = (value: string) => `'${value.replaceAll("'", "''")}'`;
@@ -31,6 +148,9 @@ export class SeedRussoPreto1786233600000 implements MigrationInterface {
   name = 'SeedRussoPreto1786233600000';
 
   async up(queryRunner: QueryRunner): Promise<void> {
+    // Retained only for migration-history compatibility. New and existing
+    // environments execute this data load explicitly through `npm run seed`.
+    if (process.env.RUN_LEGACY_MIGRATION_SEEDS !== 'true') return;
     if (process.env.NODE_ENV === 'production') return;
 
     const playerValues = PLAYERS.map(
@@ -79,7 +199,8 @@ export class SeedRussoPreto1786233600000 implements MigrationInterface {
         missing_actions text;
       BEGIN
         SELECT id INTO seed_team_id FROM equipes
-        WHERE deleted_at IS NULL ORDER BY created_at, id LIMIT 1;
+        WHERE id = '00000000-0000-0000-0000-000000000001'::uuid
+          AND deleted_at IS NULL;
         SELECT id INTO seed_type_id FROM session_types
         WHERE lower(nome) = lower('Jogo') LIMIT 1;
         SELECT id INTO seed_location_id FROM session_locations
@@ -166,13 +287,16 @@ export class SeedRussoPreto1786233600000 implements MigrationInterface {
           jogador_id = EXCLUDED.jogador_id,
           timestamp_segundos = EXCLUDED.timestamp_segundos,
           deleted_at = NULL;
+
       END $$;
     `);
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
     if (process.env.NODE_ENV === 'production') return;
-    const playerIds = PLAYERS.map((player) => `${quote(player.id)}::uuid`).join(', ');
+    const playerIds = PLAYERS.map((player) => `${quote(player.id)}::uuid`).join(
+      ', ',
+    );
     await queryRunner.query(`
       DELETE FROM acoes_taggeadas
       WHERE sessao_id = ${quote(SESSION_ID)}::uuid

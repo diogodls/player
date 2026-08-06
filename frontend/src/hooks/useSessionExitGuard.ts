@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { Cookies } from "react-cookie";
 import { ActionsContext } from "../contexts/ActionsContext/ActionsContext.tsx";
@@ -26,6 +26,8 @@ export const useSessionExitGuard = ({
     setTeamActions,
   } = useContext(ActionsContext);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const processingRef = useRef(false);
+  const [isProcessingExit, setIsProcessingExit] = useState(false);
 
   const cookieKey = `${COOKIE_KEY_PREFIX}${logType}${sessionId}`;
   const actions = logType === "individual" ? individualActions : teamActions;
@@ -34,7 +36,7 @@ export const useSessionExitGuard = ({
 
   const sessionActions = useMemo(
     () => actions.filter((action) => action.sessionId === sessionId),
-    [actions, sessionId]
+    [actions, sessionId],
   );
 
   const hasUnsavedChanges = sessionActions.length > 0;
@@ -55,11 +57,14 @@ export const useSessionExitGuard = ({
   };
 
   const clearSessionActions = () => {
-    setActions((prev) => prev.filter((action) => action.sessionId !== sessionId));
+    setActions((prev) =>
+      prev.filter((action) => action.sessionId !== sessionId),
+    );
     cookies.remove(cookieKey, { path: "/" });
   };
 
   const requestExit = () => {
+    if (processingRef.current) return;
     if (!hasUnsavedChanges) {
       goToSession();
       return;
@@ -69,17 +74,29 @@ export const useSessionExitGuard = ({
   };
 
   const closeExitModal = () => {
+    if (processingRef.current) return;
     setIsExitModalOpen(false);
   };
 
   const handleExitWithoutSaving = () => {
-    clearSessionActions();
-    setIsExitModalOpen(false);
-    info("Alterações descartadas");
-    goToSession();
+    if (processingRef.current) return;
+    processingRef.current = true;
+    setIsProcessingExit(true);
+    try {
+      clearSessionActions();
+      setIsExitModalOpen(false);
+      info("Alterações descartadas");
+      goToSession();
+    } finally {
+      processingRef.current = false;
+      setIsProcessingExit(false);
+    }
   };
 
   const handleSaveAndExit = async () => {
+    if (processingRef.current) return;
+    processingRef.current = true;
+    setIsProcessingExit(true);
     try {
       await persistSessionActions(sessionId, sessionActions);
       clearSessionActions();
@@ -88,12 +105,16 @@ export const useSessionExitGuard = ({
       goToSession();
     } catch {
       error("Falha ao salvar ações");
+    } finally {
+      processingRef.current = false;
+      setIsProcessingExit(false);
     }
   };
 
   return {
     hasUnsavedChanges,
     isExitModalOpen,
+    isProcessingExit,
     requestExit,
     closeExitModal,
     handleExitWithoutSaving,

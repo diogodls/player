@@ -8,7 +8,26 @@ vi.mock("../../hooks/useApi", () => ({ useApi: vi.fn() }));
 const mockedUseApi = vi.mocked(useApi);
 
 describe("CoachDashboard", () => {
-  beforeEach(() => mockedUseApi.mockReset());
+  beforeEach(() => {
+    mockedUseApi.mockReset();
+    vi.restoreAllMocks();
+  });
+
+  it("exports the loaded backend data as CSV", () => {
+    mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));
+    const createObjectURL = vi.fn(() => "blob:dashboard");
+    const revokeObjectURL = vi.fn();
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, value: createObjectURL });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, value: revokeObjectURL });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+    renderPage();
+
+    fireEvent.click(screen.getByRole("button", { name: "Exportar dados" }));
+
+    expect(createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith("blob:dashboard");
+  });
 
   it("loads dashboard data exclusively from the backend endpoint", () => {
     mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));

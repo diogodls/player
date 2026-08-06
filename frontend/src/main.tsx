@@ -35,7 +35,7 @@ createRoot(document.getElementById('root')!).render(
               <Route
                 path="/sessions/comparison"
                 element={
-                  <Suspense fallback={<div role="status">Carregando comparaÃ§Ã£o...</div>}>
+                  <Suspense fallback={<div role="status">Carregando comparação...</div>}>
                     <SessionComparison />
                   </Suspense>
                 }

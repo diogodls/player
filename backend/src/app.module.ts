@@ -48,7 +48,7 @@ import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
         TaggedActionEntity,
       ],
       synchronize: false,
-      migrations: [__dirname + '/migrations/*{.ts,.js}'],
+      migrations: [__dirname + '/migrations/!(*.spec){.ts,.js}'],
       migrationsRun: true,
       logging: false,
     }),

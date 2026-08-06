@@ -22,26 +22,27 @@ const AthleteRegistrationCard = ({
   const navigate = useNavigate();
 
   return (
-    <article
-      className={classNames([styles.card, styles.interactive])}
-      role="button"
-      tabIndex={0}
-      onClick={() => navigate(`/player/${athlete.id}`)}
-    >
-      <div className={styles.topRow}>
-        <span className={styles.position}>{athlete.position}</span>
-        <span className={styles.age}>{athlete.age} anos</span>
-      </div>
-
-      <div className={styles.body}>
-        <h3 className={styles.name}>{athlete.name}</h3>
-      </div>
+    <article className={classNames([styles.card, styles.interactive])}>
+      <button
+        className={styles.primaryAction}
+        type="button"
+        onClick={() => navigate(`/player/${athlete.id}`)}
+        aria-label={`Ver detalhes de ${athlete.name}`}
+      >
+        <span className={styles.topRow}>
+          <span className={styles.position}>{athlete.position}</span>
+          <span className={styles.age}>{athlete.age} anos</span>
+        </span>
+        <span className={styles.body}>
+          <span className={styles.name}>{athlete.name}</span>
+        </span>
+      </button>
 
       <div className={styles.actions}>
-        <button className={styles.secondaryAction} type="button" onClick={onEdit}>
+        <button className={styles.secondaryAction} type="button" onClick={onEdit} aria-label={`Editar ${athlete.name}`}>
           Editar
         </button>
-        <button className={styles.dangerAction} type="button" onClick={onDelete}>
+        <button className={styles.dangerAction} type="button" onClick={onDelete} aria-label={`Excluir ${athlete.name}`}>
           Excluir
         </button>
       </div>

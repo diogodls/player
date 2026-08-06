@@ -252,6 +252,9 @@ describe("SessionComparison", () => {
       "/sessions/comparison?startDate=2026-02-15&endDate=2026-02-19",
     );
 
+    expect(screen.queryByText("É necessária mais uma sessão")).not.toBeInTheDocument();
+    expect(screen.getByText("Sessões analisadas").parentElement).toHaveTextContent("2");
+
     const table = screen.getByRole("table");
     expect(
       within(table).getByRole("button", { name: /^Ana/ }),

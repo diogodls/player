@@ -31,6 +31,7 @@ describe("persistSessionActions", () => {
     expect(mockedPost).toHaveBeenCalledWith("/sessions/session-id/actions", {
       actions: [
         {
+          clientActionId: "temporary-id",
           catalogActionId: CATALOG_ACTION_ID,
           playerId: PLAYER_ID,
           timestampSeconds: 12,
@@ -57,6 +58,7 @@ describe("persistSessionActions", () => {
     expect(mockedPost).toHaveBeenCalledWith("/sessions/session-id/actions", {
       actions: [
         {
+          clientActionId: "temporary-id",
           catalogActionId: CATALOG_ACTION_ID,
           playerId: null,
           timestampSeconds: 4,

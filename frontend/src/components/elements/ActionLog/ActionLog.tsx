@@ -171,7 +171,7 @@ const ActionLog = ({ logType, session }: ActionLog) => {
       {selectedActions.length === 0 ? (
         <div className={styles.emptyState}>
           <span>
-            Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.
+            Nenhuma ação marcada. Registre uma ação para visualizá-la aqui.
           </span>
         </div>
       ) : (

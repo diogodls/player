@@ -22,7 +22,7 @@ const buttons: ButtonsType[] = [
     mode:'individual'
   },
   {
-    label: "Compare",
+    label: "Comparar atletas",
     icon: faCodeCompare,
     mode:'compare'
   }
@@ -31,9 +31,11 @@ const buttons: ButtonsType[] = [
 type Props = {
   viewMode: 'team' | 'individual' | 'compare';
   onChangeView: (mode: Props['viewMode']) => void;
+  onExport: () => void;
+  canExport: boolean;
 };
 
-const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
+const HeaderDashboard = ({ viewMode, onChangeView, onExport, canExport}: Props) => {
   return (
     <div className={styles.div}>
       <div>
@@ -55,6 +57,7 @@ const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
                   : ""
               ])}
               onClick={() => onChangeView(button.mode)}
+              type="button"
             >
               <FontAwesomeIcon icon={button.icon} />
               <span>{button.label}</span>
@@ -62,9 +65,15 @@ const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
           ))}
         </div>
         <div>
-          <button className={styles.export}>
+          <button
+            className={styles.export}
+            type="button"
+            onClick={onExport}
+            disabled={!canExport}
+            title={canExport ? "Baixar dados exibidos em CSV" : "Não há dados para exportar"}
+          >
             <FontAwesomeIcon icon={faFileExport}/>
-            <span>Exportar Data</span>
+            <span>Exportar dados</span>
           </button>
         </div>
       </div>

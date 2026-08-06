@@ -4,17 +4,24 @@ type AnalysisExitModalProps = {
   onCancel: () => void;
   onDiscard: () => void;
   onSave: () => void;
+  isProcessing?: boolean;
 };
 
 const AnalysisExitModal = ({
   onCancel,
   onDiscard,
   onSave,
+  isProcessing = false,
 }: AnalysisExitModalProps) => {
-
   return (
-    <div className={styles.overlay} onMouseDown={onCancel}>
-      <div className={styles.modal} onMouseDown={(event) => event.stopPropagation()}>
+    <div
+      className={styles.overlay}
+      onMouseDown={isProcessing ? undefined : onCancel}
+    >
+      <div
+        className={styles.modal}
+        onMouseDown={(event) => event.stopPropagation()}
+      >
         <h3>Deseja salvar antes de sair?</h3>
         <p>
           As ações desta análise ainda não foram finalizadas. Você pode salvar
@@ -22,14 +29,29 @@ const AnalysisExitModal = ({
         </p>
 
         <div className={styles.actions}>
-          <button type="button" className={styles.cancel} onClick={onCancel}>
+          <button
+            type="button"
+            className={styles.cancel}
+            onClick={onCancel}
+            disabled={isProcessing}
+          >
             Continuar editando
           </button>
-          <button type="button" className={styles.discard} onClick={onDiscard}>
+          <button
+            type="button"
+            className={styles.discard}
+            onClick={onDiscard}
+            disabled={isProcessing}
+          >
             Sair sem salvar
           </button>
-          <button type="button" className={styles.save} onClick={onSave}>
-            Salvar e sair
+          <button
+            type="button"
+            className={styles.save}
+            onClick={onSave}
+            disabled={isProcessing}
+          >
+            {isProcessing ? "Processando..." : "Salvar e sair"}
           </button>
         </div>
       </div>

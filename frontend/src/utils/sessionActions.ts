@@ -41,6 +41,7 @@ export async function persistSessionActions(
       }
 
       return {
+        clientActionId: action.id,
         catalogActionId: action.catalogActionId,
         playerId,
         timestampSeconds,

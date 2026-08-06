@@ -50,7 +50,6 @@ describe('development data cleanup', () => {
       expect.stringContaining('DELETE FROM indices_jogadores'),
       'DELETE FROM sessoes',
       'DELETE FROM jogadores',
-      'DELETE FROM migrations WHERE name = ANY($1::varchar[])',
       'COMMIT',
       expect.stringContaining('SELECT'),
     ]);
@@ -58,6 +57,7 @@ describe('development data cleanup', () => {
       before: { jogadores: 20, sessoes: 15, acoes_taggeadas: 419 },
       after: { jogadores: 0, sessoes: 0, acoes_taggeadas: 0 },
     });
+    expect(statements.join(' ')).not.toContain('DELETE FROM migrations');
   });
 
   it('rolls back if any deletion fails', async () => {

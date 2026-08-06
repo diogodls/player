@@ -39,6 +39,15 @@ export class TaggedActionsService {
       const playersRepository = manager.getRepository(PlayerEntity);
       const taggedActionsRepository = manager.getRepository(TaggedActionEntity);
 
+      const clientActionIds = dto.actions.map(
+        (action) => action.clientActionId,
+      );
+      if (new Set(clientActionIds).size !== clientActionIds.length) {
+        throw new BadRequestException(
+          'Identificadores idempotentes não podem se repetir no mesmo lote',
+        );
+      }
+
       const session = await sessionsRepository.findOneBy({ id: sessionId });
       if (!session) throw new NotFoundException('Sessão não encontrada');
 
@@ -110,9 +119,33 @@ export class TaggedActionsService {
           acaoCatalogoId: action.catalogActionId,
           jogadorId: action.playerId ?? null,
           timestampSegundos: action.timestampSeconds,
+          clientActionId: action.clientActionId,
         }),
       );
-      const savedActions = await taggedActionsRepository.save(entities);
+      await taggedActionsRepository
+        .createQueryBuilder()
+        .insert()
+        .into(TaggedActionEntity)
+        .values(entities)
+        .orIgnore()
+        .execute();
+
+      const persistedActions = await taggedActionsRepository.find({
+        where: {
+          sessaoId: sessionId,
+          clientActionId: In(clientActionIds),
+        },
+      });
+      const actionsByClientId = new Map(
+        persistedActions.map((action) => [action.clientActionId, action]),
+      );
+      const savedActions = clientActionIds.map((clientActionId) => {
+        const action = actionsByClientId.get(clientActionId);
+        if (!action) {
+          throw new Error('Ação idempotente não foi persistida');
+        }
+        return action;
+      });
 
       return { actions: savedActions.map((action) => this.toResponse(action)) };
     });

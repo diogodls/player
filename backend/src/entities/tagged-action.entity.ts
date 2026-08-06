@@ -29,6 +29,14 @@ export class TaggedActionEntity extends BaseEntity {
   @Column({ name: 'timestamp_segundos', type: 'integer' })
   timestampSegundos!: number;
 
+  @Column({
+    name: 'client_action_id',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
+  clientActionId!: string | null;
+
   @ManyToOne(() => SessionEntity, (session) => session.acoesTaggeadas, {
     nullable: false,
   })
