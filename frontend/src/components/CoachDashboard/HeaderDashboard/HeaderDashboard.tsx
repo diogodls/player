@@ -1,4 +1,5 @@
 import {faCodeCompare, faPeopleGroup, faUser} from "@fortawesome/free-solid-svg-icons";
+// import {faFileExport} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./HeaderDashboard.module.scss"
 import {classNames} from "../../../utils/classNames.ts";
@@ -65,6 +66,20 @@ const HeaderDashboard = ({
             </button>
           ))}
         </div>
+        {/* Botão de exportação temporariamente desativado.
+        <div>
+          <button
+            className={styles.export}
+            type="button"
+            onClick={onExport}
+            disabled={!canExport}
+            title={canExport ? "Baixar dados exibidos em CSV" : "Não há dados para exportar"}
+          >
+            <FontAwesomeIcon icon={faFileExport}/>
+            <span>Exportar dados</span>
+          </button>
+        </div>
+        */}
       </div>
     </div>
   );
