@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle, faPlus, faRotateLeft, faUserGroup, faX } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircle,
+  faPlus,
+  faRotateLeft,
+  faUserGroup,
+  faX,
+} from "@fortawesome/free-solid-svg-icons";
 import type { Player } from "../../../pages/CoachDashboard";
 import ComparativePlayerInfos from "./ComparativePlayerInfos/ComparativePlayerInfos.tsx";
 import { PLAYER_COLORS } from "../../../constants/metrics.ts";
@@ -14,35 +20,53 @@ type PlayerComparisonProps = {
 };
 
 const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
   const [playersCount, setPlayersCount] = useState<number>(2);
 
+  const selectedPlayers = useMemo(() => {
+    const currentPlayers = new Map(
+      (players ?? []).map((player) => [player.id, player]),
+    );
+    return selectedPlayerIds.flatMap((playerId) => {
+      const currentPlayer = currentPlayers.get(playerId);
+      return currentPlayer ? [currentPlayer] : [];
+    });
+  }, [players, selectedPlayerIds]);
+
   const playersList = useMemo(() => {
-    return players?.filter(
-      (player) =>
-        !selectedPlayers.find((selectedPlayer) => player?.id === selectedPlayer?.id)
-    ) ?? [];
+    return (
+      players?.filter(
+        (player) =>
+          !selectedPlayers.find(
+            (selectedPlayer) => player?.id === selectedPlayer?.id,
+          ),
+      ) ?? []
+    );
   }, [players, selectedPlayers]);
 
   const setPlayer = (playerId: string, index: number) => {
-    const player = playersList.find((player) => player.id === playerId) ?? selectedPlayers[index] ?? null;
+    const player =
+      players?.find((player) => player.id === playerId) ??
+      null;
     if (!player) return;
 
-    const newSelectedPlayersList = [...selectedPlayers];
-    newSelectedPlayersList[index] = player;
-    setSelectedPlayers(newSelectedPlayersList);
+    const nextSelectedPlayerIds = selectedPlayers.map(({ id }) => id);
+    nextSelectedPlayerIds[index] = player.id;
+    setSelectedPlayerIds(nextSelectedPlayerIds);
   };
 
   const removePlayer = (playerId: string) => {
-    setSelectedPlayers(
-      (players) => players.filter((selectedPlayer) => selectedPlayer.id !== playerId)
+    setSelectedPlayerIds(
+      selectedPlayers
+        .filter((selectedPlayer) => selectedPlayer.id !== playerId)
+        .map(({ id }) => id),
     );
 
     setPlayersCount(playersCount <= 2 ? playersCount : playersCount - 1);
   };
 
   const handleClearComparison = () => {
-    setSelectedPlayers([]);
+    setSelectedPlayerIds([]);
     setPlayersCount(2);
   };
 
@@ -61,28 +85,30 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
               className={styles.clearPlayers}
               onClick={handleClearComparison}
             >
-              <FontAwesomeIcon icon={faRotateLeft}/>
+              <FontAwesomeIcon icon={faRotateLeft} />
               Limpar
             </button>
           )}
 
-          {playersCount < 4 &&
+          {playersCount < 4 && (
             <button
               type="button"
               className={styles.addPlayer}
               onClick={() => setPlayersCount(playersCount + 1)}
             >
-              <FontAwesomeIcon icon={faPlus}/>
+              <FontAwesomeIcon icon={faPlus} />
               Adicionar atleta
             </button>
-          }
+          )}
         </span>
       </h3>
 
       <div className={styles.players}>
         {Array.from({ length: playersCount }).map((_position, index) => {
           const selectedPlayer = selectedPlayers[index];
-          const currentOptions = selectedPlayer ? [selectedPlayer, ...playersList] : playersList;
+          const currentOptions = selectedPlayer
+            ? [selectedPlayer, ...playersList]
+            : playersList;
 
           return (
             <div className={styles.player} key={index}>
@@ -100,16 +126,23 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
                 }}
               />
 
-              {selectedPlayer &&
+              {selectedPlayer && (
                 <div className={styles.selectedPlayer}>
                   <div className={styles.infos}>
                     <span className={styles.name}>
-                      <FontAwesomeIcon icon={faCircle} style={{ color: PLAYER_COLORS[index] }} />
+                      <FontAwesomeIcon
+                        icon={faCircle}
+                        style={{ color: PLAYER_COLORS[index] }}
+                      />
                       {selectedPlayer.name}
                     </span>
 
-                    <span className={styles.position}>{selectedPlayer.position}</span>
-                    <span className={styles.overall}>Média: {selectedPlayer.overall}</span>
+                    <span className={styles.position}>
+                      {selectedPlayer.position}
+                    </span>
+                    <span className={styles.overall}>
+                      Média: {selectedPlayer.overall}
+                    </span>
                   </div>
 
                   <FontAwesomeIcon
@@ -118,26 +151,35 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
                     onClick={() => removePlayer(selectedPlayer.id)}
                   />
                 </div>
-              }
+              )}
             </div>
           );
         })}
       </div>
 
-      {selectedPlayers.filter(Boolean).length < 2 &&
+      {selectedPlayers.filter(Boolean).length < 2 && (
         <div className={styles.emptyList}>
           <FontAwesomeIcon className={styles.icon} icon={faUserGroup} />
-          <span className={styles.title}>Selecione dois ou mais jogadores para comparar</span>
-          <span>Escolha jogadores dos dropdowns para ver a sua comparação de performance</span>
+          <span className={styles.title}>
+            Selecione dois ou mais jogadores para comparar
+          </span>
+          <span>
+            Escolha jogadores dos dropdowns para ver a sua comparação de
+            performance
+          </span>
         </div>
-      }
+      )}
 
-      {selectedPlayers.filter(Boolean).length > 1 &&
+      {selectedPlayers.filter(Boolean).length > 1 && (
         <div>
-          <PlayerRadarChart players={selectedPlayers} showButtons metrics={metrics ?? []} />
-          <ComparativePlayerInfos selectedPlayers={selectedPlayers} metrics={metrics} />
+          <PlayerRadarChart
+            players={selectedPlayers}
+            showButtons
+            metrics={metrics ?? []}
+          />
+          <ComparativePlayerInfos selectedPlayers={selectedPlayers} />
         </div>
-      }
+      )}
     </div>
   );
 };

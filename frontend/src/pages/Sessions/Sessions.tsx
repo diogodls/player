@@ -90,6 +90,19 @@ const Sessions = () => {
     setIsSaveModalOpen(true);
   };
 
+  const handleCompareSessions = () => {
+    if (sessions.length < 2) {
+      navigate("/sessions/comparison");
+      return;
+    }
+    const dates = sessions.map((session) => session.date.slice(0, 10)).sort();
+    const params = new URLSearchParams({
+      startDate: dates[0],
+      endDate: dates[dates.length - 1],
+    });
+    navigate(`/sessions/comparison?${params.toString()}`);
+  };
+
   const handleCloseModal = () => {
     setIsSaveModalOpen(false);
     setSessionBeingEdited(null);
@@ -155,7 +168,7 @@ const Sessions = () => {
     <div className={styles.container}>
       <HeaderSessionScreen
         onAddSession={handleOpenCreate}
-        onCompareSessions={() => navigate("/sessions/comparison")}
+        onCompareSessions={handleCompareSessions}
       />
       <SessionsList
         sessions={sessions}

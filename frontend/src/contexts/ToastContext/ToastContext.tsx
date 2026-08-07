@@ -19,10 +19,6 @@ type ToastContextValue = {
 
 const ToastContext = createContext<ToastContextValue>({} as ToastContextValue);
 
-function uid() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
 const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const timersRef = useRef<Map<string, number>>(new Map());
@@ -38,7 +34,7 @@ const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 
   const push = useCallback(
     (type: ToastType, message: string, durationMs = 4000) => {
-      const id = uid();
+      const id = crypto.randomUUID();
       const toast: Toast = { id, type, message, durationMs };
       setToasts((prev) => [...prev, toast]);
       const timerId = window.setTimeout(() => remove(id), durationMs);

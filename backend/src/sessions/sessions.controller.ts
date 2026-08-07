@@ -14,6 +14,7 @@ import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionComparisonFiltersDto } from './dto/session-comparison-filters.dto';
 import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import { SessionDto } from './dto/session.dto';
+import { UpdateSessionDto } from './dto/update-session.dto';
 import { SessionsService } from './sessions.service';
 
 @Controller('sessions')
@@ -64,7 +65,7 @@ export class SessionsController {
   @Put(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() dto: SessionDto,
+    @Body() dto: UpdateSessionDto,
   ) {
     return this.sessionsService.update(id, dto);
   }

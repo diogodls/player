@@ -1,3 +1,8 @@
+-- Compatibilidade para inicialização legada via Compose.
+-- A fonte canônica do schema da aplicação é backend/src/migrations.
+-- Em instalações legadas/Compose, o baseline detecta estas tabelas e apenas
+-- registra a adoção, sem tentar recriá-las.
+
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE OR REPLACE FUNCTION set_updated_at()

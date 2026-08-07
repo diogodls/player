@@ -1,4 +1,5 @@
 import styles from "./ActionLog.module.scss";
+import axios from "axios";
 import { useContext, useEffect, useRef, useState } from "react";
 import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
 import { Cookies } from "react-cookie";
@@ -125,9 +126,19 @@ const ActionLog = ({ logType, session }: ActionLog) => {
     try {
       await persistSessionActions(session.id, selectedActions);
       showSuccessAndRedirect(session.id);
-    } catch {
+    } catch (caughtError) {
       setIsSaving(false);
-      error("Falha ao salvar ações");
+      const responseMessage = axios.isAxiosError(caughtError)
+        ? caughtError.response?.data?.message
+        : undefined;
+      error(
+        Array.isArray(responseMessage)
+          ? responseMessage.join(", ")
+          : responseMessage ||
+              (caughtError instanceof Error
+                ? caughtError.message
+                : "Falha ao salvar ações"),
+      );
     }
   };
 
@@ -160,7 +171,7 @@ const ActionLog = ({ logType, session }: ActionLog) => {
       {selectedActions.length === 0 ? (
         <div className={styles.emptyState}>
           <span>
-            Sem ações taggeadas. Comece a taggear açõess e elas aparecerão aqui.
+            Nenhuma ação marcada. Registre uma ação para visualizá-la aqui.
           </span>
         </div>
       ) : (

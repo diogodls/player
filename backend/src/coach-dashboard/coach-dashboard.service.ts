@@ -158,8 +158,8 @@ export class CoachDashboardService {
         'Minutagem',
         'Gols em quadra',
         'Gols tomados em quadra',
-        'Ações defensivas',
         'Ações ofensivas',
+        'Ações defensivas',
       ],
       players,
       teamIndexes: TEAM_INDEX_CONFIG.map((config) =>

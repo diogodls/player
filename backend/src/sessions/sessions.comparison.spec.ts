@@ -22,7 +22,7 @@ function buildSession({
     sessionTypeId: typeId,
     sessionLocationId: 1,
     sessionCourtSizeId: 1,
-    data: new Date(`${date}T00:00:00.000Z`),
+    data: date,
     descricao: typeId === 2 ? 'Adversario' : 'Treino tecnico',
     sessionType: { id: typeId, nome: typeId === 2 ? 'Jogo' : 'Treino' },
   } as SessionEntity;
@@ -138,6 +138,9 @@ describe('SessionsService comparison', () => {
     const receivedOptions = findSessions.mock.calls[0]?.[0];
     const where = receivedOptions?.where as FindOptionsWhere<SessionEntity>;
     expect(where.data).toBeDefined();
+    expect(
+      (where.data as unknown as { _value: [string, string] })._value,
+    ).toEqual(['2026-02-15', '2026-02-19']);
     expect(where.sessionTypeId).toBe(1);
     expect(receivedOptions?.order).toEqual({
       data: 'ASC',

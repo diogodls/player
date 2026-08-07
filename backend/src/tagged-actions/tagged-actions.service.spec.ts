@@ -18,7 +18,7 @@ const NEW_TEAM_ACTION_ID = '00000000-0000-0000-0000-000000000601';
 
 describe('TaggedActionsService', () => {
   it('validates and saves the complete batch in one transaction', async () => {
-    const { service, transaction, save } = buildService();
+    const { service, transaction, execute, orIgnore } = buildService();
 
     const result = await service.createForSession(SESSION_ID, {
       actions: [
@@ -28,21 +28,8 @@ describe('TaggedActionsService', () => {
     });
 
     expect(transaction).toHaveBeenCalledTimes(1);
-    expect(save).toHaveBeenCalledTimes(1);
-    expect(save).toHaveBeenCalledWith([
-      expect.objectContaining({
-        sessaoId: SESSION_ID,
-        acaoCatalogoId: INDIVIDUAL_ACTION_ID,
-        jogadorId: PLAYER_ID,
-        timestampSegundos: 12,
-      }),
-      expect.objectContaining({
-        sessaoId: SESSION_ID,
-        acaoCatalogoId: TEAM_ACTION_ID,
-        jogadorId: null,
-        timestampSegundos: 34,
-      }),
-    ]);
+    expect(execute).toHaveBeenCalledTimes(1);
+    expect(orIgnore).toHaveBeenCalledTimes(1);
     expect(result.actions).toHaveLength(2);
   });
 
@@ -52,7 +39,7 @@ describe('TaggedActionsService', () => {
     await expect(
       setup.service.createForSession(SESSION_ID, dto()),
     ).rejects.toThrow(NotFoundException);
-    expect(setup.save).not.toHaveBeenCalled();
+    expect(setup.execute).not.toHaveBeenCalled();
   });
 
   it('rejects catalog actions that do not exist', async () => {
@@ -61,7 +48,7 @@ describe('TaggedActionsService', () => {
     await expect(
       setup.service.createForSession(SESSION_ID, dto()),
     ).rejects.toThrow('Uma ou mais ações do catálogo não foram encontradas');
-    expect(setup.save).not.toHaveBeenCalled();
+    expect(setup.execute).not.toHaveBeenCalled();
   });
 
   it('rejects players that do not exist or belong to another team', async () => {
@@ -109,12 +96,7 @@ describe('TaggedActionsService', () => {
     await setup.service.createForSession(SESSION_ID, {
       actions: [action(NEW_TEAM_ACTION_ID, null, 45)],
     });
-    expect(setup.save).toHaveBeenCalledWith([
-      expect.objectContaining({
-        acaoCatalogoId: NEW_TEAM_ACTION_ID,
-        jogadorId: null,
-      }),
-    ]);
+    expect(setup.execute).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a new team action with a player', async () => {
@@ -126,7 +108,32 @@ describe('TaggedActionsService', () => {
         actions: [action(NEW_TEAM_ACTION_ID, PLAYER_ID, 45)],
       }),
     ).rejects.toThrow('Ação de equipe não deve possuir um jogador');
-    expect(setup.save).not.toHaveBeenCalled();
+    expect(setup.execute).not.toHaveBeenCalled();
+  });
+
+  it('returns the existing actions when the same idempotent batch is resent', async () => {
+    const setup = buildService({
+      catalogActions: [individualCatalogAction()],
+    });
+
+    const first = await setup.service.createForSession(SESSION_ID, dto());
+    const retry = await setup.service.createForSession(SESSION_ID, dto());
+
+    expect(first).toEqual(retry);
+    expect(retry.actions).toHaveLength(1);
+    expect(setup.persistedActions).toHaveLength(1);
+  });
+
+  it('rejects duplicate client action ids inside one batch', async () => {
+    const setup = buildService();
+    const duplicate = action(INDIVIDUAL_ACTION_ID, PLAYER_ID, 12);
+
+    await expect(
+      setup.service.createForSession(SESSION_ID, {
+        actions: [duplicate, { ...duplicate }],
+      }),
+    ).rejects.toThrow('não podem se repetir no mesmo lote');
+    expect(setup.execute).not.toHaveBeenCalled();
   });
 });
 
@@ -139,7 +146,12 @@ function action(
   playerId: string | null,
   timestampSeconds: number,
 ) {
-  return { catalogActionId, playerId, timestampSeconds };
+  return {
+    clientActionId: `client-${timestampSeconds}-${catalogActionId.slice(-4)}`,
+    catalogActionId,
+    playerId,
+    timestampSeconds,
+  };
 }
 
 function individualCatalogAction(): CatalogActionEntity {
@@ -155,6 +167,14 @@ function teamCatalogAction(id = TEAM_ACTION_ID): CatalogActionEntity {
     categoriaAcao: { tipoAnaliseId: 2 },
   } as CatalogActionEntity;
 }
+
+type QueryBuilderMock = {
+  insert: () => QueryBuilderMock;
+  into: () => QueryBuilderMock;
+  values: (entities: TaggedActionEntity[]) => QueryBuilderMock;
+  orIgnore: () => QueryBuilderMock;
+  execute: () => Promise<Record<string, never>>;
+};
 
 function buildService(overrides?: {
   session?: SessionEntity | null;
@@ -172,15 +192,40 @@ function buildService(overrides?: {
   const players = overrides?.players ?? [
     { id: PLAYER_ID, equipeId: TEAM_ID } as PlayerEntity,
   ];
-  const savedEntities = (entities: TaggedActionEntity[]) =>
-    entities.map((entity, index) => ({ ...entity, id: `saved-${index}` }));
-  const save = jest.fn(
-    (entities: TaggedActionEntity[]): Promise<TaggedActionEntity[]> =>
-      Promise.resolve(savedEntities(entities)),
-  );
+  const persistedActions: TaggedActionEntity[] = [];
+  let valuesToInsert: TaggedActionEntity[] = [];
+  const execute = jest.fn(() => {
+    for (const entity of valuesToInsert) {
+      if (
+        persistedActions.some(
+          (persisted) =>
+            persisted.sessaoId === entity.sessaoId &&
+            persisted.clientActionId === entity.clientActionId,
+        )
+      )
+        continue;
+      persistedActions.push({
+        ...entity,
+        id: `saved-${persistedActions.length}`,
+      });
+    }
+    return Promise.resolve({});
+  });
+  const queryBuilder: QueryBuilderMock = {
+    insert: jest.fn(() => queryBuilder),
+    into: jest.fn(() => queryBuilder),
+    values: jest.fn((entities: TaggedActionEntity[]) => {
+      valuesToInsert = entities;
+      return queryBuilder;
+    }),
+    orIgnore: jest.fn(() => queryBuilder),
+    execute,
+  };
+  const orIgnore = queryBuilder.orIgnore;
   const taggedRepository = {
     create: jest.fn((entity: TaggedActionEntity) => entity),
-    save,
+    createQueryBuilder: jest.fn(() => queryBuilder),
+    find: jest.fn(() => Promise.resolve(persistedActions)),
   };
   const manager = {
     getRepository: jest.fn((entity) => {
@@ -204,6 +249,8 @@ function buildService(overrides?: {
   return {
     service: new TaggedActionsService(repository),
     transaction,
-    save,
+    execute,
+    orIgnore,
+    persistedActions,
   };
 }

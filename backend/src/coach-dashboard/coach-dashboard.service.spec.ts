@@ -143,6 +143,13 @@ describe('CoachDashboardService efficiencies', () => {
     const result = await service.getDashboard();
 
     expect(Array.isArray(result.metrics)).toBe(true);
+    expect(result.metrics).toEqual([
+      'Minutagem',
+      'Gols em quadra',
+      'Gols tomados em quadra',
+      'Ações ofensivas',
+      'Ações defensivas',
+    ]);
     expect(Array.isArray(result.players)).toBe(true);
     expect(Array.isArray(result.teamIndexes)).toBe(true);
     expect(

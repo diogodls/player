@@ -8,7 +8,19 @@ vi.mock("../../hooks/useApi", () => ({ useApi: vi.fn() }));
 const mockedUseApi = vi.mocked(useApi);
 
 describe("CoachDashboard", () => {
-  beforeEach(() => mockedUseApi.mockReset());
+  beforeEach(() => {
+    mockedUseApi.mockReset();
+    vi.restoreAllMocks();
+  });
+
+  it("does not render the temporarily unavailable export action", () => {
+    mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));
+    renderPage();
+
+    expect(
+      screen.queryByRole("button", { name: "Exportar dados" }),
+    ).not.toBeInTheDocument();
+  });
 
   it("loads dashboard data exclusively from the backend endpoint", () => {
     mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));

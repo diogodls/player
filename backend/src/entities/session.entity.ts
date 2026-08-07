@@ -31,7 +31,7 @@ export class SessionEntity extends BaseEntity {
   sessionCourtSizeId!: number;
 
   @Column({ type: 'date' })
-  data!: Date;
+  data!: string;
 
   @Column({ type: 'text', nullable: true })
   descricao!: string | null;

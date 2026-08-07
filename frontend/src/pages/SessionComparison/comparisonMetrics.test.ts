@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ComparisonPoint } from "./index";
 import {
+  COMPARISON_METRICS,
   formatMetricDelta,
   getMetricSummary,
   getPointMetricValue,
@@ -58,6 +59,8 @@ describe("comparison metrics", () => {
   });
 
   it("respects lower-is-better and neutral trend directions", () => {
+    expect(COMPARISON_METRICS.gtj.direction).toBe("lower");
+    expect(COMPARISON_METRICS.dto.direction).toBe("lower");
     expect(getTrend(-2, "lower")).toBe("improved");
     expect(getTrend(2, "lower")).toBe("declined");
     expect(getTrend(2, "neutral")).toBe("changed");

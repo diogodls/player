@@ -1,4 +1,5 @@
-import {faCodeCompare, faPeopleGroup, faUser, faFileExport} from "@fortawesome/free-solid-svg-icons";
+import {faCodeCompare, faPeopleGroup, faUser} from "@fortawesome/free-solid-svg-icons";
+// import {faFileExport} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./HeaderDashboard.module.scss"
 import {classNames} from "../../../utils/classNames.ts";
@@ -22,18 +23,21 @@ const buttons: ButtonsType[] = [
     mode:'individual'
   },
   {
-    label: "Compare",
+    label: "Comparar atletas",
     icon: faCodeCompare,
     mode:'compare'
   }
 ];
 
 type Props = {
-  viewMode: 'team' | 'individual' | 'compare';
-  onChangeView: (mode: Props['viewMode']) => void;
+  viewMode: "team" | "individual" | "compare";
+  onChangeView: (mode: "team" | "individual" | "compare") => void;
 };
 
-const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
+const HeaderDashboard = ({
+  viewMode,
+  onChangeView,
+}: Props) => {
   return (
     <div className={styles.div}>
       <div>
@@ -55,18 +59,27 @@ const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
                   : ""
               ])}
               onClick={() => onChangeView(button.mode)}
+              type="button"
             >
               <FontAwesomeIcon icon={button.icon} />
               <span>{button.label}</span>
             </button>
           ))}
         </div>
+        {/* Botão de exportação temporariamente desativado.
         <div>
-          <button className={styles.export}>
+          <button
+            className={styles.export}
+            type="button"
+            onClick={onExport}
+            disabled={!canExport}
+            title={canExport ? "Baixar dados exibidos em CSV" : "Não há dados para exportar"}
+          >
             <FontAwesomeIcon icon={faFileExport}/>
-            <span>Exportar Data</span>
+            <span>Exportar dados</span>
           </button>
         </div>
+        */}
       </div>
     </div>
   );

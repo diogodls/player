@@ -1,4 +1,5 @@
-import { useContext, useMemo, useState } from "react";
+import axios from "axios";
+import { useContext, useMemo, useRef, useState } from "react";
 import AthleteForm, {
   type AthleteFormValues,
 } from "../../components/AthleteRegistration/AthleteForm/AthleteForm";
@@ -14,7 +15,7 @@ import {
   PREFERRED_SIDE_IDS,
 } from "../../constants/players";
 import { useApi } from "../../hooks/useApi.ts";
-  import { useDebouncedValue } from "../../hooks/useDebouncedValue.ts";
+import { useDebouncedValue } from "../../hooks/useDebouncedValue.ts";
 import { backendApi } from "../../utils/api.ts";
 import styles from "./AthleteRegistrationScreen.module.scss";
 
@@ -22,7 +23,9 @@ type Athlete = {
   id: string;
   name: string;
   age: number;
+  positionId: number;
   position: (typeof PLAYERS_POSITIONS)[number];
+  preferredSideId: number;
   preferredSide: (typeof PREFERRED_SIDES)[number];
 };
 
@@ -37,6 +40,17 @@ type PaginatedAthletesResponse = {
 const ATHLETES_PER_PAGE = 8;
 type PositionFilter = "all" | (typeof PLAYERS_POSITIONS)[number];
 
+const DEFAULT_SAVE_ERROR = "Não foi possível salvar o atleta.";
+
+const getBackendErrorMessage = (caughtError: unknown) => {
+  if (!axios.isAxiosError(caughtError)) return DEFAULT_SAVE_ERROR;
+
+  const message = caughtError.response?.data?.message;
+  if (Array.isArray(message)) return message.join("; ");
+  if (typeof message === "string" && message.trim()) return message;
+  return DEFAULT_SAVE_ERROR;
+};
+
 const AthleteRegistrationScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAthlete, setEditingAthlete] = useState<Athlete | null>(null);
@@ -44,6 +58,7 @@ const AthleteRegistrationScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [nameFilter, setNameFilter] = useState("");
   const [positionFilter, setPositionFilter] = useState<PositionFilter>("all");
+  const isSavingAthlete = useRef(false);
   const { success, info, error } = useContext(ToastContext);
   const debouncedNameFilter = useDebouncedValue(nameFilter, 300);
 
@@ -80,18 +95,24 @@ const AthleteRegistrationScreen = () => {
   const safeCurrentPage =
     athletesResponse?.page ?? Math.min(currentPage, totalPages);
 
-  const formInitialValues = useMemo<AthleteFormValues | undefined>(
-    () =>
-      editingAthlete
-        ? {
-            name: editingAthlete.name,
-            age: editingAthlete.age,
-            position: editingAthlete.position,
-            preferredSide: editingAthlete.preferredSide,
-          }
-        : undefined,
-    [editingAthlete],
-  );
+  const formInitialValues = useMemo<AthleteFormValues | undefined>(() => {
+    if (!editingAthlete) return undefined;
+
+    const position = PLAYERS_POSITIONS.find(
+      (value) => PLAYER_POSITION_IDS[value] === editingAthlete.positionId,
+    );
+    const preferredSide = PREFERRED_SIDES.find(
+      (value) => PREFERRED_SIDE_IDS[value] === editingAthlete.preferredSideId,
+    );
+    if (!position || !preferredSide) return undefined;
+
+    return {
+      name: editingAthlete.name,
+      age: Number(editingAthlete.age),
+      position,
+      preferredSide,
+    };
+  }, [editingAthlete]);
 
   const handleOpenCreateModal = () => {
     setEditingAthlete(null);
@@ -99,10 +120,12 @@ const AthleteRegistrationScreen = () => {
   };
 
   const handleSubmitAthlete = async (values: AthleteFormValues) => {
+    if (isSavingAthlete.current) return;
+    isSavingAthlete.current = true;
     const payload = {
       id: editingAthlete?.id ?? null,
       name: values.name,
-      age: values.age,
+      age: Number(values.age),
       positionId: PLAYER_POSITION_IDS[values.position],
       preferredSideId: PREFERRED_SIDE_IDS[values.preferredSide],
     };
@@ -113,18 +136,23 @@ const AthleteRegistrationScreen = () => {
       } else {
         await backendApi.post<Athlete>("/players", payload);
       }
-    } catch {
-      error("Não foi possível salvar o atleta.");
+    } catch (caughtError) {
+      error(getBackendErrorMessage(caughtError));
+      isSavingAthlete.current = false;
       return;
     }
 
-    void mutate().catch(() => {
-      error("Não foi possível atualizar a lista de atletas.");
-    });
-    setCurrentPage(1);
+    if (!editingAthlete) setCurrentPage(1);
     success(`Atleta ${editingAthlete ? "editado" : "criado"}!`);
     setIsModalOpen(false);
     setEditingAthlete(null);
+    isSavingAthlete.current = false;
+
+    void Promise.resolve(mutate()).catch(() => {
+      info(
+        "Atleta salvo, mas não foi possível atualizar a lista. Recarregue para visualizar os dados mais recentes.",
+      );
+    });
   };
 
   const handleCloseForm = () => {

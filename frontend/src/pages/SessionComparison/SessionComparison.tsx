@@ -86,9 +86,24 @@ function isValidRange(startDate: string, endDate: string) {
 }
 
 function countPeriodDays(startDate: string, endDate: string) {
-  const start = new Date(`${startDate}T00:00:00.000Z`).getTime();
-  const end = new Date(`${endDate}T00:00:00.000Z`).getTime();
-  return Math.round((end - start) / 86_400_000) + 1;
+  const toCalendarDay = (calendarDate: string) => {
+    const [year, month, day] = calendarDate.split("-").map(Number);
+    const adjustedYear = year - (month <= 2 ? 1 : 0);
+    const era = Math.floor(adjustedYear / 400);
+    const yearOfEra = adjustedYear - era * 400;
+    const adjustedMonth = month + (month > 2 ? -3 : 9);
+    const dayOfYear = Math.floor((153 * adjustedMonth + 2) / 5) + day - 1;
+    return (
+      era * 146097 +
+      yearOfEra * 365 +
+      Math.floor(yearOfEra / 4) -
+      Math.floor(yearOfEra / 100) +
+      dayOfYear
+    );
+  };
+  const start = toCalendarDay(startDate);
+  const end = toCalendarDay(endDate);
+  return end - start + 1;
 }
 
 function getPerformanceSummary(athlete: ComparisonAthlete) {
