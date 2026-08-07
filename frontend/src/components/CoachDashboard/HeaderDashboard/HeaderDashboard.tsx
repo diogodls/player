@@ -30,13 +30,18 @@ const buttons: ButtonsType[] = [
 ];
 
 type Props = {
-  viewMode: 'team' | 'individual' | 'compare';
-  onChangeView: (mode: Props['viewMode']) => void;
-  onExport: () => void;
-  canExport: boolean;
+  viewMode: "team" | "individual" | "compare";
+  onChangeView: (mode: "team" | "individual" | "compare") => void;
+  onExport?: () => void;
+  canExport?: boolean;
 };
 
-const HeaderDashboard = ({ viewMode, onChangeView}: Props) => {
+const HeaderDashboard = ({
+  viewMode,
+  onChangeView,
+  onExport = () => {},
+  canExport = false,
+}: Props) => {
   return (
     <div className={styles.div}>
       <div>
