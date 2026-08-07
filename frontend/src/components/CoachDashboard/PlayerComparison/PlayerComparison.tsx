@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,
@@ -20,20 +20,18 @@ type PlayerComparisonProps = {
 };
 
 const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
   const [playersCount, setPlayersCount] = useState<number>(2);
 
-  useEffect(() => {
+  const selectedPlayers = useMemo(() => {
     const currentPlayers = new Map(
       (players ?? []).map((player) => [player.id, player]),
     );
-    setSelectedPlayers((selected) =>
-      selected.flatMap((player) => {
-        const currentPlayer = currentPlayers.get(player.id);
-        return currentPlayer ? [currentPlayer] : [];
-      }),
-    );
-  }, [players]);
+    return selectedPlayerIds.flatMap((playerId) => {
+      const currentPlayer = currentPlayers.get(playerId);
+      return currentPlayer ? [currentPlayer] : [];
+    });
+  }, [players, selectedPlayerIds]);
 
   const playersList = useMemo(() => {
     return (
@@ -48,26 +46,27 @@ const PlayerComparison = ({ players, metrics }: PlayerComparisonProps) => {
 
   const setPlayer = (playerId: string, index: number) => {
     const player =
-      playersList.find((player) => player.id === playerId) ??
-      selectedPlayers[index] ??
+      players?.find((player) => player.id === playerId) ??
       null;
     if (!player) return;
 
-    const newSelectedPlayersList = [...selectedPlayers];
-    newSelectedPlayersList[index] = player;
-    setSelectedPlayers(newSelectedPlayersList);
+    const nextSelectedPlayerIds = selectedPlayers.map(({ id }) => id);
+    nextSelectedPlayerIds[index] = player.id;
+    setSelectedPlayerIds(nextSelectedPlayerIds);
   };
 
   const removePlayer = (playerId: string) => {
-    setSelectedPlayers((players) =>
-      players.filter((selectedPlayer) => selectedPlayer.id !== playerId),
+    setSelectedPlayerIds(
+      selectedPlayers
+        .filter((selectedPlayer) => selectedPlayer.id !== playerId)
+        .map(({ id }) => id),
     );
 
     setPlayersCount(playersCount <= 2 ? playersCount : playersCount - 1);
   };
 
   const handleClearComparison = () => {
-    setSelectedPlayers([]);
+    setSelectedPlayerIds([]);
     setPlayersCount(2);
   };
 

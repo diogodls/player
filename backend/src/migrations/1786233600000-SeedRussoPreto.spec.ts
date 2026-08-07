@@ -21,13 +21,17 @@ describe('SeedRussoPreto1786233600000', () => {
 
   it('looks up configuration and actions without fixed catalog IDs', async () => {
     const migration = new SeedRussoPreto1786233600000();
-    const query = jest.fn().mockResolvedValue(undefined);
+    const statements: string[] = [];
+    const query = jest.fn((statement: string) => {
+      statements.push(statement);
+      return Promise.resolve(undefined);
+    });
     process.env.NODE_ENV = 'development';
     process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
 
     await migration.up({ query } as unknown as QueryRunner);
 
-    const sql = query.mock.calls[0][0] as string;
+    const sql = statements[0] ?? '';
     expect(sql).toContain("lower(nome) = lower('Jogo')");
     expect(sql).toContain("lower(nome) = lower('Casa')");
     expect(sql).toContain("lower(nome) = lower('Grande')");
@@ -38,12 +42,16 @@ describe('SeedRussoPreto1786233600000', () => {
 
   it('creates one entry and exit plus every raw action unit', async () => {
     const migration = new SeedRussoPreto1786233600000();
-    const query = jest.fn().mockResolvedValue(undefined);
+    const statements: string[] = [];
+    const query = jest.fn((statement: string) => {
+      statements.push(statement);
+      return Promise.resolve(undefined);
+    });
     process.env.NODE_ENV = 'development';
     process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
 
     await migration.up({ query } as unknown as QueryRunner);
-    const sql = query.mock.calls[0][0] as string;
+    const sql = statements[0] ?? '';
 
     expect((sql.match(/'ENTROU'/g) ?? []).length / 2).toBe(12);
     expect((sql.match(/'SAIU'/g) ?? []).length / 2).toBe(12);
@@ -52,12 +60,16 @@ describe('SeedRussoPreto1786233600000', () => {
 
   it('removes dependent actions before session and players on rollback', async () => {
     const migration = new SeedRussoPreto1786233600000();
-    const query = jest.fn().mockResolvedValue(undefined);
+    const statements: string[] = [];
+    const query = jest.fn((statement: string) => {
+      statements.push(statement);
+      return Promise.resolve(undefined);
+    });
     process.env.NODE_ENV = 'development';
     process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
 
     await migration.down({ query } as unknown as QueryRunner);
-    const sql = query.mock.calls[0][0] as string;
+    const sql = statements[0] ?? '';
 
     expect(sql.indexOf('DELETE FROM acoes_taggeadas')).toBeLessThan(
       sql.indexOf('DELETE FROM sessoes'),

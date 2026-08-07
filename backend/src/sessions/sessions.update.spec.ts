@@ -27,7 +27,13 @@ describe('SessionsService update', () => {
   it('updates only supplied fields without loading or replacing actions', async () => {
     const currentSession = session();
     const findOne = jest.fn().mockResolvedValue(currentSession);
-    const update = jest.fn().mockResolvedValue({ affected: 1 });
+    let updatePayload: Record<string, unknown> | undefined;
+    const update = jest.fn(
+      (_sessionId: string, payload: Record<string, unknown>) => {
+        updatePayload = payload;
+        return Promise.resolve({ affected: 1 });
+      },
+    );
     const taggedActionsRepository = {
       find: jest.fn(),
       save: jest.fn(),
@@ -53,14 +59,9 @@ describe('SessionsService update', () => {
       data: '2026-08-06',
       descricao: 'Treino editado',
     });
-    expect(update).not.toHaveBeenCalledWith(
-      SESSION_ID,
-      expect.objectContaining({
-        equipeId: expect.anything(),
-        sessionTypeId: expect.anything(),
-        sessionCourtSizeId: expect.anything(),
-      }),
-    );
+    expect(updatePayload).not.toHaveProperty('equipeId');
+    expect(updatePayload).not.toHaveProperty('sessionTypeId');
+    expect(updatePayload).not.toHaveProperty('sessionCourtSizeId');
     expect(taggedActionsRepository.find).not.toHaveBeenCalled();
     expect(taggedActionsRepository.save).not.toHaveBeenCalled();
     expect(taggedActionsRepository.delete).not.toHaveBeenCalled();

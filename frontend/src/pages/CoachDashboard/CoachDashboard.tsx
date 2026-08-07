@@ -21,32 +21,6 @@ const sessionLabel = (session: Session) =>
   session.description?.trim() ||
   `${session.type} — ${session.date.slice(0, 10)}`;
 
-const csvCell = (value: string | number | null) =>
-  `"${String(value ?? "Não disponível").replaceAll('"', '""')}"`;
-
-export function downloadDashboardCsv(data: CoachDashboardResponse) {
-  const rows = [
-    ["Tipo", "Nome", "Valor"],
-    ...data.teamIndexes.map((index) => [
-      "Índice coletivo",
-      index.title,
-      index.value,
-    ]),
-    ...data.players.map((player) => ["Atleta", player.name, player.overall]),
-  ];
-  const csv = rows.map((row) => row.map(csvCell).join(";")).join("\\n");
-  const url = URL.createObjectURL(
-    new Blob(["\\uFEFF", csv], { type: "text/csv;charset=utf-8" }),
-  );
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "dashboard-equipe.csv";
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
 const CoachDashboard = () => {
   const [sessionId, setSessionId] = useState(ALL);
   const [startDate, setStartDate] = useState("");
@@ -161,8 +135,6 @@ const CoachDashboard = () => {
           <HeaderDashboard
             viewMode={viewMode}
             onChangeView={setViewMode}
-            onExport={() => downloadDashboardCsv(data)}
-            canExport={data.teamIndexes.length > 0 || data.players.length > 0}
           />
           {viewMode === "team" && (
             <TeamData teamRelevantIndexes={data.teamIndexes} />

@@ -1,5 +1,4 @@
 import {faCodeCompare, faPeopleGroup, faUser} from "@fortawesome/free-solid-svg-icons";
-// import {faFileExport} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import styles from "./HeaderDashboard.module.scss"
 import {classNames} from "../../../utils/classNames.ts";
@@ -32,15 +31,11 @@ const buttons: ButtonsType[] = [
 type Props = {
   viewMode: "team" | "individual" | "compare";
   onChangeView: (mode: "team" | "individual" | "compare") => void;
-  onExport?: () => void;
-  canExport?: boolean;
 };
 
 const HeaderDashboard = ({
   viewMode,
   onChangeView,
-  onExport = () => {},
-  canExport = false,
 }: Props) => {
   return (
     <div className={styles.div}>
@@ -70,20 +65,6 @@ const HeaderDashboard = ({
             </button>
           ))}
         </div>
-        {/* Exportação temporariamente indisponível.
-        <div>
-          <button
-            className={styles.export}
-            type="button"
-            onClick={onExport}
-            disabled={!canExport}
-            title={canExport ? "Baixar dados exibidos em CSV" : "Não há dados para exportar"}
-          >
-            <FontAwesomeIcon icon={faFileExport}/>
-            <span>Exportar dados</span>
-          </button>
-        </div>
-        */}
       </div>
     </div>
   );

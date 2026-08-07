@@ -168,6 +168,14 @@ function teamCatalogAction(id = TEAM_ACTION_ID): CatalogActionEntity {
   } as CatalogActionEntity;
 }
 
+type QueryBuilderMock = {
+  insert: () => QueryBuilderMock;
+  into: () => QueryBuilderMock;
+  values: (entities: TaggedActionEntity[]) => QueryBuilderMock;
+  orIgnore: () => QueryBuilderMock;
+  execute: () => Promise<Record<string, never>>;
+};
+
 function buildService(overrides?: {
   session?: SessionEntity | null;
   catalogActions?: CatalogActionEntity[];
@@ -186,7 +194,7 @@ function buildService(overrides?: {
   ];
   const persistedActions: TaggedActionEntity[] = [];
   let valuesToInsert: TaggedActionEntity[] = [];
-  const execute = jest.fn(async () => {
+  const execute = jest.fn(() => {
     for (const entity of valuesToInsert) {
       if (
         persistedActions.some(
@@ -201,23 +209,23 @@ function buildService(overrides?: {
         id: `saved-${persistedActions.length}`,
       });
     }
-    return {};
+    return Promise.resolve({});
   });
-  const orIgnore = jest.fn().mockReturnThis();
-  const queryBuilder = {
-    insert: jest.fn().mockReturnThis(),
-    into: jest.fn().mockReturnThis(),
+  const queryBuilder: QueryBuilderMock = {
+    insert: jest.fn(() => queryBuilder),
+    into: jest.fn(() => queryBuilder),
     values: jest.fn((entities: TaggedActionEntity[]) => {
       valuesToInsert = entities;
       return queryBuilder;
     }),
-    orIgnore,
+    orIgnore: jest.fn(() => queryBuilder),
     execute,
   };
+  const orIgnore = queryBuilder.orIgnore;
   const taggedRepository = {
     create: jest.fn((entity: TaggedActionEntity) => entity),
     createQueryBuilder: jest.fn(() => queryBuilder),
-    find: jest.fn(async () => persistedActions),
+    find: jest.fn(() => Promise.resolve(persistedActions)),
   };
   const manager = {
     getRepository: jest.fn((entity) => {

@@ -1,6 +1,7 @@
 import {
   assertDevelopmentSeedAllowed,
   seedDevelopmentData,
+  type SeedClient,
   unwrapSeedSql,
 } from './seed-development-data';
 
@@ -20,25 +21,29 @@ describe('development seed', () => {
 
   it('runs base and demonstration seeds in one transaction', async () => {
     process.env.NODE_ENV = 'development';
-    const query = jest.fn().mockResolvedValue({ rows: [] });
+    const statements: string[] = [];
+    const query = jest.fn((sql: string) => {
+      statements.push(sql);
+      return Promise.resolve({ rows: [] });
+    });
     await seedDevelopmentData(
       { query },
       "BEGIN; INSERT INTO tipos_analise (id, nome) VALUES (1, 'Individual') ON CONFLICT DO NOTHING; COMMIT;",
     );
 
-    expect(query.mock.calls[0][0]).toBe('BEGIN');
-    expect(query.mock.calls[1][0]).not.toMatch(/BEGIN|COMMIT/);
-    expect(query.mock.calls[1][0]).toContain('ON CONFLICT DO NOTHING');
-    expect(query.mock.calls[2][0]).toContain('ON CONFLICT (id) DO UPDATE');
-    expect(query.mock.calls[3][0]).toContain('Russo Preto — retorno');
-    expect(query.mock.calls[3][0]).toContain('jogador_id IS NULL');
-    expect(query.mock.calls.at(-1)?.[0]).toBe('COMMIT');
+    expect(statements[0]).toBe('BEGIN');
+    expect(statements[1]).not.toMatch(/BEGIN|COMMIT/);
+    expect(statements[1]).toContain('ON CONFLICT DO NOTHING');
+    expect(statements[2]).toContain('ON CONFLICT (id) DO UPDATE');
+    expect(statements[3]).toContain('Russo Preto — retorno');
+    expect(statements[3]).toContain('jogador_id IS NULL');
+    expect(statements.at(-1)).toBe('COMMIT');
   });
 
   it('rolls back the complete load after a failure', async () => {
     process.env.NODE_ENV = 'development';
     const query = jest
-      .fn()
+      .fn<SeedClient['query']>()
       .mockResolvedValueOnce({ rows: [] })
       .mockRejectedValueOnce(new Error('seed failed'))
       .mockResolvedValueOnce({ rows: [] });

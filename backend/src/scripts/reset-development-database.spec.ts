@@ -11,14 +11,14 @@ describe('development database reset', () => {
   it('cleans dependents and then recreates demonstration data on every run', async () => {
     process.env.NODE_ENV = 'development';
     const statements: string[] = [];
-    const query = jest.fn(async (sql: string) => {
+    const query = jest.fn((sql: string) => {
       statements.push(sql.trim());
       if (sql.includes('SELECT') && sql.includes('count(*)')) {
-        return {
+        return Promise.resolve({
           rows: [{ jogadores: 12, sessoes: 1, acoes_taggeadas: 250 }],
-        };
+        });
       }
-      return { rows: [] };
+      return Promise.resolve({ rows: [] });
     });
     const client = { query } as Parameters<typeof resetDevelopmentDatabase>[0];
     const baseSeed =
@@ -39,6 +39,6 @@ describe('development database reset', () => {
     expect(statements.join(' ')).not.toContain('DELETE FROM migrations');
     expect(
       statements.filter((sql) => sql.includes('ON CONFLICT (id) DO UPDATE')),
-    ).toHaveLength(2);
+    ).toHaveLength(4);
   });
 });

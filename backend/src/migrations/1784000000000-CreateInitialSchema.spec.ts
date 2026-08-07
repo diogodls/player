@@ -3,14 +3,18 @@ import { CreateInitialSchema1784000000000 } from './1784000000000-CreateInitialS
 
 describe('CreateInitialSchema1784000000000', () => {
   it('creates the complete schema before historical migrations', async () => {
-    const query = jest.fn().mockResolvedValue(undefined);
+    const statements: string[] = [];
+    const query = jest.fn((statement: string) => {
+      statements.push(statement);
+      return Promise.resolve(undefined);
+    });
     const hasTable = jest.fn().mockResolvedValue(false);
     await new CreateInitialSchema1784000000000().up({
       query,
       hasTable,
     } as unknown as QueryRunner);
 
-    const sql = query.mock.calls.map(([statement]) => statement).join('\n');
+    const sql = statements.join('\n');
     for (const table of [
       'equipes',
       'session_types',
