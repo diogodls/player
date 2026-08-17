@@ -1,7 +1,7 @@
 import type { Session } from "../Sessions";
 
 export type ViewMode = "individual" | "team";
-export type ActionTypeFilter = "all" | "positive" | "negative";
+export type ActionTypeFilter = "all" | "positive" | "negative" | "neutral";
 export type EntityType = "player" | "team";
 
 export type SessionActionCategory = {
@@ -18,6 +18,16 @@ export type SessionSummary = {
 
 export type SessionEntityAction = {
   id: string;
+  catalogActionId: string;
+  actionKey: string;
+  actionName: string;
+  groupKey: string;
+  groupName: string;
+  impact: "POSITIVE" | "NEGATIVE" | "NEUTRAL";
+  teamContextId: string | null;
+  contextKey: string | null;
+  contextName: string | null;
+  timestampSeconds: number;
   title: string;
   category: SessionActionCategory;
   time: string;
@@ -60,6 +70,8 @@ export type SessionViewFilterOption = {
 export type SessionViewFilterOptions = {
   athletes: SessionViewFilterOption[];
   categories: SessionViewFilterOption[];
+  outcomes: SessionViewFilterOption[];
+  phases: SessionViewFilterOption[];
 };
 
 export type SessionViewFilters = {

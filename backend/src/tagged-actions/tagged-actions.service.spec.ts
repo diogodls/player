@@ -5,6 +5,7 @@ import {
   PlayerEntity,
   SessionEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
 } from '../entities';
 import { CreateSessionActionsDto } from './dto/create-session-actions.dto';
 import { TaggedActionsService } from './tagged-actions.service';
@@ -15,6 +16,12 @@ const PLAYER_ID = '00000000-0000-0000-0000-000000000201';
 const INDIVIDUAL_ACTION_ID = '00000000-0000-0000-0000-000000000411';
 const TEAM_ACTION_ID = '00000000-0000-0000-0000-000000000420';
 const NEW_TEAM_ACTION_ID = '00000000-0000-0000-0000-000000000601';
+const V2_TEAM_ACTION_ID = '00000000-0000-0000-0000-000000000716';
+const V2_TEAM_ACTION_2_ID = '00000000-0000-0000-0000-000000000717';
+const ATTACK_CATEGORY_ID = '00000000-0000-0000-0000-000000000702';
+const DEFENSE_CATEGORY_ID = '00000000-0000-0000-0000-000000000703';
+const ATTACK_CONTEXT_ID = '00000000-0000-0000-0000-000000000737';
+const DEFENSE_CONTEXT_ID = '00000000-0000-0000-0000-000000000742';
 
 describe('TaggedActionsService', () => {
   it('validates and saves the complete batch in one transaction', async () => {
@@ -111,6 +118,125 @@ describe('TaggedActionsService', () => {
     expect(setup.execute).not.toHaveBeenCalled();
   });
 
+  it('saves a v2 team action with a context from the same category', async () => {
+    const setup = buildService({
+      catalogActions: [v2TeamCatalogAction()],
+      teamContexts: [teamContext(ATTACK_CONTEXT_ID, ATTACK_CATEGORY_ID)],
+    });
+
+    const result = await setup.service.createForSession(SESSION_ID, {
+      actions: [action(V2_TEAM_ACTION_ID, null, 45, ATTACK_CONTEXT_ID)],
+    });
+
+    expect(setup.persistedActions[0].contextoAcaoEquipeId).toBe(
+      ATTACK_CONTEXT_ID,
+    );
+    expect(result.actions[0].teamContextId).toBe(ATTACK_CONTEXT_ID);
+  });
+
+  it('rejects a v2 team action without context', async () => {
+    const setup = buildService({ catalogActions: [v2TeamCatalogAction()] });
+
+    await expect(
+      setup.service.createForSession(SESSION_ID, {
+        actions: [action(V2_TEAM_ACTION_ID, null, 45)],
+      }),
+    ).rejects.toThrow('deve possuir um contexto');
+    expect(setup.execute).not.toHaveBeenCalled();
+  });
+
+  it('rejects a team context from another action category', async () => {
+    const setup = buildService({
+      catalogActions: [v2TeamCatalogAction()],
+      teamContexts: [teamContext(DEFENSE_CONTEXT_ID, DEFENSE_CATEGORY_ID)],
+    });
+
+    await expect(
+      setup.service.createForSession(SESSION_ID, {
+        actions: [action(V2_TEAM_ACTION_ID, null, 45, DEFENSE_CONTEXT_ID)],
+      }),
+    ).rejects.toThrow('mesma categoria da ação');
+    expect(setup.execute).not.toHaveBeenCalled();
+  });
+
+  it('rejects an individual action with a team context', async () => {
+    const setup = buildService({
+      catalogActions: [individualCatalogAction()],
+      teamContexts: [teamContext(ATTACK_CONTEXT_ID, ATTACK_CATEGORY_ID)],
+    });
+
+    await expect(
+      setup.service.createForSession(SESSION_ID, {
+        actions: [
+          action(INDIVIDUAL_ACTION_ID, PLAYER_ID, 45, ATTACK_CONTEXT_ID),
+        ],
+      }),
+    ).rejects.toThrow('individual não deve possuir um contexto');
+    expect(setup.execute).not.toHaveBeenCalled();
+  });
+
+  it('keeps accepting a legacy team action without context', async () => {
+    const setup = buildService({ catalogActions: [teamCatalogAction()] });
+
+    await setup.service.createForSession(SESSION_ID, {
+      actions: [action(TEAM_ACTION_ID, null, 45)],
+    });
+
+    expect(setup.persistedActions[0].contextoAcaoEquipeId).toBeNull();
+  });
+
+  it('loads all contexts from a multi-action batch in one query', async () => {
+    const setup = buildService({
+      catalogActions: [
+        v2TeamCatalogAction(V2_TEAM_ACTION_ID),
+        v2TeamCatalogAction(V2_TEAM_ACTION_2_ID),
+      ],
+      teamContexts: [
+        teamContext(ATTACK_CONTEXT_ID, ATTACK_CATEGORY_ID),
+        teamContext('00000000-0000-0000-0000-000000000738', ATTACK_CATEGORY_ID),
+      ],
+    });
+
+    await setup.service.createForSession(SESSION_ID, {
+      actions: [
+        action(V2_TEAM_ACTION_ID, null, 45, ATTACK_CONTEXT_ID),
+        action(
+          V2_TEAM_ACTION_2_ID,
+          null,
+          46,
+          '00000000-0000-0000-0000-000000000738',
+        ),
+      ],
+    });
+
+    expect(setup.findTeamContexts).toHaveBeenCalledTimes(1);
+    expect(setup.execute).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not persist any item when one action in the batch is invalid', async () => {
+    const setup = buildService({
+      catalogActions: [
+        v2TeamCatalogAction(V2_TEAM_ACTION_ID),
+        v2TeamCatalogAction(V2_TEAM_ACTION_2_ID),
+      ],
+      teamContexts: [
+        teamContext(ATTACK_CONTEXT_ID, ATTACK_CATEGORY_ID),
+        teamContext(DEFENSE_CONTEXT_ID, DEFENSE_CATEGORY_ID),
+      ],
+    });
+
+    await expect(
+      setup.service.createForSession(SESSION_ID, {
+        actions: [
+          action(V2_TEAM_ACTION_ID, null, 45, ATTACK_CONTEXT_ID),
+          action(V2_TEAM_ACTION_2_ID, null, 46, DEFENSE_CONTEXT_ID),
+        ],
+      }),
+    ).rejects.toThrow('mesma categoria da ação');
+    expect(setup.execute).not.toHaveBeenCalled();
+    expect(setup.persistedActions).toHaveLength(0);
+  });
+
   it('returns the existing actions when the same idempotent batch is resent', async () => {
     const setup = buildService({
       catalogActions: [individualCatalogAction()],
@@ -122,6 +248,25 @@ describe('TaggedActionsService', () => {
     expect(first).toEqual(retry);
     expect(retry.actions).toHaveLength(1);
     expect(setup.persistedActions).toHaveLength(1);
+  });
+
+  it('does not duplicate a contextual team action when its client id is resent', async () => {
+    const setup = buildService({
+      catalogActions: [v2TeamCatalogAction()],
+      teamContexts: [teamContext(ATTACK_CONTEXT_ID, ATTACK_CATEGORY_ID)],
+    });
+    const payload = {
+      actions: [action(V2_TEAM_ACTION_ID, null, 45, ATTACK_CONTEXT_ID)],
+    };
+
+    const first = await setup.service.createForSession(SESSION_ID, payload);
+    const retry = await setup.service.createForSession(SESSION_ID, payload);
+
+    expect(retry).toEqual(first);
+    expect(setup.persistedActions).toHaveLength(1);
+    expect(setup.persistedActions[0].contextoAcaoEquipeId).toBe(
+      ATTACK_CONTEXT_ID,
+    );
   });
 
   it('rejects duplicate client action ids inside one batch', async () => {
@@ -145,11 +290,13 @@ function action(
   catalogActionId: string,
   playerId: string | null,
   timestampSeconds: number,
+  teamContextId?: string,
 ) {
   return {
     clientActionId: `client-${timestampSeconds}-${catalogActionId.slice(-4)}`,
     catalogActionId,
     playerId,
+    ...(teamContextId ? { teamContextId } : {}),
     timestampSeconds,
   };
 }
@@ -164,8 +311,24 @@ function individualCatalogAction(): CatalogActionEntity {
 function teamCatalogAction(id = TEAM_ACTION_ID): CatalogActionEntity {
   return {
     id,
-    categoriaAcao: { tipoAnaliseId: 2 },
+    categoriaAcaoId: '00000000-0000-0000-0000-000000000305',
+    categoriaAcao: { tipoAnaliseId: 2, chave: 'SET_PIECE' },
   } as CatalogActionEntity;
+}
+
+function v2TeamCatalogAction(id = V2_TEAM_ACTION_ID): CatalogActionEntity {
+  return {
+    id,
+    categoriaAcaoId: ATTACK_CATEGORY_ID,
+    categoriaAcao: { tipoAnaliseId: 2, chave: 'TEAM_V2_ATTACK' },
+  } as CatalogActionEntity;
+}
+
+function teamContext(
+  id: string,
+  categoriaAcaoId: string,
+): TeamActionContextEntity {
+  return { id, categoriaAcaoId, deletedAt: null } as TeamActionContextEntity;
 }
 
 type QueryBuilderMock = {
@@ -180,6 +343,7 @@ function buildService(overrides?: {
   session?: SessionEntity | null;
   catalogActions?: CatalogActionEntity[];
   players?: PlayerEntity[];
+  teamContexts?: TeamActionContextEntity[];
 }) {
   const session =
     overrides && 'session' in overrides
@@ -192,6 +356,8 @@ function buildService(overrides?: {
   const players = overrides?.players ?? [
     { id: PLAYER_ID, equipeId: TEAM_ID } as PlayerEntity,
   ];
+  const teamContexts = overrides?.teamContexts ?? [];
+  const findTeamContexts = jest.fn().mockResolvedValue(teamContexts);
   const persistedActions: TaggedActionEntity[] = [];
   let valuesToInsert: TaggedActionEntity[] = [];
   const execute = jest.fn(() => {
@@ -235,6 +401,7 @@ function buildService(overrides?: {
         return { find: jest.fn().mockResolvedValue(catalogActions) };
       if (entity === PlayerEntity)
         return { findBy: jest.fn().mockResolvedValue(players) };
+      if (entity === TeamActionContextEntity) return { find: findTeamContexts };
       return taggedRepository;
     }),
   };
@@ -252,5 +419,6 @@ function buildService(overrides?: {
     execute,
     orIgnore,
     persistedActions,
+    findTeamContexts,
   };
 }

@@ -15,6 +15,7 @@ import {
   SessionLocationEntity,
   SessionTypeEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
   TeamEntity,
 } from './entities';
 import { PlayersModule } from './players/players.module';
@@ -45,6 +46,7 @@ import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
         ImpactEntity,
         ActionCategoryEntity,
         CatalogActionEntity,
+        TeamActionContextEntity,
         TaggedActionEntity,
       ],
       synchronize: false,

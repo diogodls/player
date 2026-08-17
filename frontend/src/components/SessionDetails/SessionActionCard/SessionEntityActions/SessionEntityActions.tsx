@@ -32,7 +32,10 @@ const SessionEntityActions = ({ actions }: Props) => {
           </div>
 
           <div className={styles.main}>
-            <div className={styles.title}>{action.title}</div>
+            <div className={styles.title}>
+              {action.title}
+              {action.contextName && ` · ${action.contextName}`}
+            </div>
             <div className={styles.subtitle}>{action.category.label}</div>
           </div>
 

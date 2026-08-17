@@ -26,6 +26,11 @@ import {
   PLAYER_ACTION_CATEGORY_KEYS,
 } from '../players/player-performance-actions';
 import { PlayersService } from '../players/players.service';
+import {
+  classifyTeamCatalogV2Action,
+  getTeamCatalogV2Title,
+  isTeamCatalogV2CategoryKey,
+} from '../catalog/team-catalog-v2.constants';
 import { SESSION_TYPES } from './sessions.constants';
 import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionComparisonFiltersDto } from './dto/session-comparison-filters.dto';
@@ -222,6 +227,7 @@ export class SessionsService {
           impacto: true,
         },
         jogador: true,
+        contextoAcaoEquipe: true,
       },
       order: { timestampSegundos: 'ASC' },
     });
@@ -260,8 +266,12 @@ export class SessionsService {
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: {
-        acaoCatalogo: true,
+        acaoCatalogo: {
+          categoriaAcao: true,
+          impacto: true,
+        },
         jogador: true,
+        contextoAcaoEquipe: true,
       },
       order: { timestampSegundos: 'ASC' },
     });
@@ -595,12 +605,29 @@ export class SessionsService {
       throw new Error('Relações da acao taggeada nao foram carregadas');
     }
 
+    const catalogAction = action.acaoCatalogo;
+    const category = catalogAction.categoriaAcao;
+    if (!category) {
+      throw new Error('Categoria da acao taggeada nao foi carregada');
+    }
+    const context = action.contextoAcaoEquipe ?? null;
+
     return {
       id: action.id,
-      title: action.acaoCatalogo.nome,
+      catalogActionId: catalogAction.id,
+      actionKey: catalogAction.sigla,
+      actionName: catalogAction.nome,
+      groupKey: category.chave ?? '',
+      groupName: getTeamCatalogV2Title(category.chave ?? '') ?? category.nome,
+      impact: this.getImpact(action),
+      teamContextId: action.contextoAcaoEquipeId ?? null,
+      contextKey: context?.chave ?? null,
+      contextName: context?.nome ?? null,
+      timestampSeconds: action.timestampSegundos,
+      title: catalogAction.nome,
       category: {
-        code: action.acaoCatalogo.sigla,
-        label: action.acaoCatalogo.sigla,
+        code: catalogAction.sigla,
+        label: catalogAction.sigla,
       },
       time: this.formatTimestamp(action.timestampSegundos),
       outcome: this.getOutcome(action),
@@ -608,16 +635,33 @@ export class SessionsService {
   }
 
   private countOffensiveActions(actions: TaggedActionEntity[]) {
-    return countActionsByCategoryKeys(
+    const legacyAndIndividualCount = countActionsByCategoryKeys(
       actions,
       PLAYER_ACTION_CATEGORY_KEYS.offensive,
+    );
+    return (
+      legacyAndIndividualCount +
+      actions.filter((action) => this.getTeamV2Phase(action) === 'offensive')
+        .length
     );
   }
 
   private countDefensiveActions(actions: TaggedActionEntity[]) {
-    return countActionsByCategoryKeys(
+    const legacyAndIndividualCount = countActionsByCategoryKeys(
       actions,
       PLAYER_ACTION_CATEGORY_KEYS.defensive,
+    );
+    return (
+      legacyAndIndividualCount +
+      actions.filter((action) => this.getTeamV2Phase(action) === 'defensive')
+        .length
+    );
+  }
+
+  private getTeamV2Phase(action: TaggedActionEntity) {
+    return classifyTeamCatalogV2Action(
+      action.acaoCatalogo?.categoriaAcao?.chave,
+      action.contextoAcaoEquipe?.chave,
     );
   }
 
@@ -644,7 +688,7 @@ export class SessionsService {
       const matchesPhase =
         shouldFilterPlayer ||
         !filters.phaseKey ||
-        action.acaoCatalogo?.categoriaAcao?.chave === filters.phaseKey;
+        this.getViewPhaseKey(action) === filters.phaseKey;
 
       return matchesOutcome && matchesPlayer && matchesCategory && matchesPhase;
     });
@@ -652,25 +696,77 @@ export class SessionsService {
 
   private buildFilterOptions(actions: TaggedActionEntity[]) {
     const athletes = new Map<string, string>();
-    const categories = new Map<string, string>();
+    const categories = new Map<string, { label: string; order: number }>();
+    const phases = new Map<string, { label: string; order: number }>();
+    const outcomes = new Set(actions.map((action) => this.getOutcome(action)));
 
     actions.forEach((action) => {
       if (action.jogador) athletes.set(action.jogador.id, action.jogador.nome);
       if (action.acaoCatalogo) {
-        categories.set(action.acaoCatalogo.sigla, action.acaoCatalogo.sigla);
+        const catalogAction = action.acaoCatalogo;
+        const isV2 = isTeamCatalogV2CategoryKey(
+          catalogAction.categoriaAcao?.chave,
+        );
+        categories.set(catalogAction.sigla, {
+          label: isV2 ? catalogAction.nome : catalogAction.sigla,
+          order: catalogAction.ordem ?? Number.MAX_SAFE_INTEGER,
+        });
+        if (action.jogadorId === null) {
+          const phaseKey = this.getViewPhaseKey(action);
+          const phaseLabel = isV2
+            ? action.contextoAcaoEquipe?.nome
+            : catalogAction.categoriaAcao?.nome;
+          const phaseOrder = isV2
+            ? action.contextoAcaoEquipe?.ordem
+            : catalogAction.categoriaAcao?.ordem;
+          if (phaseKey && phaseLabel) {
+            phases.set(phaseKey, {
+              label: phaseLabel,
+              order: phaseOrder ?? Number.MAX_SAFE_INTEGER,
+            });
+          }
+        }
       }
     });
 
+    const outcomeLabels = {
+      positive: 'Positivas',
+      negative: 'Negativas',
+      neutral: 'Neutras',
+    } as const;
+    const outcomeOrder = ['positive', 'negative', 'neutral'] as const;
+
     return {
-      athletes: Array.from(athletes.entries()).map(([value, label]) => ({
-        value,
-        label,
-      })),
-      categories: Array.from(categories.entries()).map(([value, label]) => ({
-        value,
-        label,
-      })),
+      athletes: Array.from(athletes.entries())
+        .map(([value, label]) => ({ value, label }))
+        .sort((left, right) => left.label.localeCompare(right.label, 'pt-BR')),
+      categories: Array.from(categories.entries())
+        .map(([value, option]) => ({ value, ...option }))
+        .sort(
+          (left, right) =>
+            left.order - right.order ||
+            left.label.localeCompare(right.label, 'pt-BR'),
+        )
+        .map(({ value, label }) => ({ value, label })),
+      outcomes: outcomeOrder
+        .filter((value) => outcomes.has(value))
+        .map((value) => ({ value, label: outcomeLabels[value] })),
+      phases: Array.from(phases.entries())
+        .map(([value, option]) => ({ value, ...option }))
+        .sort(
+          (left, right) =>
+            left.order - right.order ||
+            left.label.localeCompare(right.label, 'pt-BR'),
+        )
+        .map(({ value, label }) => ({ value, label })),
     };
+  }
+
+  private getViewPhaseKey(action: TaggedActionEntity) {
+    const categoryKey = action.acaoCatalogo?.categoriaAcao?.chave;
+    return isTeamCatalogV2CategoryKey(categoryKey)
+      ? (action.contextoAcaoEquipe?.chave ?? null)
+      : (categoryKey ?? null);
   }
 
   private calculatePercentage(value: number, total: number) {
@@ -684,6 +780,13 @@ export class SessionsService {
       return 'negative' as const;
     }
     return 'neutral' as const;
+  }
+
+  private getImpact(action: TaggedActionEntity) {
+    const outcome = this.getOutcome(action);
+    if (outcome === 'positive') return 'POSITIVE' as const;
+    if (outcome === 'negative') return 'NEGATIVE' as const;
+    return 'NEUTRAL' as const;
   }
 
   private formatTimestamp(seconds: number) {

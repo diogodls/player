@@ -12,63 +12,55 @@ vi.mock("../SessionSummary/SessionSummary", () => ({
 
 const mockedUseApi = vi.mocked(useApi);
 
-const teamGroups = [
-  { key: "SET_PIECE", title: "Bola parada", order: 1, actions: [] },
-  {
-    key: "OFFENSIVE_ORGANIZATION",
-    title: "Organização ofensiva",
-    order: 2,
-    actions: [],
-  },
-  {
-    key: "OFFENSIVE_TRANSITION",
-    title: "Transição ofensiva",
-    order: 3,
-    actions: [],
-  },
-  {
-    key: "DEFENSIVE_ORGANIZATION",
-    title: "Organização defensiva",
-    order: 4,
-    actions: [],
-  },
-  {
-    key: "DEFENSIVE_TRANSITION",
-    title: "Transição defensiva",
-    order: 5,
-    actions: [],
-  },
-];
-
 describe("SessionActions team phase filter", () => {
   beforeEach(() => {
     mockedUseApi.mockReset();
-    mockedUseApi.mockImplementation((endpoint) => {
-      if (endpoint === "/catalog/actions/team") {
-        return apiState({
-          data: { analysisType: "TEAM", groups: teamGroups },
-        });
-      }
-
-      return apiState({ data: sessionView() });
-    });
+    mockedUseApi.mockImplementation(() => apiState({ data: sessionView() }));
   });
 
   it("lists the team catalog phases and sends the selected phase to the session view", () => {
     render(<SessionActions sessionId="session-1" viewMode="team" />);
 
     const phaseFilter = screen.getByLabelText("Fase");
-    expect(screen.getByRole("option", { name: "Todas as fases" })).toBeInTheDocument();
-    teamGroups.forEach((group) => {
-      expect(screen.getByRole("option", { name: group.title })).toBeInTheDocument();
-    });
+    expect(
+      screen.getByRole("option", { name: "Todas as fases" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Ataque posicional" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Pressão" })).toBeInTheDocument();
 
     fireEvent.change(phaseFilter, {
-      target: { value: "OFFENSIVE_TRANSITION" },
+      target: { value: "POSITIONAL_ATTACK" },
     });
 
     expect(mockedUseApi).toHaveBeenCalledWith(
-      "/sessions/session-1/view?phaseKey=OFFENSIVE_TRANSITION",
+      "/sessions/session-1/view?phaseKey=POSITIONAL_ATTACK",
+    );
+  });
+
+  it("shows actual v2 action filters and sends neutral outcome", () => {
+    render(<SessionActions sessionId="session-1" viewMode="team" />);
+
+    expect(
+      screen.getByRole("option", { name: "Finalização" }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Neutras" }));
+
+    expect(mockedUseApi).toHaveBeenCalledWith(
+      "/sessions/session-1/view?outcome=neutral",
+    );
+  });
+
+  it("sends the selected v2 action key through the existing category filter", () => {
+    render(<SessionActions sessionId="session-1" viewMode="team" />);
+
+    fireEvent.change(screen.getByLabelText("Ação"), {
+      target: { value: "AT_FINALIZACAO" },
+    });
+
+    expect(mockedUseApi).toHaveBeenCalledWith(
+      "/sessions/session-1/view?categoryCode=AT_FINALIZACAO",
     );
   });
 });
@@ -112,8 +104,24 @@ function sessionView() {
       team: emptyAnalysis,
     },
     filters: {
-      individual: { athletes: [], categories: [] },
-      team: { athletes: [], categories: [] },
+      individual: {
+        athletes: [],
+        categories: [],
+        outcomes: [],
+        phases: [],
+      },
+      team: {
+        athletes: [],
+        categories: [{ value: "AT_FINALIZACAO", label: "Finalização" }],
+        outcomes: [
+          { value: "positive", label: "Positivas" },
+          { value: "neutral", label: "Neutras" },
+        ],
+        phases: [
+          { value: "POSITIONAL_ATTACK", label: "Ataque posicional" },
+          { value: "PRESSING", label: "Pressão" },
+        ],
+      },
     },
   };
 }

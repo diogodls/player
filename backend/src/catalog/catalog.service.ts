@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ActionCategoryEntity } from '../entities';
 import {
   IMPACT_NAMES,
@@ -13,6 +13,10 @@ import {
   IndividualCatalogResponseDto,
   TeamCatalogResponseDto,
 } from './dto/catalog-response.dto';
+import {
+  getTeamCatalogV2Title,
+  TEAM_CATALOG_V2_CATEGORY_KEYS,
+} from './team-catalog-v2.constants';
 
 @Injectable()
 export class CatalogService {
@@ -27,20 +31,46 @@ export class CatalogService {
   }
 
   async getTeamCatalog(): Promise<TeamCatalogResponseDto> {
-    const groups = await this.getCatalogGroups(TEAM_ANALYSIS_TYPE_ID);
+    return this.getTeamCatalogV2();
+  }
+
+  async getTeamCatalogV2(): Promise<TeamCatalogResponseDto> {
+    const groups = await this.getCatalogGroups(
+      TEAM_ANALYSIS_TYPE_ID,
+      TEAM_CATALOG_V2_CATEGORY_KEYS,
+      true,
+    );
     return { analysisType: 'TEAM', groups };
   }
 
-  private async getCatalogGroups(tipoAnaliseId: number) {
+  private async getCatalogGroups(
+    tipoAnaliseId: number,
+    categoryKeys?: string[],
+    includeContexts = false,
+  ) {
     const categories = await this.categoriesRepository.find({
-      where: { tipoAnaliseId },
-      relations: { acoes: { impacto: true } },
+      where: {
+        tipoAnaliseId,
+        ...(categoryKeys ? { chave: In(categoryKeys) } : {}),
+      },
+      relations: {
+        acoes: { impacto: true },
+        ...(includeContexts ? { contextosAcaoEquipe: true } : {}),
+      },
       order: {
         ordem: 'ASC',
         acoes: {
           ordem: 'ASC',
           sigla: 'ASC',
         },
+        ...(includeContexts
+          ? {
+              contextosAcaoEquipe: {
+                ordem: 'ASC' as const,
+                chave: 'ASC' as const,
+              },
+            }
+          : {}),
       },
     });
 
@@ -54,7 +84,7 @@ export class CatalogService {
         : category.chave;
       const groupTitle = isIndividualOffensiveGroup
         ? 'Ações ofensivas'
-        : category.nome;
+        : (getTeamCatalogV2Title(category.chave ?? '') ?? category.nome);
       const groupOrder = isIndividualOffensiveGroup ? 1 : category.ordem;
 
       if (!groupKey || groupOrder === null) {
@@ -102,6 +132,16 @@ export class CatalogService {
         title: groupTitle,
         order: groupOrder,
         actions,
+        ...(includeContexts
+          ? {
+              contexts: (category.contextosAcaoEquipe ?? []).map((context) => ({
+                id: context.id,
+                key: context.chave,
+                name: context.nome,
+                order: context.ordem,
+              })),
+            }
+          : {}),
       });
     }
 

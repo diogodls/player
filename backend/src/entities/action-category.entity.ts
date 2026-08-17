@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { AnalysisTypeEntity } from './analysis-type.entity';
 import { CatalogActionEntity } from './catalog-action.entity';
+import { TeamActionContextEntity } from './team-action-context.entity';
 
 @Entity({ name: 'categorias_acao' })
 @Unique('categorias_acao_tipo_nome_unique', ['tipoAnaliseId', 'nome'])
@@ -35,4 +36,7 @@ export class ActionCategoryEntity extends BaseEntity {
 
   @OneToMany(() => CatalogActionEntity, (action) => action.categoriaAcao)
   acoes?: CatalogActionEntity[];
+
+  @OneToMany(() => TeamActionContextEntity, (context) => context.categoriaAcao)
+  contextosAcaoEquipe?: TeamActionContextEntity[];
 }
