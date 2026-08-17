@@ -13,6 +13,7 @@ import {
   SessionLocationEntity,
   SessionTypeEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
   TeamEntity,
 } from './entities';
 
@@ -30,6 +31,7 @@ export const databaseEntities = [
   ImpactEntity,
   ActionCategoryEntity,
   CatalogActionEntity,
+  TeamActionContextEntity,
   TaggedActionEntity,
 ];
 

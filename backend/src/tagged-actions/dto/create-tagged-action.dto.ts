@@ -31,6 +31,12 @@ export class CreateTaggedActionDto {
   })
   playerId!: string | null;
 
+  @IsOptional()
+  @Matches(POSTGRES_ID_PATTERN, {
+    message: 'Identificador do contexto de equipe deve ser um UUID válido',
+  })
+  teamContextId?: string | null;
+
   @IsInt({ message: 'Tempo do vídeo deve ser um número inteiro' })
   @Min(0, { message: 'Tempo do vídeo deve ser maior ou igual a zero' })
   timestampSeconds!: number;

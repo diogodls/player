@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SessionActions.module.scss";
@@ -11,7 +11,10 @@ import type {
 } from "../../../pages/SessionView";
 import Select from "../../elements/Select/Select.tsx";
 import { useApi } from "../../../hooks/useApi.ts";
-import type { TeamCatalog } from "../../../pages/Analysis";
+import { backendApi } from "../../../utils/api.ts";
+import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
+import type { SessionEntityAction } from "../../../pages/SessionView";
+import DeleteSessionActionModal from "../DeleteSessionActionModal/DeleteSessionActionModal.tsx";
 
 const emptyFilters: SessionViewFilters = {
   outcome: "all",
@@ -27,16 +30,20 @@ type Props = {
 
 const SessionActions = ({ sessionId, viewMode }: Props) => {
   const [filters, setFilters] = useState<SessionViewFilters>(emptyFilters);
-  const { data: teamCatalog } = useApi<TeamCatalog>(
-    viewMode === "team" ? "/catalog/actions/team" : null,
-  );
-
+  const [actionToDelete, setActionToDelete] =
+    useState<SessionEntityAction | null>(null);
+  const [deletingActionId, setDeletingActionId] = useState<string | null>(null);
+  const toast = useContext(ToastContext);
   const filteredSessionViewEndpoint = useMemo(() => {
     if (!sessionId) return null;
 
     const searchParams = new URLSearchParams();
     if (filters.outcome !== "all") searchParams.set("outcome", filters.outcome);
-    if (viewMode === "individual" && filters.athleteId && filters.athleteId !== "all") {
+    if (
+      viewMode === "individual" &&
+      filters.athleteId &&
+      filters.athleteId !== "all"
+    ) {
       searchParams.set("playerId", filters.athleteId);
     }
     if (filters.categoryCode && filters.categoryCode !== "all") {
@@ -55,13 +62,19 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
     error: sessionViewError,
     isLoading,
     isValidating,
+    mutate,
   } = useApi<SessionViewData>(filteredSessionViewEndpoint);
 
   const view = filteredSessionView?.analysis?.[viewMode];
   const filterOptions = filteredSessionView?.filters?.[viewMode] ?? {
     athletes: [],
     categories: [],
+    outcomes: [],
+    phases: [],
   };
+  const availableOutcomes = new Set(
+    filterOptions.outcomes?.map((option) => option.value) ?? [],
+  );
   const visibleEntities = view?.entities ?? [];
   const isRefreshing = isValidating && Boolean(view);
   const hasAnalysisForView = visibleEntities.length > 0;
@@ -75,13 +88,32 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
     setFilters(emptyFilters);
   };
 
+  const handleDeleteAction = async () => {
+    if (!sessionId || !actionToDelete || deletingActionId) return;
+    setDeletingActionId(actionToDelete.id);
+    try {
+      await backendApi.delete(
+        `/sessions/${sessionId}/actions/${actionToDelete.id}`,
+      );
+      await mutate();
+      toast.success("Ação excluída com sucesso");
+      setActionToDelete(null);
+    } catch {
+      toast.error("Não foi possível excluir a ação");
+    } finally {
+      setDeletingActionId(null);
+    }
+  };
+
   return (
     <>
       <section className={styles.filtersCard} aria-busy={isRefreshing}>
         <div className={styles.filtersTitleRow}>
           <FontAwesomeIcon icon={faFilter} />
           <h4>Filtros de ações</h4>
-          {isRefreshing && <span className={styles.refreshingLabel}>Atualizando...</span>}
+          {isRefreshing && (
+            <span className={styles.refreshingLabel}>Atualizando...</span>
+          )}
         </div>
 
         <div className={styles.filtersGrid}>
@@ -109,6 +141,15 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
               >
                 Negativas
               </button>
+              {availableOutcomes.has("neutral") && (
+                <button
+                  type="button"
+                  className={`${styles.typeFilterButton} ${filters.outcome === "neutral" ? styles.typeFilterActive : ""}`}
+                  onClick={() => setFilters({ ...filters, outcome: "neutral" })}
+                >
+                  Neutras
+                </button>
+              )}
             </div>
           </div>
 
@@ -117,8 +158,13 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
               label="Atleta"
               name="athlete-filter"
               value={filters.athleteId}
-              options={[{ value: "all", label: "Todos os atletas" }, ...filterOptions.athletes]}
-              onChange={(value) => setFilters({ ...filters, athleteId: value || "all" })}
+              options={[
+                { value: "all", label: "Todos os atletas" },
+                ...filterOptions.athletes,
+              ]}
+              onChange={(value) =>
+                setFilters({ ...filters, athleteId: value || "all" })
+              }
             />
           )}
 
@@ -129,10 +175,7 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
               value={filters.phaseKey}
               options={[
                 { value: "all", label: "Todas as fases" },
-                ...(teamCatalog?.groups.map((group) => ({
-                  value: group.key,
-                  label: group.title,
-                })) ?? []),
+                ...(filterOptions.phases ?? []),
               ]}
               onChange={(value) =>
                 setFilters({ ...filters, phaseKey: value || "all" })
@@ -141,11 +184,16 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
           )}
 
           <Select
-            label="Categoria"
+            label="Ação"
             name="category-filter"
             value={filters.categoryCode}
-            options={[{ value: "all", label: "Todas as categorias" }, ...filterOptions.categories]}
-            onChange={(value) => setFilters({ ...filters, categoryCode: value || "all" })}
+            options={[
+              { value: "all", label: "Todas as categorias" },
+              ...filterOptions.categories,
+            ]}
+            onChange={(value) =>
+              setFilters({ ...filters, categoryCode: value || "all" })
+            }
           />
         </div>
       </section>
@@ -168,13 +216,22 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
           />
 
           <h3 className={styles.sectionTitle}>
-            {viewMode === "individual" ? "Ações Individuais" : "Ações da Equipe"}
+            {viewMode === "individual"
+              ? "Ações Individuais"
+              : "Ações da Equipe"}
           </h3>
 
           {hasAnalysisForView ? (
-            <div className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}>
+            <div
+              className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}
+            >
               {visibleEntities.map((athlete) => (
-                <SessionActionCard key={athlete.id} entity={athlete} />
+                <SessionActionCard
+                  key={athlete.id}
+                  entity={athlete}
+                  deletingActionId={deletingActionId}
+                  onDeleteAction={setActionToDelete}
+                />
               ))}
             </div>
           ) : (
@@ -185,7 +242,11 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
                   : "Esta sessão ainda não possui ações para esta visualização."}
               </h3>
               {hasActiveFilters && (
-                <button type="button" className={styles.resetButton} onClick={handleResetFilters}>
+                <button
+                  type="button"
+                  className={styles.resetButton}
+                  onClick={handleResetFilters}
+                >
                   Limpar filtros
                 </button>
               )}
@@ -193,6 +254,14 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
           )}
         </>
       )}
+      <DeleteSessionActionModal
+        action={actionToDelete}
+        isDeleting={deletingActionId !== null}
+        onClose={() => {
+          if (!deletingActionId) setActionToDelete(null);
+        }}
+        onConfirm={handleDeleteAction}
+      />
     </>
   );
 };

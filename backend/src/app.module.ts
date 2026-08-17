@@ -16,6 +16,7 @@ import {
   SessionLocationEntity,
   SessionTypeEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
   TeamEntity,
 } from './entities';
 import { PlayersModule } from './players/players.module';
@@ -48,6 +49,7 @@ import { PlayerSessionMinutesModule } from './player-session-minutes/player-sess
         ImpactEntity,
         ActionCategoryEntity,
         CatalogActionEntity,
+        TeamActionContextEntity,
         TaggedActionEntity,
       ],
       synchronize: false,

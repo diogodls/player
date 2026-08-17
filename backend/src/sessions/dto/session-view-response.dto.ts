@@ -3,6 +3,7 @@ import { SessionResponseDto } from './session-response.dto';
 export type SessionViewMode = 'individual' | 'team';
 export type SessionViewEntityType = 'player' | 'team';
 export type SessionViewActionOutcome = 'positive' | 'negative' | 'neutral';
+export type SessionViewActionImpact = 'POSITIVE' | 'NEGATIVE' | 'NEUTRAL';
 
 export class SessionViewActionCategoryDto {
   code!: string;
@@ -18,6 +19,16 @@ export class SessionViewSummaryDto {
 
 export class SessionViewActionDto {
   id!: string;
+  catalogActionId!: string;
+  actionKey!: string;
+  actionName!: string;
+  groupKey!: string;
+  groupName!: string;
+  impact!: SessionViewActionImpact;
+  teamContextId!: string | null;
+  contextKey!: string | null;
+  contextName!: string | null;
+  timestampSeconds!: number;
   title!: string;
   category!: SessionViewActionCategoryDto;
   time!: string;
@@ -55,6 +66,8 @@ export class SessionViewFilterOptionDto {
 export class SessionViewFilterOptionsDto {
   athletes!: SessionViewFilterOptionDto[];
   categories!: SessionViewFilterOptionDto[];
+  outcomes!: SessionViewFilterOptionDto[];
+  phases!: SessionViewFilterOptionDto[];
 }
 
 export class SessionViewAnalysisSectionDto {

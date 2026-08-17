@@ -3,54 +3,66 @@
   background-color: var(--surface);
   width: 100%;
   min-width: 0;
-  padding: 50px;
+  padding: var(--video-analysis-padding, 50px);
   border-radius: var(--border-radius);
 
-  .above{
+  .above {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--video-header-gap, 0);
     max-width: 100%;
-    padding-bottom: 15px;
+    padding-bottom: var(--video-header-padding-bottom, 15px);
   }
 
   .actions {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
+    justify-content: var(--video-actions-justify, normal);
+    flex-wrap: var(--video-actions-wrap, wrap);
+    gap: var(--video-actions-gap, 12px);
     min-width: 0;
   }
 
-  .text{
+  .text {
+    flex: var(--video-title-flex, 0 1 auto);
     display: flex;
     align-items: center;
-    gap: 8px;
-    height: 36px;
+    gap: var(--video-title-gap, 8px);
+    min-height: var(--video-title-min-height, 36px);
     color: #e5e7eb;
-    font-size: 28px;
-    font-weight: 500;
+    font-size: var(--video-title-font-size, 28px);
+    font-weight: var(--video-title-font-weight, 500);
+    line-height: 1.2;
+    white-space: var(--video-title-white-space, normal);
     min-width: 0;
   }
 
-  .icon{
-    font-size: 28px;
+  .icon {
+    flex: 0 0 auto;
+    font-size: var(--video-title-icon-size, 28px);
     color: var(--green);
   }
 
   .button {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
+    gap: var(--video-header-button-gap, 8px);
+    width: auto;
+    min-height: var(--video-header-button-min-height, auto);
+    padding: var(--video-header-button-padding, 10px 16px);
     border-radius: var(--border-radius);
-    background-color:  var(--selected-blue);
+    background-color: var(--selected-blue);
     color: #fff;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--video-header-button-font-size, 14px);
+    font-weight: var(--video-header-button-font-weight, 500);
+    line-height: 1.2;
+    white-space: var(--video-header-button-white-space, normal);
     border: none;
     cursor: pointer;
-    transition: background-color 0.18s ease, transform 0.18s ease;
+    transition:
+      background-color 0.18s ease,
+      transform 0.18s ease;
 
     &:hover {
       background: var(--selected-blue-hover);
@@ -175,14 +187,17 @@
   .removeButton {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--video-header-button-gap, 8px);
     background: var(--deep-red);
     color: var(--text-primary);
     border: none;
-    padding: 10px 16px;
+    min-height: var(--video-header-button-min-height, auto);
+    padding: var(--video-header-button-padding, 10px 16px);
     border-radius: var(--border-radius);
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--video-header-button-font-size, 14px);
+    font-weight: var(--video-header-button-font-weight, 500);
+    white-space: var(--video-header-button-white-space, normal);
   }
 
   .modalOverlay {
@@ -240,7 +255,7 @@
     margin-top: 14px;
     padding: 12px 16px;
     border-radius: var(--border-radius);
-    background-color:  var(--selected-blue);
+    background-color: var(--selected-blue);
     color: #fff;
     font-size: 14px;
     font-weight: 500;
@@ -250,7 +265,6 @@
       background: var(--selected-blue-hover);
     }
   }
-
 }
 @media (max-width: 768px) {
   .screen {
@@ -270,10 +284,17 @@
       font-size: 24px;
       height: auto;
       gap: 6px;
+      white-space: normal;
     }
 
     .icon {
       font-size: 22px;
+    }
+
+    .actions {
+      width: 100%;
+      justify-content: flex-start;
+      flex-wrap: wrap;
     }
 
     .button,

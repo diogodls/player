@@ -32,24 +32,26 @@ describe("CoachDashboard", () => {
     expect(mockedUseApi).toHaveBeenCalledTimes(2);
     expect(screen.getByText("Ataque posicional")).toBeInTheDocument();
     expect(screen.getByText("77,8%")).toBeInTheDocument();
-    expect(screen.getAllByText("Eficiência")).toHaveLength(4);
+    expect(screen.getAllByText("Eficiência")).toHaveLength(14);
   });
 
-  it("renders exactly one set-piece card and none of the old cards", () => {
+  it("renders the 14 V2 cards in one collective carousel", () => {
     mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));
     renderPage();
 
-    expect(screen.getAllByText("Bolas paradas")).toHaveLength(1);
-    expect(screen.queryByText("Cantos")).not.toBeInTheDocument();
-    expect(screen.queryByText("Lateral ofensivo")).not.toBeInTheDocument();
-    expect(screen.queryByText("Faltas")).not.toBeInTheDocument();
+    expect(screen.getAllByLabelText("Índices coletivos")).toHaveLength(1);
+    expect(screen.getAllByText("Eficiência")).toHaveLength(14);
+    expect(screen.getByText("Lateral ofensivo")).toBeInTheDocument();
+    expect(screen.getByText("Goleiro linha defensivo")).toBeInTheDocument();
+    expect(screen.getByText("Arremesso de meta")).toBeInTheDocument();
+    expect(screen.queryByText("Bolas paradas")).not.toBeInTheDocument();
   });
 
   it("formats null, zero, one hundred and decimal values correctly", () => {
     mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));
     renderPage();
 
-    expect(screen.getByText("Nenhum dado registrado")).toBeInTheDocument();
+    expect(screen.getAllByText("Nenhum dado registrado")).toHaveLength(11);
     expect(screen.getByText("0,0%")).toBeInTheDocument();
     expect(screen.getByText("100,0%")).toBeInTheDocument();
     expect(screen.getByText("77,8%")).toBeInTheDocument();
@@ -186,10 +188,35 @@ function dashboardData() {
       },
     ],
     teamIndexes: [
-      teamIndex("decimal", "Ataque posicional", 77.777),
-      teamIndex("zero", "Transição ofensiva", 0),
-      teamIndex("hundred", "Pressing", 100, "defensive"),
-      teamIndex("set-piece", "Bolas paradas", null, "set-piece"),
+      teamIndex("offensive-transition", "Transição ofensiva", 0),
+      teamIndex("playing-out-pressure", "Saída de pressão", null),
+      teamIndex("positional-attack", "Ataque posicional", 77.777),
+      teamIndex("fly-goalkeeper", "Goleiro linha", null),
+      teamIndex(
+        "defensive-fly-goalkeeper",
+        "Goleiro linha defensivo",
+        null,
+        "defensive",
+      ),
+      teamIndex(
+        "variable-pressing",
+        "Marcação variando pra pressão",
+        null,
+        "defensive",
+      ),
+      teamIndex("pressing", "Pressão", 100, "defensive"),
+      teamIndex("low-block", "Marcação baixa", null, "defensive"),
+      teamIndex(
+        "defensive-transition",
+        "Transição defensiva",
+        null,
+        "defensive",
+      ),
+      teamIndex("corner", "Canto", null, "set-piece"),
+      teamIndex("offensive-kick-in", "Lateral ofensivo", null, "set-piece"),
+      teamIndex("defensive-kick-in", "Lateral defensivo", null, "set-piece"),
+      teamIndex("free-kick", "Falta", null, "set-piece"),
+      teamIndex("goal-clearance", "Arremesso de meta", null, "set-piece"),
     ],
   };
 }

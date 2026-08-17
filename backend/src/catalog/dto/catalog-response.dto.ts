@@ -8,11 +8,19 @@ export class CatalogActionDto {
   order!: number;
 }
 
+export class TeamActionContextDto {
+  id!: string;
+  key!: string;
+  name!: string;
+  order!: number;
+}
+
 export class CatalogGroupDto {
   key!: string;
   title!: string;
   order!: number;
   actions!: CatalogActionDto[];
+  contexts?: TeamActionContextDto[];
 }
 
 export class IndividualCatalogResponseDto {

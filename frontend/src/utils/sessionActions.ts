@@ -9,6 +9,7 @@ export type PersistedSessionAction = {
   sessionId: string;
   catalogActionId: string;
   playerId: string | null;
+  teamContextId: string | null;
   timestampSeconds: number;
 };
 
@@ -40,12 +41,28 @@ export async function persistSessionActions(
         throw new Error("Ação coletiva não deve possuir um jogador");
       }
 
-      return {
+      const baseAction = {
         clientActionId: action.id,
         catalogActionId: action.catalogActionId,
-        playerId,
         timestampSeconds,
       };
+
+      if (action.type === "team") {
+        if (
+          action.teamContextId &&
+          !POSTGRES_ID_PATTERN.test(action.teamContextId)
+        ) {
+          throw new Error("Identificador do contexto de equipe inválido");
+        }
+        return {
+          ...baseAction,
+          ...(action.teamContextId
+            ? { teamContextId: action.teamContextId }
+            : {}),
+        };
+      }
+
+      return { ...baseAction, playerId };
     }),
   };
 

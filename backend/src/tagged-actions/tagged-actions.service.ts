@@ -4,17 +4,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import {
   CatalogActionEntity,
   PlayerEntity,
   SessionEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
 } from '../entities';
 import {
   INDIVIDUAL_ANALYSIS_TYPE_ID,
   TEAM_ANALYSIS_TYPE_ID,
 } from '../catalog/catalog.constants';
+import { isTeamCatalogV2CategoryKey } from '../catalog/team-catalog-v2.constants';
 import { CreateSessionActionsDto } from './dto/create-session-actions.dto';
 import {
   CreateSessionActionsResponseDto,
@@ -28,6 +30,20 @@ export class TaggedActionsService {
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
   ) {}
 
+  async removeFromSession(sessionId: string, actionId: string): Promise<void> {
+    const sessionsRepository =
+      this.taggedActionsRepository.manager.getRepository(SessionEntity);
+    const session = await sessionsRepository.findOneBy({ id: sessionId });
+    if (!session) throw new NotFoundException('Sessão não encontrada');
+
+    const action = await this.taggedActionsRepository.findOne({
+      where: { id: actionId, sessaoId: sessionId },
+    });
+    if (!action) throw new NotFoundException('Ação registrada não encontrada');
+
+    await this.taggedActionsRepository.softRemove(action);
+  }
+
   async createForSession(
     sessionId: string,
     dto: CreateSessionActionsDto,
@@ -37,6 +53,9 @@ export class TaggedActionsService {
       const catalogActionsRepository =
         manager.getRepository(CatalogActionEntity);
       const playersRepository = manager.getRepository(PlayerEntity);
+      const teamContextsRepository = manager.getRepository(
+        TeamActionContextEntity,
+      );
       const taggedActionsRepository = manager.getRepository(TaggedActionEntity);
 
       const clientActionIds = dto.actions.map(
@@ -85,12 +104,41 @@ export class TaggedActionsService {
         );
       }
 
+      const teamContextIds = [
+        ...new Set(
+          dto.actions.flatMap((action) =>
+            action.teamContextId ? [action.teamContextId] : [],
+          ),
+        ),
+      ];
+      const teamContexts = teamContextIds.length
+        ? await teamContextsRepository.find({
+            where: { id: In(teamContextIds), deletedAt: IsNull() },
+          })
+        : [];
+      if (teamContexts.length !== teamContextIds.length) {
+        throw new BadRequestException(
+          'Um ou mais contextos de equipe não foram encontrados',
+        );
+      }
+
       const catalogActionsById = new Map(
         catalogActions.map((action) => [action.id, action]),
       );
+      const teamContextsById = new Map(
+        teamContexts.map((context) => [context.id, context]),
+      );
       for (const action of dto.actions) {
         const catalogAction = catalogActionsById.get(action.catalogActionId);
-        const analysisTypeId = catalogAction?.categoriaAcao?.tipoAnaliseId;
+        if (!catalogAction) {
+          throw new BadRequestException(
+            'Uma ou mais ações do catálogo não foram encontradas',
+          );
+        }
+        const analysisTypeId = catalogAction.categoriaAcao?.tipoAnaliseId;
+        const teamContext = action.teamContextId
+          ? teamContextsById.get(action.teamContextId)
+          : undefined;
 
         if (
           analysisTypeId === INDIVIDUAL_ANALYSIS_TYPE_ID &&
@@ -106,10 +154,35 @@ export class TaggedActionsService {
           );
         }
         if (
+          analysisTypeId === INDIVIDUAL_ANALYSIS_TYPE_ID &&
+          action.teamContextId
+        ) {
+          throw new BadRequestException(
+            'Ação individual não deve possuir um contexto de equipe',
+          );
+        }
+        if (
           analysisTypeId !== INDIVIDUAL_ANALYSIS_TYPE_ID &&
           analysisTypeId !== TEAM_ANALYSIS_TYPE_ID
         ) {
           throw new BadRequestException('Tipo de análise da ação inválido');
+        }
+        if (
+          analysisTypeId === TEAM_ANALYSIS_TYPE_ID &&
+          isTeamCatalogV2CategoryKey(catalogAction.categoriaAcao?.chave) &&
+          !action.teamContextId
+        ) {
+          throw new BadRequestException(
+            'Ação do novo catálogo de equipe deve possuir um contexto',
+          );
+        }
+        if (
+          teamContext &&
+          teamContext.categoriaAcaoId !== catalogAction.categoriaAcaoId
+        ) {
+          throw new BadRequestException(
+            'Contexto de equipe deve pertencer à mesma categoria da ação',
+          );
         }
       }
 
@@ -118,6 +191,7 @@ export class TaggedActionsService {
           sessaoId: sessionId,
           acaoCatalogoId: action.catalogActionId,
           jogadorId: action.playerId ?? null,
+          contextoAcaoEquipeId: action.teamContextId ?? null,
           timestampSegundos: action.timestampSeconds,
           clientActionId: action.clientActionId,
         }),
@@ -157,6 +231,7 @@ export class TaggedActionsService {
       sessionId: action.sessaoId,
       catalogActionId: action.acaoCatalogoId,
       playerId: action.jogadorId,
+      teamContextId: action.contextoAcaoEquipeId ?? null,
       timestampSeconds: action.timestampSegundos,
     };
   }

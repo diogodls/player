@@ -1,8 +1,5 @@
 .actionsListPadding {
   box-sizing: border-box;
-  padding: 0 20px;
-
-  @media (max-width: 720px) {
-    padding: 0;
-  }
+  padding: 0;
+  position: static;
 }
