@@ -1,0 +1,269 @@
+.container {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding: 24px 16px 40px;
+  background: var(--bg-dark);
+  color: var(--text-light);
+}
+
+.contentWrap {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(26px, 3.3vw, 36px);
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 3px 0 0;
+    color: var(--text-muted);
+  }
+}
+
+.eyebrow {
+  color: var(--light-blue);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.backButton {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-20);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+.minutesSection {
+  padding: 20px;
+  border: 1px solid var(--border-20);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  p {
+    margin-top: 2px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+}
+
+.sectionIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(253, 230, 138, 0.3);
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.playersGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.playerCard {
+  padding: 18px;
+  border: 1px solid var(--border-20);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.035);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.activeCard {
+  border-color: rgba(74, 222, 128, 0.58);
+  background: linear-gradient(145deg, rgba(22, 101, 52, 0.18), rgba(255, 255, 255, 0.035));
+  box-shadow: 0 12px 30px rgba(34, 197, 94, 0.1);
+}
+
+.playerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 17px;
+  }
+
+  > div > span {
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.activeStatus {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+
+  .statusDot {
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+  }
+}
+
+.timer {
+  display: block;
+  margin: 18px 0;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(30px, 5vw, 42px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.actions,
+.manualControls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  button {
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid var(--border-20);
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+}
+
+.startButton {
+  background: rgba(22, 163, 74, 0.82);
+}
+
+.stopButton {
+  background: rgba(220, 38, 38, 0.82);
+}
+
+.editButton,
+.manualControls button {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.manualForm {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-20);
+
+  label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  input {
+    width: 110px;
+    min-height: 38px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    border: 1px solid var(--border-20);
+    border-radius: 10px;
+    outline: none;
+    background: rgba(2, 6, 23, 0.6);
+    color: var(--text-light);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+
+    &:focus {
+      border-color: rgba(96, 165, 250, 0.75);
+    }
+  }
+
+  [role="alert"] {
+    color: #fca5a5;
+    font-size: 12px;
+  }
+}
+
+.empty,
+.feedback {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.feedback {
+  min-height: 60svh;
+  background: var(--bg-dark);
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: 18px 12px 28px;
+  }
+
+  .minutesSection {
+    padding: 14px 12px;
+  }
+
+  .playersGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .playerCard {
+    padding: 15px;
+  }
+}

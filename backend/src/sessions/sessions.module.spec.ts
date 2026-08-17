@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   SessionEntity,
   TaggedActionEntity,
   TeamEntity,
@@ -26,6 +27,8 @@ describe('SessionsModule', () => {
       .overrideProvider(getRepositoryToken(TaggedActionEntity))
       .useValue({})
       .overrideProvider(getRepositoryToken(PlayerEntity))
+      .useValue({})
+      .overrideProvider(getRepositoryToken(PlayerSessionMinutesEntity))
       .useValue({})
       .overrideProvider(PlayersService)
       .useValue(playersService)
