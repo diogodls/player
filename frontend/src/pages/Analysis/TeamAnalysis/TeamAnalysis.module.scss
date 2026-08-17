@@ -16,17 +16,19 @@
     box-sizing: border-box;
     min-width: 0;
     display: grid;
-    grid-template-areas: "item1 item1 item2 item2 item2"
-                         "item1 item1 item3 item3 item3";
-    grid-template-columns: minmax(0, 2fr) minmax(0, 2fr) minmax(0, 2fr) minmax(0, 2fr) minmax(0, 2fr);
+    grid-template-areas:
+      "item1 item2"
+      "item1 item3";
+    grid-template-columns: minmax(0, 45fr) minmax(360px, 55fr);
     gap: 20px;
     align-items: start;
     margin-top: 20px;
 
     @media (max-width: 1024px) {
-      grid-template-areas: "item2"
-                           "item1"
-                           "item3";
+      grid-template-areas:
+        "item2"
+        "item1"
+        "item3";
       grid-template-columns: 1fr;
     }
 
@@ -38,6 +40,25 @@
     .videoAnalysis {
       grid-area: item2;
       min-width: 0;
+      --video-analysis-padding: 24px;
+      --video-header-gap: 16px;
+      --video-header-padding-bottom: 10px;
+      --video-actions-wrap: nowrap;
+      --video-actions-justify: flex-end;
+      --video-actions-gap: 8px;
+      --video-title-gap: 6px;
+      --video-title-flex: 0 0 auto;
+      --video-title-min-height: 32px;
+      --video-title-font-size: 18px;
+      --video-title-font-weight: 600;
+      --video-title-white-space: nowrap;
+      --video-title-icon-size: 18px;
+      --video-header-button-gap: 5px;
+      --video-header-button-min-height: 36px;
+      --video-header-button-padding: 7px 10px;
+      --video-header-button-font-size: 12px;
+      --video-header-button-font-weight: 600;
+      --video-header-button-white-space: nowrap;
     }
 
     .actionLog {
