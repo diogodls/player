@@ -16,9 +16,7 @@
     box-sizing: border-box;
     min-width: 0;
     display: grid;
-    grid-template-areas:
-      "item1 item2"
-      "item1 item3";
+    grid-template-areas: "item1 item2";
     grid-template-columns: minmax(0, 45fr) minmax(360px, 55fr);
     gap: 20px;
     align-items: start;
@@ -27,14 +25,28 @@
     @media (max-width: 1024px) {
       grid-template-areas:
         "item2"
-        "item1"
-        "item3";
+        "item1";
       grid-template-columns: 1fr;
     }
 
     .leftContent {
       grid-area: item1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      .actionsArea {
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .teamActionLog {
+        width: 100%;
+        min-width: 0;
+      }
     }
 
     .videoAnalysis {
@@ -60,11 +72,6 @@
       --video-header-button-font-weight: 600;
       --video-header-button-white-space: nowrap;
     }
-
-    .actionLog {
-      grid-area: item3;
-      min-width: 0;
-    }
   }
 
   @media (max-width: 720px) {
@@ -73,6 +80,10 @@
     .content {
       gap: 14px;
       margin-top: 16px;
+
+      .leftContent {
+        gap: 14px;
+      }
     }
   }
 
