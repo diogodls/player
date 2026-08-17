@@ -127,6 +127,12 @@
             box-shadow: 0 12px 28px rgba(34, 197, 94, 0.14);
           }
 
+          &.minutesButton {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(180, 83, 9, 0.84));
+            border-color: rgba(253, 230, 138, 0.28);
+            box-shadow: 0 12px 28px rgba(245, 158, 11, 0.14);
+          }
+
           .actionIconWrap {
             width: 34px;
             height: 34px;

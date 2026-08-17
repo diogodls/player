@@ -15,6 +15,7 @@ import SessionView from "./pages/SessionView/SessionView.tsx";
 import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 import AthleteRegistrationScreen from "./pages/AthleteRegistrationScreen/AthleteRegistrationScreen.tsx";
 import Rankings from "./pages/Rankings/Rankings.tsx";
+import SessionMinutes from "./pages/SessionMinutes/SessionMinutes.tsx";
 
 const SessionComparison = lazy(
   () => import("./pages/SessionComparison/SessionComparison.tsx"),
@@ -43,6 +44,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/sessions/:id" element={<SessionView />} />
               <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
               <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis />} />
+              <Route path="/sessions/:id/minutes" element={<SessionMinutes />} />
               <Route path={"/athlete-registration"} element={<AthleteRegistrationScreen />}/>
             </Route>
           </Routes>
