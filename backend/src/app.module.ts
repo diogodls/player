@@ -8,6 +8,7 @@ import {
   CatalogActionEntity,
   ImpactEntity,
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   PositionEntity,
   PreferredSideEntity,
   SessionCourtSizeEntity,
@@ -22,6 +23,7 @@ import { SessionsModule } from './sessions/sessions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
 import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
+import { PlayerSessionMinutesModule } from './player-session-minutes/player-session-minutes.module';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
         PositionEntity,
         PreferredSideEntity,
         PlayerEntity,
+        PlayerSessionMinutesEntity,
         SessionEntity,
         AnalysisTypeEntity,
         ImpactEntity,
@@ -57,6 +60,7 @@ import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
     CatalogModule,
     TaggedActionsModule,
     CoachDashboardModule,
+    PlayerSessionMinutesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

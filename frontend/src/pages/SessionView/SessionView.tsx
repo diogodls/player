@@ -1,7 +1,12 @@
 import { useState } from "react";
 import styles from "./SessionView.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faPeopleGroup, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faArrowLeft,
+  faPeopleGroup,
+  faStopwatch,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useParams } from "react-router";
 import SessionDetails from "../../components/elements/SessionDetails/SessionDetails.tsx";
 import SessionActions from "../../components/SessionDetails/SessionActions/SessionActions.tsx";
@@ -71,6 +76,19 @@ const SessionView = () => {
 
               <div className={styles.actionText}>
                 <strong>Fazer analise de equipe</strong>
+              </div>
+            </button>
+
+            <button
+              className={`${styles.actionButton} ${styles.minutesButton}`}
+              onClick={() => navigate(`/sessions/${sessionId}/minutes`)}
+            >
+              <div className={styles.actionIconWrap}>
+                <FontAwesomeIcon icon={faStopwatch} />
+              </div>
+
+              <div className={styles.actionText}>
+                <strong>Minutagem</strong>
               </div>
             </button>
           </div>

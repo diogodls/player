@@ -69,28 +69,15 @@ describe("ActionsModal", () => {
     expect(screen.getByText("Nenhuma ação disponível.")).toBeInTheDocument();
   });
 
-  it("renders playing-time actions as neutral catalog actions", () => {
-    renderModal([playingTimeGroup]);
+  it("hides legacy playing-time actions but keeps all other actions", () => {
+    renderModal([playingTimeGroup, ...groups]);
 
+    expect(screen.queryByText("Entrou em quadra")).not.toBeInTheDocument();
+    expect(screen.queryByText("Saiu de quadra")).not.toBeInTheDocument();
+    expect(screen.queryByText("Minutagem")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Entrou em quadra" }),
-    ).toHaveAttribute("title", "ENTROU");
-    expect(
-      screen.getByRole("button", { name: "Saiu de quadra" }),
-    ).toHaveAttribute("title", "SAIU");
-
-    const tagged = createIndividualTaggedAction(
-      playingTimeGroup.actions[0],
-      playingTimeGroup.title,
-      session,
-      null,
-      "15",
-    );
-    expect(tagged).toMatchObject({
-      key: "ENTROU",
-      impact: "NEUTRAL",
-      goodAction: false,
-    });
+      screen.getByRole("button", { name: "Gol sofrido bola parada" }),
+    ).toBeInTheDocument();
   });
 
   it("keeps the selected catalog action identity and impact when registering it", () => {

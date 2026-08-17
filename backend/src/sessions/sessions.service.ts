@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import {
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   SessionEntity,
   TaggedActionEntity,
   TeamEntity,
@@ -62,6 +63,8 @@ export class SessionsService {
     @InjectRepository(TaggedActionEntity)
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
     private readonly playersService: PlayersService,
+    @InjectRepository(PlayerSessionMinutesEntity)
+    private readonly playerSessionMinutesRepository: Repository<PlayerSessionMinutesEntity>,
   ) {}
 
   async findAll(filters?: SessionFiltersDto): Promise<SessionListResponseDto> {
@@ -171,6 +174,12 @@ export class SessionsService {
         timestampSegundos: 'ASC',
       },
     });
+    const minutesRecords = await this.playerSessionMinutesRepository.find({
+      where: {
+        sessionId: In(sessions.map((session) => session.id)),
+        player: { deletedAt: IsNull() },
+      },
+    });
 
     return {
       period: {
@@ -182,6 +191,7 @@ export class SessionsService {
       athletes: this.buildComparisonAthletes(
         actions,
         sessions.map((session) => session.id),
+        minutesRecords,
       ),
     };
   }
@@ -508,6 +518,7 @@ export class SessionsService {
   private buildComparisonAthletes(
     actions: TaggedActionEntity[],
     orderedSessionIds: string[],
+    minutesRecords: PlayerSessionMinutesEntity[],
   ): SessionComparisonAthleteDto[] {
     const actionsBySession = new Map<string, TaggedActionEntity[]>();
     actions.forEach((action) => {
@@ -515,11 +526,25 @@ export class SessionsService {
       sessionActions.push(action);
       actionsBySession.set(action.sessaoId, sessionActions);
     });
+    const minutesBySession = new Map<
+      string,
+      Array<{ playerId: string; sessionId: string; totalSeconds: number }>
+    >();
+    minutesRecords.forEach((record) => {
+      const sessionMinutes = minutesBySession.get(record.sessionId) ?? [];
+      sessionMinutes.push({
+        playerId: record.playerId,
+        sessionId: record.sessionId,
+        totalSeconds: record.totalSeconds,
+      });
+      minutesBySession.set(record.sessionId, sessionMinutes);
+    });
     const indexesBySession = new Map(
       orderedSessionIds.map((sessionId) => [
         sessionId,
         calculateSessionPlayerPerformances(
           actionsBySession.get(sessionId) ?? [],
+          minutesBySession.get(sessionId) ?? [],
         ),
       ]),
     );

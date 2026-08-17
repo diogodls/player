@@ -28,6 +28,14 @@ const ActionsModal = ({ groups, closeModal, session }: ActionsModal) => {
     isVideoLoaded,
   } = useContext(ActionsContext);
   const { error } = useContext(ToastContext);
+  const visibleGroups = groups
+    .map((group) => ({
+      ...group,
+      actions: group.actions.filter(
+        (action) => action.key !== "ENTROU" && action.key !== "SAIU",
+      ),
+    }))
+    .filter((group) => group.actions.length > 0);
 
   const handleActionClick = (action: CatalogAction, category: string) => {
     if (!isVideoLoaded) {
@@ -74,11 +82,11 @@ const ActionsModal = ({ groups, closeModal, session }: ActionsModal) => {
           />
         </div>
 
-        {groups.length === 0 ? (
+        {visibleGroups.length === 0 ? (
           <div className={styles.emptyCatalog}>Nenhuma ação disponível.</div>
         ) : (
           <div className={styles.actionsListPadding}>
-            {groups.map((group) => (
+            {visibleGroups.map((group) => (
               <section className={styles.actionsType} key={group.key}>
                 <span className={styles.actionsTitle}>{group.title}</span>
                 <div className={styles.tagActions}>

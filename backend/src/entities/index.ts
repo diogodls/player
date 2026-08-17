@@ -4,6 +4,7 @@ export * from './base.entity';
 export * from './catalog-action.entity';
 export * from './impact.entity';
 export * from './player.entity';
+export * from './player-session-minutes.entity';
 export * from './position.entity';
 export * from './preferred-side.entity';
 export * from './session-court-size.entity';
