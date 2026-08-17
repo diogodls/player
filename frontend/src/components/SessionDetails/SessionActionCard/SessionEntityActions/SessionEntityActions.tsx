@@ -4,12 +4,14 @@ import {
   faCircleCheck,
   faCircleInfo,
   faCircleXmark,
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import type { SessionEntityAction } from "../../../../pages/SessionView";
-import { formatVideoTime } from "../../../../utils/videoTime.ts";
 
 type Props = {
   actions: SessionEntityAction[];
+  deletingActionId: string | null;
+  onDeleteAction: (action: SessionEntityAction) => void;
 };
 
 function iconByType(outcome: SessionEntityAction["outcome"]) {
@@ -18,7 +20,11 @@ function iconByType(outcome: SessionEntityAction["outcome"]) {
   return faCircleInfo;
 }
 
-const SessionEntityActions = ({ actions }: Props) => {
+const SessionEntityActions = ({
+  actions,
+  deletingActionId,
+  onDeleteAction,
+}: Props) => {
   if (!actions.length) {
     return <div className={styles.empty}>Sem acoes para este item.</div>;
   }
@@ -40,7 +46,15 @@ const SessionEntityActions = ({ actions }: Props) => {
           </div>
 
           <div className={styles.meta}>
-            <span className={styles.time}>{formatVideoTime(action.time)}</span>
+            <button
+              type="button"
+              className={styles.deleteButton}
+              onClick={() => onDeleteAction(action)}
+              disabled={deletingActionId === action.id}
+              aria-label={`Excluir ação ${action.title}`}
+            >
+              <FontAwesomeIcon icon={faTrashCan} />
+            </button>
           </div>
         </div>
       ))}

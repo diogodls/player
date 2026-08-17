@@ -1,20 +1,40 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useApi } from "../../../hooks/useApi";
+import { backendApi } from "../../../utils/api";
+import { ToastContext } from "../../../contexts/ToastContext/ToastContext";
 import SessionActions from "./SessionActions";
 
 vi.mock("../../../hooks/useApi", () => ({ useApi: vi.fn() }));
+vi.mock("../../../utils/api", () => ({ backendApi: { delete: vi.fn() } }));
 vi.mock("../SessionActionCard/SessionActionCard", () => ({
-  default: () => <div />,
+  default: ({ entity, onDeleteAction, deletingActionId }: any) => (
+    <button
+      type="button"
+      disabled={deletingActionId === entity.actions[0].id}
+      onClick={() => onDeleteAction(entity.actions[0])}
+    >
+      Excluir ação exibida
+    </button>
+  ),
 }));
 vi.mock("../SessionSummary/SessionSummary", () => ({
   default: () => <div />,
 }));
 
 const mockedUseApi = vi.mocked(useApi);
+const mockedDelete = vi.mocked(backendApi.delete);
+const toast = {
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  clearAll: vi.fn(),
+};
 
 describe("SessionActions team phase filter", () => {
   beforeEach(() => {
     mockedUseApi.mockReset();
+    mockedDelete.mockReset();
+    Object.values(toast).forEach((mock) => mock.mockReset());
     mockedUseApi.mockImplementation(() => apiState({ data: sessionView() }));
   });
 
@@ -63,7 +83,58 @@ describe("SessionActions team phase filter", () => {
       "/sessions/session-1/view?categoryCode=AT_FINALIZACAO",
     );
   });
+
+  it("confirms deletion, calls the scoped endpoint and revalidates the view", async () => {
+    const mutate = vi.fn().mockResolvedValue(undefined);
+    mockedUseApi.mockReturnValue(
+      apiState({ data: sessionViewWithAction(), mutate }) as never,
+    );
+    mockedDelete.mockResolvedValue({} as never);
+    renderWithToast(<SessionActions sessionId="session-1" viewMode="team" />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Excluir ação exibida" }),
+    );
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
+
+    await waitFor(() =>
+      expect(mockedDelete).toHaveBeenCalledWith(
+        "/sessions/session-1/actions/action-1",
+      ),
+    );
+    expect(mutate).toHaveBeenCalledTimes(1);
+    expect(toast.success).toHaveBeenCalledWith("Ação excluída com sucesso");
+  });
+
+  it("keeps the action and reports feedback when deletion fails", async () => {
+    const mutate = vi.fn();
+    mockedUseApi.mockReturnValue(
+      apiState({ data: sessionViewWithAction(), mutate }) as never,
+    );
+    mockedDelete.mockRejectedValue(new Error("failed"));
+    renderWithToast(<SessionActions sessionId="session-1" viewMode="team" />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Excluir ação exibida" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Não foi possível excluir a ação",
+      ),
+    );
+    expect(mutate).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
 });
+
+function renderWithToast(children: React.ReactNode) {
+  return render(
+    <ToastContext.Provider value={toast}>{children}</ToastContext.Provider>,
+  );
+}
 
 function apiState(overrides: Record<string, unknown> = {}) {
   return {
@@ -122,6 +193,25 @@ function sessionView() {
           { value: "PRESSING", label: "Pressão" },
         ],
       },
+    },
+  };
+}
+
+function sessionViewWithAction() {
+  const data = sessionView();
+  const entity = {
+    id: "team",
+    title: "Equipe",
+    type: "team",
+    stats: { positive: 1, negative: 0, neutral: 0, total: 1 },
+    metrics: { offensive: 1, defensive: 0, performance: 100 },
+    actions: [{ id: "action-1", title: "Gol", outcome: "positive" }],
+  };
+  return {
+    ...data,
+    analysis: {
+      ...data.analysis,
+      team: { ...data.analysis.team, entities: [entity] },
     },
   };
 }

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import type { SessionEntityAction } from "../../../../pages/SessionView";
 import SessionEntityActions from "./SessionEntityActions";
 
@@ -10,6 +10,8 @@ describe("SessionEntityActions", () => {
           action("Finalização", "Ataque posicional"),
           action("Recuperação de bola", "Pressão"),
         ]}
+        deletingActionId={null}
+        onDeleteAction={vi.fn()}
       />,
     );
 
@@ -28,12 +30,47 @@ describe("SessionEntityActions", () => {
           action("Gol em transição ofensiva", null),
           action("Assistência", null),
         ]}
+        deletingActionId={null}
+        onDeleteAction={vi.fn()}
       />,
     );
 
     expect(screen.getByText("Gol em transição ofensiva")).toBeInTheDocument();
     expect(screen.getByText("Assistência")).toBeInTheDocument();
     expect(screen.queryByText(/·/)).not.toBeInTheDocument();
+  });
+
+  it("replaces the timestamp with an accessible delete button", () => {
+    const onDeleteAction = vi.fn();
+    const taggedAction = action("Gol marcado", null);
+    render(
+      <SessionEntityActions
+        actions={[taggedAction]}
+        deletingActionId={null}
+        onDeleteAction={onDeleteAction}
+      />,
+    );
+
+    expect(screen.queryByText("01:20")).not.toBeInTheDocument();
+    const button = screen.getByRole("button", {
+      name: "Excluir ação Gol marcado",
+    });
+    fireEvent.click(button);
+    expect(onDeleteAction).toHaveBeenCalledWith(taggedAction);
+  });
+
+  it("disables only the action currently being deleted", () => {
+    const taggedAction = action("Gol marcado", null);
+    render(
+      <SessionEntityActions
+        actions={[taggedAction]}
+        deletingActionId={taggedAction.id}
+        onDeleteAction={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: "Excluir ação Gol marcado" }),
+    ).toBeDisabled();
   });
 });
 

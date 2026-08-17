@@ -30,6 +30,20 @@ export class TaggedActionsService {
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
   ) {}
 
+  async removeFromSession(sessionId: string, actionId: string): Promise<void> {
+    const sessionsRepository =
+      this.taggedActionsRepository.manager.getRepository(SessionEntity);
+    const session = await sessionsRepository.findOneBy({ id: sessionId });
+    if (!session) throw new NotFoundException('Sessão não encontrada');
+
+    const action = await this.taggedActionsRepository.findOne({
+      where: { id: actionId, sessaoId: sessionId },
+    });
+    if (!action) throw new NotFoundException('Ação registrada não encontrada');
+
+    await this.taggedActionsRepository.softRemove(action);
+  }
+
   async createForSession(
     sessionId: string,
     dto: CreateSessionActionsDto,

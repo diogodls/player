@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SessionActions.module.scss";
@@ -11,6 +11,10 @@ import type {
 } from "../../../pages/SessionView";
 import Select from "../../elements/Select/Select.tsx";
 import { useApi } from "../../../hooks/useApi.ts";
+import { backendApi } from "../../../utils/api.ts";
+import { ToastContext } from "../../../contexts/ToastContext/ToastContext.tsx";
+import type { SessionEntityAction } from "../../../pages/SessionView";
+import DeleteSessionActionModal from "../DeleteSessionActionModal/DeleteSessionActionModal.tsx";
 
 const emptyFilters: SessionViewFilters = {
   outcome: "all",
@@ -26,6 +30,10 @@ type Props = {
 
 const SessionActions = ({ sessionId, viewMode }: Props) => {
   const [filters, setFilters] = useState<SessionViewFilters>(emptyFilters);
+  const [actionToDelete, setActionToDelete] =
+    useState<SessionEntityAction | null>(null);
+  const [deletingActionId, setDeletingActionId] = useState<string | null>(null);
+  const toast = useContext(ToastContext);
   const filteredSessionViewEndpoint = useMemo(() => {
     if (!sessionId) return null;
 
@@ -54,6 +62,7 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
     error: sessionViewError,
     isLoading,
     isValidating,
+    mutate,
   } = useApi<SessionViewData>(filteredSessionViewEndpoint);
 
   const view = filteredSessionView?.analysis?.[viewMode];
@@ -77,6 +86,23 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
 
   const handleResetFilters = () => {
     setFilters(emptyFilters);
+  };
+
+  const handleDeleteAction = async () => {
+    if (!sessionId || !actionToDelete || deletingActionId) return;
+    setDeletingActionId(actionToDelete.id);
+    try {
+      await backendApi.delete(
+        `/sessions/${sessionId}/actions/${actionToDelete.id}`,
+      );
+      await mutate();
+      toast.success("Ação excluída com sucesso");
+      setActionToDelete(null);
+    } catch {
+      toast.error("Não foi possível excluir a ação");
+    } finally {
+      setDeletingActionId(null);
+    }
   };
 
   return (
@@ -200,7 +226,12 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
               className={`${styles.cardsList} ${viewMode === "individual" ? styles.cardsGrid : ""}`}
             >
               {visibleEntities.map((athlete) => (
-                <SessionActionCard key={athlete.id} entity={athlete} />
+                <SessionActionCard
+                  key={athlete.id}
+                  entity={athlete}
+                  deletingActionId={deletingActionId}
+                  onDeleteAction={setActionToDelete}
+                />
               ))}
             </div>
           ) : (
@@ -223,6 +254,14 @@ const SessionActions = ({ sessionId, viewMode }: Props) => {
           )}
         </>
       )}
+      <DeleteSessionActionModal
+        action={actionToDelete}
+        isDeleting={deletingActionId !== null}
+        onClose={() => {
+          if (!deletingActionId) setActionToDelete(null);
+        }}
+        onConfirm={handleDeleteAction}
+      />
     </>
   );
 };

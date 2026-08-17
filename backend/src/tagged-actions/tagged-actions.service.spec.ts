@@ -282,6 +282,64 @@ describe('TaggedActionsService', () => {
   });
 });
 
+describe('TaggedActionsService removal', () => {
+  const ACTION_ID = '00000000-0000-0000-0000-000000000901';
+
+  it.each([
+    ['individual', PLAYER_ID],
+    ['team', null],
+  ])('soft deletes a valid %s action', async (_type, jogadorId) => {
+    const actionEntity = {
+      id: ACTION_ID,
+      sessaoId: SESSION_ID,
+      jogadorId,
+      deletedAt: null,
+    } as TaggedActionEntity;
+    const setup = buildRemovalService({ action: actionEntity });
+
+    await setup.service.removeFromSession(SESSION_ID, ACTION_ID);
+
+    expect(setup.softRemove).toHaveBeenCalledWith(actionEntity);
+    expect(setup.physicalDelete).not.toHaveBeenCalled();
+    expect(actionEntity.deletedAt).toBeInstanceOf(Date);
+    expect(await setup.findActive()).toEqual([]);
+  });
+
+  it('rejects an action from another session without deleting it', async () => {
+    const setup = buildRemovalService({ action: null });
+    await expect(
+      setup.service.removeFromSession(SESSION_ID, ACTION_ID),
+    ).rejects.toThrow('Ação registrada não encontrada');
+    expect(setup.findOne).toHaveBeenCalledWith({
+      where: { id: ACTION_ID, sessaoId: SESSION_ID },
+    });
+    expect(setup.softRemove).not.toHaveBeenCalled();
+  });
+
+  it('returns not found for an unknown action', async () => {
+    const setup = buildRemovalService({ action: null });
+    await expect(
+      setup.service.removeFromSession(SESSION_ID, ACTION_ID),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('validates the session before looking up the action', async () => {
+    const setup = buildRemovalService({ session: null });
+    await expect(
+      setup.service.removeFromSession(SESSION_ID, ACTION_ID),
+    ).rejects.toThrow('Sessão não encontrada');
+    expect(setup.findOne).not.toHaveBeenCalled();
+  });
+
+  it('does not delete an already removed action', async () => {
+    const setup = buildRemovalService({ action: null });
+    await expect(
+      setup.service.removeFromSession(SESSION_ID, ACTION_ID),
+    ).rejects.toThrow('Ação registrada não encontrada');
+    expect(setup.softRemove).not.toHaveBeenCalled();
+  });
+});
+
 function dto(): CreateSessionActionsDto {
   return { actions: [action(INDIVIDUAL_ACTION_ID, PLAYER_ID, 12)] };
 }
@@ -420,5 +478,50 @@ function buildService(overrides?: {
     orIgnore,
     persistedActions,
     findTeamContexts,
+  };
+}
+
+function buildRemovalService(overrides?: {
+  session?: SessionEntity | null;
+  action?: TaggedActionEntity | null;
+}) {
+  const session =
+    overrides && 'session' in overrides
+      ? overrides.session
+      : ({ id: SESSION_ID } as SessionEntity);
+  const actionEntity =
+    overrides && 'action' in overrides
+      ? overrides.action
+      : ({
+          id: '00000000-0000-0000-0000-000000000901',
+          sessaoId: SESSION_ID,
+          jogadorId: PLAYER_ID,
+          deletedAt: null,
+        } as TaggedActionEntity);
+  const findOne = jest.fn().mockResolvedValue(actionEntity);
+  const softRemove = jest.fn(async (action: TaggedActionEntity) => {
+    action.deletedAt = new Date();
+    return action;
+  });
+  const physicalDelete = jest.fn();
+  const sessionsRepository = {
+    findOneBy: jest.fn().mockResolvedValue(session),
+  };
+  const repository = {
+    manager: {
+      getRepository: jest.fn().mockReturnValue(sessionsRepository),
+    },
+    findOne,
+    softRemove,
+    delete: physicalDelete,
+  } as unknown as Repository<TaggedActionEntity>;
+
+  return {
+    service: new TaggedActionsService(repository),
+    findOne,
+    softRemove,
+    physicalDelete,
+    findActive: async () =>
+      actionEntity && actionEntity.deletedAt === null ? [actionEntity] : [],
   };
 }
