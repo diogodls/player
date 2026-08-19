@@ -5,6 +5,7 @@ import {
   CatalogActionEntity,
   ImpactEntity,
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   PositionEntity,
   PreferredSideEntity,
   SessionCourtSizeEntity,
@@ -12,6 +13,7 @@ import {
   SessionLocationEntity,
   SessionTypeEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
   TeamEntity,
 } from './entities';
 
@@ -23,11 +25,13 @@ export const databaseEntities = [
   PositionEntity,
   PreferredSideEntity,
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   SessionEntity,
   AnalysisTypeEntity,
   ImpactEntity,
   ActionCategoryEntity,
   CatalogActionEntity,
+  TeamActionContextEntity,
   TaggedActionEntity,
 ];
 

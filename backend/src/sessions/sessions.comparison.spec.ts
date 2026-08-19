@@ -1,6 +1,12 @@
 import { BadRequestException } from '@nestjs/common';
 import { FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { SessionEntity, TaggedActionEntity, TeamEntity } from '../entities';
+import {
+  PlayerSessionMinutesEntity,
+  SessionEntity,
+  TaggedActionEntity,
+  TeamEntity,
+} from '../entities';
+import { PlayersService } from '../players/players.service';
 import { SessionsService } from './sessions.service';
 
 const TEAM_ID = '00000000-0000-0000-0000-000000000001';
@@ -81,9 +87,11 @@ function buildAction({
 function buildService({
   sessions,
   actions,
+  minutes = [],
 }: {
   sessions: SessionEntity[];
   actions: TaggedActionEntity[];
+  minutes?: PlayerSessionMinutesEntity[];
 }) {
   const findSessions = jest.fn(
     (options?: FindManyOptions<SessionEntity>): Promise<SessionEntity[]> => {
@@ -96,6 +104,10 @@ function buildService({
     { find: findSessions } as unknown as Repository<SessionEntity>,
     {} as Repository<TeamEntity>,
     { find: findActions } as unknown as Repository<TaggedActionEntity>,
+    {} as PlayersService,
+    {
+      find: jest.fn().mockResolvedValue(minutes),
+    } as unknown as Repository<PlayerSessionMinutesEntity>,
   );
 
   return { service, findSessions, findActions };
@@ -305,5 +317,40 @@ describe('SessionsService comparison', () => {
     expect(
       response.athletes[0]?.points.map((point) => point.sessionId),
     ).toEqual([FIRST_SESSION_ID, SECOND_SESSION_ID]);
+  });
+
+  it('uses official player-session minutes for comparison indexes', async () => {
+    const playerId = '00000000-0000-0000-0000-000000000201';
+    const sessions = [
+      buildSession({ id: FIRST_SESSION_ID, date: '2026-02-15' }),
+    ];
+    const actions = [
+      buildAction({
+        id: 'goal',
+        sessionId: FIRST_SESSION_ID,
+        playerId,
+        playerName: 'Ana',
+        category: 'Ações ofensivas',
+        categoryKey: 'OFFENSIVE_ACTIONS',
+        acronym: 'GM',
+        impactId: 1,
+      }),
+    ];
+    const minutes = [
+      {
+        sessionId: FIRST_SESSION_ID,
+        playerId,
+        totalSeconds: 2400,
+        activeSince: null,
+      } as PlayerSessionMinutesEntity,
+    ];
+    const { service } = buildService({ sessions, actions, minutes });
+
+    const response = await service.compare({
+      startDate: '2026-02-14',
+      endDate: '2026-02-16',
+    });
+
+    expect(response.athletes[0]?.points[0]?.indexes.pgj).toBe(1);
   });
 });

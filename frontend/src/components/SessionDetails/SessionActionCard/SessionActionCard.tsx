@@ -10,13 +10,22 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import SessionActionView from "./SessionEntityActions/SessionEntityActions.tsx";
-import type { SessionEntity } from "../../../pages/SessionView";
+import type {
+  SessionEntity,
+  SessionEntityAction,
+} from "../../../pages/SessionView";
 
 type Props = {
   entity: SessionEntity;
+  deletingActionId: string | null;
+  onDeleteAction: (action: SessionEntityAction) => void;
 };
 
-const SessionActionCard = ({ entity }: Props) => {
+const SessionActionCard = ({
+  entity,
+  deletingActionId,
+  onDeleteAction,
+}: Props) => {
   const [open, setOpen] = useState(false);
   const actionsCount = entity.stats.total;
   const isTeam = entity.type === "team";
@@ -41,12 +50,18 @@ const SessionActionCard = ({ entity }: Props) => {
         <div className={styles.right}>
           <div className={styles.counts}>
             <span className={styles.count}>
-              <FontAwesomeIcon icon={faArrowTrendUp} className={styles.posIco} />
+              <FontAwesomeIcon
+                icon={faArrowTrendUp}
+                className={styles.posIco}
+              />
               <span className={styles.posTxt}>{positiveActions}</span>
             </span>
 
             <span className={styles.count}>
-              <FontAwesomeIcon icon={faArrowTrendDown} className={styles.negIco} />
+              <FontAwesomeIcon
+                icon={faArrowTrendDown}
+                className={styles.negIco}
+              />
               <span className={styles.negTxt}>{negativeActions}</span>
             </span>
           </div>
@@ -59,8 +74,16 @@ const SessionActionCard = ({ entity }: Props) => {
       </div>
 
       <div className={styles.metrics}>
-        <MiniMetric label="OFENSIVO" value={entity.metrics.offensive} tone="blue" />
-        <MiniMetric label="DEFENSIVO" value={entity.metrics.defensive} tone="yellow" />
+        <MiniMetric
+          label="OFENSIVO"
+          value={entity.metrics.offensive}
+          tone="blue"
+        />
+        <MiniMetric
+          label="DEFENSIVO"
+          value={entity.metrics.defensive}
+          tone="yellow"
+        />
         <MiniMetric label="PERFORMANCE" value={performance} tone="green" />
       </div>
 
@@ -71,12 +94,19 @@ const SessionActionCard = ({ entity }: Props) => {
         aria-expanded={open}
       >
         <span className={styles.viewLink}>Ver ações ({actionsCount})</span>
-        <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} className={styles.chevron} />
+        <FontAwesomeIcon
+          icon={open ? faChevronUp : faChevronDown}
+          className={styles.chevron}
+        />
       </button>
 
       {open && (
         <div className={styles.expandArea}>
-          <SessionActionView actions={entity.actions} />
+          <SessionActionView
+            actions={entity.actions}
+            deletingActionId={deletingActionId}
+            onDeleteAction={onDeleteAction}
+          />
         </div>
       )}
     </article>
@@ -95,12 +125,17 @@ function MiniMetric({
   return (
     <div className={styles.metricBox}>
       <div className={styles.metricHeader}>
-        <span className={`${styles.metricLabel} ${styles[`tone_${tone}`]}`}>{label}</span>
+        <span className={`${styles.metricLabel} ${styles[`tone_${tone}`]}`}>
+          {label}
+        </span>
         <span className={styles.metricValue}>{value}</span>
       </div>
 
       <div className={styles.track}>
-        <div className={`${styles.fill} ${styles[`fill_${tone}`]}`} style={{ width: `${Math.min(value, 100)}%` }} />
+        <div
+          className={`${styles.fill} ${styles[`fill_${tone}`]}`}
+          style={{ width: `${Math.min(value, 100)}%` }}
+        />
       </div>
     </div>
   );

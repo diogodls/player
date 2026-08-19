@@ -10,6 +10,7 @@ import {
 import { CatalogActionEntity } from './catalog-action.entity';
 import { PlayerEntity } from './player.entity';
 import { SessionEntity } from './session.entity';
+import { TeamActionContextEntity } from './team-action-context.entity';
 
 @Entity({ name: 'acoes_taggeadas' })
 @Check(`"timestamp_segundos" >= 0`)
@@ -25,6 +26,9 @@ export class TaggedActionEntity extends BaseEntity {
 
   @Column({ name: 'jogador_id', type: 'uuid', nullable: true })
   jogadorId!: string | null;
+
+  @Column({ name: 'contexto_acao_equipe_id', type: 'uuid', nullable: true })
+  contextoAcaoEquipeId!: string | null;
 
   @Column({ name: 'timestamp_segundos', type: 'integer' })
   timestampSegundos!: number;
@@ -54,4 +58,12 @@ export class TaggedActionEntity extends BaseEntity {
   })
   @JoinColumn({ name: 'jogador_id' })
   jogador?: PlayerEntity | null;
+
+  @ManyToOne(
+    () => TeamActionContextEntity,
+    (context) => context.acoesTaggeadas,
+    { nullable: true },
+  )
+  @JoinColumn({ name: 'contexto_acao_equipe_id' })
+  contextoAcaoEquipe?: TeamActionContextEntity | null;
 }

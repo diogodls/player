@@ -93,130 +93,116 @@ describe('CatalogService', () => {
     ]);
   });
 
-  it('returns team groups directly from database metadata', async () => {
+  it('queries only v2 team categories and leaves legacy categories out', async () => {
+    find.mockResolvedValue([]);
+
+    await service.getTeamCatalog();
+
+    const options = find.mock.calls[0][0];
+    const where = options?.where as unknown as {
+      tipoAnaliseId: number;
+      chave: { _value: string[] };
+    };
+    expect(where.tipoAnaliseId).toBe(2);
+    expect(where.chave._value).toEqual([
+      'TEAM_V2_SET_PIECE',
+      'TEAM_V2_ATTACK',
+      'TEAM_V2_DEFENSE',
+    ]);
+    expect(where.chave._value).not.toContain('SET_PIECE');
+    expect(where.chave._value).not.toContain('OFFENSIVE_ORGANIZATION');
+  });
+
+  it('builds the isolated v2 catalog with 3 groups, 12 actions and 14 contexts', async () => {
     find.mockResolvedValue([
-      category('SET_PIECE', 'Bola parada', 1, [
-        action('BPSE', 'Bola parada sem execução', 'Negativa', 1),
-      ]),
-      category('OFFENSIVE_ORGANIZATION', 'Organização ofensiva', 2, [
-        action('GSP', 'Gol de saída de pressão', 'Positiva', 1),
-      ]),
+      category(
+        'TEAM_V2_SET_PIECE',
+        'Bola parada - novo catálogo',
+        1,
+        [
+          action('BP_GOL', 'Gol', 'Positiva', 1),
+          action('BP_BEM_EXEC', 'Jogada bem executada', 'Positiva', 2),
+          action('BP_MAL_EXEC', 'Jogada mal executada', 'Negativa', 3),
+          action('BP_SEM_EXEC', 'Sem execução', 'Negativa', 4),
+        ],
+        [
+          context('CORNER', 'Canto', 1),
+          context('OFFENSIVE_KICK_IN', 'Lateral ofensivo', 2),
+          context('FREE_KICK', 'Falta', 3),
+          context('DEFENSIVE_KICK_IN', 'Lateral defensivo', 4),
+          context('GOAL_CLEARANCE', 'Arremesso de meta', 5),
+        ],
+      ),
+      category(
+        'TEAM_V2_ATTACK',
+        'Ataque',
+        2,
+        [
+          action('AT_GOL', 'Gol', 'Positiva', 1),
+          action('AT_FINALIZACAO', 'Finalização', 'Positiva', 2),
+          action('AT_POSSE_MANTIDA', 'Posse mantida', 'Positiva', 3),
+          action('AT_POSSE_PERDIDA', 'Posse perdida', 'Negativa', 4),
+        ],
+        [
+          context('OFFENSIVE_TRANSITION', 'Transição ofensiva', 1),
+          context('PRESSURE_EXIT', 'Saída de pressão', 2),
+          context('FLY_GOALKEEPER', 'Goleiro linha', 3),
+          context('POSITIONAL_ATTACK', 'Ataque posicional', 4),
+        ],
+      ),
+      category(
+        'TEAM_V2_DEFENSE',
+        'Defesa',
+        3,
+        [
+          action('DF_GOL_SOFRIDO', 'Gol sofrido', 'Negativa', 1),
+          action(
+            'DF_FINALIZACAO_SOFRIDA',
+            'Finalização sofrida',
+            'Negativa',
+            2,
+          ),
+          action(
+            'DF_JOGADA_INTERCEPTADA',
+            'Jogada interceptada',
+            'Positiva',
+            3,
+          ),
+          action('DF_RECUPERACAO', 'Recuperação de bola', 'Positiva', 4),
+        ],
+        [
+          context('DEFENSIVE_TRANSITION', 'Transição defensiva', 1),
+          context('VARIABLE_PRESSING', 'Marcação variando pra pressão', 2),
+          context('LOW_BLOCK', 'Marcação baixa', 3),
+          context('PRESSING', 'Pressão', 4),
+          context('DEFENSIVE_FLY_GOALKEEPER', 'Goleiro linha defensivo', 5),
+        ],
+      ),
     ]);
 
     const result = await service.getTeamCatalog();
 
-    expect(find).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { tipoAnaliseId: 2 } }),
+    expect(result.groups.map((group) => group.title)).toEqual([
+      'Bola parada',
+      'Ataque',
+      'Defesa',
+    ]);
+    expect(result.groups.flatMap((group) => group.actions)).toHaveLength(12);
+    expect(result.groups.flatMap((group) => group.contexts ?? [])).toHaveLength(
+      14,
     );
-    expect(result).toEqual({
-      analysisType: 'TEAM',
-      groups: [
-        expect.objectContaining({
-          key: 'SET_PIECE',
-          title: 'Bola parada',
-          actions: [
-            expect.objectContaining({ key: 'BPSE', impact: 'NEGATIVE' }),
-          ],
-        }),
-        expect.objectContaining({
-          key: 'OFFENSIVE_ORGANIZATION',
-          title: 'Organização ofensiva',
-          actions: [
-            expect.objectContaining({ key: 'GSP', impact: 'POSITIVE' }),
-          ],
-        }),
-      ],
-    });
-  });
-
-  it('returns all 35 team actions with database category, impact and order', async () => {
-    const definitions: ReadonlyArray<
-      readonly [string, string, readonly string[]]
-    > = [
-      ['SET_PIECE', 'Bola parada', ['BPSE:N', 'BPME:N', 'BPBE:P', 'GBP:P']],
-      [
-        'OFFENSIVE_ORGANIZATION',
-        'Organização ofensiva',
-        [
-          'GSP:P',
-          'FSP:P',
-          'PMSP:P',
-          'PPSP:N',
-          'GAP:P',
-          'FAP:P',
-          'PMAP:P',
-          'PPAP:N',
-          'GGL:P',
-          'FGL:P',
-          'PMGL:P',
-          'PPGL:N',
-        ],
-      ],
-      [
-        'OFFENSIVE_TRANSITION',
-        'Transição ofensiva',
-        ['GT:P', 'FT:P', 'PMT:P', 'PPT:N'],
-      ],
-      [
-        'DEFENSIVE_ORGANIZATION',
-        'Organização defensiva',
-        [
-          'MBRP:P',
-          'MBJI:P',
-          'MBFS:N',
-          'MBGT:N',
-          'VRP:P',
-          'VJI:P',
-          'VFS:N',
-          'VGT:N',
-          'PRP:P',
-          'PJI:P',
-          'PFS:N',
-          'PRGT:N',
-        ],
-      ],
-      [
-        'DEFENSIVE_TRANSITION',
-        'Transição defensiva',
-        ['TRP:P', 'TFS:N', 'TGT:N'],
-      ],
-    ];
-    find.mockResolvedValue(
-      definitions.map(([key, title, entries], groupIndex) =>
-        category(
-          key,
-          title,
-          groupIndex + 1,
-          entries.map((entry, actionIndex) => {
-            const [key, impact] = entry.split(':');
-            return action(
-              key,
-              key,
-              impact === 'P' ? 'Positiva' : 'Negativa',
-              actionIndex + 1,
-            );
-          }),
-        ),
-      ),
-    );
-
-    const result = await service.getTeamCatalog();
-    expect(result.groups.map((group) => group.key)).toEqual(
-      definitions.map(([key]) => key),
-    );
-    expect(result.groups.flatMap((group) => group.actions)).toHaveLength(35);
-    definitions.forEach(([key, , entries], groupIndex) => {
-      const group = result.groups[groupIndex];
-      expect(group.key).toBe(key);
-      expect(group.actions.map((item) => item.key)).toEqual(
-        entries.map((entry) => entry.split(':')[0]),
-      );
-      expect(group.actions.map((item) => item.impact)).toEqual(
-        entries.map((entry) =>
-          entry.endsWith(':P') ? 'POSITIVE' : 'NEGATIVE',
-        ),
-      );
-    });
+    expect(result.groups.map((group) => group.actions.length)).toEqual([
+      4, 4, 4,
+    ]);
+    expect(result.groups.map((group) => group.contexts?.length)).toEqual([
+      5, 4, 5,
+    ]);
+    expect(result.groups[1].contexts?.map(({ key }) => key)).toEqual([
+      'OFFENSIVE_TRANSITION',
+      'PRESSURE_EXIT',
+      'FLY_GOALKEEPER',
+      'POSITIONAL_ATTACK',
+    ]);
   });
 });
 
@@ -225,14 +211,25 @@ function category(
   nome: string,
   ordem: number,
   acoes: ActionCategoryEntity['acoes'],
+  contextosAcaoEquipe?: ActionCategoryEntity['contextosAcaoEquipe'],
 ): ActionCategoryEntity {
   return {
     chave,
     nome,
     ordem,
     acoes,
+    contextosAcaoEquipe,
     tipoAnaliseId: 1,
   } as ActionCategoryEntity;
+}
+
+function context(chave: string, nome: string, ordem: number) {
+  return {
+    id: `id-${chave}`,
+    chave,
+    nome,
+    ordem,
+  };
 }
 
 function action(sigla: string, nome: string, impacto: string, ordem: number) {

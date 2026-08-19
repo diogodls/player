@@ -198,7 +198,20 @@ const ActionLog = ({ logType, session }: ActionLog) => {
                   <FontAwesomeIcon
                     icon={action.impact === "NEUTRAL" ? faClock : faBullseye}
                   />
-                  {action.title}
+                  <span
+                    className={styles.actionText}
+                    data-testid={
+                      logType === "team" ? "team-action-description" : undefined
+                    }
+                  >
+                    {action.title}
+                    {logType === "team" && action.contextName && (
+                      <span className={styles.contextName}>
+                        {" · "}
+                        {action.contextName}
+                      </span>
+                    )}
+                  </span>
                 </span>
 
                 {action.player && (

@@ -9,7 +9,7 @@ import type { CatalogAction, CatalogGroup } from "../../../pages/Analysis";
 
 type ActionsList = {
   groups: CatalogGroup[];
-  handleActionClick: (action: CatalogAction, category: string) => void;
+  handleActionClick: (action: CatalogAction, group: CatalogGroup) => void;
   className?: string;
 };
 
@@ -35,7 +35,7 @@ const ActionsList = ({ groups, handleActionClick, className }: ActionsList) => {
                   }`}
                   title={action.key}
                   key={action.id}
-                  onClick={() => handleActionClick(action, group.title)}
+                  onClick={() => handleActionClick(action, group)}
                 >
                   <FontAwesomeIcon
                     icon={

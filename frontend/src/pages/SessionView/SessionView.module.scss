@@ -67,16 +67,18 @@
           }
 
           .title {
-            margin: 0 0 2px;
-            font-size: clamp(26px, 3.3vw, 36px);
+            margin: 0 0 4px;
+            font-size: clamp(22px, 2.2vw, 28px);
             line-height: 1.08;
+            white-space: nowrap;
           }
 
           .subtitle {
             margin: 0;
             color: var(--text-muted);
-            max-width: 70ch;
-            line-height: 1.32;
+            max-width: 34ch;
+            font-size: 14px;
+            line-height: 1.35;
           }
         }
       }
@@ -125,6 +127,12 @@
             background: linear-gradient(135deg, rgba(34, 197, 94, 0.86), rgba(21, 128, 61, 0.8));
             border-color: rgba(134, 239, 172, 0.24);
             box-shadow: 0 12px 28px rgba(34, 197, 94, 0.14);
+          }
+
+          &.minutesButton {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(180, 83, 9, 0.84));
+            border-color: rgba(253, 230, 138, 0.28);
+            box-shadow: 0 12px 28px rgba(245, 158, 11, 0.14);
           }
 
           .actionIconWrap {

@@ -50,13 +50,15 @@ const TeamAnalysis = () => {
 
       <div className={styles.content}>
         <div className={styles.leftContent}>
-          <TeamActions groups={catalog.groups} session={session} />
+          <div className={styles.actionsArea}>
+            <TeamActions groups={catalog.groups} session={session} />
+          </div>
+          <div className={styles.teamActionLog}>
+            <ActionLog logType={"team"} session={session} />
+          </div>
         </div>
         <div className={styles.videoAnalysis}>
           <VideoAnalysis />
-        </div>
-        <div className={styles.actionLog}>
-          <ActionLog logType={"team"} session={session} />
         </div>
       </div>
       {exitGuard.isExitModalOpen && (

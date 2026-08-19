@@ -52,6 +52,12 @@ function buildTaggedAction({
   acronym,
   impactId,
   seconds,
+  actionOrder,
+  categoryOrder,
+  contextId,
+  contextKey,
+  contextName,
+  contextOrder,
 }: {
   id: string;
   playerId?: string;
@@ -62,22 +68,31 @@ function buildTaggedAction({
   acronym: string;
   impactId: number;
   seconds: number;
+  actionOrder?: number;
+  categoryOrder?: number;
+  contextId?: string;
+  contextKey?: string;
+  contextName?: string;
+  contextOrder?: number;
 }): TaggedActionEntity {
   return {
     id,
     sessaoId: SESSION_ID,
     acaoCatalogoId: `catalog-${id}`,
     jogadorId: playerId ?? null,
+    contextoAcaoEquipeId: contextId ?? null,
     timestampSegundos: seconds,
     acaoCatalogo: {
       id: `catalog-${id}`,
       nome: title,
       sigla: acronym,
       impactoId: impactId,
+      ordem: actionOrder ?? null,
       categoriaAcao: {
         id: `category-${id}`,
         nome: categoryName,
         chave: categoryKey ?? null,
+        ordem: categoryOrder ?? null,
       },
     },
     jogador: playerId
@@ -86,7 +101,73 @@ function buildTaggedAction({
           nome: playerName,
         }
       : null,
+    contextoAcaoEquipe:
+      contextId && contextKey && contextName
+        ? {
+            id: contextId,
+            chave: contextKey,
+            nome: contextName,
+            ordem: contextOrder ?? 1,
+          }
+        : null,
   } as TaggedActionEntity;
+}
+
+function buildViewService(actions: TaggedActionEntity[]) {
+  const findOne = jest.fn().mockResolvedValue(buildSession());
+  const find = jest.fn().mockResolvedValue(actions);
+  return {
+    find,
+    service: new SessionsService(
+      { findOne } as unknown as Repository<SessionEntity>,
+      {} as Repository<TeamEntity>,
+      { find } as unknown as Repository<TaggedActionEntity>,
+      playersServiceMock,
+    ),
+  };
+}
+
+function buildV2TeamAction({
+  id,
+  categoryKey,
+  acronym,
+  title,
+  impactId,
+  contextKey,
+  contextName,
+  contextOrder = 1,
+  seconds = 10,
+}: {
+  id: string;
+  categoryKey: string;
+  acronym: string;
+  title: string;
+  impactId: number;
+  contextKey: string;
+  contextName: string;
+  contextOrder?: number;
+  seconds?: number;
+}) {
+  return buildTaggedAction({
+    id,
+    title,
+    categoryName: categoryKey,
+    categoryKey,
+    categoryOrder:
+      categoryKey === 'TEAM_V2_SET_PIECE'
+        ? 1
+        : categoryKey === 'TEAM_V2_ATTACK'
+          ? 2
+          : 3,
+    acronym,
+    actionOrder: 1,
+    impactId,
+    seconds,
+    contextId: `context-${id}`,
+    contextKey,
+    contextName,
+    contextOrder,
+  });
 }
 
 describe('SessionsService id validation', () => {
@@ -368,16 +449,18 @@ describe('SessionsService id validation', () => {
         },
       }),
     );
-    expect(response.analysis.individual.entities[0].actions[0]).toEqual({
-      id: 'action-1',
-      title: 'Roubada de bola',
-      category: {
-        code: 'RB',
-        label: 'RB',
-      },
-      time: '00:24',
-      outcome: 'positive',
-    });
+    expect(response.analysis.individual.entities[0].actions[0]).toEqual(
+      expect.objectContaining({
+        id: 'action-1',
+        title: 'Roubada de bola',
+        category: {
+          code: 'RB',
+          label: 'RB',
+        },
+        time: '00:24',
+        outcome: 'positive',
+      }),
+    );
     expect(response.analysis.individual.entities[0].actions[2]).toEqual(
       expect.objectContaining({
         id: 'action-5',
@@ -417,15 +500,23 @@ describe('SessionsService id validation', () => {
         { value: 'player-2', label: 'Bia' },
       ],
       categories: [
-        { value: 'RB', label: 'RB' },
-        { value: 'FD', label: 'FD' },
         { value: 'ASS', label: 'ASS' },
         { value: 'ENTROU', label: 'ENTROU' },
+        { value: 'FD', label: 'FD' },
+        { value: 'RB', label: 'RB' },
       ],
+      outcomes: [
+        { value: 'positive', label: 'Positivas' },
+        { value: 'negative', label: 'Negativas' },
+        { value: 'neutral', label: 'Neutras' },
+      ],
+      phases: [],
     });
     expect(response.filters.team).toEqual({
       athletes: [],
       categories: [{ value: 'BPSE', label: 'BPSE' }],
+      outcomes: [{ value: 'negative', label: 'Negativas' }],
+      phases: [{ value: 'OFFENSIVE_ORGANIZATION', label: 'Acoes ofensivas' }],
     });
   });
 
@@ -567,6 +658,299 @@ describe('SessionsService id validation', () => {
     expect(response.analysis.individual.entities[0].actions[0].id).toBe(
       'action-3',
     );
+  });
+
+  it('returns and classifies contextual v2, legacy and individual actions together', async () => {
+    const actions = [
+      buildV2TeamAction({
+        id: 'v2-attack',
+        categoryKey: 'TEAM_V2_ATTACK',
+        acronym: 'AT_FINALIZACAO',
+        title: 'Finalizacao',
+        impactId: 1,
+        contextKey: 'POSITIONAL_ATTACK',
+        contextName: 'Ataque posicional',
+        seconds: 80,
+      }),
+      buildV2TeamAction({
+        id: 'v2-defense',
+        categoryKey: 'TEAM_V2_DEFENSE',
+        acronym: 'DF_GOL_SOFRIDO',
+        title: 'Gol sofrido',
+        impactId: 2,
+        contextKey: 'LOW_BLOCK',
+        contextName: 'Marcacao baixa',
+      }),
+      buildV2TeamAction({
+        id: 'set-corner',
+        categoryKey: 'TEAM_V2_SET_PIECE',
+        acronym: 'BP_GOL',
+        title: 'Gol',
+        impactId: 1,
+        contextKey: 'CORNER',
+        contextName: 'Canto',
+        contextOrder: 1,
+      }),
+      buildV2TeamAction({
+        id: 'set-offensive-kick-in',
+        categoryKey: 'TEAM_V2_SET_PIECE',
+        acronym: 'BP_BEM_EXEC',
+        title: 'Jogada bem executada',
+        impactId: 1,
+        contextKey: 'OFFENSIVE_KICK_IN',
+        contextName: 'Lateral ofensivo',
+        contextOrder: 2,
+      }),
+      buildV2TeamAction({
+        id: 'set-free-kick',
+        categoryKey: 'TEAM_V2_SET_PIECE',
+        acronym: 'BP_NEUTRAL_TEST',
+        title: 'Acao neutra',
+        impactId: 3,
+        contextKey: 'FREE_KICK',
+        contextName: 'Falta',
+        contextOrder: 3,
+      }),
+      buildV2TeamAction({
+        id: 'set-defensive-kick-in',
+        categoryKey: 'TEAM_V2_SET_PIECE',
+        acronym: 'BP_MAL_EXEC',
+        title: 'Jogada mal executada',
+        impactId: 2,
+        contextKey: 'DEFENSIVE_KICK_IN',
+        contextName: 'Lateral defensivo',
+        contextOrder: 4,
+      }),
+      buildV2TeamAction({
+        id: 'set-goal-clearance',
+        categoryKey: 'TEAM_V2_SET_PIECE',
+        acronym: 'BP_SEM_EXEC',
+        title: 'Sem execucao',
+        impactId: 2,
+        contextKey: 'GOAL_CLEARANCE',
+        contextName: 'Arremesso de meta',
+        contextOrder: 5,
+      }),
+      buildTaggedAction({
+        id: 'legacy-team',
+        title: 'Gol em transicao ofensiva',
+        categoryName: 'Transicao ofensiva',
+        categoryKey: 'OFFENSIVE_TRANSITION',
+        acronym: 'GT',
+        impactId: 1,
+        seconds: 90,
+      }),
+      buildTaggedAction({
+        id: 'individual',
+        playerId: 'player-1',
+        playerName: 'Ana',
+        title: 'Entrou em quadra',
+        categoryName: 'Minutagem',
+        categoryKey: 'PLAYING_TIME',
+        acronym: 'ENTROU',
+        impactId: 3,
+        seconds: 2,
+      }),
+    ];
+    const { service, find } = buildViewService(actions);
+
+    const response = await service.findView(SESSION_ID);
+    const team = response.analysis.team.entities[0];
+    const attack = team.actions.find((action) => action.id === 'v2-attack');
+    const legacy = team.actions.find((action) => action.id === 'legacy-team');
+    const individual = response.analysis.individual.entities[0].actions[0];
+
+    expect(find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        relations: expect.objectContaining({ contextoAcaoEquipe: true }),
+      }),
+    );
+    expect(attack).toEqual(
+      expect.objectContaining({
+        catalogActionId: 'catalog-v2-attack',
+        actionKey: 'AT_FINALIZACAO',
+        actionName: 'Finalizacao',
+        groupKey: 'TEAM_V2_ATTACK',
+        groupName: 'Ataque',
+        impact: 'POSITIVE',
+        teamContextId: 'context-v2-attack',
+        contextKey: 'POSITIONAL_ATTACK',
+        contextName: 'Ataque posicional',
+        timestampSeconds: 80,
+      }),
+    );
+    expect(legacy).toEqual(
+      expect.objectContaining({
+        actionKey: 'GT',
+        contextKey: null,
+        contextName: null,
+        teamContextId: null,
+      }),
+    );
+    expect(individual).toEqual(
+      expect.objectContaining({
+        actionKey: 'ENTROU',
+        contextKey: null,
+        contextName: null,
+        teamContextId: null,
+      }),
+    );
+    expect(team.stats).toEqual({
+      positive: 4,
+      negative: 3,
+      neutral: 1,
+      total: 8,
+    });
+    expect(team.metrics).toEqual({
+      overall: 8,
+      offensive: 5,
+      defensive: 3,
+      performance: 57,
+    });
+  });
+
+  it.each([
+    ['positive', 'positive-action'],
+    ['negative', 'negative-action'],
+    ['neutral', 'neutral-action'],
+  ] as const)('filters the session view by %s outcome', async (outcome, id) => {
+    const actions = [
+      buildV2TeamAction({
+        id: 'positive-action',
+        categoryKey: 'TEAM_V2_ATTACK',
+        acronym: 'AT_FINALIZACAO',
+        title: 'Finalizacao',
+        impactId: 1,
+        contextKey: 'POSITIONAL_ATTACK',
+        contextName: 'Ataque posicional',
+      }),
+      buildV2TeamAction({
+        id: 'negative-action',
+        categoryKey: 'TEAM_V2_DEFENSE',
+        acronym: 'DF_GOL_SOFRIDO',
+        title: 'Gol sofrido',
+        impactId: 2,
+        contextKey: 'LOW_BLOCK',
+        contextName: 'Marcacao baixa',
+      }),
+      buildV2TeamAction({
+        id: 'neutral-action',
+        categoryKey: 'TEAM_V2_SET_PIECE',
+        acronym: 'BP_NEUTRAL_TEST',
+        title: 'Acao neutra',
+        impactId: 3,
+        contextKey: 'CORNER',
+        contextName: 'Canto',
+      }),
+    ];
+
+    const response = await buildViewService(actions).service.findView(
+      SESSION_ID,
+      { outcome },
+    );
+
+    expect(response.analysis.team.entities[0].actions).toHaveLength(1);
+    expect(response.analysis.team.entities[0].actions[0].id).toBe(id);
+  });
+
+  it('filters v2 team actions by action key and context phase', async () => {
+    const actions = [
+      buildV2TeamAction({
+        id: 'positional-shot',
+        categoryKey: 'TEAM_V2_ATTACK',
+        acronym: 'AT_FINALIZACAO',
+        title: 'Finalizacao',
+        impactId: 1,
+        contextKey: 'POSITIONAL_ATTACK',
+        contextName: 'Ataque posicional',
+      }),
+      buildV2TeamAction({
+        id: 'transition-shot',
+        categoryKey: 'TEAM_V2_ATTACK',
+        acronym: 'AT_FINALIZACAO',
+        title: 'Finalizacao',
+        impactId: 1,
+        contextKey: 'OFFENSIVE_TRANSITION',
+        contextName: 'Transicao ofensiva',
+      }),
+      buildV2TeamAction({
+        id: 'positional-goal',
+        categoryKey: 'TEAM_V2_ATTACK',
+        acronym: 'AT_GOL',
+        title: 'Gol',
+        impactId: 1,
+        contextKey: 'POSITIONAL_ATTACK',
+        contextName: 'Ataque posicional',
+      }),
+    ];
+
+    const response = await buildViewService(actions).service.findView(
+      SESSION_ID,
+      {
+        categoryCode: 'AT_FINALIZACAO',
+        phaseKey: 'POSITIONAL_ATTACK',
+      },
+    );
+
+    expect(response.analysis.team.entities[0].actions).toHaveLength(1);
+    expect(response.analysis.team.entities[0].actions[0].id).toBe(
+      'positional-shot',
+    );
+  });
+
+  it('builds unique filters only from actions and contexts present in a mixed session', async () => {
+    const positional = buildV2TeamAction({
+      id: 'positional-1',
+      categoryKey: 'TEAM_V2_ATTACK',
+      acronym: 'AT_FINALIZACAO',
+      title: 'Finalizacao',
+      impactId: 1,
+      contextKey: 'POSITIONAL_ATTACK',
+      contextName: 'Ataque posicional',
+      contextOrder: 4,
+    });
+    const duplicate = buildV2TeamAction({
+      id: 'positional-2',
+      categoryKey: 'TEAM_V2_ATTACK',
+      acronym: 'AT_FINALIZACAO',
+      title: 'Finalizacao',
+      impactId: 1,
+      contextKey: 'POSITIONAL_ATTACK',
+      contextName: 'Ataque posicional',
+      contextOrder: 4,
+    });
+    const legacy = buildTaggedAction({
+      id: 'legacy',
+      title: 'Gol em transicao ofensiva',
+      categoryName: 'Transicao ofensiva',
+      categoryKey: 'OFFENSIVE_TRANSITION',
+      categoryOrder: 3,
+      acronym: 'GT',
+      impactId: 2,
+      seconds: 30,
+    });
+    const { service, find } = buildViewService([positional, duplicate, legacy]);
+
+    const filters = await service.findViewFilters(SESSION_ID);
+
+    expect(find).toHaveBeenCalledTimes(1);
+    expect(find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        relations: expect.objectContaining({ contextoAcaoEquipe: true }),
+      }),
+    );
+    expect(filters.team.categories).toEqual([
+      { value: 'AT_FINALIZACAO', label: 'Finalizacao' },
+      { value: 'GT', label: 'GT' },
+    ]);
+    expect(filters.team.phases).toEqual([
+      { value: 'OFFENSIVE_TRANSITION', label: 'Transicao ofensiva' },
+      { value: 'POSITIONAL_ATTACK', label: 'Ataque posicional' },
+    ]);
+    expect(filters.team.outcomes).toEqual([
+      { value: 'positive', label: 'Positivas' },
+      { value: 'negative', label: 'Negativas' },
+    ]);
   });
 });
 

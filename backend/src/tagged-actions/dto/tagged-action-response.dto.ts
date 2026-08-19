@@ -3,6 +3,7 @@ export class TaggedActionResponseDto {
   sessionId!: string;
   catalogActionId!: string;
   playerId!: string | null;
+  teamContextId!: string | null;
   timestampSeconds!: number;
 }
 

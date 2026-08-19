@@ -8,8 +8,8 @@ function toOptionalString(value: unknown): unknown {
 
 export class SessionViewFiltersDto {
   @IsOptional()
-  @IsIn(['positive', 'negative'], { message: 'Resultado invalido' })
-  outcome?: 'positive' | 'negative';
+  @IsIn(['positive', 'negative', 'neutral'], { message: 'Resultado invalido' })
+  outcome?: 'positive' | 'negative' | 'neutral';
 
   @Transform(({ value }: { value: unknown }) => toOptionalString(value))
   @IsOptional()

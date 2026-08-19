@@ -11,11 +11,13 @@ export type ActionTagged = {
   id: string;
   sessionId: string;
   catalogActionId?: string;
+  teamContextId?: string;
   type: ActionType;
   time: string;
   title: string;
   key?: string;
   category?: string;
+  contextName?: string;
   goodAction: boolean;
   impact?: CatalogImpact;
   player?: AnalysisPlayer;
@@ -39,11 +41,19 @@ export type CatalogAction = {
   order: number;
 };
 
+export type TeamActionContext = {
+  id: string;
+  key: string;
+  name: string;
+  order: number;
+};
+
 export type CatalogGroup = {
   key: string;
   title: string;
   order: number;
   actions: CatalogAction[];
+  contexts?: TeamActionContext[];
 };
 
 export type IndividualCatalog = {

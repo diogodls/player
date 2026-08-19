@@ -18,6 +18,7 @@ import Rankings from "./pages/Rankings/Rankings.tsx";
 import Login from "./pages/Login/Login.tsx";
 import {AuthProvider} from "./contexts/AuthContext/AuthContext.tsx";
 import ProtectedRoute from "./components/layout/ProtectedRoute/ProtectedRoute.tsx";
+import SessionMinutes from "./pages/SessionMinutes/SessionMinutes.tsx";
 
 const SessionComparison = lazy(
   () => import("./pages/SessionComparison/SessionComparison.tsx"),
@@ -52,6 +53,7 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="/sessions/:id" element={<SessionView />} />
                   <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
                   <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis />} />
+                  <Route path="/sessions/:id/minutes" element={<SessionMinutes />} />
                   <Route path={"/athlete-registration"} element={<AthleteRegistrationScreen />}/>
                 </Route>
               </Route>

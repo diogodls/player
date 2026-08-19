@@ -8,6 +8,7 @@ import {
   CatalogActionEntity,
   ImpactEntity,
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   PositionEntity,
   PreferredSideEntity,
   SessionCourtSizeEntity,
@@ -15,6 +16,7 @@ import {
   SessionLocationEntity,
   SessionTypeEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
   TeamEntity,
   UserEntity,
 } from './entities';
@@ -24,6 +26,7 @@ import { CatalogModule } from './catalog/catalog.module';
 import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
 import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
 import { AuthModule } from './auth/auth.module';
+import { PlayerSessionMinutesModule } from './player-session-minutes/player-session-minutes.module';
 
 @Module({
   imports: [
@@ -42,11 +45,13 @@ import { AuthModule } from './auth/auth.module';
         PositionEntity,
         PreferredSideEntity,
         PlayerEntity,
+        PlayerSessionMinutesEntity,
         SessionEntity,
         AnalysisTypeEntity,
         ImpactEntity,
         ActionCategoryEntity,
         CatalogActionEntity,
+        TeamActionContextEntity,
         TaggedActionEntity,
         UserEntity,
       ],
@@ -61,6 +66,7 @@ import { AuthModule } from './auth/auth.module';
     CatalogModule,
     TaggedActionsModule,
     CoachDashboardModule,
+    PlayerSessionMinutesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
