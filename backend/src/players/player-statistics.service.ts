@@ -7,6 +7,7 @@ import { PlayerPerformanceDto } from './dto/player-performance.dto';
 const PLAYERS_ON_COURT = 4;
 // JJ uses the athlete's 25-minute game equivalent, not the 40-minute match duration.
 const EQUIVALENT_GAME_MINUTES = 25;
+const RF_REFERENCE = 0.8;
 
 const ACTION_CODES = [
   'Gol TO',
@@ -515,7 +516,7 @@ function calculatePerformance(
         ),
       ),
       gtj: round(gtj),
-      rf: round(divide(2 * actions.RB + actions.DIA, actions.GP + actions.FD)),
+      rf: round(divide(2 * actions.RB + actions.DIA, RF_REFERENCE)),
       tid: round(
         divide(
           defensiveInfluence * (team.totalMinutes / PLAYERS_ON_COURT) * 100,

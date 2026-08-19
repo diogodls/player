@@ -116,6 +116,40 @@ describe('calculateSessionPlayerPerformances', () => {
 });
 
 describe('calculatePlayerPerformances', () => {
+  it.each([
+    {
+      name: 'applies weight two to RB in the normal case',
+      actions: { RB: 1, DIA: 8 },
+      expected: 12.5,
+    },
+    {
+      name: 'calculates RF without RB',
+      actions: { RB: 0, DIA: 1 },
+      expected: 1.25,
+    },
+    {
+      name: 'returns zero without positive defensive actions',
+      actions: { RB: 0, DIA: 0 },
+      expected: 0,
+    },
+  ])('$name', ({ actions, expected }) => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 1500, actions),
+    ]).get('player-1');
+
+    expect(performance?.indexes.rf).toBe(expected);
+  });
+
+  it('does not use GP or FD in RF', () => {
+    const performances = calculatePlayerPerformances([
+      aggregate('player-a', 1500, { RB: 1, DIA: 8, GP: 0, FD: 0 }),
+      aggregate('player-b', 1500, { RB: 1, DIA: 8, GP: 3, FD: 10 }),
+    ]);
+
+    expect(performances.get('player-a')?.indexes.rf).toBe(12.5);
+    expect(performances.get('player-b')?.indexes.rf).toBe(12.5);
+  });
+
   it('uses one equivalent game for 25 minutes played', () => {
     const performance = calculatePlayerPerformances([
       aggregate('player-1', 1500, { GM: 1 }),
