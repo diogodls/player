@@ -12,9 +12,11 @@ import { ActionsContext } from "../../../contexts/ActionsContext/ActionsContext.
 import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
 import AnalysisExitModal from "../../../components/elements/AnalysisExitModal/AnalysisExitModal.tsx";
 import { useParams } from "react-router";
+import { useScrollToTop } from "../../../hooks/useScrollToTop.ts";
 
 const IndividualAnalysis = () => {
   const { id: sessionId } = useParams<{ id: string }>();
+  useScrollToTop();
   const { setIsTagging } = useContext(ActionsContext);
   const {
     data: session,

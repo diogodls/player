@@ -9,11 +9,14 @@ import {
   Post,
   Query,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}

@@ -12,3 +12,4 @@ export * from './session-type.entity';
 export * from './session.entity';
 export * from './tagged-action.entity';
 export * from './team.entity';
+export * from './user.entity';

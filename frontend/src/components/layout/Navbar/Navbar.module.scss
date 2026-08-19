@@ -48,6 +48,16 @@
     }
   }
 
+  .logoutButton {
+    margin-left: 8px;
+    border-color: transparent;
+
+    &:hover {
+      color: #fca5a5;
+      background: rgba(220, 38, 38, 0.12);
+    }
+  }
+
   .mobileMenuButton {
     display: none;
     align-items: center;

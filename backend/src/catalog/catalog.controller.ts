@@ -1,10 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 import {
   IndividualCatalogResponseDto,
   TeamCatalogResponseDto,
 } from './dto/catalog-response.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('catalog/actions')
 export class CatalogController {
   constructor(private readonly catalogService: CatalogService) {}

@@ -9,9 +9,11 @@ import SessionAnalysisHeader from "../../../components/elements/SessionAnalysisH
 import { useSessionExitGuard } from "../../../hooks/useSessionExitGuard.ts";
 import AnalysisExitModal from "../../../components/elements/AnalysisExitModal/AnalysisExitModal.tsx";
 import { useParams } from "react-router";
+import { useScrollToTop } from "../../../hooks/useScrollToTop.ts";
 
 const TeamAnalysis = () => {
   const { id: sessionId } = useParams<{ id: string }>();
+  useScrollToTop();
   const {
     data: session,
     isLoading: isSessionLoading,

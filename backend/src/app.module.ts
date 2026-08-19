@@ -16,12 +16,14 @@ import {
   SessionTypeEntity,
   TaggedActionEntity,
   TeamEntity,
+  UserEntity,
 } from './entities';
 import { PlayersModule } from './players/players.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { TaggedActionsModule } from './tagged-actions/tagged-actions.module';
 import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -46,12 +48,14 @@ import { CoachDashboardModule } from './coach-dashboard/coach-dashboard.module';
         ActionCategoryEntity,
         CatalogActionEntity,
         TaggedActionEntity,
+        UserEntity,
       ],
       synchronize: false,
       migrations: [__dirname + '/migrations/!(*.spec){.ts,.js}'],
       migrationsRun: true,
       logging: false,
     }),
+    AuthModule,
     PlayersModule,
     SessionsModule,
     CatalogModule,

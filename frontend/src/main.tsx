@@ -15,6 +15,9 @@ import SessionView from "./pages/SessionView/SessionView.tsx";
 import TeamAnalysis from "./pages/Analysis/TeamAnalysis/TeamAnalysis.tsx";
 import AthleteRegistrationScreen from "./pages/AthleteRegistrationScreen/AthleteRegistrationScreen.tsx";
 import Rankings from "./pages/Rankings/Rankings.tsx";
+import Login from "./pages/Login/Login.tsx";
+import {AuthProvider} from "./contexts/AuthContext/AuthContext.tsx";
+import ProtectedRoute from "./components/layout/ProtectedRoute/ProtectedRoute.tsx";
 
 const SessionComparison = lazy(
   () => import("./pages/SessionComparison/SessionComparison.tsx"),
@@ -25,29 +28,38 @@ createRoot(document.getElementById('root')!).render(
     <ActionsProvider>
       <ToastProvider>
         <BrowserRouter>
-          <Routes>
-            <Route element={<App/>}>
-              <Route path={"/"} element={<Home/>}/>
-              <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
-              <Route path={"/player/:id"} element={<PlayerView/>}/>
-              <Route path="/rankings" element={<Rankings/>}/>
-              <Route path={"/sessions"} element={<Sessions />}/>
-              <Route
-                path="/sessions/comparison"
-                element={
-                  <Suspense fallback={<div role="status">Carregando comparação...</div>}>
-                    <SessionComparison />
-                  </Suspense>
-                }
-              />
-              <Route path="/sessions/:id" element={<SessionView />} />
-              <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
-              <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis />} />
-              <Route path={"/athlete-registration"} element={<AthleteRegistrationScreen />}/>
-            </Route>
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              {/* Rota pública — sem Navbar/Footer */}
+              <Route path="/login" element={<Login />} />
+
+              {/* Rotas protegidas — requerem autenticação */}
+              <Route element={<ProtectedRoute />}>
+                <Route element={<App/>}>
+                  <Route path={"/"} element={<Home/>}/>
+                  <Route path={"/coach-dashboard"} element={<CoachDashboard/>}/>
+                  <Route path={"/player/:id"} element={<PlayerView/>}/>
+                  <Route path="/rankings" element={<Rankings/>}/>
+                  <Route path={"/sessions"} element={<Sessions />}/>
+                  <Route
+                    path="/sessions/comparison"
+                    element={
+                      <Suspense fallback={<div role="status">Carregando comparação...</div>}>
+                        <SessionComparison />
+                      </Suspense>
+                    }
+                  />
+                  <Route path="/sessions/:id" element={<SessionView />} />
+                  <Route path="/sessions/:id/analysis/individual" element={<IndividualAnalysis />} />
+                  <Route path="/sessions/:id/analysis/team" element={<TeamAnalysis />} />
+                  <Route path={"/athlete-registration"} element={<AthleteRegistrationScreen />}/>
+                </Route>
+              </Route>
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </ToastProvider>
     </ActionsProvider>
   </CookiesProvider>
 )
+
