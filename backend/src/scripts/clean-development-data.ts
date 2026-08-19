@@ -25,21 +25,25 @@ export function assertDevelopmentCleanupAllowed(
 
 export async function cleanDevelopmentData(
   client: DatabaseClient,
+  manageTransaction = true,
 ): Promise<{ before: Record<string, number>; after: Record<string, number> }> {
   const counts = async () => {
     const result = await client.query(`
       SELECT
         (SELECT count(*)::integer FROM jogadores) AS jogadores,
         (SELECT count(*)::integer FROM sessoes) AS sessoes,
+        (SELECT count(*)::integer FROM player_session_minutes) AS minutagens,
+        (SELECT count(*)::integer FROM equipes) AS equipes,
         (SELECT count(*)::integer FROM acoes_taggeadas) AS acoes_taggeadas
     `);
     return result.rows[0] as Record<string, number>;
   };
 
   const before = await counts();
-  await client.query('BEGIN');
+  if (manageTransaction) await client.query('BEGIN');
   try {
     await client.query('DELETE FROM acoes_taggeadas');
+    await client.query('DELETE FROM player_session_minutes');
     await client.query(`
       DO $$
       BEGIN
@@ -50,9 +54,10 @@ export async function cleanDevelopmentData(
     `);
     await client.query('DELETE FROM sessoes');
     await client.query('DELETE FROM jogadores');
-    await client.query('COMMIT');
+    await client.query('DELETE FROM equipes');
+    if (manageTransaction) await client.query('COMMIT');
   } catch (error) {
-    await client.query('ROLLBACK');
+    if (manageTransaction) await client.query('ROLLBACK');
     throw error;
   }
 

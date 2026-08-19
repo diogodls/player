@@ -19,7 +19,7 @@ describe('development seed', () => {
     ).toThrow('bloqueado em produção');
   });
 
-  it('runs base and demonstration seeds in one transaction', async () => {
+  it('runs base and real-game seeds in one transaction', async () => {
     process.env.NODE_ENV = 'development';
     const statements: string[] = [];
     const query = jest.fn((sql: string) => {
@@ -34,9 +34,11 @@ describe('development seed', () => {
     expect(statements[0]).toBe('BEGIN');
     expect(statements[1]).not.toMatch(/BEGIN|COMMIT/);
     expect(statements[1]).toContain('ON CONFLICT DO NOTHING');
-    expect(statements[2]).toContain('ON CONFLICT (id) DO UPDATE');
-    expect(statements[3]).toContain('Russo Preto — retorno');
-    expect(statements[3]).toContain('jogador_id IS NULL');
+    expect(statements[2]).toContain('Russo Preto');
+    expect(statements[2]).toContain('Passo Fundo');
+    expect(statements[2]).toContain('player_session_minutes');
+    expect(statements[2]).not.toContain('ENTROU');
+    expect(statements[2]).not.toContain('jogador_id IS NULL');
     expect(statements.at(-1)).toBe('COMMIT');
   });
 

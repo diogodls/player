@@ -1,9 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Client } from 'pg';
-import { QueryRunner } from 'typeorm';
-import { SeedRussoPreto1786233600000 } from '../migrations/1786233600000-SeedRussoPreto';
-import { PRESENTATION_DEMO_SEED_SQL } from './presentation-demo-seed';
+import { REAL_GAMES_SEED_SQL } from './real-games-seed';
 
 type Environment = Record<string, string | undefined>;
 export type SeedClient = {
@@ -28,24 +26,16 @@ export function unwrapSeedSql(sql: string): string {
 export async function seedDevelopmentData(
   client: Pick<SeedClient, 'query'>,
   baseSeedSql: string,
+  manageTransaction = true,
 ): Promise<void> {
-  await client.query('BEGIN');
-  const previousFlag = process.env.RUN_LEGACY_MIGRATION_SEEDS;
+  if (manageTransaction) await client.query('BEGIN');
   try {
     await client.query(unwrapSeedSql(baseSeedSql));
-    process.env.RUN_LEGACY_MIGRATION_SEEDS = 'true';
-    await new SeedRussoPreto1786233600000().up({
-      query: (sql: string) => client.query(sql),
-    } as unknown as QueryRunner);
-    await client.query(PRESENTATION_DEMO_SEED_SQL);
-    await client.query('COMMIT');
+    await client.query(REAL_GAMES_SEED_SQL);
+    if (manageTransaction) await client.query('COMMIT');
   } catch (error) {
-    await client.query('ROLLBACK');
+    if (manageTransaction) await client.query('ROLLBACK');
     throw error;
-  } finally {
-    if (previousFlag === undefined)
-      delete process.env.RUN_LEGACY_MIGRATION_SEEDS;
-    else process.env.RUN_LEGACY_MIGRATION_SEEDS = previousFlag;
   }
 }
 
