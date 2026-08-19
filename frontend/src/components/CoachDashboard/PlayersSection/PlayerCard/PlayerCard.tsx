@@ -7,6 +7,13 @@ type PlayerCardProps = {
 };
 
 const PlayerCard = ({ player }: PlayerCardProps) => {
+  const formattedRating =
+    player.rating == null
+      ? "—"
+      : player.rating.toLocaleString("pt-BR", {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        });
   return (
     <Link to={`/player/${player.id}`} className={styles.card}>
       <div className={styles.header}>
@@ -20,14 +27,9 @@ const PlayerCard = ({ player }: PlayerCardProps) => {
       <div className={styles.radar}>Click to view radar chart</div>
 
       <div className={styles.stats}>
-        <div className={`${styles.stat} ${styles.off}`}>
-          <span>OFF</span>
-          <span>{player.offensiveActions}</span>
-        </div>
-
-        <div className={`${styles.stat} ${styles.def}`}>
-          <span>DEF</span>
-          <span>{player.defensiveActions}</span>
+        <div className={styles.rating}>
+          <span>NOTA MÉDIA</span>
+          <strong>{formattedRating}</strong>
         </div>
       </div>
     </Link>

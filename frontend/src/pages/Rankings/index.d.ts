@@ -1,5 +1,6 @@
 export type RankingIndexKey =
   | "overall"
+  | "rating"
   | "radj"
   | "goalsRelations"
   | "actionsRelations"

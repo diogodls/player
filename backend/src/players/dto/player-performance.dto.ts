@@ -26,4 +26,5 @@ export class DashboardPlayerDto extends PlayerPerformanceDto {
   name!: string;
   position!: string;
   overall!: number | null;
+  rating!: number | null;
 }

@@ -34,12 +34,14 @@ type ActionCounts = Record<ActionCode, number>;
 
 export type PlayerActionAggregate = {
   playerId: string;
+  sessionId?: string;
   secondsPlayed: number;
   actions: ActionCounts;
 };
 
 type RawPlayerActionAggregate = {
   playerId: string;
+  sessionId?: string;
 } & Record<ActionCode, string>;
 
 export type PlayerSessionMinutes = {
@@ -70,6 +72,43 @@ const COURT_GOAL_CONCEDED_CODES: ActionCode[] = [
 ];
 const OFFENSIVE_ACTION_CODES: ActionCode[] = ['GM', 'ASS', 'AD', 'CC', 'PP'];
 const DEFENSIVE_ACTION_CODES: ActionCode[] = ['GP', 'FD', 'RB', 'DIA'];
+
+export type PlayerRatingInput = {
+  goals: number;
+  assists: number;
+  overall: number;
+  positiveActions: number;
+  negativeActions: number;
+  positiveGoals: number;
+  negativeGoals: number;
+  tio: number;
+  tid: number;
+};
+
+export type SessionPlayerStatistics = {
+  performance: PlayerPerformanceDto;
+  ratingData: Omit<PlayerRatingInput, 'overall'>;
+};
+
+export function calculatePlayerRating(input: PlayerRatingInput): number {
+  const goalsAndAssistsPoints = Math.min((input.goals + input.assists) * 8, 40);
+  const overallPoints = Math.min(input.overall * 0.3, 30);
+  const actionsBalance = input.positiveActions - input.negativeActions;
+  const goalsBalance = input.positiveGoals - input.negativeGoals;
+  const balancePoints = Math.min((actionsBalance + goalsBalance) * 3, 30);
+  const raw =
+    (goalsAndAssistsPoints +
+      overallPoints +
+      balancePoints +
+      input.tio / 2 +
+      input.tid / 2) /
+    10;
+  return Math.min(10, Math.max(0, raw));
+}
+
+export function roundRating(value: number): number {
+  return Math.round((value + Number.EPSILON) * 10) / 10;
+}
 
 @Injectable()
 export class PlayerStatisticsService {
@@ -169,6 +208,142 @@ export class PlayerStatisticsService {
       ),
     );
   }
+
+  async findByTeamIdGroupedBySession(
+    teamId: string,
+    sessionId?: string,
+    period?: { startDate?: string; endDate?: string },
+  ): Promise<Map<string, Map<string, SessionPlayerStatistics>>> {
+    const query = this.taggedActionsRepository
+      .createQueryBuilder('taggedAction')
+      .innerJoin('taggedAction.sessao', 'session')
+      .innerJoin('taggedAction.jogador', 'player')
+      .innerJoin('taggedAction.acaoCatalogo', 'catalogAction')
+      .select('taggedAction.jogadorId', 'playerId')
+      .addSelect('taggedAction.sessaoId', 'sessionId');
+    ACTION_CODES.forEach((code, index) => {
+      query
+        .addSelect(
+          `SUM(CASE WHEN catalogAction.sigla = :sessionActionCode${index} THEN 1 ELSE 0 END)`,
+          code,
+        )
+        .setParameter(`sessionActionCode${index}`, code);
+    });
+    query
+      .where('taggedAction.jogadorId IS NOT NULL')
+      .andWhere('taggedAction.deletedAt IS NULL')
+      .andWhere('session.deletedAt IS NULL')
+      .andWhere('player.deletedAt IS NULL')
+      .andWhere('catalogAction.deletedAt IS NULL')
+      .andWhere('session.equipeId = :teamId', { teamId })
+      .andWhere('player.equipeId = :teamId', { teamId });
+    applySessionFilters(query, sessionId, period);
+    const actionRows = await query
+      .groupBy('taggedAction.jogadorId')
+      .addGroupBy('taggedAction.sessaoId')
+      .getRawMany<RawPlayerActionAggregate>();
+
+    const minutesQuery = this.playerSessionMinutesRepository
+      .createQueryBuilder('minutes')
+      .innerJoin('minutes.session', 'session')
+      .innerJoin('minutes.player', 'player')
+      .select('minutes.playerId', 'playerId')
+      .addSelect('minutes.sessionId', 'sessionId')
+      .addSelect('minutes.totalSeconds', 'totalSeconds')
+      .where('session.deletedAt IS NULL')
+      .andWhere('player.deletedAt IS NULL')
+      .andWhere('session.equipeId = :teamId', { teamId })
+      .andWhere('player.equipeId = :teamId', { teamId });
+    applySessionFilters(minutesQuery, sessionId, period);
+    const minuteRows = await minutesQuery.getRawMany<RawPlayerSessionMinutes>();
+
+    const sessionIds = new Set([
+      ...actionRows.map((row) => row.sessionId).filter(Boolean),
+      ...minuteRows.map((row) => row.sessionId),
+    ] as string[]);
+    const result = new Map<string, Map<string, SessionPlayerStatistics>>();
+    for (const currentSessionId of sessionIds) {
+      const sessionMinutes = minuteRows
+        .filter((row) => row.sessionId === currentSessionId)
+        .map(toPlayerSessionMinutes);
+      const seconds = calculateOfficialPlayingSeconds(sessionMinutes);
+      const rows = actionRows.filter(
+        (row) => row.sessionId === currentSessionId,
+      );
+      const rowsByPlayer = new Map(rows.map((row) => [row.playerId, row]));
+      const playerIds = new Set([
+        ...rowsByPlayer.keys(),
+        ...sessionMinutes.map((row) => row.playerId),
+      ]);
+      const aggregates = Array.from(playerIds, (playerId) =>
+        toPlayerActionAggregate(
+          rowsByPlayer.get(playerId),
+          playerId,
+          seconds.get(playerId) ?? 0,
+        ),
+      );
+      const performances = calculatePlayerPerformances(aggregates);
+      result.set(
+        currentSessionId,
+        new Map(
+          aggregates.map((aggregate) => [
+            aggregate.playerId,
+            {
+              performance:
+                performances.get(aggregate.playerId) ??
+                emptyPlayerPerformance(),
+              ratingData: toRatingData(
+                aggregate,
+                performances.get(aggregate.playerId) ??
+                  emptyPlayerPerformance(),
+              ),
+            },
+          ]),
+        ),
+      );
+    }
+    return result;
+  }
+}
+
+function applySessionFilters(
+  query: {
+    andWhere: (sql: string, parameters: Record<string, unknown>) => unknown;
+  },
+  sessionId?: string,
+  period?: { startDate?: string; endDate?: string },
+) {
+  if (sessionId) query.andWhere('session.id = :sessionId', { sessionId });
+  if (period?.startDate)
+    query.andWhere('session.data >= :startDate', {
+      startDate: period.startDate,
+    });
+  if (period?.endDate)
+    query.andWhere('session.data <= :endDate', { endDate: period.endDate });
+}
+
+function toRatingData(
+  aggregate: PlayerActionAggregate,
+  performance: PlayerPerformanceDto,
+): Omit<PlayerRatingInput, 'overall'> {
+  const { actions } = aggregate;
+  return {
+    goals: performance.goals,
+    assists: actions.ASS,
+    positiveActions: sumActions(actions, [
+      'GM',
+      'ASS',
+      'AD',
+      'CC',
+      'RB',
+      'DIA',
+    ]),
+    negativeActions: sumActions(actions, ['PP', 'GP', 'FD']),
+    positiveGoals: performance.goals,
+    negativeGoals: performance.goalsTaken,
+    tio: performance.indexes.tio,
+    tid: performance.indexes.tid,
+  };
 }
 
 export function calculateSessionPlayerPerformances(

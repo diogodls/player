@@ -2,7 +2,7 @@ import type { PlayerIndexesDto } from './player-performance.dto';
 
 export type PlayerIndexKey = keyof PlayerIndexesDto;
 
-export type PlayerRankingKey = PlayerIndexKey | 'overall';
+export type PlayerRankingKey = PlayerIndexKey | 'overall' | 'rating';
 
 export type PlayerIndexSortDirection = 'ASC' | 'DESC';
 

@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { PlayerSessionMinutesEntity, TaggedActionEntity } from '../entities';
 import {
   calculateOfficialPlayingSeconds,
+  calculatePlayerRating,
   calculatePlayerPerformances,
   calculateSessionPlayerPerformances,
   emptyPlayerPerformance,
@@ -9,6 +10,75 @@ import {
   PlayerSessionMinutes,
   PlayerStatisticsService,
 } from './player-statistics.service';
+
+describe('calculatePlayerRating', () => {
+  const base = {
+    goals: 0,
+    assists: 0,
+    overall: 0,
+    positiveActions: 0,
+    negativeActions: 0,
+    positiveGoals: 0,
+    negativeGoals: 0,
+    tio: 0,
+    tid: 0,
+  };
+
+  it('limits goals and assists to 40 points', () => {
+    expect(calculatePlayerRating({ ...base, goals: 5 })).toBe(
+      calculatePlayerRating({ ...base, goals: 50 }),
+    );
+  });
+
+  it('limits overall to 30 points', () => {
+    expect(calculatePlayerRating({ ...base, overall: 100 })).toBe(
+      calculatePlayerRating({ ...base, overall: 500 }),
+    );
+  });
+
+  it('limits the combined balances to 30 points', () => {
+    expect(calculatePlayerRating({ ...base, positiveActions: 10 })).toBe(
+      calculatePlayerRating({ ...base, positiveActions: 100 }),
+    );
+  });
+
+  it('never returns less than zero or more than ten', () => {
+    expect(
+      calculatePlayerRating({
+        ...base,
+        negativeActions: 100,
+        negativeGoals: 100,
+      }),
+    ).toBe(0);
+    expect(
+      calculatePlayerRating({
+        ...base,
+        goals: 100,
+        overall: 100,
+        positiveActions: 100,
+        tio: 100,
+        tid: 100,
+      }),
+    ).toBe(10);
+  });
+
+  it('calculates a session without rounding intermediate components', () => {
+    expect(
+      calculatePlayerRating({
+        ...base,
+        goals: 1,
+        assists: 1,
+        overall: 80,
+        positiveActions: 5,
+        negativeActions: 2,
+        positiveGoals: 2,
+        negativeGoals: 1,
+        tio: 60,
+        tid: 40,
+      }),
+    ).toBe(10);
+  });
+});
 
 describe('calculateOfficialPlayingSeconds', () => {
   it('uses only the new source and sums multiple sessions', () => {

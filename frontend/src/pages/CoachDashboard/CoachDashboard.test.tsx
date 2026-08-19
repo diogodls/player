@@ -128,6 +128,17 @@ describe("CoachDashboard", () => {
     fireEvent.click(screen.getByText("Análise Individual"));
     expect(screen.getByText("Nenhum jogador disponível")).toBeInTheDocument();
   });
+
+  it("shows the backend rating on the player card and removes OFF and DEF", () => {
+    mockedUseApi.mockReturnValue(apiState({ data: dashboardData() }));
+    renderPage();
+    fireEvent.click(screen.getByText("Análise Individual"));
+
+    expect(screen.getByText("NOTA MÉDIA")).toBeInTheDocument();
+    expect(screen.getByText("8,4")).toBeInTheDocument();
+    expect(screen.queryByText("OFF")).not.toBeInTheDocument();
+    expect(screen.queryByText("DEF")).not.toBeInTheDocument();
+  });
 });
 
 function renderPage() {
@@ -167,6 +178,7 @@ function dashboardData() {
         name: "Jogador",
         position: "Fixo",
         overall: 90,
+        rating: 8.4,
         minutes: 10,
         defensiveActions: 2,
         offensiveActions: 3,

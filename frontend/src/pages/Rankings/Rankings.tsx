@@ -70,6 +70,7 @@ const Rankings = () => {
       rankingPosition: item.position,
       rankingValue: item.value,
     })) ?? [];
+  const isRating = rankingResponse?.index.key === "rating";
   const renderRankingContent = () => {
     if (rankingOptionsError)
       return (
@@ -100,6 +101,17 @@ const Rankings = () => {
           title={rankingResponse.index.name}
           players={rankingPlayers}
           metricLabel={rankingResponse.index.name || rankingResponse.index.key}
+          valueFormatter={
+            isRating
+              ? (value) =>
+                  value === null
+                    ? "—"
+                    : value.toLocaleString("pt-BR", {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1,
+                      })
+              : undefined
+          }
           highlightTop3
         />
       </section>

@@ -22,8 +22,10 @@ import type {
 import type { PlayerIndexesDto } from './dto/player-performance.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
 import {
+  calculatePlayerRating,
   emptyPlayerPerformance,
   PlayerStatisticsService,
+  roundRating,
 } from './player-statistics.service';
 
 @Injectable()
@@ -33,6 +35,7 @@ export class PlayersService {
     { name: string; sortDirection: 'ASC' | 'DESC' }
   > = {
     overall: { name: 'Ranking Geral', sortDirection: 'DESC' },
+    rating: { name: 'Nota', sortDirection: 'DESC' },
     radj: { name: 'Ranking RADJ', sortDirection: 'DESC' },
     goalsRelations: { name: 'Relação de Gols', sortDirection: 'DESC' },
     actionsRelations: {
@@ -120,14 +123,8 @@ export class PlayersService {
       filters.sessionId,
       { startDate: filters.startDate, endDate: filters.endDate },
     );
-    const overallRanking = this.buildOverallRanking(
-      players,
-      performances,
-      PlayersService.INDEX_RANKING_RULES.overall,
-    );
-    const overallByPlayer = new Map(
-      overallRanking.ranking.map(({ player, value }) => [player.id, value]),
-    );
+    const overallByPlayer = await this.calculateOverallValues(players, filters);
+    const ratings = await this.calculateRatings(players, filters);
     return players.map((player) => {
       if (!player.posicao)
         throw new Error('Relação de posição do jogador não foi carregada');
@@ -136,6 +133,7 @@ export class PlayersService {
         name: player.nome,
         position: player.posicao.nome,
         overall: overallByPlayer.get(player.id) ?? null,
+        rating: ratings.get(player.id) ?? null,
         ...(performances.get(player.id) ?? emptyPlayerPerformance()),
       };
     });
@@ -152,19 +150,26 @@ export class PlayersService {
     ).map(([key, rule]) => ({ key, ...rule }));
   }
 
-  async findRanking(indexKey: string): Promise<PlayerRankingResponseDto> {
+  async findRanking(
+    indexKey: string,
+    filters: { sessionId?: string; startDate?: string; endDate?: string } = {},
+  ): Promise<PlayerRankingResponseDto> {
     const rankingKey = indexKey as PlayerRankingKey;
     const rule = PlayersService.INDEX_RANKING_RULES[rankingKey];
     if (!rule) throw new BadRequestException('Índice de ranking inválido');
 
     const players = await this.findActiveRankingPlayers();
-    return this.buildRankingForPlayers(players, rankingKey);
+    return this.buildRankingForPlayers(players, rankingKey, filters.sessionId, {
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+    });
   }
 
   async buildRankingForPlayers(
     players: PlayerEntity[],
     indexKey: string,
     sessionId?: string,
+    period?: { startDate?: string; endDate?: string },
   ): Promise<PlayerRankingResponseDto> {
     const rankingKey = indexKey as PlayerRankingKey;
     const rule = PlayersService.INDEX_RANKING_RULES[rankingKey];
@@ -173,13 +178,148 @@ export class PlayersService {
     if (players.length === 0) {
       return { index: { key: rankingKey, ...rule }, ranking: [] };
     }
+    if (rankingKey === 'rating') {
+      const ratings = await this.calculateRatings(players, {
+        sessionId,
+        startDate: period?.startDate,
+        endDate: period?.endDate,
+      });
+      const ranking = players
+        .map((player) => {
+          const value = ratings.get(player.id);
+          return value === undefined
+            ? null
+            : { player: this.toRankingPlayer(player), value };
+        })
+        .filter((item) => item !== null)
+        .sort((left, right) => this.compareRankingItems(left, right, rule));
+      return {
+        index: { key: rankingKey, ...rule },
+        ranking: this.assignRankingPositions(ranking),
+      };
+    }
+    if (rankingKey === 'overall') {
+      const overallByPlayer = await this.calculateOverallValues(players, {
+        sessionId,
+        startDate: period?.startDate,
+        endDate: period?.endDate,
+      });
+      const ranking = players
+        .flatMap((player) => {
+          const value = overallByPlayer.get(player.id);
+          return value === undefined
+            ? []
+            : [{ player: this.toRankingPlayer(player), value }];
+        })
+        .sort((left, right) => this.compareRankingItems(left, right, rule));
+      return {
+        index: { key: rankingKey, ...rule },
+        ranking: this.assignRankingPositions(ranking),
+      };
+    }
     const performances = await this.playerStatisticsService.findByTeamId(
       players[0].equipeId,
       sessionId,
     );
-    return rankingKey === 'overall'
-      ? this.buildOverallRanking(players, performances, rule)
-      : this.buildIndexRanking(players, performances, rankingKey, rule);
+    return this.buildIndexRanking(players, performances, rankingKey, rule);
+  }
+
+  private async calculateOverallValues(
+    players: PlayerEntity[],
+    filters: { sessionId?: string; startDate?: string; endDate?: string },
+  ): Promise<Map<string, number>> {
+    if (players.length === 0) return new Map();
+    const statisticsBySession =
+      await this.playerStatisticsService.findByTeamIdGroupedBySession(
+        players[0].equipeId,
+        filters.sessionId,
+        { startDate: filters.startDate, endDate: filters.endDate },
+      );
+    const valuesByPlayer = new Map<string, number[]>();
+    for (const sessionStatistics of statisticsBySession.values()) {
+      const performances = new Map(
+        Array.from(sessionStatistics, ([playerId, stats]) => [
+          playerId,
+          stats.performance,
+        ]),
+      );
+      const sessionPlayers = players.filter(
+        (player) => (performances.get(player.id)?.minutes ?? 0) > 0,
+      );
+      const sessionOverall = this.buildOverallRanking(
+        sessionPlayers,
+        performances,
+        PlayersService.INDEX_RANKING_RULES.overall,
+      );
+      for (const { player, value } of sessionOverall.ranking) {
+        if (value === null) continue;
+        const values = valuesByPlayer.get(player.id) ?? [];
+        values.push(value);
+        valuesByPlayer.set(player.id, values);
+      }
+    }
+    return new Map(
+      Array.from(valuesByPlayer, ([playerId, values]) => [
+        playerId,
+        Math.round(
+          values.reduce((sum, value) => sum + value, 0) / values.length,
+        ),
+      ]),
+    );
+  }
+
+  private async calculateRatings(
+    players: PlayerEntity[],
+    filters: { sessionId?: string; startDate?: string; endDate?: string },
+  ): Promise<Map<string, number>> {
+    if (players.length === 0) return new Map();
+    const statisticsBySession =
+      await this.playerStatisticsService.findByTeamIdGroupedBySession(
+        players[0].equipeId,
+        filters.sessionId,
+        { startDate: filters.startDate, endDate: filters.endDate },
+      );
+    const ratingsByPlayer = new Map<string, number[]>();
+    for (const sessionStatistics of statisticsBySession.values()) {
+      const performances = new Map(
+        Array.from(sessionStatistics, ([playerId, stats]) => [
+          playerId,
+          stats.performance,
+        ]),
+      );
+      const sessionPlayers = players.filter(
+        (player) => (performances.get(player.id)?.minutes ?? 0) > 0,
+      );
+      const overall = this.buildOverallRanking(
+        sessionPlayers,
+        performances,
+        PlayersService.INDEX_RANKING_RULES.overall,
+      );
+      const overallByPlayer = new Map(
+        overall.ranking.map((item) => [item.player.id, item.value]),
+      );
+      for (const [playerId, stats] of sessionStatistics) {
+        if (stats.performance.minutes <= 0) continue;
+        const playerOverall = overallByPlayer.get(playerId);
+        if (playerOverall === undefined || playerOverall === null) continue;
+        const values = ratingsByPlayer.get(playerId) ?? [];
+        values.push(
+          calculatePlayerRating({
+            ...stats.ratingData,
+            overall: playerOverall,
+          }),
+        );
+        ratingsByPlayer.set(playerId, values);
+      }
+    }
+    return new Map(
+      Array.from(ratingsByPlayer, ([playerId, values]) => [
+        playerId,
+        roundRating(
+          values.reduce((sum, value) => sum + value, 0) / values.length,
+        ),
+      ]),
+    );
   }
   async create(dto: PlayerDto): Promise<PlayerResponseDto> {
     if (dto.id !== null) {
@@ -291,48 +431,42 @@ export class PlayersService {
           : null;
       })
       .filter((item) => item !== null);
-    const ranges = new Map<
-      PlayerIndexKey,
-      {
-        minimum: number;
-        maximum: number;
-        sortDirection: 'ASC' | 'DESC';
-      }
-    >();
+    const participantCount = playersWithIndexes.length;
+    if (participantCount === 0) {
+      return { index: { key: 'overall', ...rule }, ranking: [] };
+    }
+    const pointsByPlayer = new Map(
+      playersWithIndexes.map(({ player }) => [player.id, 0]),
+    );
 
     for (const indexKey of PlayersService.PLAYER_INDEX_KEYS) {
-      const values = playersWithIndexes
-        .map(({ indexes }) => indexes[indexKey])
-        .filter(this.isValidIndexValue);
-      if (values.length === 0) continue;
-      ranges.set(indexKey, {
-        minimum: Math.min(...values),
-        maximum: Math.max(...values),
-        sortDirection:
-          PlayersService.INDEX_RANKING_RULES[indexKey].sortDirection,
-      });
+      const indexRule = PlayersService.INDEX_RANKING_RULES[indexKey];
+      const ordered = playersWithIndexes
+        .flatMap(({ player, indexes }) => {
+          const value = indexes[indexKey];
+          return this.isValidIndexValue(value) ? [{ player, value }] : [];
+        })
+        .sort((left, right) =>
+          this.compareRankingItems(left, right, indexRule),
+        );
+      const positioned = this.assignRankingPositions(ordered);
+      for (const { player, position } of positioned) {
+        pointsByPlayer.set(
+          player.id,
+          (pointsByPlayer.get(player.id) ?? 0) +
+            calculateOverallIndexPoints(participantCount, position),
+        );
+      }
     }
 
-    // Overall is relative to the compared group. It can change when valid
-    // players enter or leave the group even if an individual's performance
-    // remains unchanged.
     const ranking = playersWithIndexes
-      .map(({ player, indexes }) => {
-        const normalizedValues: number[] = [];
-        for (const [indexKey, range] of ranges) {
-          const value = indexes[indexKey];
-          if (!this.isValidIndexValue(value)) continue;
-          normalizedValues.push(this.normalizeIndex(value, range));
-        }
-        if (normalizedValues.length === 0) return null;
-        const average =
-          normalizedValues.reduce((sum, value) => sum + value, 0) /
-          normalizedValues.length;
-        return {
-          player,
-          value: Math.min(99, Math.max(0, Math.round(average))),
-        };
-      })
+      .map(({ player }) => ({
+        player,
+        value: calculateOverall(
+          pointsByPlayer.get(player.id) ?? 0,
+          participantCount,
+        ),
+      }))
       .filter((item) => item !== null)
       .sort((left, right) => this.compareRankingItems(left, right, rule));
 
@@ -340,19 +474,6 @@ export class PlayersService {
       index: { key: 'overall', ...rule },
       ranking: this.assignRankingPositions(ranking),
     };
-  }
-
-  private normalizeIndex(
-    value: number,
-    range: { minimum: number; maximum: number; sortDirection: 'ASC' | 'DESC' },
-  ): number {
-    const difference = range.maximum - range.minimum;
-    if (difference === 0) return 50;
-    const distanceFromWorst =
-      range.sortDirection === 'DESC'
-        ? value - range.minimum
-        : range.maximum - value;
-    return Math.min(99, Math.max(0, (99 * distanceFromWorst) / difference));
   }
 
   private readonly isValidIndexValue = (
@@ -428,4 +549,22 @@ export class PlayersService {
       ...performance,
     };
   }
+}
+
+export function calculateOverallIndexPoints(
+  participantCount: number,
+  position: number,
+): number {
+  if (participantCount <= 0 || position <= 0) return 0;
+  return Math.max(0, participantCount + 1 - position);
+}
+
+export function calculateOverall(
+  pointsSum: number,
+  participantCount: number,
+): number {
+  if (participantCount <= 0 || !Number.isFinite(pointsSum)) return 0;
+  const denominator = (participantCount / 10) * 1.1;
+  if (denominator === 0) return 0;
+  return Math.round(pointsSum / denominator);
 }

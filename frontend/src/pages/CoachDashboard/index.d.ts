@@ -7,6 +7,7 @@ export type Player = {
   id: string;
   name: string;
   overall: number | null;
+  rating?: number | null;
   position: string;
   minutes: number;
   defensiveActions: number;
