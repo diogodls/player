@@ -111,12 +111,30 @@ describe('calculateSessionPlayerPerformances', () => {
     expect(withoutMinutes?.minutes).toBe(0);
     expect(withMinutes?.minutes).toBe(20);
     expect(withMinutes?.offensiveActions).toBe(2);
-    expect(withMinutes?.indexes.pgj).toBe(4);
+    expect(withMinutes?.indexes.pgj).toBe(2.5);
   });
 });
 
 describe('calculatePlayerPerformances', () => {
-  it('keeps every time-dependent index formula unchanged', () => {
+  it('uses one equivalent game for 25 minutes played', () => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 1500, { GM: 1 }),
+    ]).get('player-1');
+
+    expect(performance?.minutes).toBe(25);
+    expect(performance?.indexes.pgj).toBe(1);
+  });
+
+  it('does not treat a 40-minute match duration as one equivalent game', () => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 2400, { GM: 1 }),
+    ]).get('player-1');
+
+    expect(performance?.minutes).toBe(40);
+    expect(performance?.indexes.pgj).toBe(0.63);
+  });
+
+  it('calculates time-dependent indexes using 25-minute equivalents', () => {
     const performance = calculatePlayerPerformances([
       aggregate('player-1', 2400, {
         'Gol TO': 1,
@@ -136,9 +154,9 @@ describe('calculatePlayerPerformances', () => {
     expect(performance).toMatchObject({
       minutes: 40,
       indexes: {
-        pgj: 4,
-        gtj: 3,
-        radj: 1,
+        pgj: 2.5,
+        gtj: 1.88,
+        radj: 0.63,
         atd: 0,
         dto: 0,
         tio: 25,

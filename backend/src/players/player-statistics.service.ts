@@ -5,7 +5,8 @@ import { PlayerSessionMinutesEntity, TaggedActionEntity } from '../entities';
 import { PlayerPerformanceDto } from './dto/player-performance.dto';
 
 const PLAYERS_ON_COURT = 4;
-const GAME_MINUTES = 40;
+// JJ uses the athlete's 25-minute game equivalent, not the 40-minute match duration.
+const EQUIVALENT_GAME_MINUTES = 25;
 
 const ACTION_CODES = [
   'Gol TO',
@@ -475,7 +476,7 @@ function calculatePerformance(
   const goalParticipations = actions.GM + actions.ASS + actions.AD;
   const offensiveInfluence = actions.GM + actions.ASS + actions.AD + actions.CC;
   const defensiveInfluence = actions.RB + actions.DIA;
-  const equivalentGames = divide(minutes, GAME_MINUTES);
+  const equivalentGames = divide(minutes, EQUIVALENT_GAME_MINUTES);
   const pgj = divide(goalParticipations, equivalentGames);
   const gtj = divide(goalsTaken + actions.GP, equivalentGames);
 
@@ -575,7 +576,7 @@ function emptyActionCounts(): ActionCounts {
 function atdBase(aggregate: PlayerActionAggregate) {
   return divide(
     aggregate.actions.PP + aggregate.actions['GS TO'],
-    divide(minutesFor(aggregate), GAME_MINUTES),
+    divide(minutesFor(aggregate), EQUIVALENT_GAME_MINUTES),
   );
 }
 
@@ -583,7 +584,7 @@ function dtoBase(aggregate: PlayerActionAggregate) {
   return divide(
     (2 * aggregate.actions.RB + aggregate.actions.DIA) / 3 +
       aggregate.actions['Gol TO'],
-    divide(minutesFor(aggregate), GAME_MINUTES),
+    divide(minutesFor(aggregate), EQUIVALENT_GAME_MINUTES),
   );
 }
 

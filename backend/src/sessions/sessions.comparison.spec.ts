@@ -351,6 +351,6 @@ describe('SessionsService comparison', () => {
       endDate: '2026-02-16',
     });
 
-    expect(response.athletes[0]?.points[0]?.indexes.pgj).toBe(1);
+    expect(response.athletes[0]?.points[0]?.indexes.pgj).toBe(0.63);
   });
 });
