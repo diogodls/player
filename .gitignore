@@ -23,7 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment secrets — NUNCA commitar
-.env
+# Apenas o .env de produção é bloqueado — o .env de dev é commitado
 .env.local
 .env.production
