@@ -28,7 +28,10 @@ const AuthContext = createContext<AuthContextValue>({} as AuthContextValue);
 function decodeJwt(token: string): { sub: string; email: string; exp: number } | null {
   try {
     const base64Payload = token.split('.')[1];
-    const json = atob(base64Payload.replace(/-/g, '+').replace(/_/g, '/'));
+    if (!base64Payload) return null;
+    const normalized = base64Payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = normalized + '==='.slice((normalized.length + 3) % 4);
+    const json = atob(padded);
     return JSON.parse(json) as { sub: string; email: string; exp: number };
   } catch {
     return null;
