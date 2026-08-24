@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './jwt-payload.interface';
 
 const BCRYPT_ROUNDS = 12;
+const DUMMY_BCRYPT_HASH = bcrypt.hashSync('invalid_password', BCRYPT_ROUNDS);
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
@@ -30,7 +31,7 @@ export class AuthService {
 
     // Timing-safe: sempre executa bcrypt, mesmo quando usuário não existe,
     // para evitar enumeração de usuários via tempo de resposta.
-    const hash = user?.passwordHash ?? '$2b$12$invalidhashinvalidhashinvalidhas';
+    const hash = user?.passwordHash ?? DUMMY_BCRYPT_HASH;
     const valid = await bcrypt.compare(dto.senha, hash);
 
     if (!user || !valid) {
