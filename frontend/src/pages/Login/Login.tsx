@@ -1,4 +1,5 @@
 import { useState, useId } from 'react';
+import axios from 'axios';
 import { useNavigate, Navigate } from 'react-router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -41,8 +42,12 @@ const Login = () => {
     try {
       await login(email.trim(), senha);
       navigate('/', { replace: true });
-    } catch {
-      setError('Email ou senha inválidos. Tente novamente.');
+    } catch (requestError) {
+      if (axios.isAxiosError(requestError) && !requestError.response) {
+        setError('Não foi possível conectar ao servidor. Tente novamente em instantes.');
+      } else {
+        setError('Email ou senha inválidos. Tente novamente.');
+      }
     } finally {
       setIsLoading(false);
     }
