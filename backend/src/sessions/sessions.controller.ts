@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionComparisonFiltersDto } from './dto/session-comparison-filters.dto';
@@ -16,7 +17,9 @@ import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import { SessionDto } from './dto/session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { SessionsService } from './sessions.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('sessions')
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
