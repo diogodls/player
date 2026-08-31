@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Apenas o .env de produção é bloqueado — o .env de dev é commitado
+.env.local
+.env.production

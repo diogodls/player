@@ -8,11 +8,13 @@ import {
   faHouse,
   faTrophy,
   faXmark,
-  faUserPlus
+  faUserPlus,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { classNames } from "../../../utils/classNames.ts";
 import { useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../../contexts/AuthContext/AuthContext.tsx";
 
 const buttons = [
   {
@@ -46,6 +48,12 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { logout, user } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   useEffect(() => {
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
@@ -80,6 +88,17 @@ const Navbar = () => {
             </button>
           );
         })}
+
+        {user && (
+          <button
+            className={classNames([styles.button, styles.logoutButton])}
+            onClick={handleLogout}
+            title={`Sair (${user.email})`}
+          >
+            <FontAwesomeIcon icon={faRightFromBracket} />
+            <span>Sair</span>
+          </button>
+        )}
       </div>
 
       <button

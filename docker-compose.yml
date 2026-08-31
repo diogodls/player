@@ -43,6 +43,8 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+    env_file:
+      - ./backend/.env
     environment:
       - CHOKIDAR_USEPOLLING=true
       - PORT=3000

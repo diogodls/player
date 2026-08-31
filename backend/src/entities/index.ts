@@ -14,3 +14,4 @@ export * from './session.entity';
 export * from './tagged-action.entity';
 export * from './team.entity';
 export * from './team-action-context.entity';
+export * from './user.entity';
