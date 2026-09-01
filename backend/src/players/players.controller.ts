@@ -14,6 +14,7 @@ import {
 import { PlayerFiltersDto } from './dto/player-filters.dto';
 import { PlayerDto } from './dto/player.dto';
 import { PlayersService } from './players.service';
+import { CoachDashboardFiltersDto } from '../coach-dashboard/dto/coach-dashboard-filters.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
@@ -32,8 +33,11 @@ export class PlayersController {
   }
 
   @Get('rankings/:indexKey')
-  findRanking(@Param('indexKey') indexKey: string) {
-    return this.playersService.findRanking(indexKey);
+  findRanking(
+    @Param('indexKey') indexKey: string,
+    @Query() filters: CoachDashboardFiltersDto,
+  ) {
+    return this.playersService.findRanking(indexKey, filters);
   }
 
   @Get(':id')

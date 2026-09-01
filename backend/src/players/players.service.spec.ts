@@ -8,7 +8,11 @@ import {
   emptyPlayerPerformance,
   PlayerStatisticsService,
 } from './player-statistics.service';
-import { PlayersService } from './players.service';
+import {
+  calculateOverall,
+  calculateOverallIndexPoints,
+  PlayersService,
+} from './players.service';
 
 const PLAYER_ID = '79fbbbe8-39b1-4b25-bd11-236a0f228cb0';
 const OTHER_PLAYER_ID = '9828b90e-6aa0-4d75-985d-f286802c3086';
@@ -44,6 +48,36 @@ const indexes = (values: TestIndexes): TestIndexes => ({
   ...values,
 });
 
+const completeIndexes = (value: number): PlayerIndexesDto => ({
+  radj: value,
+  goalsRelations: value,
+  actionsRelations: value,
+  atd: value,
+  dto: value,
+  pgj: value,
+  ic: value,
+  tio: value,
+  gtj: value,
+  rf: value,
+  tid: value,
+});
+
+describe('overall positional formula', () => {
+  it('converts fifth place among twelve participants to eight points', () => {
+    expect(calculateOverallIndexPoints(12, 5)).toBe(8);
+  });
+
+  it('uses the specified denominator and rounds only the final result', () => {
+    expect(calculateOverall(105, 12)).toBe(80);
+  });
+
+  it('avoids division by zero, NaN and Infinity', () => {
+    expect(calculateOverall(0, 0)).toBe(0);
+    expect(calculateOverall(Number.NaN, 12)).toBe(0);
+    expect(calculateOverall(Number.POSITIVE_INFINITY, 12)).toBe(0);
+  });
+});
+
 const buildRankingService = (
   players: PlayerEntity[],
   indexesByPlayerId: Record<string, TestIndexes> = {},
@@ -61,13 +95,42 @@ const buildRankingService = (
     ]),
   );
   const findByTeamId = jest.fn().mockResolvedValue(performances);
+  const findByTeamIdGroupedBySession = jest.fn().mockResolvedValue(
+    new Map([
+      [
+        'session-1',
+        new Map(
+          Array.from(performances, ([playerId, performance]) => [
+            playerId,
+            {
+              performance,
+              ratingData: {
+                goals: 0,
+                assists: 0,
+                positiveActions: 0,
+                negativeActions: 0,
+                positiveGoals: 0,
+                negativeGoals: 0,
+                tio: 0,
+                tid: 0,
+              },
+            },
+          ]),
+        ),
+      ],
+    ]),
+  );
   return {
     find,
     findByTeamId,
+    findByTeamIdGroupedBySession,
     service: new PlayersService(
       { find } as unknown as Repository<PlayerEntity>,
       {} as Repository<TeamEntity>,
-      { findByTeamId } as unknown as PlayerStatisticsService,
+      {
+        findByTeamId,
+        findByTeamIdGroupedBySession,
+      } as unknown as PlayerStatisticsService,
     ),
   };
 };
@@ -351,7 +414,7 @@ describe('PlayersService id validation', () => {
     const missing = buildRankingPlayer('missing', 'Sem dados');
     const worst = buildRankingPlayer('worst', 'Participante pior');
     const best = buildRankingPlayer('best', 'Participante melhor');
-    const { findByTeamId, service } = buildRankingService(
+    const { findByTeamIdGroupedBySession, service } = buildRankingService(
       [],
       {
         worst: indexes({ radj: 2 }),
@@ -366,13 +429,83 @@ describe('PlayersService id validation', () => {
       'session-id',
     );
 
-    expect(findByTeamId).toHaveBeenCalledWith(TEAM_ID, 'session-id');
+    expect(findByTeamIdGroupedBySession).toHaveBeenCalledWith(
+      TEAM_ID,
+      'session-id',
+      { startDate: undefined, endDate: undefined },
+    );
     expect(
       response.ranking.map(({ player, value }) => [player.id, value]),
     ).toEqual([
-      ['best', 99],
-      ['worst', 0],
+      ['best', 9],
+      ['worst', 5],
     ]);
+  });
+
+  it('isolates overall positions between sessions', async () => {
+    const ana = buildRankingPlayer(PLAYER_ID, 'Ana');
+    const bia = buildRankingPlayer(OTHER_PLAYER_ID, 'Bia');
+    const performance = (radj: number) => ({
+      ...emptyPlayerPerformance(),
+      minutes: 40,
+      indexes: { ...emptyPlayerPerformance().indexes, radj },
+    });
+    const findByTeamIdGroupedBySession = jest.fn(
+      (_teamId: string, sessionId?: string) =>
+        Promise.resolve(
+          new Map([
+            [
+              sessionId ?? 'session-2',
+              new Map(
+                (sessionId === 'session-1'
+                  ? [
+                      [ana.id, performance(10)],
+                      [bia.id, performance(1)],
+                    ]
+                  : [
+                      [ana.id, performance(1)],
+                      [bia.id, performance(10)],
+                    ]
+                ).map(([playerId, playerPerformance]) => [
+                  playerId,
+                  { performance: playerPerformance },
+                ]),
+              ),
+            ],
+          ]),
+        ),
+    );
+    const service = new PlayersService(
+      {} as Repository<PlayerEntity>,
+      {} as Repository<TeamEntity>,
+      { findByTeamIdGroupedBySession } as unknown as PlayerStatisticsService,
+    );
+
+    const first = await service.buildRankingForPlayers(
+      [ana, bia],
+      'overall',
+      'session-1',
+    );
+    const second = await service.buildRankingForPlayers(
+      [ana, bia],
+      'overall',
+      'session-2',
+    );
+
+    expect(first.ranking[0].player.id).toBe(ana.id);
+    expect(second.ranking[0].player.id).toBe(bia.id);
+    expect(findByTeamIdGroupedBySession).toHaveBeenNthCalledWith(
+      1,
+      TEAM_ID,
+      'session-1',
+      { startDate: undefined, endDate: undefined },
+    );
+    expect(findByTeamIdGroupedBySession).toHaveBeenNthCalledWith(
+      2,
+      TEAM_ID,
+      'session-2',
+      { startDate: undefined, endDate: undefined },
+    );
   });
 
   it('returns every ranking option from the centralized ranking rules', () => {
@@ -380,6 +513,7 @@ describe('PlayersService id validation', () => {
 
     expect(service.findRankingOptions()).toEqual([
       { key: 'overall', name: 'Ranking Geral', sortDirection: 'DESC' },
+      { key: 'rating', name: 'Nota', sortDirection: 'DESC' },
       { key: 'radj', name: 'Ranking RADJ', sortDirection: 'DESC' },
       {
         key: 'goalsRelations',
@@ -513,7 +647,7 @@ describe('PlayersService id validation', () => {
   });
 
   describe('overall ranking', () => {
-    it('normalizes higher-is-better indexes with the best at 99 and worst at 0', async () => {
+    it('gives more positional points to the best higher-is-better index', async () => {
       const worst = buildRankingPlayer('worst', 'Pior');
       const middle = buildRankingPlayer('middle', 'Meio');
       const best = buildRankingPlayer('best', 'Melhor');
@@ -533,9 +667,9 @@ describe('PlayersService id validation', () => {
       expect(
         response.ranking.map(({ player, value }) => [player.id, value]),
       ).toEqual([
-        ['best', 99],
-        ['middle', 50],
-        ['worst', 0],
+        ['best', 9],
+        ['middle', 6],
+        ['worst', 3],
       ]);
     });
 
@@ -552,9 +686,56 @@ describe('PlayersService id validation', () => {
       expect(
         response.ranking.map(({ player, value }) => [player.id, value]),
       ).toEqual([
-        ['low', 99],
-        ['high', 0],
+        ['low', 9],
+        ['high', 5],
       ]);
+    });
+
+    it('ranks a higher ATD ahead and gives it more overall points', async () => {
+      const high = buildRankingPlayer('high', 'Maior ATD');
+      const low = buildRankingPlayer('low', 'Menor ATD');
+      const { service } = buildOverallService([low, high], {
+        high: indexes({ atd: 3 }),
+        low: indexes({ atd: 1 }),
+      });
+
+      const response = await service.findRanking('overall');
+
+      expect(
+        response.ranking.map(({ player, value }) => [player.id, value]),
+      ).toEqual([
+        ['high', 9],
+        ['low', 5],
+      ]);
+    });
+
+    it('calculates all eleven indexes for twelve session participants', async () => {
+      const players = Array.from({ length: 12 }, (_, index) =>
+        buildRankingPlayer(`player-${index + 1}`, `Jogador ${index + 1}`),
+      );
+      const values = Object.fromEntries(
+        players.map((player, index) => {
+          const descendingValue = 12 - index;
+          return [
+            player.id,
+            {
+              ...completeIndexes(descendingValue),
+              dto: index + 1,
+              gtj: index + 1,
+            },
+          ];
+        }),
+      );
+      const { service } = buildOverallService(players, values);
+
+      const response = await service.findRanking('overall');
+      const byPlayer = new Map(
+        response.ranking.map(({ player, value }) => [player.id, value]),
+      );
+
+      expect(byPlayer.get('player-1')).toBe(100);
+      expect(byPlayer.get('player-5')).toBe(67);
+      expect(byPlayer.get('player-12')).toBe(8);
     });
 
     it('uses the centralized ascending direction to invert dto normalization', async () => {
@@ -570,12 +751,12 @@ describe('PlayersService id validation', () => {
       expect(
         response.ranking.map(({ player, value }) => [player.id, value]),
       ).toEqual([
-        ['best', 99],
-        ['worst', 0],
+        ['best', 9],
+        ['worst', 5],
       ]);
     });
 
-    it('assigns 50 when every valid value of an index is equal', async () => {
+    it('assigns the same best position and points when index values tie', async () => {
       const first = buildRankingPlayer('first', 'Ana');
       const second = buildRankingPlayer('second', 'Bruno');
       const { service } = buildOverallService([second, first], {
@@ -585,10 +766,10 @@ describe('PlayersService id validation', () => {
 
       const response = await service.findRanking('overall');
 
-      expect(response.ranking.map(({ value }) => value)).toEqual([50, 50]);
+      expect(response.ranking.map(({ value }) => value)).toEqual([9, 9]);
     });
 
-    it('uses equal weights, keeps normalized precision and rounds only the final bounded overall', async () => {
+    it('uses equal positional weights and rounds only the final overall', async () => {
       const minimum = buildRankingPlayer('minimum', 'Mínimo');
       const target = buildRankingPlayer('target', 'Alvo');
       const maximum = buildRankingPlayer('maximum', 'Máximo');
@@ -603,10 +784,10 @@ describe('PlayersService id validation', () => {
         response.ranking.map((item) => [item.player.id, item.value]),
       );
 
-      expect(values).toMatchObject({ maximum: 99, target: 49, minimum: 0 });
+      expect(values).toMatchObject({ maximum: 18, target: 12, minimum: 6 });
       expect(
         response.ranking.every(
-          ({ value }) => value !== null && value >= 0 && value <= 99,
+          ({ value }) => value !== null && value >= 0 && value <= 100,
         ),
       ).toBe(true);
     });
@@ -626,8 +807,9 @@ describe('PlayersService id validation', () => {
       expect(response.ranking.map(({ player }) => player.id)).toEqual([
         'partial',
         'minimum',
+        'invalid',
       ]);
-      expect(response.ranking[0].value).toBe(99);
+      expect(response.ranking.map(({ value }) => value)).toEqual([9, 6, 0]);
     });
 
     it('sorts descending and preserves competition ties with alphabetical order', async () => {
@@ -650,7 +832,7 @@ describe('PlayersService id validation', () => {
       expect(response.ranking.map(({ position }) => position)).toEqual([
         1, 1, 3,
       ]);
-      expect(response.ranking.map(({ value }) => value)).toEqual([99, 99, 0]);
+      expect(response.ranking.map(({ value }) => value)).toEqual([9, 9, 3]);
     });
 
     it('excludes soft-deleted players from both ranking and normalization', async () => {
@@ -675,8 +857,8 @@ describe('PlayersService id validation', () => {
       expect(
         response.ranking.map(({ player, value }) => [player.id, value]),
       ).toEqual([
-        ['active-best', 99],
-        ['minimum', 0],
+        ['active-best', 9],
+        ['minimum', 5],
       ]);
     });
 
@@ -705,8 +887,8 @@ describe('PlayersService id validation', () => {
         ({ player }) => player.id === 'middle',
       );
 
-      expect(fullMiddle?.value).toBe(50);
-      expect(reducedMiddle?.value).toBe(99);
+      expect(fullMiddle?.value).toBe(6);
+      expect(reducedMiddle?.value).toBe(9);
     });
   });
 
@@ -749,5 +931,132 @@ describe('PlayersService id validation', () => {
       ['best', -1.5],
       ['worst', 2],
     ]);
+  });
+});
+
+describe('rating ranking', () => {
+  const ratingStats = (radj: number, goals: number) => ({
+    performance: {
+      ...emptyPlayerPerformance(),
+      minutes: 40,
+      indexes: { ...emptyPlayerPerformance().indexes, radj },
+    },
+    ratingData: {
+      goals,
+      assists: 0,
+      positiveActions: goals,
+      negativeActions: 0,
+      positiveGoals: goals,
+      negativeGoals: 0,
+      tio: 0,
+      tid: 0,
+    },
+  });
+
+  const setup = (
+    sessions: Map<string, Map<string, ReturnType<typeof ratingStats>>>,
+  ) => {
+    const players = [
+      buildRankingPlayer(PLAYER_ID, 'Ana'),
+      buildRankingPlayer(OTHER_PLAYER_ID, 'Bia'),
+    ];
+    const findByTeamIdGroupedBySession = jest.fn().mockResolvedValue(sessions);
+    const service = new PlayersService(
+      {
+        find: jest.fn().mockResolvedValue(players),
+      } as unknown as Repository<PlayerEntity>,
+      {} as Repository<TeamEntity>,
+      {
+        findByTeamId: jest.fn(),
+        findByTeamIdGroupedBySession,
+      } as unknown as PlayerStatisticsService,
+    );
+    return { service, findByTeamIdGroupedBySession };
+  };
+
+  it('sorts by highest rating and returns the selected session rating', async () => {
+    const { service, findByTeamIdGroupedBySession } = setup(
+      new Map([
+        [
+          'session-1',
+          new Map([
+            [PLAYER_ID, ratingStats(0, 0)],
+            [OTHER_PLAYER_ID, ratingStats(10, 3)],
+          ]),
+        ],
+      ]),
+    );
+
+    const response = await service.findRanking('rating', {
+      sessionId: 'session-1',
+    });
+
+    expect(findByTeamIdGroupedBySession).toHaveBeenCalledWith(
+      TEAM_ID,
+      'session-1',
+      { startDate: undefined, endDate: undefined },
+    );
+    expect(response.ranking.map((item) => item.player.id)).toEqual([
+      OTHER_PLAYER_ID,
+      PLAYER_ID,
+    ]);
+  });
+
+  it('uses the corrected positional overall in the existing rating formula', async () => {
+    const { service } = setup(
+      new Map([
+        [
+          'session-1',
+          new Map([
+            [PLAYER_ID, ratingStats(10, 0)],
+            [OTHER_PLAYER_ID, ratingStats(1, 0)],
+          ]),
+        ],
+      ]),
+    );
+
+    const response = await service.findRanking('rating', {
+      sessionId: 'session-1',
+    });
+
+    expect(
+      response.ranking.map(({ player, value }) => [player.id, value]),
+    ).toEqual([
+      [PLAYER_ID, 3],
+      [OTHER_PLAYER_ID, 2.9],
+    ]);
+  });
+
+  it('averages session ratings after calculating each session separately', async () => {
+    const { service } = setup(
+      new Map([
+        [
+          'session-1',
+          new Map([
+            [PLAYER_ID, ratingStats(0, 0)],
+            [OTHER_PLAYER_ID, ratingStats(10, 5)],
+          ]),
+        ],
+        [
+          'session-2',
+          new Map([
+            [PLAYER_ID, ratingStats(10, 5)],
+            [OTHER_PLAYER_ID, ratingStats(0, 0)],
+          ]),
+        ],
+      ]),
+    );
+
+    const response = await service.findRanking('rating');
+
+    expect(response.ranking).toHaveLength(2);
+    expect(response.ranking[0].value).toBe(response.ranking[1].value);
+  });
+
+  it('does not fail or rank a player without session data', async () => {
+    const { service } = setup(new Map());
+    await expect(service.findRanking('rating')).resolves.toMatchObject({
+      ranking: [],
+    });
   });
 });

@@ -11,9 +11,16 @@ export async function resetDevelopmentDatabase(
   client: DatabaseClient,
   baseSeedSql: string,
 ) {
-  const cleanup = await cleanDevelopmentData(client);
-  await seedDevelopmentData(client, baseSeedSql);
-  return cleanup;
+  await client.query('BEGIN');
+  try {
+    const cleanup = await cleanDevelopmentData(client, false);
+    await seedDevelopmentData(client, baseSeedSql, false);
+    await client.query('COMMIT');
+    return cleanup;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  }
 }
 
 async function main() {

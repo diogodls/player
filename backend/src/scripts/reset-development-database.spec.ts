@@ -8,14 +8,22 @@ describe('development database reset', () => {
     delete process.env.RUN_LEGACY_MIGRATION_SEEDS;
   });
 
-  it('cleans dependents and then recreates demonstration data on every run', async () => {
+  it('cleans dependents and recreates only the two real games on every run', async () => {
     process.env.NODE_ENV = 'development';
     const statements: string[] = [];
     const query = jest.fn((sql: string) => {
       statements.push(sql.trim());
       if (sql.includes('SELECT') && sql.includes('count(*)')) {
         return Promise.resolve({
-          rows: [{ jogadores: 12, sessoes: 1, acoes_taggeadas: 250 }],
+          rows: [
+            {
+              jogadores: 16,
+              sessoes: 2,
+              minutagens: 24,
+              equipes: 1,
+              acoes_taggeadas: 529,
+            },
+          ],
         });
       }
       return Promise.resolve({ rows: [] });
@@ -27,9 +35,9 @@ describe('development database reset', () => {
     await resetDevelopmentDatabase(client, baseSeed);
     await resetDevelopmentDatabase(client, baseSeed);
 
-    expect(
-      statements.filter((sql) => sql === 'DELETE FROM acoes_taggeadas'),
-    ).toHaveLength(2);
+    expect(statements.join(' ')).toContain('Russo Preto');
+    expect(statements.join(' ')).toContain('Passo Fundo');
+    expect(statements.join(' ')).toContain('player_session_minutes');
     expect(
       statements.filter((sql) => sql === 'DELETE FROM sessoes'),
     ).toHaveLength(2);
@@ -37,8 +45,7 @@ describe('development database reset', () => {
       statements.filter((sql) => sql === 'DELETE FROM jogadores'),
     ).toHaveLength(2);
     expect(statements.join(' ')).not.toContain('DELETE FROM migrations');
-    expect(
-      statements.filter((sql) => sql.includes('ON CONFLICT (id) DO UPDATE')),
-    ).toHaveLength(4);
+    expect(statements.join(' ')).not.toContain('ENTROU');
+    expect(statements.join(' ')).not.toContain('jogador_id IS NULL');
   });
 });

@@ -6,6 +6,7 @@ type RankingSectionProps = {
   metricLabel: string;
   limit?: number;
   highlightTop3?: boolean;
+  valueFormatter?: (value: number | null) => string;
 };
 const podiumClassMap = [styles.top1, styles.top2, styles.top3];
 const RankingSection = ({
@@ -14,6 +15,7 @@ const RankingSection = ({
   metricLabel,
   limit,
   highlightTop3 = true,
+  valueFormatter,
 }: RankingSectionProps) => {
   const displayedPlayers =
     typeof limit === "number" ? players.slice(0, limit) : players;
@@ -47,7 +49,11 @@ const RankingSection = ({
                 </div>
                 <div className={styles.metric}>
                   <span className={styles.metricLabel}>{metricLabel}</span>
-                  <strong>{player.rankingValue ?? "—"}</strong>
+                  <strong>
+                    {valueFormatter
+                      ? valueFormatter(player.rankingValue)
+                      : (player.rankingValue ?? "—")}
+                  </strong>
                 </div>
               </article>
             );

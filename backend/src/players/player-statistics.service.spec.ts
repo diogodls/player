@@ -2,6 +2,7 @@ import { Repository } from 'typeorm';
 import { PlayerSessionMinutesEntity, TaggedActionEntity } from '../entities';
 import {
   calculateOfficialPlayingSeconds,
+  calculatePlayerRating,
   calculatePlayerPerformances,
   calculateSessionPlayerPerformances,
   emptyPlayerPerformance,
@@ -9,6 +10,75 @@ import {
   PlayerSessionMinutes,
   PlayerStatisticsService,
 } from './player-statistics.service';
+
+describe('calculatePlayerRating', () => {
+  const base = {
+    goals: 0,
+    assists: 0,
+    overall: 0,
+    positiveActions: 0,
+    negativeActions: 0,
+    positiveGoals: 0,
+    negativeGoals: 0,
+    tio: 0,
+    tid: 0,
+  };
+
+  it('limits goals and assists to 40 points', () => {
+    expect(calculatePlayerRating({ ...base, goals: 5 })).toBe(
+      calculatePlayerRating({ ...base, goals: 50 }),
+    );
+  });
+
+  it('limits overall to 30 points', () => {
+    expect(calculatePlayerRating({ ...base, overall: 100 })).toBe(
+      calculatePlayerRating({ ...base, overall: 500 }),
+    );
+  });
+
+  it('limits the combined balances to 30 points', () => {
+    expect(calculatePlayerRating({ ...base, positiveActions: 10 })).toBe(
+      calculatePlayerRating({ ...base, positiveActions: 100 }),
+    );
+  });
+
+  it('never returns less than zero or more than ten', () => {
+    expect(
+      calculatePlayerRating({
+        ...base,
+        negativeActions: 100,
+        negativeGoals: 100,
+      }),
+    ).toBe(0);
+    expect(
+      calculatePlayerRating({
+        ...base,
+        goals: 100,
+        overall: 100,
+        positiveActions: 100,
+        tio: 100,
+        tid: 100,
+      }),
+    ).toBe(10);
+  });
+
+  it('calculates a session without rounding intermediate components', () => {
+    expect(
+      calculatePlayerRating({
+        ...base,
+        goals: 1,
+        assists: 1,
+        overall: 80,
+        positiveActions: 5,
+        negativeActions: 2,
+        positiveGoals: 2,
+        negativeGoals: 1,
+        tio: 60,
+        tid: 40,
+      }),
+    ).toBe(10);
+  });
+});
 
 describe('calculateOfficialPlayingSeconds', () => {
   it('uses only the new source and sums multiple sessions', () => {
@@ -41,12 +111,64 @@ describe('calculateSessionPlayerPerformances', () => {
     expect(withoutMinutes?.minutes).toBe(0);
     expect(withMinutes?.minutes).toBe(20);
     expect(withMinutes?.offensiveActions).toBe(2);
-    expect(withMinutes?.indexes.pgj).toBe(4);
+    expect(withMinutes?.indexes.pgj).toBe(2.5);
   });
 });
 
 describe('calculatePlayerPerformances', () => {
-  it('keeps every time-dependent index formula unchanged', () => {
+  it.each([
+    {
+      name: 'applies weight two to RB in the normal case',
+      actions: { RB: 1, DIA: 8 },
+      expected: 12.5,
+    },
+    {
+      name: 'calculates RF without RB',
+      actions: { RB: 0, DIA: 1 },
+      expected: 1.25,
+    },
+    {
+      name: 'returns zero without positive defensive actions',
+      actions: { RB: 0, DIA: 0 },
+      expected: 0,
+    },
+  ])('$name', ({ actions, expected }) => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 1500, actions),
+    ]).get('player-1');
+
+    expect(performance?.indexes.rf).toBe(expected);
+  });
+
+  it('does not use GP or FD in RF', () => {
+    const performances = calculatePlayerPerformances([
+      aggregate('player-a', 1500, { RB: 1, DIA: 8, GP: 0, FD: 0 }),
+      aggregate('player-b', 1500, { RB: 1, DIA: 8, GP: 3, FD: 10 }),
+    ]);
+
+    expect(performances.get('player-a')?.indexes.rf).toBe(12.5);
+    expect(performances.get('player-b')?.indexes.rf).toBe(12.5);
+  });
+
+  it('uses one equivalent game for 25 minutes played', () => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 1500, { GM: 1 }),
+    ]).get('player-1');
+
+    expect(performance?.minutes).toBe(25);
+    expect(performance?.indexes.pgj).toBe(1);
+  });
+
+  it('does not treat a 40-minute match duration as one equivalent game', () => {
+    const performance = calculatePlayerPerformances([
+      aggregate('player-1', 2400, { GM: 1 }),
+    ]).get('player-1');
+
+    expect(performance?.minutes).toBe(40);
+    expect(performance?.indexes.pgj).toBe(0.63);
+  });
+
+  it('calculates time-dependent indexes using 25-minute equivalents', () => {
     const performance = calculatePlayerPerformances([
       aggregate('player-1', 2400, {
         'Gol TO': 1,
@@ -66,9 +188,9 @@ describe('calculatePlayerPerformances', () => {
     expect(performance).toMatchObject({
       minutes: 40,
       indexes: {
-        pgj: 4,
-        gtj: 3,
-        radj: 1,
+        pgj: 2.5,
+        gtj: 1.88,
+        radj: 0.63,
         atd: 0,
         dto: 0,
         tio: 25,

@@ -33,8 +33,20 @@ describe('development data cleanup', () => {
       return Promise.resolve({
         rows: [
           countCalls === 1
-            ? { jogadores: 20, sessoes: 15, acoes_taggeadas: 419 }
-            : { jogadores: 0, sessoes: 0, acoes_taggeadas: 0 },
+            ? {
+                jogadores: 20,
+                sessoes: 15,
+                minutagens: 18,
+                equipes: 2,
+                acoes_taggeadas: 419,
+              }
+            : {
+                jogadores: 0,
+                sessoes: 0,
+                minutagens: 0,
+                equipes: 0,
+                acoes_taggeadas: 0,
+              },
         ],
       });
     });
@@ -47,15 +59,29 @@ describe('development data cleanup', () => {
       expect.stringContaining('SELECT'),
       'BEGIN',
       'DELETE FROM acoes_taggeadas',
+      'DELETE FROM player_session_minutes',
       expect.stringContaining('DELETE FROM indices_jogadores'),
       'DELETE FROM sessoes',
       'DELETE FROM jogadores',
+      'DELETE FROM equipes',
       'COMMIT',
       expect.stringContaining('SELECT'),
     ]);
     expect(result).toEqual({
-      before: { jogadores: 20, sessoes: 15, acoes_taggeadas: 419 },
-      after: { jogadores: 0, sessoes: 0, acoes_taggeadas: 0 },
+      before: {
+        jogadores: 20,
+        sessoes: 15,
+        minutagens: 18,
+        equipes: 2,
+        acoes_taggeadas: 419,
+      },
+      after: {
+        jogadores: 0,
+        sessoes: 0,
+        minutagens: 0,
+        equipes: 0,
+        acoes_taggeadas: 0,
+      },
     });
     expect(statements.join(' ')).not.toContain('DELETE FROM migrations');
   });
