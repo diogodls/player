@@ -1,0 +1,5 @@
+# Configuracoes locais e variaveis por ambiente; somente o exemplo e versionado.
+.env
+.env.*
+!.env.example
+.vercel
