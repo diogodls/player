@@ -92,6 +92,11 @@ export type SessionPlayerStatistics = {
   ratingData: Omit<PlayerRatingInput, 'overall'>;
 };
 
+export type TeamPlayerStatistics = {
+  performances: Map<string, PlayerPerformanceDto>;
+  bySession: Map<string, Map<string, SessionPlayerStatistics>>;
+};
+
 export function calculatePlayerRating(input: PlayerRatingInput): number {
   const goalsAndAssistsPoints = Math.min((input.goals + input.assists) * 8, 40);
   const overallPoints = Math.min(input.overall * 0.3, 30);
@@ -125,6 +130,7 @@ export class PlayerStatisticsService {
     teamId: string,
     sessionId?: string,
     period?: { startDate?: string; endDate?: string },
+    playerId?: string,
   ): Promise<Map<string, PlayerPerformanceDto>> {
     const query = this.taggedActionsRepository
       .createQueryBuilder('taggedAction')
@@ -208,6 +214,7 @@ export class PlayerStatisticsService {
           secondsPlayedByPlayer.get(playerId) ?? 0,
         ),
       ),
+      playerId ? new Set([playerId]) : undefined,
     );
   }
 
@@ -216,6 +223,20 @@ export class PlayerStatisticsService {
     sessionId?: string,
     period?: { startDate?: string; endDate?: string },
   ): Promise<Map<string, Map<string, SessionPlayerStatistics>>> {
+    return (await this.findByTeamIdWithSessions(teamId, sessionId, period))
+      .bySession;
+  }
+
+  /**
+   * Loads the session-level source aggregates once and derives both the
+   * requested-range performance and per-session statistics from those rows.
+   * This is intended for consumers such as the dashboard that need both views.
+   */
+  async findByTeamIdWithSessions(
+    teamId: string,
+    sessionId?: string,
+    period?: { startDate?: string; endDate?: string },
+  ): Promise<TeamPlayerStatistics> {
     const query = this.taggedActionsRepository
       .createQueryBuilder('taggedAction')
       .innerJoin('taggedAction.sessao', 'session')
@@ -304,8 +325,38 @@ export class PlayerStatisticsService {
         ),
       );
     }
-    return result;
+    return {
+      performances: calculatePlayerPerformances(
+        combineAggregates(actionRows, minuteRows),
+      ),
+      bySession: result,
+    };
   }
+}
+
+function combineAggregates(
+  actionRows: RawPlayerActionAggregate[],
+  minuteRows: RawPlayerSessionMinutes[],
+): PlayerActionAggregate[] {
+  const actionsByPlayer = new Map<string, ActionCounts>();
+  for (const row of actionRows) {
+    const counts = actionsByPlayer.get(row.playerId) ?? emptyActionCounts();
+    for (const code of ACTION_CODES) counts[code] += Number(row[code] ?? 0);
+    actionsByPlayer.set(row.playerId, counts);
+  }
+
+  const secondsByPlayer = calculateOfficialPlayingSeconds(
+    minuteRows.map(toPlayerSessionMinutes),
+  );
+  const playerIds = new Set([
+    ...actionsByPlayer.keys(),
+    ...secondsByPlayer.keys(),
+  ]);
+  return Array.from(playerIds, (playerId) => ({
+    playerId,
+    secondsPlayed: secondsByPlayer.get(playerId) ?? 0,
+    actions: actionsByPlayer.get(playerId) ?? emptyActionCounts(),
+  }));
 }
 
 function applySessionFilters(
@@ -387,6 +438,7 @@ export function calculateSessionPlayerPerformances(
 
 export function calculatePlayerPerformances(
   aggregates: PlayerActionAggregate[],
+  playerIdsToReturn?: ReadonlySet<string>,
 ): Map<string, PlayerPerformanceDto> {
   if (aggregates.length === 0) return new Map();
   const participants = aggregates.filter(
@@ -422,16 +474,21 @@ export function calculatePlayerPerformances(
         ) / participants.length;
 
   return new Map(
-    aggregates.map((aggregate) => [
-      aggregate.playerId,
-      calculatePerformance(aggregate, {
-        totalMinutes,
-        teamOffensiveInfluence,
-        teamDefensiveInfluence,
-        averageAtd,
-        averageDto,
-      }),
-    ]),
+    aggregates
+      .filter(
+        (aggregate) =>
+          !playerIdsToReturn || playerIdsToReturn.has(aggregate.playerId),
+      )
+      .map((aggregate) => [
+        aggregate.playerId,
+        calculatePerformance(aggregate, {
+          totalMinutes,
+          teamOffensiveInfluence,
+          teamDefensiveInfluence,
+          averageAtd,
+          averageDto,
+        }),
+      ]),
   );
 }
 

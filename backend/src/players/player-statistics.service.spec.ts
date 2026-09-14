@@ -315,6 +315,55 @@ describe('PlayerStatisticsService', () => {
       });
     });
   });
+
+  it('derives range and per-session results from the same two queries', async () => {
+    const { service, taggedActionsRepository, minutesRepository } =
+      buildService({
+        aggregateRows: [
+          { playerId: 'player-1', sessionId: 'session-1', GM: '1' },
+          { playerId: 'player-1', sessionId: 'session-2', GM: '2' },
+        ],
+        minutesRows: [
+          { playerId: 'player-1', sessionId: 'session-1', totalSeconds: '600' },
+          {
+            playerId: 'player-1',
+            sessionId: 'session-2',
+            totalSeconds: '1200',
+          },
+        ],
+      });
+
+    const statistics = await service.findByTeamIdWithSessions('team-1');
+
+    expect(taggedActionsRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
+    expect(minutesRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
+    expect(statistics.performances.get('player-1')).toMatchObject({
+      minutes: 30,
+      offensiveActions: 3,
+    });
+    expect(
+      statistics.bySession.get('session-1')?.get('player-1')?.performance,
+    ).toMatchObject({ minutes: 10, offensiveActions: 1 });
+    expect(
+      statistics.bySession.get('session-2')?.get('player-1')?.performance,
+    ).toMatchObject({ minutes: 20, offensiveActions: 2 });
+  });
+
+  it('returns only the requested player while retaining team context', () => {
+    const first = aggregate('player-1', 600, { PP: 1 });
+    const second = aggregate('player-2', 600, { PP: 3 });
+    const expected = calculatePlayerPerformances([first, second]).get(
+      'player-1',
+    );
+
+    const result = calculatePlayerPerformances(
+      [first, second],
+      new Set(['player-1']),
+    );
+
+    expect(result.size).toBe(1);
+    expect(result.get('player-1')).toEqual(expected);
+  });
 });
 
 function buildService(
@@ -404,6 +453,7 @@ function chainableQueryBuilder(rows: unknown[]) {
     where: jest.fn(),
     andWhere: jest.fn(),
     groupBy: jest.fn(),
+    addGroupBy: jest.fn(),
     getRawMany: jest.fn().mockResolvedValue(rows),
   };
   Object.values(queryBuilder).forEach((method) => {

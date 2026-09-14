@@ -322,7 +322,12 @@ describe('PlayersService id validation', () => {
     const response = await service.findOne(PLAYER_ID);
 
     expect(findByTeamId).toHaveBeenCalledTimes(1);
-    expect(findByTeamId).toHaveBeenCalledWith(TEAM_ID);
+    expect(findByTeamId).toHaveBeenCalledWith(
+      TEAM_ID,
+      undefined,
+      undefined,
+      PLAYER_ID,
+    );
     expect(response).toEqual({
       id: PLAYER_ID,
       name: 'Ana Silva',
@@ -931,6 +936,54 @@ describe('PlayersService id validation', () => {
       ['best', -1.5],
       ['worst', 2],
     ]);
+  });
+});
+
+describe('PlayersService dashboard statistics reuse', () => {
+  it('uses one shared statistics snapshot for indexes, overall and rating', async () => {
+    const player = buildRankingPlayer(PLAYER_ID, 'Ana');
+    const performance = {
+      ...emptyPlayerPerformance(),
+      minutes: 10,
+      indexes: completeIndexes(1),
+    };
+    const ratingData = {
+      goals: 0,
+      assists: 0,
+      positiveActions: 0,
+      negativeActions: 0,
+      positiveGoals: 0,
+      negativeGoals: 0,
+      tio: 1,
+      tid: 1,
+    };
+    const findByTeamIdWithSessions = jest.fn().mockResolvedValue({
+      performances: new Map([[PLAYER_ID, performance]]),
+      bySession: new Map([
+        ['session-1', new Map([[PLAYER_ID, { performance, ratingData }]])],
+      ]),
+    });
+    const service = new PlayersService(
+      {
+        find: jest.fn().mockResolvedValue([player]),
+      } as unknown as Repository<PlayerEntity>,
+      {} as Repository<TeamEntity>,
+      { findByTeamIdWithSessions } as unknown as PlayerStatisticsService,
+    );
+
+    const result = await service.findDashboardPlayers(TEAM_ID, {});
+
+    expect(findByTeamIdWithSessions).toHaveBeenCalledTimes(1);
+    expect(findByTeamIdWithSessions).toHaveBeenCalledWith(TEAM_ID, undefined, {
+      startDate: undefined,
+      endDate: undefined,
+    });
+    expect(result[0]).toMatchObject({
+      id: PLAYER_ID,
+      minutes: 10,
+      overall: expect.any(Number),
+      rating: expect.any(Number),
+    });
   });
 });
 
