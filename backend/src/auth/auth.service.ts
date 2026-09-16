@@ -26,7 +26,9 @@ export class AuthService {
     private readonly config: ConfigService,
   ) {}
 
-  async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(
+    dto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepo.findOne({ where: { email: dto.email } });
 
     // Timing-safe: sempre executa bcrypt, mesmo quando usuário não existe,
@@ -38,7 +40,11 @@ export class AuthService {
       throw new UnauthorizedException('Email ou senha inválidos.');
     }
 
-    const payload: JwtPayload = { sub: user.id, email: user.email };
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      equipeId: user.equipeId,
+    };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: ACCESS_TOKEN_EXPIRY }),
       this.jwtService.signAsync(payload, {
@@ -72,10 +78,16 @@ export class AuthService {
     if (!valid) {
       // Possível roubo de token — invalida todas as sessões do usuário
       await this.userRepo.update(user.id, { refreshTokenHash: null });
-      throw new UnauthorizedException('Refresh token inválido. Faça login novamente.');
+      throw new UnauthorizedException(
+        'Refresh token inválido. Faça login novamente.',
+      );
     }
 
-    const newPayload: JwtPayload = { sub: user.id, email: user.email };
+    const newPayload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      equipeId: user.equipeId,
+    };
     const accessToken = await this.jwtService.signAsync(newPayload, {
       expiresIn: ACCESS_TOKEN_EXPIRY,
     });
@@ -91,13 +103,17 @@ export class AuthService {
    * Utilitário para criar/atualizar usuários manualmente (use no script de seed ou CLI).
    * Nunca exposto como endpoint público.
    */
-  async createUser(email: string, senha: string): Promise<UserEntity> {
+  async createUser(
+    email: string,
+    senha: string,
+    equipeId: string,
+  ): Promise<UserEntity> {
     const existing = await this.userRepo.findOne({ where: { email } });
     if (existing) {
       throw new InternalServerErrorException(`Usuário ${email} já existe.`);
     }
     const passwordHash = await bcrypt.hash(senha, BCRYPT_ROUNDS);
-    const user = this.userRepo.create({ email, passwordHash });
+    const user = this.userRepo.create({ email, passwordHash, equipeId });
     return this.userRepo.save(user);
   }
 }

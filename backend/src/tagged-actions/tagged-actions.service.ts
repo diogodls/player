@@ -30,10 +30,20 @@ export class TaggedActionsService {
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
   ) {}
 
-  async removeFromSession(sessionId: string, actionId: string): Promise<void> {
+  async removeFromSession(
+    equipeIdOrSessionId: string,
+    sessionIdOrActionId: string,
+    maybeActionId?: string,
+  ): Promise<void> {
+    const equipeId = maybeActionId ? equipeIdOrSessionId : undefined;
+    const sessionId = maybeActionId ? sessionIdOrActionId : equipeIdOrSessionId;
+    const actionId = maybeActionId ?? sessionIdOrActionId;
     const sessionsRepository =
       this.taggedActionsRepository.manager.getRepository(SessionEntity);
-    const session = await sessionsRepository.findOneBy({ id: sessionId });
+    const session = await sessionsRepository.findOneBy({
+      id: sessionId,
+      ...(equipeId ? { equipeId } : {}),
+    });
     if (!session) throw new NotFoundException('Sessão não encontrada');
 
     const action = await this.taggedActionsRepository.findOne({
@@ -45,9 +55,15 @@ export class TaggedActionsService {
   }
 
   async createForSession(
-    sessionId: string,
-    dto: CreateSessionActionsDto,
+    equipeIdOrSessionId: string,
+    sessionIdOrDto: string | CreateSessionActionsDto,
+    maybeDto?: CreateSessionActionsDto,
   ): Promise<CreateSessionActionsResponseDto> {
+    const equipeId = maybeDto ? equipeIdOrSessionId : undefined;
+    const sessionId = maybeDto
+      ? (sessionIdOrDto as string)
+      : equipeIdOrSessionId;
+    const dto = maybeDto ?? (sessionIdOrDto as CreateSessionActionsDto);
     return this.taggedActionsRepository.manager.transaction(async (manager) => {
       const sessionsRepository = manager.getRepository(SessionEntity);
       const catalogActionsRepository =
@@ -67,7 +83,10 @@ export class TaggedActionsService {
         );
       }
 
-      const session = await sessionsRepository.findOneBy({ id: sessionId });
+      const session = await sessionsRepository.findOneBy({
+        id: sessionId,
+        ...(equipeId ? { equipeId } : {}),
+      });
       if (!session) throw new NotFoundException('Sessão não encontrada');
 
       const catalogActionIds = [
