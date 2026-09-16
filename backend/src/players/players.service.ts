@@ -26,6 +26,7 @@ import {
   emptyPlayerPerformance,
   PlayerStatisticsService,
   roundRating,
+  SessionPlayerStatistics,
 } from './player-statistics.service';
 
 @Injectable()
@@ -117,6 +118,9 @@ export class PlayersService {
     const player = await this.findEntity(equipeId, id);
     const performances = await this.playerStatisticsService.findByTeamId(
       equipeId ?? player.equipeId,
+      undefined,
+      undefined,
+      player.id,
     );
     return this.toResponse(player, performances.get(player.id));
   }
@@ -131,13 +135,14 @@ export class PlayersService {
       order: { nome: 'ASC' },
     });
     if (players.length === 0) return [];
-    const performances = await this.playerStatisticsService.findByTeamId(
-      teamId,
-      filters.sessionId,
-      { startDate: filters.startDate, endDate: filters.endDate },
-    );
-    const overallByPlayer = await this.calculateOverallValues(players, filters);
-    const ratings = await this.calculateRatings(players, filters);
+    const statistics =
+      await this.playerStatisticsService.findByTeamIdWithSessions(
+        teamId,
+        filters.sessionId,
+        { startDate: filters.startDate, endDate: filters.endDate },
+      );
+    const { overallByPlayer, ratingsByPlayer } =
+      this.calculateOverallAndRatings(players, statistics.bySession);
     return players.map((player) => {
       if (!player.posicao)
         throw new Error('Relação de posição do jogador não foi carregada');
@@ -146,8 +151,8 @@ export class PlayersService {
         name: player.nome,
         position: player.posicao.nome,
         overall: overallByPlayer.get(player.id) ?? null,
-        rating: ratings.get(player.id) ?? null,
-        ...(performances.get(player.id) ?? emptyPlayerPerformance()),
+        rating: ratingsByPlayer.get(player.id) ?? null,
+        ...(statistics.performances.get(player.id) ?? emptyPlayerPerformance()),
       };
     });
   }
@@ -244,6 +249,7 @@ export class PlayersService {
     const performances = await this.playerStatisticsService.findByTeamId(
       players[0].equipeId,
       sessionId,
+      period,
     );
     return this.buildIndexRanking(players, performances, rankingKey, rule);
   }
@@ -259,7 +265,19 @@ export class PlayersService {
         filters.sessionId,
         { startDate: filters.startDate, endDate: filters.endDate },
       );
-    const valuesByPlayer = new Map<string, number[]>();
+    return this.calculateOverallAndRatings(players, statisticsBySession)
+      .overallByPlayer;
+  }
+
+  private calculateOverallAndRatings(
+    players: PlayerEntity[],
+    statisticsBySession: Map<string, Map<string, SessionPlayerStatistics>>,
+  ): {
+    overallByPlayer: Map<string, number>;
+    ratingsByPlayer: Map<string, number>;
+  } {
+    const overallValuesByPlayer = new Map<string, number[]>();
+    const ratingValuesByPlayer = new Map<string, number[]>();
     for (const sessionStatistics of statisticsBySession.values()) {
       const performances = new Map(
         Array.from(sessionStatistics, ([playerId, stats]) => [
@@ -277,19 +295,47 @@ export class PlayersService {
       );
       for (const { player, value } of sessionOverall.ranking) {
         if (value === null) continue;
-        const values = valuesByPlayer.get(player.id) ?? [];
+        const values = overallValuesByPlayer.get(player.id) ?? [];
         values.push(value);
-        valuesByPlayer.set(player.id, values);
+        overallValuesByPlayer.set(player.id, values);
+      }
+      const overallByPlayer = new Map(
+        sessionOverall.ranking.flatMap(({ player, value }) =>
+          value === null ? [] : [[player.id, value] as const],
+        ),
+      );
+      for (const [playerId, stats] of sessionStatistics) {
+        if (stats.performance.minutes <= 0) continue;
+        const playerOverall = overallByPlayer.get(playerId);
+        if (playerOverall === undefined) continue;
+        const values = ratingValuesByPlayer.get(playerId) ?? [];
+        values.push(
+          calculatePlayerRating({
+            ...stats.ratingData,
+            overall: playerOverall,
+          }),
+        );
+        ratingValuesByPlayer.set(playerId, values);
       }
     }
-    return new Map(
-      Array.from(valuesByPlayer, ([playerId, values]) => [
-        playerId,
-        Math.round(
-          values.reduce((sum, value) => sum + value, 0) / values.length,
-        ),
-      ]),
-    );
+    return {
+      overallByPlayer: new Map(
+        Array.from(overallValuesByPlayer, ([playerId, values]) => [
+          playerId,
+          Math.round(
+            values.reduce((sum, value) => sum + value, 0) / values.length,
+          ),
+        ]),
+      ),
+      ratingsByPlayer: new Map(
+        Array.from(ratingValuesByPlayer, ([playerId, values]) => [
+          playerId,
+          roundRating(
+            values.reduce((sum, value) => sum + value, 0) / values.length,
+          ),
+        ]),
+      ),
+    };
   }
 
   private async calculateRatings(
@@ -303,47 +349,8 @@ export class PlayersService {
         filters.sessionId,
         { startDate: filters.startDate, endDate: filters.endDate },
       );
-    const ratingsByPlayer = new Map<string, number[]>();
-    for (const sessionStatistics of statisticsBySession.values()) {
-      const performances = new Map(
-        Array.from(sessionStatistics, ([playerId, stats]) => [
-          playerId,
-          stats.performance,
-        ]),
-      );
-      const sessionPlayers = players.filter(
-        (player) => (performances.get(player.id)?.minutes ?? 0) > 0,
-      );
-      const overall = this.buildOverallRanking(
-        sessionPlayers,
-        performances,
-        PlayersService.INDEX_RANKING_RULES.overall,
-      );
-      const overallByPlayer = new Map(
-        overall.ranking.map((item) => [item.player.id, item.value]),
-      );
-      for (const [playerId, stats] of sessionStatistics) {
-        if (stats.performance.minutes <= 0) continue;
-        const playerOverall = overallByPlayer.get(playerId);
-        if (playerOverall === undefined || playerOverall === null) continue;
-        const values = ratingsByPlayer.get(playerId) ?? [];
-        values.push(
-          calculatePlayerRating({
-            ...stats.ratingData,
-            overall: playerOverall,
-          }),
-        );
-        ratingsByPlayer.set(playerId, values);
-      }
-    }
-    return new Map(
-      Array.from(ratingsByPlayer, ([playerId, values]) => [
-        playerId,
-        roundRating(
-          values.reduce((sum, value) => sum + value, 0) / values.length,
-        ),
-      ]),
-    );
+    return this.calculateOverallAndRatings(players, statisticsBySession)
+      .ratingsByPlayer;
   }
   async create(
     equipeIdOrDto: string | PlayerDto,
