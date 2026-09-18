@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,15 +10,21 @@ import {
   faCheck,
   faCircleInfo,
   faClock,
+  faDownload,
+  faFileCsv,
   faMinus,
   faPlus,
   faRotateRight,
+  faTable,
   faUsers,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useSearchParams } from "react-router";
 import { PLAYER_COLORS } from "../../constants/metrics";
 import { SESSION_TYPE_IDS } from "../../constants/sessions";
 import { useApi } from "../../hooks/useApi";
+import { backendApi } from "../../utils/api";
+import { ToastContext } from "../../contexts/ToastContext/ToastContext";
 import type {
   ComparisonAthlete,
   SessionComparisonResponse,
@@ -32,6 +38,7 @@ import ComparisonIndexCharts from "./ComparisonIndexCharts";
 import styles from "./SessionComparison.module.scss";
 
 type SessionTypeFilter = "all" | "1" | "2";
+type ExportKind = "players" | "team";
 
 type FilterDraft = {
   appliedKey: string;
@@ -132,9 +139,96 @@ function EmptyState({
   );
 }
 
+function getFilenameFromDisposition(disposition: string | undefined) {
+  const match = disposition?.match(/filename="?([^"]+)"?/i);
+  return match?.[1] ?? null;
+}
+
+function CsvExportModal({
+  isOpen,
+  isExporting,
+  onClose,
+  onExport,
+}: {
+  isOpen: boolean;
+  isExporting: boolean;
+  onClose: () => void;
+  onExport: (kind: ExportKind) => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.modalOverlay} onMouseDown={onClose}>
+      <div
+        className={styles.exportModal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="csv-export-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className={styles.modalHeader}>
+          <div className={styles.modalIcon}>
+            <FontAwesomeIcon icon={faFileCsv} />
+          </div>
+          <button
+            type="button"
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Fechar exportação"
+          >
+            <FontAwesomeIcon icon={faXmark} />
+          </button>
+        </div>
+
+        <div className={styles.modalContent}>
+          <h2 id="csv-export-title">Exportar CSV</h2>
+          <p>
+            Escolha o formato do arquivo para o período selecionado.
+          </p>
+
+          <div className={styles.exportOptions}>
+            <button
+              type="button"
+              onClick={() => onExport("players")}
+              disabled={isExporting}
+            >
+              <FontAwesomeIcon icon={faUsers} />
+              <span>
+                <strong>Jogadores</strong>
+                <small>Uma linha por jogador em cada treino ou jogo.</small>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onExport("team")}
+              disabled={isExporting}
+            >
+              <FontAwesomeIcon icon={faTable} />
+              <span>
+                <strong>Equipe</strong>
+                <small>Uma linha por sessão com ações coletivas.</small>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.modalFooter}>
+          <button type="button" onClick={onClose} disabled={isExporting}>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const SessionComparison = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { success, error: showError } = useContext(ToastContext);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const appliedStartDate = searchParams.get("startDate") ?? "";
   const appliedEndDate = searchParams.get("endDate") ?? "";
   const appliedTypeId = searchParams.get("typeId");
@@ -211,6 +305,45 @@ const SessionComparison = () => {
     setSearchParams(nextParams);
   };
 
+  const handleExportCsv = async (kind: ExportKind) => {
+    if (!hasAppliedRange) return;
+    setIsExporting(true);
+
+    const params = new URLSearchParams({
+      startDate: appliedStartDate,
+      endDate: appliedEndDate,
+    });
+    if (appliedTypeId === "1" || appliedTypeId === "2") {
+      params.set("typeId", appliedTypeId);
+    }
+
+    try {
+      const response = await backendApi.get<Blob>(
+        `/sessions/comparison/export/${kind}?${params.toString()}`,
+        { responseType: "blob" },
+      );
+      const blob = new Blob([response.data], {
+        type: "text/csv;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download =
+        getFilenameFromDisposition(response.headers["content-disposition"]) ??
+        `comparacao-${kind === "players" ? "jogadores" : "equipe"}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setIsExportModalOpen(false);
+      success("CSV gerado com sucesso!");
+    } catch {
+      showError("Não foi possível exportar o CSV.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const toggleAthlete = (athleteId: string) => {
     const isSelected = selectedAthleteIds.includes(athleteId);
     if (isSelected && selectedAthleteIds.length === 1) return;
@@ -257,7 +390,18 @@ const SessionComparison = () => {
               <h2>Período da análise</h2>
               <p>As sessões nas duas datas também entram na comparação.</p>
             </div>
-            <FontAwesomeIcon icon={faCalendarDays} />
+            <div className={styles.filterActions}>
+              <button
+                type="button"
+                className={styles.exportButton}
+                onClick={() => setIsExportModalOpen(true)}
+                disabled={!hasAppliedRange}
+              >
+                <FontAwesomeIcon icon={faDownload} />
+                Exportar CSV
+              </button>
+              <FontAwesomeIcon icon={faCalendarDays} />
+            </div>
           </div>
 
           <div className={styles.filters}>
@@ -584,6 +728,13 @@ const SessionComparison = () => {
           </>
         )}
       </div>
+
+      <CsvExportModal
+        isOpen={isExportModalOpen}
+        isExporting={isExporting}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={(kind) => void handleExportCsv(kind)}
+      />
     </main>
   );
 };
