@@ -51,5 +51,6 @@ export type SessionComparisonResponse = {
     typeId: number | null;
   };
   sessions: ComparisonSession[];
+  availableSessions: ComparisonSession[];
   athletes: ComparisonAthlete[];
 };

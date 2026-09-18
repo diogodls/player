@@ -24,6 +24,7 @@ async function bootstrap() {
   app.enableCors({
     origin: frontendOrigins,
     credentials: true,
+    exposedHeaders: ['Content-Disposition'],
   });
   await app.listen(process.env.PORT ?? 3000);
 }

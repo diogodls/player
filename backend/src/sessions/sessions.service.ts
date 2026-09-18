@@ -144,43 +144,20 @@ export class SessionsService {
     const filters =
       typeof equipeIdOrFilters === 'string' ? maybeFilters : equipeIdOrFilters;
     if (!filters) throw new BadRequestException('Filtros não informados');
-    if (filters.startDate >= filters.endDate) {
-      throw new BadRequestException(
-        'Data inicial deve ser anterior a data final',
-      );
-    }
+    this.validateComparisonFilters(filters);
 
-    const sessions = await this.sessionsRepository.find({
-      where: {
-        ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
-        data: Between(filters.startDate, filters.endDate),
-        ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
-      },
-      relations: {
-        sessionType: true,
-      },
-      order: {
-        data: 'ASC',
-        createdAt: 'ASC',
-        id: 'ASC',
-      },
-    });
-
-    const comparisonSessions = sessions.map((session) => {
-      if (!session.sessionType) {
-        throw new Error('Tipo da sessao nao foi carregado');
-      }
-
-      const description = session.descricao ?? null;
-      return {
-        id: session.id,
-        date: this.formatDate(session.data),
-        type: session.sessionType.nome,
-        description,
-        opponent:
-          session.sessionTypeId === SESSION_TYPES.Jogo ? description : null,
-      };
-    });
+    const availableSessions = await this.findComparisonSessions(
+      equipeId,
+      filters,
+      false,
+    );
+    const sessions = this.filterSelectedSessions(availableSessions, filters);
+    const comparisonSessions = sessions.map((session) =>
+      this.toComparisonSession(session),
+    );
+    const availableComparisonSessions = availableSessions.map((session) =>
+      this.toComparisonSession(session),
+    );
 
     if (sessions.length === 0) {
       return {
@@ -190,6 +167,7 @@ export class SessionsService {
           typeId: filters.typeId ?? null,
         },
         sessions: [],
+        availableSessions: availableComparisonSessions,
         athletes: [],
       };
     }
@@ -216,11 +194,11 @@ export class SessionsService {
     const minutesRecords = await this
       .getPlayerSessionMinutesRepository()
       .find({
-      where: {
-        sessionId: In(sessions.map((session) => session.id)),
-        player: { deletedAt: IsNull() },
-      },
-    });
+        where: {
+          sessionId: In(sessions.map((session) => session.id)),
+          player: { deletedAt: IsNull() },
+        },
+      });
 
     return {
       period: {
@@ -229,6 +207,7 @@ export class SessionsService {
         typeId: filters.typeId ?? null,
       },
       sessions: comparisonSessions,
+      availableSessions: availableComparisonSessions,
       athletes: this.buildComparisonAthletes(
         actions,
         sessions.map((session) => session.id),
@@ -435,9 +414,9 @@ export class SessionsService {
 
   private validateComparisonFilters(filters: SessionComparisonFiltersDto) {
     if (!filters) throw new BadRequestException('Filtros não informados');
-    if (filters.startDate >= filters.endDate) {
+    if (filters.startDate > filters.endDate) {
       throw new BadRequestException(
-        'Data inicial deve ser anterior a data final',
+        'Data inicial deve ser igual ou anterior a data final',
       );
     }
   }
@@ -453,12 +432,16 @@ export class SessionsService {
   private findComparisonSessions(
     equipeId: string | undefined,
     filters: SessionComparisonFiltersDto,
+    shouldApplySelection = true,
   ) {
     return this.sessionsRepository.find({
       where: {
         ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
         data: Between(filters.startDate, filters.endDate),
         ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
+        ...(shouldApplySelection && filters.sessionIds?.length
+          ? { id: In(filters.sessionIds) }
+          : {}),
       },
       relations: {
         equipe: true,
@@ -472,6 +455,31 @@ export class SessionsService {
         id: 'ASC',
       },
     });
+  }
+
+  private filterSelectedSessions(
+    sessions: SessionEntity[],
+    filters: SessionComparisonFiltersDto,
+  ) {
+    if (!filters.sessionIds?.length) return sessions;
+    const selectedIds = new Set(filters.sessionIds);
+    return sessions.filter((session) => selectedIds.has(session.id));
+  }
+
+  private toComparisonSession(session: SessionEntity) {
+    if (!session.sessionType) {
+      throw new Error('Tipo da sessao nao foi carregado');
+    }
+
+    const description = session.descricao ?? null;
+    return {
+      id: session.id,
+      date: this.formatDate(session.data),
+      type: session.sessionType.nome,
+      description,
+      opponent:
+        session.sessionTypeId === SESSION_TYPES.Jogo ? description : null,
+    };
   }
 
   private async buildPlayersComparisonCsv(
@@ -590,7 +598,9 @@ export class SessionsService {
           stats.positive,
           stats.negative,
           this.calculatePercentage(stats.positive, stats.total),
-          ...columns.map((column) => actionsByCatalogId.get(column.action.id) ?? 0),
+          ...columns.map(
+            (column) => actionsByCatalogId.get(column.action.id) ?? 0,
+          ),
         ];
       });
 
