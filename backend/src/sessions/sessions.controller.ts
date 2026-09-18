@@ -9,14 +9,18 @@ import {
   Post,
   Put,
   Query,
+  Res,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { SessionFiltersDto } from './dto/session-filters.dto';
 import { SessionComparisonFiltersDto } from './dto/session-comparison-filters.dto';
 import { SessionViewFiltersDto } from './dto/session-view-filters.dto';
 import { SessionDto } from './dto/session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { SessionsService } from './sessions.service';
+import type { SessionComparisonCsvKind } from './sessions.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/authenticated-user.interface';
@@ -40,6 +44,33 @@ export class SessionsController {
     @Query() filters: SessionComparisonFiltersDto,
   ) {
     return this.sessionsService.compare(user.equipeId, filters);
+  }
+
+  @Get('comparison/export/:kind')
+  async exportComparisonCsv(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('kind') kind: string,
+    @Query() filters: SessionComparisonFiltersDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    if (kind !== 'players' && kind !== 'team') {
+      throw new BadRequestException('Tipo de exportacao invalido');
+    }
+
+    const csv = await this.sessionsService.exportComparisonCsv(
+      user.equipeId,
+      filters,
+      kind as SessionComparisonCsvKind,
+    );
+    const suffix = kind === 'players' ? 'jogadores' : 'equipe';
+    const period = `${filters.startDate}-a-${filters.endDate}`;
+    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="comparacao-${suffix}-${period}.csv"`,
+    );
+
+    return csv;
   }
 
   @Get(':id/rankings/:indexKey')

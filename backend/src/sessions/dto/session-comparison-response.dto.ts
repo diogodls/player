@@ -51,5 +51,6 @@ export class SessionComparisonAthleteDto {
 export class SessionComparisonResponseDto {
   period!: SessionComparisonPeriodDto;
   sessions!: SessionComparisonSessionDto[];
+  availableSessions!: SessionComparisonSessionDto[];
   athletes!: SessionComparisonAthleteDto[];
 }
