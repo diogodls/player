@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,15 +10,22 @@ import {
   faCheck,
   faCircleInfo,
   faClock,
+  faDownload,
+  faFileCsv,
+  faListCheck,
   faMinus,
   faPlus,
   faRotateRight,
+  faTable,
   faUsers,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useSearchParams } from "react-router";
 import { PLAYER_COLORS } from "../../constants/metrics";
 import { SESSION_TYPE_IDS } from "../../constants/sessions";
 import { useApi } from "../../hooks/useApi";
+import { backendApi } from "../../utils/api";
+import { ToastContext } from "../../contexts/ToastContext/ToastContext";
 import type {
   ComparisonAthlete,
   SessionComparisonResponse,
@@ -32,6 +39,8 @@ import ComparisonIndexCharts from "./ComparisonIndexCharts";
 import styles from "./SessionComparison.module.scss";
 
 type SessionTypeFilter = "all" | "1" | "2";
+type ExportKind = "players" | "team";
+type ComparisonSessionOption = SessionComparisonResponse["sessions"][number];
 
 type FilterDraft = {
   appliedKey: string;
@@ -82,7 +91,7 @@ const TREND_CONTENT = {
 } as const;
 
 function isValidRange(startDate: string, endDate: string) {
-  return Boolean(startDate && endDate && startDate < endDate);
+  return Boolean(startDate && endDate && startDate <= endDate);
 }
 
 function countPeriodDays(startDate: string, endDate: string) {
@@ -132,12 +141,307 @@ function EmptyState({
   );
 }
 
+function getFilenameFromDisposition(disposition: string | undefined) {
+  if (!disposition) return null;
+
+  const filenamePart = disposition
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.toLowerCase().startsWith("filename="));
+
+  return filenamePart?.split("=").slice(1).join("=").split('"').join("") ?? null;
+}
+
+function getCsvFilename(kind: ExportKind, startDate: string, endDate: string) {
+  const suffix = kind === "players" ? "jogadores" : "equipe";
+  return `comparacao-${suffix}-${startDate}-a-${endDate}.csv`;
+}
+
+function buildComparisonParams({
+  startDate,
+  endDate,
+  typeId,
+  sessionIds,
+}: {
+  startDate: string;
+  endDate: string;
+  typeId: string | null;
+  sessionIds?: string[];
+}) {
+  const params = new URLSearchParams({ startDate, endDate });
+
+  if (typeId === "1" || typeId === "2") {
+    params.set("typeId", typeId);
+  }
+  if (sessionIds?.length) {
+    params.set("sessionIds", sessionIds.join(","));
+  }
+
+  return params;
+}
+
+function getSessionDetail(session: ComparisonSessionOption) {
+  if (session.type === "Jogo") {
+    return session.opponent ?? session.description;
+  }
+
+  return session.description;
+}
+
+function getRequestedAthleteIds(searchParams: URLSearchParams) {
+  return (searchParams.get("athleteIds") ?? searchParams.get("athleteId") ?? "")
+    .split(",")
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
+function getSelectedAthletes(
+  athletes: ComparisonAthlete[],
+  requestedAthleteIds: string[],
+) {
+  if (requestedAthleteIds.length === 0) return athletes.slice(0, 1);
+
+  return requestedAthleteIds.flatMap((id) => {
+    const athlete = athletes.find((item) => item.id === id);
+    return athlete ? [athlete] : [];
+  });
+}
+
+function getSelectedSessionIds(
+  availableSessions: ComparisonSessionOption[],
+  appliedSessionIds: string[],
+) {
+  if (appliedSessionIds.length === 0) {
+    return availableSessions.map((session) => session.id);
+  }
+
+  const availableIds = new Set(availableSessions.map((session) => session.id));
+  return appliedSessionIds.filter((id) => availableIds.has(id));
+}
+
+function getSessionIdsParam(
+  currentSessionIds: string[],
+  availableSessions: ComparisonSessionOption[],
+) {
+  if (
+    currentSessionIds.length === 0 ||
+    currentSessionIds.length === availableSessions.length
+  ) {
+    return undefined;
+  }
+
+  return currentSessionIds;
+}
+
+function formatDelta(delta: number | null) {
+  if (delta === null) return "N/D";
+  const sign = delta > 0 ? "+" : "";
+  return `${sign}${delta.toFixed(0)} pp`;
+}
+
+function getAthleteToggleLabel(athleteName: string, isSelected: boolean) {
+  const action = isSelected ? "Remover" : "Adicionar";
+  const preposition = isSelected ? "da" : "à";
+  return `${action} ${athleteName} ${preposition} comparação`;
+}
+
+function CsvExportModal({
+  isOpen,
+  isExporting,
+  onClose,
+  onExport,
+}: {
+  isOpen: boolean;
+  isExporting: boolean;
+  onClose: () => void;
+  onExport: (kind: ExportKind) => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.modalOverlay} onMouseDown={onClose}>
+      <div
+        className={styles.exportModal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="csv-export-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className={styles.modalHeader}>
+          <div className={styles.modalIcon}>
+            <FontAwesomeIcon icon={faFileCsv} />
+          </div>
+          <button
+            type="button"
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Fechar exportação"
+          >
+            <FontAwesomeIcon icon={faXmark} />
+          </button>
+        </div>
+
+        <div className={styles.modalContent}>
+          <h2 id="csv-export-title">Exportar CSV</h2>
+          <p>
+            Escolha o formato do arquivo para o período selecionado.
+          </p>
+
+          <div className={styles.exportOptions}>
+            <button
+              type="button"
+              onClick={() => onExport("players")}
+              disabled={isExporting}
+            >
+              <FontAwesomeIcon icon={faUsers} />
+              <span>
+                <strong>Jogadores</strong>
+                <small>Uma linha por jogador em cada treino ou jogo.</small>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onExport("team")}
+              disabled={isExporting}
+            >
+              <FontAwesomeIcon icon={faTable} />
+              <span>
+                <strong>Equipe</strong>
+                <small>Uma linha por sessão com ações coletivas.</small>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.modalFooter}>
+          <button type="button" onClick={onClose} disabled={isExporting}>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SessionSelectionModal({
+  isOpen,
+  sessions,
+  selectedIds,
+  onClose,
+  onApply,
+}: {
+  isOpen: boolean;
+  sessions: ComparisonSessionOption[];
+  selectedIds: string[];
+  onClose: () => void;
+  onApply: (sessionIds: string[]) => void;
+}) {
+  const [draftIds, setDraftIds] = useState<string[]>(selectedIds);
+
+  if (!isOpen) return null;
+
+  const selectedSet = new Set(draftIds);
+  const allSelected = sessions.length > 0 && draftIds.length === sessions.length;
+  const toggleSession = (sessionId: string) => {
+    setDraftIds((current) =>
+      current.includes(sessionId)
+        ? current.filter((id) => id !== sessionId)
+        : [...current, sessionId],
+    );
+  };
+
+  return (
+    <div className={styles.modalOverlay} onMouseDown={onClose}>
+      <div
+        className={styles.exportModal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="session-selection-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className={styles.modalHeader}>
+          <div className={styles.modalIcon}>
+            <FontAwesomeIcon icon={faListCheck} />
+          </div>
+          <button
+            type="button"
+            className={styles.modalClose}
+            onClick={onClose}
+            aria-label="Fechar seleção de sessões"
+          >
+            <FontAwesomeIcon icon={faXmark} />
+          </button>
+        </div>
+
+        <div className={styles.modalContent}>
+          <h2 id="session-selection-title">Selecionar sessões do período</h2>
+          <p>Escolha quais sessões entram na comparação e nos CSVs.</p>
+
+          <div className={styles.sessionSelectionActions}>
+            <button
+              type="button"
+              onClick={() => setDraftIds(sessions.map((session) => session.id))}
+              disabled={allSelected}
+            >
+              Selecionar todas
+            </button>
+            <span>{draftIds.length}/{sessions.length} selecionadas</span>
+          </div>
+
+          <div className={styles.sessionList}>
+            {sessions.map((session) => {
+              const detail = getSessionDetail(session);
+              const isSelected = selectedSet.has(session.id);
+
+              return (
+                <button
+                  type="button"
+                  key={session.id}
+                  className={isSelected ? styles.selectedSessionOption : ""}
+                  onClick={() => toggleSession(session.id)}
+                  aria-pressed={isSelected}
+                >
+                  <FontAwesomeIcon icon={isSelected ? faCheck : faPlus} />
+                  <span>
+                    <strong>{session.date} · {session.type}</strong>
+                    {detail && <small>{detail}</small>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.modalFooter}>
+          <button type="button" onClick={onClose}>
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className={styles.confirmModalButton}
+            onClick={() => onApply(draftIds)}
+            disabled={draftIds.length < 1}
+          >
+            Aplicar seleção
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const SessionComparison = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { success, error: showError } = useContext(ToastContext);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const appliedStartDate = searchParams.get("startDate") ?? "";
   const appliedEndDate = searchParams.get("endDate") ?? "";
   const appliedTypeId = searchParams.get("typeId");
+  const appliedSessionIdsParam = searchParams.get("sessionIds") ?? "";
   const appliedDraft = createFilterDraft(
     appliedStartDate,
     appliedEndDate,
@@ -150,6 +454,10 @@ const SessionComparison = () => {
       : appliedDraft;
   const { startDate, endDate, typeFilter } = draft;
   const hasAppliedRange = isValidRange(appliedStartDate, appliedEndDate);
+  const appliedSessionIds = useMemo(
+    () => appliedSessionIdsParam.split(",").filter(Boolean),
+    [appliedSessionIdsParam],
+  );
 
   const updateDraft = (changes: Partial<Omit<FilterDraft, "appliedKey">>) => {
     setStoredDraft({ ...draft, ...changes });
@@ -157,17 +465,17 @@ const SessionComparison = () => {
 
   const endpoint = useMemo(() => {
     if (!hasAppliedRange) return null;
-    const params = new URLSearchParams({
+    const params = buildComparisonParams({
       startDate: appliedStartDate,
       endDate: appliedEndDate,
+      typeId: appliedTypeId,
+      sessionIds: appliedSessionIds,
     });
-    if (appliedTypeId === "1" || appliedTypeId === "2") {
-      params.set("typeId", appliedTypeId);
-    }
     return `/sessions/comparison?${params.toString()}`;
   }, [
     appliedEndDate,
     appliedStartDate,
+    appliedSessionIds,
     appliedTypeId,
     hasAppliedRange,
   ]);
@@ -182,22 +490,17 @@ const SessionComparison = () => {
     keepPreviousData: false,
   });
 
-  const requestedAthleteIds = (
-    searchParams.get("athleteIds") ?? searchParams.get("athleteId") ?? ""
-  )
-    .split(",")
-    .filter(Boolean)
-    .slice(0, 4);
+  const requestedAthleteIds = getRequestedAthleteIds(searchParams);
   const selectedAthletes = data
-    ? requestedAthleteIds.length > 0
-      ? requestedAthleteIds.flatMap((id) => {
-          const athlete = data.athletes.find((item) => item.id === id);
-          return athlete ? [athlete] : [];
-        })
-      : data.athletes.slice(0, 1)
+    ? getSelectedAthletes(data.athletes, requestedAthleteIds)
     : [];
   const selectedAthleteIds = selectedAthletes.map((athlete) => athlete.id);
   const selectionIsFull = selectedAthletes.length >= 4;
+  const availableSessions = data?.availableSessions ?? data?.sessions ?? [];
+  const currentSessionIds = getSelectedSessionIds(
+    availableSessions,
+    appliedSessionIds,
+  );
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -209,6 +512,59 @@ const SessionComparison = () => {
     });
     if (typeFilter !== "all") nextParams.set("typeId", typeFilter);
     setSearchParams(nextParams);
+  };
+
+  const handleApplySessionSelection = (sessionIds: string[]) => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete("athleteId");
+    nextParams.delete("athleteIds");
+
+    if (sessionIds.length === availableSessions.length) {
+      nextParams.delete("sessionIds");
+    } else {
+      nextParams.set("sessionIds", sessionIds.join(","));
+    }
+
+    setSearchParams(nextParams);
+    setIsSessionModalOpen(false);
+  };
+
+  const handleExportCsv = async (kind: ExportKind) => {
+    if (!hasAppliedRange) return;
+    setIsExporting(true);
+
+    const params = buildComparisonParams({
+      startDate: appliedStartDate,
+      endDate: appliedEndDate,
+      typeId: appliedTypeId,
+      sessionIds: getSessionIdsParam(currentSessionIds, availableSessions),
+    });
+
+    try {
+      const response = await backendApi.get<Blob>(
+        `/sessions/comparison/export/${kind}?${params.toString()}`,
+        { responseType: "blob" },
+      );
+      const blob = new Blob([response.data], {
+        type: "text/csv;charset=utf-8",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download =
+        getFilenameFromDisposition(response.headers["content-disposition"]) ??
+        getCsvFilename(kind, appliedStartDate, appliedEndDate);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setIsExportModalOpen(false);
+      success("CSV gerado com sucesso!");
+    } catch {
+      showError("Não foi possível exportar o CSV.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const toggleAthlete = (athleteId: string) => {
@@ -227,8 +583,289 @@ const SessionComparison = () => {
 
   const rangeError =
     startDate && endDate && !isValidRange(startDate, endDate)
-      ? "A data final deve ser posterior à data inicial."
+      ? "A data final deve ser igual ou posterior à data inicial."
       : "";
+
+  let comparisonBody: ReactNode;
+  if (!hasAppliedRange) {
+    comparisonBody = (
+      <EmptyState
+        title="Selecione um período"
+        text="Informe a data inicial e a data final para carregar a evolução dos atletas."
+      />
+    );
+  } else if (isLoading) {
+    comparisonBody = (
+      <EmptyState
+        title="Calculando evolução..."
+        text="Estamos reunindo as ações de todas as sessões do período."
+      />
+    );
+  } else if (error) {
+    comparisonBody = (
+      <EmptyState
+        title="Não foi possível carregar a comparação"
+        text="Verifique se o backend está disponível e tente novamente."
+        action={
+          <button
+            type="button"
+            className={styles.retryButton}
+            onClick={() => void mutate()}
+          >
+            <FontAwesomeIcon icon={faRotateRight} />
+            Tentar novamente
+          </button>
+        }
+      />
+    );
+  } else if (!data || data.sessions.length === 0) {
+    comparisonBody = (
+      <EmptyState
+        title="Nenhuma sessão encontrada"
+        text="Altere as datas ou o tipo de sessão para ampliar a busca."
+      />
+    );
+  } else if (data.athletes.length === 0) {
+    comparisonBody = (
+      <EmptyState
+        title="Nenhum atleta com ações no período"
+        text="As sessões existem, mas ainda não possuem ações individuais registradas."
+      />
+    );
+  } else {
+    comparisonBody = (
+      <>
+        <section className={styles.summaryCards} aria-label="Resumo do período">
+          <article>
+            <FontAwesomeIcon icon={faCalendarDays} />
+            <div>
+              <span>Sessões analisadas</span>
+              <strong>{data.sessions.length}</strong>
+            </div>
+          </article>
+          <article>
+            <FontAwesomeIcon icon={faUsers} />
+            <div>
+              <span>Atletas com dados</span>
+              <strong>{data.athletes.length}</strong>
+            </div>
+          </article>
+          <article>
+            <FontAwesomeIcon icon={faClock} />
+            <div>
+              <span>Duração do período</span>
+              <strong>
+                {countPeriodDays(data.period.startDate, data.period.endDate)}{" "}
+                dias
+              </strong>
+            </div>
+          </article>
+        </section>
+
+        <section className={styles.athletesCard}>
+          <div className={styles.sectionHeading}>
+            <div>
+              <h2>Resumo dos atletas</h2>
+              <p>
+                Selecione de 1 a 4 atletas para comparar. A variação usa a
+                primeira e a última sessão com dados.
+              </p>
+            </div>
+            <div className={styles.selectionStatus}>
+              <strong>{selectedAthletes.length}/4 selecionados</strong>
+              {isValidating && <span>Atualizando...</span>}
+            </div>
+          </div>
+
+          <div className={styles.performanceNote} role="note">
+            <FontAwesomeIcon icon={faCircleInfo} />
+            <p>
+              <strong>Como interpretar:</strong> Inicial e Final mostram a
+              performance percentual na primeira e na última sessão em que o
+              atleta possui ações no período. A performance é calculada por
+              ações positivas ÷ total de ações × 100, e a Variação é a diferença
+              entre esses valores em pontos percentuais (pp).
+            </p>
+          </div>
+
+          <div className={styles.desktopTable}>
+            <table>
+              <thead>
+                <tr>
+                  <th>Atleta</th>
+                  <th>Sessões</th>
+                  <th>Inicial</th>
+                  <th>Final</th>
+                  <th>Variação</th>
+                  <th>Tendência</th>
+                  <th>Comparar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.athletes.map((athlete) => {
+                  const summary = getPerformanceSummary(athlete);
+                  const trend = getTrend(summary.delta, "higher");
+                  const trendContent = TREND_CONTENT[trend];
+                  const isSelected = selectedAthleteIds.includes(athlete.id);
+                  const isDisabled = !isSelected && selectionIsFull;
+                  const selectAthlete = () => toggleAthlete(athlete.id);
+
+                  return (
+                    <tr
+                      key={athlete.id}
+                      className={`${styles.clickableRow} ${
+                        isSelected ? styles.selectedRow : ""
+                      } ${isDisabled ? styles.disabledRow : ""}`}
+                      onClick={isDisabled ? undefined : selectAthlete}
+                    >
+                      <td>
+                        <button
+                          type="button"
+                          className={styles.athleteButton}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            selectAthlete();
+                          }}
+                          aria-pressed={isSelected}
+                          disabled={isDisabled}
+                        >
+                          <strong>{athlete.name}</strong>
+                          <span>{athlete.position}</span>
+                        </button>
+                      </td>
+                      <td>{athlete.points.length}</td>
+                      <td>
+                        {formatMetricValue(
+                          summary.first,
+                          "performancePercentage",
+                        )}
+                      </td>
+                      <td>
+                        {formatMetricValue(
+                          summary.last,
+                          "performancePercentage",
+                        )}
+                      </td>
+                      <td>{formatDelta(summary.delta)}</td>
+                      <td>
+                        <span
+                          className={`${styles.trend} ${trendContent.className}`}
+                        >
+                          <FontAwesomeIcon icon={trendContent.icon} />
+                          {trendContent.label}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className={styles.rowArrowButton}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            selectAthlete();
+                          }}
+                          aria-label={getAthleteToggleLabel(
+                            athlete.name,
+                            isSelected,
+                          )}
+                          aria-pressed={isSelected}
+                          disabled={isDisabled}
+                        >
+                          <FontAwesomeIcon
+                            icon={isSelected ? faCheck : faPlus}
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.mobileAthletes}>
+            {data.athletes.map((athlete) => {
+              const summary = getPerformanceSummary(athlete);
+              const trend = getTrend(summary.delta, "higher");
+              const trendContent = TREND_CONTENT[trend];
+              const isSelected = selectedAthleteIds.includes(athlete.id);
+              const isDisabled = !isSelected && selectionIsFull;
+
+              return (
+                <button
+                  type="button"
+                  key={athlete.id}
+                  className={isSelected ? styles.selectedAthleteCard : ""}
+                  onClick={() => toggleAthlete(athlete.id)}
+                  aria-pressed={isSelected}
+                  disabled={isDisabled}
+                >
+                  <span className={styles.mobileAthleteHeading}>
+                    <span>
+                      <strong>{athlete.name}</strong>
+                      <small>{athlete.position}</small>
+                    </span>
+                    <FontAwesomeIcon icon={isSelected ? faCheck : faPlus} />
+                  </span>
+                  <span className={styles.mobileAthleteMetrics}>
+                    <span>
+                      {formatMetricValue(
+                        summary.first,
+                        "performancePercentage",
+                      )}
+                      <small>Inicial</small>
+                    </span>
+                    <span>
+                      {formatMetricValue(
+                        summary.last,
+                        "performancePercentage",
+                      )}
+                      <small>Final</small>
+                    </span>
+                    <span
+                      className={`${styles.trend} ${trendContent.className}`}
+                    >
+                      <FontAwesomeIcon icon={trendContent.icon} />
+                      {trendContent.label}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {selectedAthletes.length > 0 && (
+          <section className={styles.detailCard}>
+            <div className={styles.detailHeader}>
+              <div>
+                <span className={styles.eyebrow}>Evolução comparativa</span>
+                <h2>Comparação entre atletas</h2>
+                <p>
+                  Analise se os atletas estão evoluindo ou regredindo no mesmo
+                  período.
+                </p>
+              </div>
+              <div className={styles.selectedAthleteLegend}>
+                {selectedAthletes.map((athlete, index) => (
+                  <span key={athlete.id}>
+                    <i style={{ background: PLAYER_COLORS[index] }} />
+                    {athlete.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <ComparisonIndexCharts
+              athletes={selectedAthletes}
+              sessions={data.sessions}
+              startDate={data.period.startDate}
+              endDate={data.period.endDate}
+            />
+          </section>
+        )}
+      </>
+    );
+  }
 
   return (
     <main className={styles.container}>
@@ -257,7 +894,27 @@ const SessionComparison = () => {
               <h2>Período da análise</h2>
               <p>As sessões nas duas datas também entram na comparação.</p>
             </div>
-            <FontAwesomeIcon icon={faCalendarDays} />
+            <div className={styles.filterActions}>
+              <button
+                type="button"
+                className={styles.exportButton}
+                onClick={() => setIsSessionModalOpen(true)}
+                disabled={!data || availableSessions.length === 0}
+              >
+                <FontAwesomeIcon icon={faListCheck} />
+                Selecionar sessões do período
+              </button>
+              <button
+                type="button"
+                className={styles.exportButton}
+                onClick={() => setIsExportModalOpen(true)}
+                disabled={!hasAppliedRange || currentSessionIds.length === 0}
+              >
+                <FontAwesomeIcon icon={faDownload} />
+                Exportar CSV
+              </button>
+              <FontAwesomeIcon icon={faCalendarDays} />
+            </div>
           </div>
 
           <div className={styles.filters}>
@@ -309,281 +966,23 @@ const SessionComparison = () => {
           {rangeError && <p className={styles.formError}>{rangeError}</p>}
         </form>
 
-        {!hasAppliedRange ? (
-          <EmptyState
-            title="Selecione um período"
-            text="Informe duas datas diferentes para carregar a evolução dos atletas."
-          />
-        ) : isLoading ? (
-          <EmptyState
-            title="Calculando evolução..."
-            text="Estamos reunindo as ações de todas as sessões do período."
-          />
-        ) : error ? (
-          <EmptyState
-            title="Não foi possível carregar a comparação"
-            text="Verifique se o backend está disponível e tente novamente."
-            action={
-              <button
-                type="button"
-                className={styles.retryButton}
-                onClick={() => void mutate()}
-              >
-                <FontAwesomeIcon icon={faRotateRight} />
-                Tentar novamente
-              </button>
-            }
-          />
-        ) : !data || data.sessions.length === 0 ? (
-          <EmptyState
-            title="Nenhuma sessão encontrada"
-            text="Altere as datas ou o tipo de sessão para ampliar a busca."
-          />
-        ) : data.sessions.length === 1 ? (
-          <EmptyState
-            title="É necessária mais uma sessão"
-            text="O período selecionado contém somente uma sessão e ainda não permite medir evolução."
-          />
-        ) : data.athletes.length === 0 ? (
-          <EmptyState
-            title="Nenhum atleta com ações no período"
-            text="As sessões existem, mas ainda não possuem ações individuais registradas."
-          />
-        ) : (
-          <>
-            <section className={styles.summaryCards} aria-label="Resumo do período">
-              <article>
-                <FontAwesomeIcon icon={faCalendarDays} />
-                <div>
-                  <span>Sessões analisadas</span>
-                  <strong>{data.sessions.length}</strong>
-                </div>
-              </article>
-              <article>
-                <FontAwesomeIcon icon={faUsers} />
-                <div>
-                  <span>Atletas com dados</span>
-                  <strong>{data.athletes.length}</strong>
-                </div>
-              </article>
-              <article>
-                <FontAwesomeIcon icon={faClock} />
-                <div>
-                  <span>Duração do período</span>
-                  <strong>
-                    {countPeriodDays(
-                      data.period.startDate,
-                      data.period.endDate,
-                    )}{" "}
-                    dias
-                  </strong>
-                </div>
-              </article>
-            </section>
-
-            <section className={styles.athletesCard}>
-              <div className={styles.sectionHeading}>
-                <div>
-                  <h2>Resumo dos atletas</h2>
-                  <p>
-                    Selecione de 1 a 4 atletas para comparar. A variação usa a
-                    primeira e a última sessão com dados.
-                  </p>
-                </div>
-                <div className={styles.selectionStatus}>
-                  <strong>{selectedAthletes.length}/4 selecionados</strong>
-                  {isValidating && <span>Atualizando...</span>}
-                </div>
-              </div>
-
-              <div className={styles.performanceNote} role="note">
-                <FontAwesomeIcon icon={faCircleInfo} />
-                <p>
-                  <strong>Como interpretar:</strong> Inicial e Final mostram a
-                  performance percentual na primeira e na última sessão em que
-                  o atleta possui ações no período. A performance é calculada
-                  por ações positivas ÷ total de ações × 100, e a Variação é a
-                  diferença entre esses valores em pontos percentuais (pp).
-                </p>
-              </div>
-
-              <div className={styles.desktopTable}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Atleta</th>
-                      <th>Sessões</th>
-                      <th>Inicial</th>
-                      <th>Final</th>
-                      <th>Variação</th>
-                      <th>Tendência</th>
-                      <th>Comparar</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.athletes.map((athlete) => {
-                      const summary = getPerformanceSummary(athlete);
-                      const trend = getTrend(summary.delta, "higher");
-                      const trendContent = TREND_CONTENT[trend];
-                      const isSelected = selectedAthleteIds.includes(athlete.id);
-                      const isDisabled = !isSelected && selectionIsFull;
-                      const selectAthlete = () => toggleAthlete(athlete.id);
-
-                      return (
-                        <tr
-                          key={athlete.id}
-                          className={`${styles.clickableRow} ${
-                            isSelected ? styles.selectedRow : ""
-                          } ${isDisabled ? styles.disabledRow : ""}`}
-                          onClick={isDisabled ? undefined : selectAthlete}
-                        >
-                          <td>
-                            <button
-                              type="button"
-                              className={styles.athleteButton}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                selectAthlete();
-                              }}
-                              aria-pressed={isSelected}
-                              disabled={isDisabled}
-                            >
-                              <strong>{athlete.name}</strong>
-                              <span>{athlete.position}</span>
-                            </button>
-                          </td>
-                          <td>{athlete.points.length}</td>
-                          <td>
-                            {formatMetricValue(
-                              summary.first,
-                              "performancePercentage",
-                            )}
-                          </td>
-                          <td>
-                            {formatMetricValue(
-                              summary.last,
-                              "performancePercentage",
-                            )}
-                          </td>
-                          <td>
-                            {summary.delta === null
-                              ? "N/D"
-                              : `${summary.delta > 0 ? "+" : ""}${summary.delta.toFixed(0)} pp`}
-                          </td>
-                          <td>
-                            <span
-                              className={`${styles.trend} ${trendContent.className}`}
-                            >
-                              <FontAwesomeIcon icon={trendContent.icon} />
-                              {trendContent.label}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              className={styles.rowArrowButton}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                selectAthlete();
-                              }}
-                              aria-label={`${isSelected ? "Remover" : "Adicionar"} ${athlete.name} ${isSelected ? "da" : "à"} comparação`}
-                              aria-pressed={isSelected}
-                              disabled={isDisabled}
-                            >
-                              <FontAwesomeIcon icon={isSelected ? faCheck : faPlus} />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className={styles.mobileAthletes}>
-                {data.athletes.map((athlete) => {
-                  const summary = getPerformanceSummary(athlete);
-                  const trend = getTrend(summary.delta, "higher");
-                  const trendContent = TREND_CONTENT[trend];
-                  const isSelected = selectedAthleteIds.includes(athlete.id);
-                  const isDisabled = !isSelected && selectionIsFull;
-
-                  return (
-                    <button
-                      type="button"
-                      key={athlete.id}
-                      className={isSelected ? styles.selectedAthleteCard : ""}
-                      onClick={() => toggleAthlete(athlete.id)}
-                      aria-pressed={isSelected}
-                      disabled={isDisabled}
-                    >
-                      <span className={styles.mobileAthleteHeading}>
-                        <span>
-                          <strong>{athlete.name}</strong>
-                          <small>{athlete.position}</small>
-                        </span>
-                        <FontAwesomeIcon icon={isSelected ? faCheck : faPlus} />
-                      </span>
-                      <span className={styles.mobileAthleteMetrics}>
-                        <span>
-                          {formatMetricValue(
-                            summary.first,
-                            "performancePercentage",
-                          )}
-                          <small>Inicial</small>
-                        </span>
-                        <span>
-                          {formatMetricValue(
-                            summary.last,
-                            "performancePercentage",
-                          )}
-                          <small>Final</small>
-                        </span>
-                        <span
-                          className={`${styles.trend} ${trendContent.className}`}
-                        >
-                          <FontAwesomeIcon icon={trendContent.icon} />
-                          {trendContent.label}
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            {selectedAthletes.length > 0 && (
-              <section className={styles.detailCard}>
-                <div className={styles.detailHeader}>
-                  <div>
-                    <span className={styles.eyebrow}>Evolução comparativa</span>
-                    <h2>Comparação entre atletas</h2>
-                    <p>
-                      Analise se os atletas estão evoluindo ou regredindo no
-                      mesmo período.
-                    </p>
-                  </div>
-                  <div className={styles.selectedAthleteLegend}>
-                    {selectedAthletes.map((athlete, index) => (
-                      <span key={athlete.id}>
-                        <i style={{ background: PLAYER_COLORS[index] }} />
-                        {athlete.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <ComparisonIndexCharts
-                  athletes={selectedAthletes}
-                  sessions={data.sessions}
-                  startDate={data.period.startDate}
-                  endDate={data.period.endDate}
-                />
-              </section>
-            )}
-          </>
-        )}
+        {comparisonBody}
       </div>
+
+      <CsvExportModal
+        isOpen={isExportModalOpen}
+        isExporting={isExporting}
+        onClose={() => setIsExportModalOpen(false)}
+        onExport={(kind) => void handleExportCsv(kind)}
+      />
+      <SessionSelectionModal
+        key={currentSessionIds.join(",")}
+        isOpen={isSessionModalOpen}
+        sessions={availableSessions}
+        selectedIds={currentSessionIds}
+        onClose={() => setIsSessionModalOpen(false)}
+        onApply={handleApplySessionSelection}
+      />
     </main>
   );
 };
