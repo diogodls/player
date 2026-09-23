@@ -15,6 +15,7 @@ import { classNames } from "../../../utils/classNames.ts";
 import { useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext/AuthContext.tsx";
+import { ADMIN_EMAIL } from "../../../constants/admin";
 
 const buttons = [
   {
@@ -66,6 +67,15 @@ const Navbar = () => {
   return (
     <nav className={styles.navbar}>
       <img className={styles.img} src={reactLogo} alt="" />
+      {user?.email === ADMIN_EMAIL && (
+        <button
+          type="button"
+          className={classNames([styles.button, styles.adminButton, location.pathname === '/admin/users' ? styles.active : ''])}
+          onClick={() => navigate('/admin/users')}
+        >
+          Administrar Usuários
+        </button>
+      )}
 
       <div className={styles.buttons}>
         {buttons.map((btn) => {
