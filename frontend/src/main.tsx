@@ -8,6 +8,9 @@ import { CookiesProvider } from 'react-cookie';
 import { ActionsProvider } from './contexts/ActionsContext/ActionsContext.tsx';
 import { AuthProvider } from './contexts/AuthContext/AuthContext.tsx';
 import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute.tsx';
+import AdminRoute from './components/layout/AdminRoute/AdminRoute.tsx';
+
+const AdminUsers = lazy(() => import('./pages/AdminUsers/AdminUsers.tsx'));
 
 const Home = lazy(() => import('./pages/Home/Home.tsx'));
 const CoachDashboard = lazy(
@@ -50,6 +53,9 @@ createRoot(document.getElementById('root')!).render(
                 {/* Rotas protegidas — requerem autenticação */}
                 <Route element={<ProtectedRoute />}>
                   <Route element={<App />}>
+                    <Route element={<AdminRoute />}>
+                      <Route path="/admin/users" element={<AdminUsers />} />
+                    </Route>
                     <Route path="/" element={<Home />} />
                     <Route
                       path="/coach-dashboard"

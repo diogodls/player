@@ -2,6 +2,10 @@ import {
   Body,
   Controller,
   HttpCode,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Put,
   Post,
   Req,
   Res,
@@ -12,6 +16,8 @@ import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { AdminGuard } from './admin.guard';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 const REFRESH_COOKIE_NAME = 'refresh_token';
 const REFRESH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 dias
@@ -19,6 +25,22 @@ const REFRESH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 dias
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get('admin/users')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  listUsers() {
+    return this.authService.listUsers();
+  }
+
+  @Put('admin/users/:id/password')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @HttpCode(204)
+  async updatePassword(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: UpdatePasswordDto,
+  ) {
+    await this.authService.updatePassword(id, dto.password);
+  }
 
   @Post('login')
   @HttpCode(200)
