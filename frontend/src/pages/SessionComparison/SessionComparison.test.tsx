@@ -92,6 +92,9 @@ const comparisonData: SessionComparisonResponse = {
       opponent: "Adversário",
     },
   ],
+  get availableSessions() {
+    return this.sessions;
+  },
   athletes: [
     {
       id: "athlete-1",
@@ -372,7 +375,7 @@ describe("SessionComparison", () => {
     ).toBeDisabled();
   });
 
-  it("shows the explicit single-session state", () => {
+  it("shows the comparison for a single selected session", () => {
     useApiMock.mockReturnValue({
       data: {
         ...comparisonData,
@@ -387,8 +390,6 @@ describe("SessionComparison", () => {
       "/sessions/comparison?startDate=2026-02-15&endDate=2026-02-19",
     );
 
-    expect(
-      screen.getByText("É necessária mais uma sessão"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Resumo dos atletas")).toBeInTheDocument();
   });
 });

@@ -18,6 +18,8 @@ import {
   SessionEntity,
   TaggedActionEntity,
   TeamEntity,
+  CatalogActionEntity,
+  TeamActionContextEntity,
 } from '../entities';
 import type { PlayerRankingResponseDto } from '../players/dto/player-ranking-response.dto';
 import { calculateSessionPlayerPerformances } from '../players/player-statistics.service';
@@ -27,6 +29,10 @@ import {
   PLAYER_ACTION_CATEGORY_KEYS,
 } from '../players/player-performance-actions';
 import { PlayersService } from '../players/players.service';
+import {
+  INDIVIDUAL_ANALYSIS_TYPE_ID,
+  TEAM_ANALYSIS_TYPE_ID,
+} from '../catalog/catalog.constants';
 import {
   classifyTeamCatalogV2Action,
   getTeamCatalogV2Title,
@@ -58,6 +64,14 @@ const NEGATIVE_IMPACT_ID = 2;
 const TEAM_ENTITY_ID = 'team';
 const TEAM_ENTITY_TITLE = 'Equipe';
 
+export type SessionComparisonCsvKind = 'players' | 'team';
+
+type CsvMeasure = {
+  key: string;
+  action: CatalogActionEntity;
+  context?: TeamActionContextEntity | null;
+};
+
 @Injectable()
 export class SessionsService {
   constructor(
@@ -69,12 +83,20 @@ export class SessionsService {
     private readonly taggedActionsRepository: Repository<TaggedActionEntity>,
     private readonly playersService: PlayersService,
     @InjectRepository(PlayerSessionMinutesEntity)
-    private readonly playerSessionMinutesRepository: Repository<PlayerSessionMinutesEntity>,
+    private readonly playerSessionMinutesRepository?: Repository<PlayerSessionMinutesEntity>,
   ) {}
 
-  async findAll(filters?: SessionFiltersDto): Promise<SessionListResponseDto> {
+  async findAll(
+    equipeIdOrFilters?: string | SessionFiltersDto,
+    maybeFilters?: SessionFiltersDto,
+  ): Promise<SessionListResponseDto> {
+    const equipeId =
+      typeof equipeIdOrFilters === 'string' ? equipeIdOrFilters : undefined;
+    const filters =
+      typeof equipeIdOrFilters === 'string' ? maybeFilters : equipeIdOrFilters;
     const limit = filters?.limit ?? 5;
     const where: FindOptionsWhere<SessionEntity> = {
+      ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
       ...(filters?.typeId ? { sessionTypeId: filters.typeId } : {}),
       ...(filters?.locationId ? { sessionLocationId: filters.locationId } : {}),
       ...(filters?.date ? { data: filters.date } : {}),
@@ -104,49 +126,38 @@ export class SessionsService {
     };
   }
 
-  async findOne(id: string): Promise<SessionResponseDto> {
-    return this.toResponse(await this.findEntity(id));
+  async findOne(
+    equipeIdOrId: string,
+    maybeId?: string,
+  ): Promise<SessionResponseDto> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    return this.toResponse(await this.findEntity(equipeId, id));
   }
 
   async compare(
-    filters: SessionComparisonFiltersDto,
+    equipeIdOrFilters: string | SessionComparisonFiltersDto,
+    maybeFilters?: SessionComparisonFiltersDto,
   ): Promise<SessionComparisonResponseDto> {
-    if (filters.startDate >= filters.endDate) {
-      throw new BadRequestException(
-        'Data inicial deve ser anterior a data final',
-      );
-    }
+    const equipeId =
+      typeof equipeIdOrFilters === 'string' ? equipeIdOrFilters : undefined;
+    const filters =
+      typeof equipeIdOrFilters === 'string' ? maybeFilters : equipeIdOrFilters;
+    if (!filters) throw new BadRequestException('Filtros não informados');
+    this.validateComparisonFilters(filters);
 
-    const sessions = await this.sessionsRepository.find({
-      where: {
-        data: Between(filters.startDate, filters.endDate),
-        ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
-      },
-      relations: {
-        sessionType: true,
-      },
-      order: {
-        data: 'ASC',
-        createdAt: 'ASC',
-        id: 'ASC',
-      },
-    });
-
-    const comparisonSessions = sessions.map((session) => {
-      if (!session.sessionType) {
-        throw new Error('Tipo da sessao nao foi carregado');
-      }
-
-      const description = session.descricao ?? null;
-      return {
-        id: session.id,
-        date: this.formatDate(session.data),
-        type: session.sessionType.nome,
-        description,
-        opponent:
-          session.sessionTypeId === SESSION_TYPES.Jogo ? description : null,
-      };
-    });
+    const availableSessions = await this.findComparisonSessions(
+      equipeId,
+      filters,
+      false,
+    );
+    const sessions = this.filterSelectedSessions(availableSessions, filters);
+    const comparisonSessions = sessions.map((session) =>
+      this.toComparisonSession(session),
+    );
+    const availableComparisonSessions = availableSessions.map((session) =>
+      this.toComparisonSession(session),
+    );
 
     if (sessions.length === 0) {
       return {
@@ -156,6 +167,7 @@ export class SessionsService {
           typeId: filters.typeId ?? null,
         },
         sessions: [],
+        availableSessions: availableComparisonSessions,
         athletes: [],
       };
     }
@@ -179,12 +191,14 @@ export class SessionsService {
         timestampSegundos: 'ASC',
       },
     });
-    const minutesRecords = await this.playerSessionMinutesRepository.find({
-      where: {
-        sessionId: In(sessions.map((session) => session.id)),
-        player: { deletedAt: IsNull() },
-      },
-    });
+    const minutesRecords = await this
+      .getPlayerSessionMinutesRepository()
+      .find({
+        where: {
+          sessionId: In(sessions.map((session) => session.id)),
+          player: { deletedAt: IsNull() },
+        },
+      });
 
     return {
       period: {
@@ -193,6 +207,7 @@ export class SessionsService {
         typeId: filters.typeId ?? null,
       },
       sessions: comparisonSessions,
+      availableSessions: availableComparisonSessions,
       athletes: this.buildComparisonAthletes(
         actions,
         sessions.map((session) => session.id),
@@ -201,11 +216,30 @@ export class SessionsService {
     };
   }
 
+  async exportComparisonCsv(
+    equipeId: string,
+    filters: SessionComparisonFiltersDto,
+    kind: SessionComparisonCsvKind,
+  ): Promise<string> {
+    this.validateComparisonFilters(filters);
+    const sessions = await this.findComparisonSessions(equipeId, filters);
+
+    if (kind === 'players') {
+      return this.buildPlayersComparisonCsv(sessions);
+    }
+
+    return this.buildTeamComparisonCsv(sessions);
+  }
+
   async findRanking(
-    id: string,
-    indexKey: string,
+    equipeIdOrId: string,
+    idOrIndexKey: string,
+    maybeIndexKey?: string,
   ): Promise<PlayerRankingResponseDto> {
-    await this.findEntity(id);
+    const equipeId = maybeIndexKey ? equipeIdOrId : undefined;
+    const id = maybeIndexKey ? idOrIndexKey : equipeIdOrId;
+    const indexKey = maybeIndexKey ?? idOrIndexKey;
+    await this.findEntity(equipeId, id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: { jogador: { posicao: true } },
@@ -225,10 +259,15 @@ export class SessionsService {
   }
 
   async findView(
-    id: string,
-    filters: SessionViewFiltersDto = {},
+    equipeIdOrId: string,
+    idOrFilters?: string | SessionViewFiltersDto,
+    maybeFilters: SessionViewFiltersDto = {},
   ): Promise<SessionViewResponseDto> {
-    const session = await this.findEntity(id);
+    const equipeId = typeof idOrFilters === 'string' ? equipeIdOrId : undefined;
+    const id = typeof idOrFilters === 'string' ? idOrFilters : equipeIdOrId;
+    const filters =
+      typeof idOrFilters === 'string' ? maybeFilters : (idOrFilters ?? {});
+    const session = await this.findEntity(equipeId, id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: {
@@ -271,8 +310,12 @@ export class SessionsService {
   }
 
   async findViewFilters(
-    id: string,
+    equipeIdOrId: string,
+    maybeId?: string,
   ): Promise<Record<'individual' | 'team', SessionViewFilterOptionsDto>> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    await this.findEntity(equipeId, id);
     const actions = await this.taggedActionsRepository.find({
       where: { sessaoId: id },
       relations: {
@@ -300,12 +343,19 @@ export class SessionsService {
     };
   }
 
-  async create(dto: SessionDto): Promise<SessionResponseDto> {
+  async create(
+    equipeIdOrDto: string | SessionDto,
+    maybeDto?: SessionDto,
+  ): Promise<SessionResponseDto> {
+    const equipeId =
+      typeof equipeIdOrDto === 'string' ? equipeIdOrDto : undefined;
+    const dto = typeof equipeIdOrDto === 'string' ? maybeDto : equipeIdOrDto;
+    if (!dto) throw new BadRequestException('Dados da sessão não informados');
     if (dto.id !== null) {
       throw new BadRequestException('Id deve ser nulo ao criar uma sessão');
     }
 
-    const team = await this.findTeam();
+    const team = await this.findTeam(equipeId);
     const session = this.sessionsRepository.create({
       equipeId: team.id,
       sessionTypeId: dto.typeId,
@@ -316,18 +366,27 @@ export class SessionsService {
     });
 
     const savedSession = await this.sessionsRepository.save(session);
-    return this.findOne(savedSession.id);
+    return equipeId
+      ? this.findOne(equipeId, savedSession.id)
+      : this.findOne(savedSession.id);
   }
 
-  async update(id: string, dto: UpdateSessionDto): Promise<SessionResponseDto> {
+  async update(
+    equipeIdOrId: string,
+    idOrDto: string | UpdateSessionDto,
+    maybeDto?: UpdateSessionDto,
+  ): Promise<SessionResponseDto> {
+    const equipeId = maybeDto ? equipeIdOrId : undefined;
+    const id = maybeDto ? (idOrDto as string) : equipeIdOrId;
+    const dto = maybeDto ?? (idOrDto as UpdateSessionDto);
     if (dto.id !== id) {
       throw new BadRequestException(
         'Id da sessão deve ser igual ao identificador da rota',
       );
     }
 
-    await this.findEntity(id);
-    await this.sessionsRepository.update(id, {
+    await this.findEntity(equipeId, id);
+    const changes = {
       ...(dto.typeId !== undefined ? { sessionTypeId: dto.typeId } : {}),
       ...(dto.locationId !== undefined
         ? { sessionLocationId: dto.locationId }
@@ -337,17 +396,457 @@ export class SessionsService {
         : {}),
       ...(dto.date !== undefined ? { data: dto.date } : {}),
       ...(dto.description !== undefined ? { descricao: dto.description } : {}),
+    };
+    await this.sessionsRepository.update(
+      equipeId ? { id, equipeId } : id,
+      changes,
+    );
+    return equipeId ? this.findOne(equipeId, id) : this.findOne(id);
+  }
+
+  async remove(equipeIdOrId: string, maybeId?: string): Promise<void> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    await this.sessionsRepository.softRemove(
+      await this.findEntity(equipeId, id),
+    );
+  }
+
+  private validateComparisonFilters(filters: SessionComparisonFiltersDto) {
+    if (!filters) throw new BadRequestException('Filtros não informados');
+    if (filters.startDate > filters.endDate) {
+      throw new BadRequestException(
+        'Data inicial deve ser igual ou anterior a data final',
+      );
+    }
+  }
+
+  private getPlayerSessionMinutesRepository() {
+    if (!this.playerSessionMinutesRepository) {
+      throw new Error('Repositorio de minutagem nao foi carregado');
+    }
+
+    return this.playerSessionMinutesRepository;
+  }
+
+  private findComparisonSessions(
+    equipeId: string | undefined,
+    filters: SessionComparisonFiltersDto,
+    shouldApplySelection = true,
+  ) {
+    return this.sessionsRepository.find({
+      where: {
+        ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
+        data: Between(filters.startDate, filters.endDate),
+        ...(filters.typeId ? { sessionTypeId: filters.typeId } : {}),
+        ...(shouldApplySelection && filters.sessionIds?.length
+          ? { id: In(filters.sessionIds) }
+          : {}),
+      },
+      relations: {
+        equipe: true,
+        sessionType: true,
+        sessionLocation: true,
+        sessionCourtSize: true,
+      },
+      order: {
+        data: 'ASC',
+        createdAt: 'ASC',
+        id: 'ASC',
+      },
     });
-    return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.sessionsRepository.softRemove(await this.findEntity(id));
+  private filterSelectedSessions(
+    sessions: SessionEntity[],
+    filters: SessionComparisonFiltersDto,
+  ) {
+    if (!filters.sessionIds?.length) return sessions;
+    const selectedIds = new Set(filters.sessionIds);
+    return sessions.filter((session) => selectedIds.has(session.id));
   }
 
-  private async findEntity(id: string): Promise<SessionEntity> {
+  private toComparisonSession(session: SessionEntity) {
+    if (!session.sessionType) {
+      throw new Error('Tipo da sessao nao foi carregado');
+    }
+
+    const description = session.descricao ?? null;
+    return {
+      id: session.id,
+      date: this.formatDate(session.data),
+      type: session.sessionType.nome,
+      description,
+      opponent:
+        session.sessionTypeId === SESSION_TYPES.Jogo ? description : null,
+    };
+  }
+
+  private async buildPlayersComparisonCsv(
+    sessions: SessionEntity[],
+  ): Promise<string> {
+    const catalogActions = await this.findCatalogActions(
+      INDIVIDUAL_ANALYSIS_TYPE_ID,
+    );
+    const columns = this.buildCatalogActionColumns(catalogActions);
+    const sessionIds = sessions.map((session) => session.id);
+    const actions = sessionIds.length
+      ? await this.taggedActionsRepository.find({
+          where: {
+            sessaoId: In(sessionIds),
+            jogadorId: Not(IsNull()),
+          },
+          relations: {
+            acaoCatalogo: {
+              categoriaAcao: true,
+              impacto: true,
+            },
+            jogador: {
+              posicao: true,
+            },
+          },
+          order: {
+            sessaoId: 'ASC',
+            timestampSegundos: 'ASC',
+          },
+        })
+      : [];
+    const minutesRecords = sessionIds.length
+      ? await this.getPlayerSessionMinutesRepository().find({
+          where: {
+            sessionId: In(sessionIds),
+            player: { deletedAt: IsNull() },
+          },
+          relations: {
+            player: {
+              posicao: true,
+            },
+          },
+        })
+      : [];
+    const rowsByKey = new Map<
+      string,
+      {
+        session: SessionEntity;
+        player: PlayerEntity;
+        minutes: number;
+        actions: TaggedActionEntity[];
+      }
+    >();
+
+    const ensureRow = (sessionId: string, player: PlayerEntity) => {
+      const session = sessions.find((item) => item.id === sessionId);
+      if (!session) throw new Error('Sessao da exportacao nao encontrada');
+      const key = `${sessionId}:${player.id}`;
+      const current = rowsByKey.get(key);
+      if (current) return current;
+
+      const next = { session, player, minutes: 0, actions: [] };
+      rowsByKey.set(key, next);
+      return next;
+    };
+
+    minutesRecords.forEach((record) => {
+      if (!record.player) return;
+      ensureRow(record.sessionId, record.player).minutes =
+        record.totalSeconds / 60;
+    });
+
+    actions.forEach((action) => {
+      if (!action.jogador || action.jogador.deletedAt) return;
+      ensureRow(action.sessaoId, action.jogador).actions.push(action);
+    });
+
+    const headers = [
+      'session_id',
+      'session_date',
+      'session_type',
+      'session_location',
+      'court_size',
+      'session_description',
+      'player_id',
+      'player_name',
+      'position',
+      'minutes',
+      'total_actions',
+      'positive_actions',
+      'negative_actions',
+      'performance_percentage',
+      ...columns.map((column) => column.key),
+    ];
+    const rows = Array.from(rowsByKey.values())
+      .sort((left, right) =>
+        left.session.data.localeCompare(right.session.data) ||
+        left.player.nome.localeCompare(right.player.nome, 'pt-BR'),
+      )
+      .map(({ session, player, minutes, actions: rowActions }) => {
+        const stats = this.buildStats(rowActions);
+        const actionsByCatalogId = this.countByCatalogAction(rowActions);
+
+        return [
+          session.id,
+          this.formatDate(session.data),
+          session.sessionType?.nome ?? '',
+          session.sessionLocation?.nome ?? '',
+          session.sessionCourtSize?.nome ?? '',
+          session.descricao ?? '',
+          player.id,
+          player.nome,
+          player.posicao?.nome ?? '',
+          this.formatDecimal(minutes),
+          rowActions.length,
+          stats.positive,
+          stats.negative,
+          this.calculatePercentage(stats.positive, stats.total),
+          ...columns.map(
+            (column) => actionsByCatalogId.get(column.action.id) ?? 0,
+          ),
+        ];
+      });
+
+    return this.toCsv(headers, rows);
+  }
+
+  private async buildTeamComparisonCsv(
+    sessions: SessionEntity[],
+  ): Promise<string> {
+    const measures = await this.findTeamCsvMeasures();
+    const sessionIds = sessions.map((session) => session.id);
+    const actions = sessionIds.length
+      ? await this.taggedActionsRepository.find({
+          where: {
+            sessaoId: In(sessionIds),
+            jogadorId: IsNull(),
+          },
+          relations: {
+            acaoCatalogo: {
+              categoriaAcao: true,
+              impacto: true,
+            },
+            contextoAcaoEquipe: true,
+          },
+          order: {
+            sessaoId: 'ASC',
+            timestampSegundos: 'ASC',
+          },
+        })
+      : [];
+    const actionsBySession = new Map<string, TaggedActionEntity[]>();
+    actions.forEach((action) => {
+      const current = actionsBySession.get(action.sessaoId) ?? [];
+      current.push(action);
+      actionsBySession.set(action.sessaoId, current);
+    });
+
+    const headers = [
+      'session_id',
+      'session_date',
+      'session_type',
+      'session_location',
+      'court_size',
+      'session_description',
+      'total_actions',
+      'positive_actions',
+      'negative_actions',
+      'performance_percentage',
+      ...measures.map((measure) => measure.key),
+    ];
+    const rows = sessions.map((session) => {
+      const sessionActions = actionsBySession.get(session.id) ?? [];
+      const stats = this.buildStats(sessionActions);
+      const counts = this.countByTeamMeasure(sessionActions);
+
+      return [
+        session.id,
+        this.formatDate(session.data),
+        session.sessionType?.nome ?? '',
+        session.sessionLocation?.nome ?? '',
+        session.sessionCourtSize?.nome ?? '',
+        session.descricao ?? '',
+        stats.total,
+        stats.positive,
+        stats.negative,
+        this.calculatePercentage(stats.positive, stats.total),
+        ...measures.map((measure) => counts.get(measure.key) ?? 0),
+      ];
+    });
+
+    return this.toCsv(headers, rows);
+  }
+
+  private async findCatalogActions(analysisTypeId: number) {
+    const repository =
+      this.taggedActionsRepository.manager.getRepository(CatalogActionEntity);
+    return repository.find({
+      where: {
+        deletedAt: IsNull(),
+        categoriaAcao: {
+          tipoAnaliseId: analysisTypeId,
+          deletedAt: IsNull(),
+        },
+      },
+      relations: {
+        categoriaAcao: true,
+        impacto: true,
+      },
+      order: {
+        categoriaAcao: {
+          ordem: 'ASC',
+          nome: 'ASC',
+        },
+        ordem: 'ASC',
+        nome: 'ASC',
+      },
+    });
+  }
+
+  private async findTeamCsvMeasures(): Promise<CsvMeasure[]> {
+    const catalogActions = await this.findCatalogActions(TEAM_ANALYSIS_TYPE_ID);
+    const contextsRepository =
+      this.taggedActionsRepository.manager.getRepository(
+        TeamActionContextEntity,
+      );
+    const contexts = await contextsRepository.find({
+      where: {
+        categoriaAcao: {
+          tipoAnaliseId: TEAM_ANALYSIS_TYPE_ID,
+          deletedAt: IsNull(),
+        },
+      },
+      relations: {
+        categoriaAcao: true,
+      },
+      order: {
+        categoriaAcao: {
+          ordem: 'ASC',
+          nome: 'ASC',
+        },
+        ordem: 'ASC',
+        nome: 'ASC',
+      },
+    });
+    const contextsByCategory = new Map<string, TeamActionContextEntity[]>();
+    contexts.forEach((context) => {
+      const current = contextsByCategory.get(context.categoriaAcaoId) ?? [];
+      current.push(context);
+      contextsByCategory.set(context.categoriaAcaoId, current);
+    });
+
+    return catalogActions.flatMap<CsvMeasure>((action) => {
+      const categoryKey = action.categoriaAcao?.chave;
+      if (!isTeamCatalogV2CategoryKey(categoryKey)) {
+        return [
+          {
+            key: this.buildTeamMeasureKey(action, null),
+            action,
+            context: null,
+          },
+        ];
+      }
+
+      return (contextsByCategory.get(action.categoriaAcaoId) ?? []).map(
+        (context) => ({
+          key: this.buildTeamMeasureKey(action, context),
+          action,
+          context,
+        }),
+      );
+    });
+  }
+
+  private buildCatalogActionColumns(actions: CatalogActionEntity[]) {
+    const keyCounts = new Map<string, number>();
+    const baseKeys = actions.map((action) =>
+      this.normalizeCsvColumnName(action.sigla || action.nome),
+    );
+    baseKeys.forEach((key) => keyCounts.set(key, (keyCounts.get(key) ?? 0) + 1));
+
+    return actions.map((action, index) => {
+      const baseKey = baseKeys[index];
+      const key =
+        (keyCounts.get(baseKey) ?? 0) > 1
+          ? `${this.normalizeCsvColumnName(
+              action.categoriaAcao?.chave ??
+                action.categoriaAcao?.nome ??
+                'acao',
+            )}_${baseKey}`
+          : baseKey;
+
+      return { key, action };
+    });
+  }
+
+  private countByCatalogAction(actions: TaggedActionEntity[]) {
+    const counts = new Map<string, number>();
+    actions.forEach((action) => {
+      counts.set(
+        action.acaoCatalogoId,
+        (counts.get(action.acaoCatalogoId) ?? 0) + 1,
+      );
+    });
+    return counts;
+  }
+
+  private countByTeamMeasure(actions: TaggedActionEntity[]) {
+    const counts = new Map<string, number>();
+    actions.forEach((action) => {
+      if (!action.acaoCatalogo) return;
+      const key = this.buildTeamMeasureKey(
+        action.acaoCatalogo,
+        action.contextoAcaoEquipe ?? null,
+      );
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    });
+    return counts;
+  }
+
+  private buildTeamMeasureKey(
+    action: CatalogActionEntity,
+    context: TeamActionContextEntity | null,
+  ) {
+    const categoryKey = action.categoriaAcao?.chave;
+    const prefix = isTeamCatalogV2CategoryKey(categoryKey)
+      ? (context?.chave ?? categoryKey ?? action.categoriaAcao?.nome ?? 'equipe')
+      : (categoryKey ?? action.categoriaAcao?.nome ?? 'equipe');
+
+    return `${this.normalizeCsvColumnName(prefix)}_${this.normalizeCsvColumnName(
+      action.sigla || action.nome,
+    )}`;
+  }
+
+  private normalizeCsvColumnName(value: string) {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toLowerCase();
+  }
+
+  private formatDecimal(value: number) {
+    return Number.isInteger(value) ? String(value) : value.toFixed(2);
+  }
+
+  private toCsv(headers: string[], rows: Array<Array<string | number>>) {
+    return [headers, ...rows]
+      .map((row) => row.map((value) => this.escapeCsv(value)).join(','))
+      .join('\n');
+  }
+
+  private escapeCsv(value: string | number) {
+    const text = String(value);
+    return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  private async findEntity(
+    equipeId: string | undefined,
+    id: string,
+  ): Promise<SessionEntity> {
     const session = await this.sessionsRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
+      },
       relations: {
         equipe: true,
         sessionType: true,
@@ -361,8 +860,11 @@ export class SessionsService {
     return session;
   }
 
-  private async findTeam(): Promise<TeamEntity> {
-    const [team] = await this.teamsRepository.find({ take: 1 });
+  private async findTeam(equipeId?: string): Promise<TeamEntity> {
+    const [team] = await this.teamsRepository.find({
+      ...(equipeId ? { where: { id: equipeId } } : {}),
+      take: 1,
+    });
 
     if (!team) {
       throw new BadRequestException('Equipe nao encontrada');
