@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -97,6 +98,40 @@ export class AuthService {
 
   async logout(userId: string): Promise<void> {
     await this.userRepo.update(userId, { refreshTokenHash: null });
+  }
+
+  async listUsers() {
+    const users = await this.userRepo.find({
+      select: {
+        id: true,
+        email: true,
+        equipeId: true,
+        equipe: { id: true, nome: true },
+      },
+      relations: { equipe: true },
+      order: { email: 'ASC' },
+    });
+    return users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      equipeId: user.equipeId,
+      equipeNome: user.equipe?.nome ?? null,
+    }));
+  }
+
+  async updatePassword(id: string, password: string): Promise<void> {
+    const user = await this.userRepo.findOne({
+      where: { id },
+      select: { id: true },
+    });
+    if (!user) throw new NotFoundException('Usuário não encontrado.');
+    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    const result = await this.userRepo.update(id, {
+      passwordHash,
+      refreshTokenHash: null,
+    });
+    if (!result.affected)
+      throw new NotFoundException('Usuário não encontrado.');
   }
 
   /**
