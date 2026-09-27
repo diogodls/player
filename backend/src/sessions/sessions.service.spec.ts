@@ -1,9 +1,12 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import {
+  CatalogActionEntity,
   PlayerEntity,
+  PlayerSessionMinutesEntity,
   SessionEntity,
   TaggedActionEntity,
+  TeamActionContextEntity,
   TeamEntity,
 } from '../entities';
 import { PlayersService } from '../players/players.service';
@@ -951,6 +954,189 @@ describe('SessionsService id validation', () => {
       { value: 'positive', label: 'Positivas' },
       { value: 'negative', label: 'Negativas' },
     ]);
+  });
+});
+
+describe('SessionsService CSV exports', () => {
+  const player = {
+    id: 'player-1',
+    nome: 'Ana',
+    deletedAt: null,
+    posicao: { id: 1, nome: 'Ala' },
+  } as PlayerEntity;
+  const individualCategory = {
+    id: 'individual-category',
+    nome: 'Acoes ofensivas',
+    chave: 'OFFENSIVE_ACTIONS',
+    tipoAnaliseId: 1,
+  };
+  const teamCategory = {
+    id: 'team-category',
+    nome: 'Ataque',
+    chave: 'TEAM_V2_ATTACK',
+    tipoAnaliseId: 2,
+  };
+  const catalogAction = (
+    id: string,
+    sigla: string,
+    nome: string,
+    category = individualCategory,
+    impactoId = 1,
+  ) =>
+    ({
+      id,
+      sigla,
+      nome,
+      impactoId,
+      categoriaAcaoId: category.id,
+      categoriaAcao: category,
+    }) as CatalogActionEntity;
+  const context = {
+    id: 'context-1',
+    categoriaAcaoId: teamCategory.id,
+    chave: 'POSITIONAL_ATTACK',
+    nome: 'Ataque posicional',
+    ordem: 1,
+  } as TeamActionContextEntity;
+
+  function setup({
+    catalogActions,
+    contexts = [],
+    taggedActions = [],
+    minutesRecords = [],
+  }: {
+    catalogActions: CatalogActionEntity[];
+    contexts?: TeamActionContextEntity[];
+    taggedActions?: TaggedActionEntity[];
+    minutesRecords?: PlayerSessionMinutesEntity[];
+  }) {
+    const session = buildSession();
+    const getRepository = jest.fn((entity) => {
+      if (entity === CatalogActionEntity) {
+        return { find: jest.fn().mockResolvedValue(catalogActions) };
+      }
+      if (entity === TeamActionContextEntity) {
+        return { find: jest.fn().mockResolvedValue(contexts) };
+      }
+      throw new Error('Repositorio inesperado');
+    });
+    const sessionsRepository = {
+      find: jest.fn().mockResolvedValue([session]),
+    } as unknown as Repository<SessionEntity>;
+    const taggedActionsRepository = {
+      find: jest.fn().mockResolvedValue(taggedActions),
+      manager: { getRepository },
+    } as unknown as Repository<TaggedActionEntity>;
+    const minutesRepository = {
+      find: jest.fn().mockResolvedValue(minutesRecords),
+    } as unknown as Repository<PlayerSessionMinutesEntity>;
+    const service = new SessionsService(
+      sessionsRepository,
+      {} as Repository<TeamEntity>,
+      taggedActionsRepository,
+      playersServiceMock,
+      minutesRepository,
+    );
+
+    return { service };
+  }
+
+  it('exports a player/session matrix with every individual catalog action', async () => {
+    const goal = catalogAction('goal', 'GM', 'Gol marcado');
+    const assist = catalogAction('assist', 'ASS', 'Assistencia');
+    const taggedActions = [
+      {
+        ...buildTaggedAction({
+          id: 'action-1',
+          playerId: player.id,
+          playerName: player.nome,
+          title: goal.nome,
+          categoryName: individualCategory.nome,
+          categoryKey: individualCategory.chave,
+          acronym: goal.sigla,
+          impactId: 1,
+          seconds: 10,
+        }),
+        acaoCatalogoId: goal.id,
+        acaoCatalogo: goal,
+        jogador: player,
+      },
+      {
+        ...buildTaggedAction({
+          id: 'action-2',
+          playerId: player.id,
+          playerName: player.nome,
+          title: assist.nome,
+          categoryName: individualCategory.nome,
+          categoryKey: individualCategory.chave,
+          acronym: assist.sigla,
+          impactId: 1,
+          seconds: 20,
+        }),
+        acaoCatalogoId: assist.id,
+        acaoCatalogo: assist,
+        jogador: player,
+      },
+    ] as TaggedActionEntity[];
+    const { service } = setup({
+      catalogActions: [goal, assist],
+      taggedActions,
+      minutesRecords: [
+        {
+          sessionId: SESSION_ID,
+          playerId: player.id,
+          player,
+          totalSeconds: 750,
+        } as PlayerSessionMinutesEntity,
+      ],
+    });
+
+    const csv = await service.exportComparisonCsv(
+      TEAM_ID,
+      { startDate: '2026-08-01', endDate: '2026-08-31' },
+      'players',
+    );
+
+    expect(csv.split('\n')[0]).toContain('gm,ass');
+    expect(csv).toContain(',Ana,Ala,12.50,2,2,0,100,1,1');
+  });
+
+  it('exports team actions by contextual measure', async () => {
+    const shot = catalogAction(
+      'shot',
+      'AT_FINALIZACAO',
+      'Finalizacao',
+      teamCategory,
+    );
+    const taggedAction = {
+      ...buildTaggedAction({
+        id: 'team-action',
+        title: shot.nome,
+        categoryName: teamCategory.nome,
+        categoryKey: teamCategory.chave,
+        acronym: shot.sigla,
+        impactId: 1,
+        seconds: 40,
+      }),
+      acaoCatalogoId: shot.id,
+      acaoCatalogo: shot,
+      contextoAcaoEquipeId: context.id,
+      contextoAcaoEquipe: context,
+    } as TaggedActionEntity;
+    const { service } = setup({
+      catalogActions: [shot],
+      contexts: [context],
+      taggedActions: [taggedAction],
+    });
+
+    const csv = await service.exportComparisonCsv(
+      TEAM_ID,
+      { startDate: '2026-08-01', endDate: '2026-08-31' },
+      'team',
+    );
+
+    expect(csv.split('\n')[0]).toContain('positional_attack_at_finalizacao');
+    expect(csv).toContain(',1,1,0,100,1');
   });
 });
 

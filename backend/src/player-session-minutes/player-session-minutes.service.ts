@@ -25,8 +25,16 @@ export class PlayerSessionMinutesService {
     private readonly playersRepository: Repository<PlayerEntity>,
   ) {}
 
-  async findAll(sessionId: string): Promise<PlayerSessionMinutesResponseDto[]> {
-    const session = await this.sessionsRepository.findOneBy({ id: sessionId });
+  async findAll(
+    equipeIdOrSessionId: string,
+    maybeSessionId?: string,
+  ): Promise<PlayerSessionMinutesResponseDto[]> {
+    const equipeId = maybeSessionId ? equipeIdOrSessionId : undefined;
+    const sessionId = maybeSessionId ?? equipeIdOrSessionId;
+    const session = await this.sessionsRepository.findOneBy({
+      id: sessionId,
+      ...(equipeId ? { equipeId } : {}),
+    });
     if (!session) throw new NotFoundException('Sessão não encontrada');
 
     const [players, records] = await Promise.all([
@@ -48,12 +56,18 @@ export class PlayerSessionMinutesService {
   }
 
   async update(
-    sessionId: string,
-    playerId: string,
-    dto: UpdatePlayerSessionMinutesDto,
+    equipeIdOrSessionId: string,
+    sessionIdOrPlayerId: string,
+    playerIdOrDto: string | UpdatePlayerSessionMinutesDto,
+    maybeDto?: UpdatePlayerSessionMinutesDto,
   ): Promise<PlayerSessionMinutesResponseDto> {
+    const equipeId = maybeDto ? equipeIdOrSessionId : undefined;
+    const sessionId = maybeDto ? sessionIdOrPlayerId : equipeIdOrSessionId;
+    const playerId = maybeDto ? (playerIdOrDto as string) : sessionIdOrPlayerId;
+    const dto = maybeDto ?? (playerIdOrDto as UpdatePlayerSessionMinutesDto);
     this.validateTotalSeconds(dto.totalSeconds);
     return this.withLockedRecord(
+      equipeId,
       sessionId,
       playerId,
       async (record, player, manager) => {
@@ -69,10 +83,15 @@ export class PlayerSessionMinutesService {
   }
 
   async start(
-    sessionId: string,
-    playerId: string,
+    equipeIdOrSessionId: string,
+    sessionIdOrPlayerId: string,
+    maybePlayerId?: string,
   ): Promise<PlayerSessionMinutesResponseDto> {
+    const equipeId = maybePlayerId ? equipeIdOrSessionId : undefined;
+    const sessionId = maybePlayerId ? sessionIdOrPlayerId : equipeIdOrSessionId;
+    const playerId = maybePlayerId ?? sessionIdOrPlayerId;
     return this.withLockedRecord(
+      equipeId,
       sessionId,
       playerId,
       async (record, player, manager) => {
@@ -86,10 +105,15 @@ export class PlayerSessionMinutesService {
   }
 
   async stop(
-    sessionId: string,
-    playerId: string,
+    equipeIdOrSessionId: string,
+    sessionIdOrPlayerId: string,
+    maybePlayerId?: string,
   ): Promise<PlayerSessionMinutesResponseDto> {
+    const equipeId = maybePlayerId ? equipeIdOrSessionId : undefined;
+    const sessionId = maybePlayerId ? sessionIdOrPlayerId : equipeIdOrSessionId;
+    const playerId = maybePlayerId ?? sessionIdOrPlayerId;
     return this.withLockedRecord(
+      equipeId,
       sessionId,
       playerId,
       async (record, player, manager) => {
@@ -108,6 +132,7 @@ export class PlayerSessionMinutesService {
   }
 
   private async withLockedRecord<T>(
+    equipeId: string | undefined,
     sessionId: string,
     playerId: string,
     operation: (
@@ -119,6 +144,7 @@ export class PlayerSessionMinutesService {
     return this.minutesRepository.manager.transaction(async (manager) => {
       const player = await this.validateSessionAndPlayer(
         manager,
+        equipeId,
         sessionId,
         playerId,
       );
@@ -140,10 +166,14 @@ export class PlayerSessionMinutesService {
 
   private async validateSessionAndPlayer(
     manager: EntityManager,
+    equipeId: string | undefined,
     sessionId: string,
     playerId: string,
   ): Promise<PlayerEntity> {
-    const session = await manager.findOneBy(SessionEntity, { id: sessionId });
+    const session = await manager.findOneBy(SessionEntity, {
+      id: sessionId,
+      ...(equipeId ? { equipeId } : {}),
+    });
     if (!session) throw new NotFoundException('Sessão não encontrada');
     const player = await manager.findOne(PlayerEntity, {
       where: { id: playerId },

@@ -333,8 +333,15 @@ export class CoachDashboardService {
   ) {}
 
   async getDashboard(
-    filters: CoachDashboardFiltersDto = {},
+    equipeIdOrFilters?: string | CoachDashboardFiltersDto,
+    maybeFilters?: CoachDashboardFiltersDto,
   ): Promise<CoachDashboardResponseDto> {
+    const equipeId =
+      typeof equipeIdOrFilters === 'string' ? equipeIdOrFilters : undefined;
+    const filters =
+      typeof equipeIdOrFilters === 'string'
+        ? (maybeFilters ?? {})
+        : (equipeIdOrFilters ?? {});
     if (
       filters.startDate &&
       filters.endDate &&
@@ -344,7 +351,10 @@ export class CoachDashboardService {
         'Data inicial deve ser anterior à data final',
       );
     }
-    const [team] = await this.teamsRepository.find({ take: 1 });
+    const [team] = await this.teamsRepository.find({
+      ...(equipeId ? { where: { id: equipeId } } : {}),
+      take: 1,
+    });
     if (!team) throw new BadRequestException('Equipe não encontrada');
     const [counts, players] = await Promise.all([
       this.findCollectiveActionCounts(team.id, filters),

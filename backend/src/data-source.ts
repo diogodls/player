@@ -15,6 +15,7 @@ import {
   TaggedActionEntity,
   TeamActionContextEntity,
   TeamEntity,
+  UserEntity,
 } from './entities';
 
 export const databaseEntities = [
@@ -33,6 +34,7 @@ export const databaseEntities = [
   CatalogActionEntity,
   TeamActionContextEntity,
   TaggedActionEntity,
+  UserEntity,
 ];
 
 export default new DataSource({

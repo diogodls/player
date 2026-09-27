@@ -65,9 +65,17 @@ export class PlayersService {
     private readonly playerStatisticsService: PlayerStatisticsService,
   ) {}
 
-  async findAll(filters?: PlayerFiltersDto): Promise<PlayerListResponseDto> {
+  async findAll(
+    equipeIdOrFilters?: string | PlayerFiltersDto,
+    maybeFilters?: PlayerFiltersDto,
+  ): Promise<PlayerListResponseDto> {
+    const equipeId =
+      typeof equipeIdOrFilters === 'string' ? equipeIdOrFilters : undefined;
+    const filters =
+      typeof equipeIdOrFilters === 'string' ? maybeFilters : equipeIdOrFilters;
     const limit = filters?.limit ?? 8;
     const where = {
+      ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
       ...(filters?.name ? { nome: ILike(`%${filters.name}%`) } : {}),
       ...(filters?.positionId ? { posicaoId: filters.positionId } : {}),
     };
@@ -101,10 +109,15 @@ export class PlayersService {
     };
   }
 
-  async findOne(id: string): Promise<PlayerResponseDto> {
-    const player = await this.findEntity(id);
+  async findOne(
+    equipeIdOrId: string,
+    maybeId?: string,
+  ): Promise<PlayerResponseDto> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    const player = await this.findEntity(equipeId, id);
     const performances = await this.playerStatisticsService.findByTeamId(
-      player.equipeId,
+      equipeId ?? player.equipeId,
       undefined,
       undefined,
       player.id,
@@ -156,14 +169,25 @@ export class PlayersService {
   }
 
   async findRanking(
-    indexKey: string,
-    filters: { sessionId?: string; startDate?: string; endDate?: string } = {},
+    equipeIdOrIndexKey: string,
+    maybeIndexKeyOrFilters:
+      | string
+      | { sessionId?: string; startDate?: string; endDate?: string } = {},
+    maybeFilters: {
+      sessionId?: string;
+      startDate?: string;
+      endDate?: string;
+    } = {},
   ): Promise<PlayerRankingResponseDto> {
+    const hasEquipeId = typeof maybeIndexKeyOrFilters === 'string';
+    const equipeId = hasEquipeId ? equipeIdOrIndexKey : undefined;
+    const indexKey = hasEquipeId ? maybeIndexKeyOrFilters : equipeIdOrIndexKey;
+    const filters = hasEquipeId ? maybeFilters : maybeIndexKeyOrFilters;
     const rankingKey = indexKey as PlayerRankingKey;
     const rule = PlayersService.INDEX_RANKING_RULES[rankingKey];
     if (!rule) throw new BadRequestException('Índice de ranking inválido');
 
-    const players = await this.findActiveRankingPlayers();
+    const players = await this.findActiveRankingPlayers(equipeId);
     return this.buildRankingForPlayers(players, rankingKey, filters.sessionId, {
       startDate: filters.startDate,
       endDate: filters.endDate,
@@ -328,12 +352,19 @@ export class PlayersService {
     return this.calculateOverallAndRatings(players, statisticsBySession)
       .ratingsByPlayer;
   }
-  async create(dto: PlayerDto): Promise<PlayerResponseDto> {
+  async create(
+    equipeIdOrDto: string | PlayerDto,
+    maybeDto?: PlayerDto,
+  ): Promise<PlayerResponseDto> {
+    const equipeId =
+      typeof equipeIdOrDto === 'string' ? equipeIdOrDto : undefined;
+    const dto = typeof equipeIdOrDto === 'string' ? maybeDto : equipeIdOrDto;
+    if (!dto) throw new BadRequestException('Dados do jogador não informados');
     if (dto.id !== null) {
       throw new BadRequestException('Id deve ser nulo ao criar um jogador');
     }
 
-    const team = await this.findTeam();
+    const team = await this.findTeam(equipeId);
 
     const player = this.playersRepository.create({
       nome: dto.name,
@@ -344,17 +375,26 @@ export class PlayersService {
     });
 
     const savedPlayer = await this.playersRepository.save(player);
-    return this.findOne(savedPlayer.id);
+    return equipeId
+      ? this.findOne(equipeId, savedPlayer.id)
+      : this.findOne(savedPlayer.id);
   }
 
-  async update(id: string, dto: PlayerDto): Promise<PlayerResponseDto> {
+  async update(
+    equipeIdOrId: string,
+    idOrDto: string | PlayerDto,
+    maybeDto?: PlayerDto,
+  ): Promise<PlayerResponseDto> {
+    const equipeId = maybeDto ? equipeIdOrId : undefined;
+    const id = maybeDto ? (idOrDto as string) : equipeIdOrId;
+    const dto = maybeDto ?? (idOrDto as PlayerDto);
     if (dto.id !== id) {
       throw new BadRequestException(
         'Id do jogador deve ser igual ao identificador da rota',
       );
     }
 
-    await this.findEntity(id);
+    await this.findEntity(equipeId, id);
 
     const changes: Partial<PlayerEntity> = {};
     if (dto.name !== undefined) changes.nome = dto.name;
@@ -364,18 +404,31 @@ export class PlayersService {
       changes.ladoPreferencialId = dto.preferredSideId;
     }
     if (Object.keys(changes).length > 0) {
-      await this.playersRepository.update(id, changes);
+      await this.playersRepository.update(
+        equipeId ? { id, equipeId } : { id },
+        changes,
+      );
     }
-    return this.findOne(id);
+    return equipeId ? this.findOne(equipeId, id) : this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.playersRepository.softRemove(await this.findEntity(id));
+  async remove(equipeIdOrId: string, maybeId?: string): Promise<void> {
+    const equipeId = maybeId ? equipeIdOrId : undefined;
+    const id = maybeId ?? equipeIdOrId;
+    await this.playersRepository.softRemove(
+      await this.findEntity(equipeId, id),
+    );
   }
 
-  private async findEntity(id: string): Promise<PlayerEntity> {
+  private async findEntity(
+    equipeId: string | undefined,
+    id: string,
+  ): Promise<PlayerEntity> {
     const player = await this.playersRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        ...(equipeId ? { equipeId, deletedAt: IsNull() } : {}),
+      },
       relations: {
         equipe: true,
         posicao: true,
@@ -396,9 +449,11 @@ export class PlayersService {
     return performance && performance.minutes > 0 ? performance.indexes : null;
   }
 
-  private async findActiveRankingPlayers(): Promise<PlayerEntity[]> {
+  private async findActiveRankingPlayers(
+    equipeId?: string,
+  ): Promise<PlayerEntity[]> {
     const players = await this.playersRepository.find({
-      where: { deletedAt: IsNull() },
+      where: { ...(equipeId ? { equipeId } : {}), deletedAt: IsNull() },
       relations: { posicao: true },
     });
     return players.filter((player) => player.deletedAt == null);
@@ -526,8 +581,11 @@ export class PlayersService {
       return { position, ...item };
     });
   }
-  private async findTeam(): Promise<TeamEntity> {
-    const [team] = await this.teamsRepository.find({ take: 1 });
+  private async findTeam(equipeId?: string): Promise<TeamEntity> {
+    const [team] = await this.teamsRepository.find({
+      ...(equipeId ? { where: { id: equipeId } } : {}),
+      take: 1,
+    });
 
     if (!team) {
       throw new BadRequestException('Equipe não encontrada');
